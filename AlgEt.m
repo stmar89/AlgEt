@@ -68,7 +68,14 @@ intrinsic NumberFields(A::AlgEt) -> SeqEnum
 end intrinsic;
 
 
+//------------
+// Access attributes
+//------------
 
+intrinsic 'eq'(A1::AlgEt,A2::AlgEt) -> BoolElt
+{A1 eq A2}
+   return A1 cmpeq A2;
+end intrinsic;
 
 /*
 
@@ -176,6 +183,5 @@ end intrinsic;
 
     A:=EtaleAlgebra([NumberField(p),NumberField(x^2-5)]);
     A;
-
 
 */

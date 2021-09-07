@@ -1,37 +1,28 @@
 /* vim: set syntax=magma :*/
 
-freeze;
+//freeze;
 
 /////////////////////////////////////////////////////
 // Stefano Marseglia, Utrecht University, s.marseglia@uu.nl
 // http://www.staff.science.uu.nl/~marse004/
 /////////////////////////////////////////////////////
 
-declare verbose ?????, 1;
+declare verbose AlgEtElt, 1;
 
 /*TODO:
 
 */
 
-// THIS IS A TEMPLATE
+declare attributes AlgEtElt : Algebra, // AlgEt
+                              Coordinates; // Tup
 
 //------------
-// What do we do here?
-//------------
-
-intrinsic ???(???::???) -> ???
-{???}
-  return ???;
-end intrinsic;
-
-
-//------------
-// Creation and Printig for AlgEtElt
+// Printing for AlgEtElt
 //------------
 
 intrinsic Print(x::AlgEtElt)
-{?}
-    printf "%o", ?;
+{Print the AlgEtElt.}
+    printf "%o", Coordinates(x);
 end intrinsic;
 
 //------------
@@ -39,8 +30,18 @@ end intrinsic;
 //------------
 
 intrinsic Parent(x::AlgEtElt) -> AlgEt
-{returns the underlying etale algebra of A}
+{Returns the algebra to which the elemenet belongs to.}
   return x`Algebra;
+end intrinsic;
+
+intrinsic Algebra(x::AlgEtElt) -> AlgEt
+{Returns the algebra to which the elemenet belongs to.}
+  return x`Algebra;
+end intrinsic;
+
+intrinsic Coordinates(x::AlgEtElt) -> SeqEnum
+{Given an element x returns its coordinates, which are elements of number fields.}
+  return x`Coordinates;
 end intrinsic;
 
 //------------
@@ -48,35 +49,230 @@ end intrinsic;
 //------------
 
 intrinsic IsCoercible(A::AlgEt, x::.) -> BoolElt, .
-{Return whether x is coercible into A and the result if so}
+{Return whether x is coercible into A and the result of the coercion if so.}
     if Parent(x) cmpeq A then
         return true,x;
-    elif Type(x) eq FldNumElt or Type(x) eq RngIntElt or Type(x) eq FldRatElt then
-// TODO
+    elif Type(x) in {List,Tup,SeqEnum} and forall{i : i in [1..#x] | IsCoercible(NumberFields(A)[i],x[i])} then 
         x1:=New(AlgEtElt);
         x1`Algebra:=A;
-        x1`AlgAssElt:=AssAlgebra(A) ! x;
-        return true, x1;
+        x1`Coordinates:=<x[i]:i in [1..#x]>;
+        return true,x1;
+    elif Type(x) eq RngIntElt or Type(x) eq FldRatElt then
+        x1:=New(AlgEtElt);
+        x1`Algebra:=A;
+        x1`Coordinates:=<x:i in [1..#NumberFields(A)]>; //diagonal embedding
+        return true,x1;
     else 
-      return false,_;
+        return false,_;
     end if;
 end intrinsic;
 
-intrinsic '!'(A::AlgEt,x::AlgAssElt) -> AlgEtElt
-{ given an etale algebra A and an element x of the underlying Associtive Algebra coerces x in A}
+intrinsic '!'(A::AlgEt, x::.) -> AlgEtElt
+{Coerce x into A.}
     bool,x:=IsCoercible(A,x);
-    error if not bool, "the element cannot be coerced in the algebra";
+    require bool : "The element cannot be coerced in the algebra.";
     return x;
 end intrinsic;
 
-//CONTINUE FROM HERE
+//------------
+// Basic and Random elements
+//------------
 
-
-
-intrinsic Algebra(x::AlgEtElt) -> AlgEt
-{returns the underlying etale algebra of A}
-  return x`Algebra;
+intrinsic One(A::AlgEt) -> AlgEtElt
+{The multiplicative neutral element of A.}   
+    return A![1 : i in [1..#NumberFields(A)]];
 end intrinsic;
+
+intrinsic Zero(A::AlgEt) -> AlgEtElt
+{The additive neutral element of A.}   
+    return A![0 : i in [1..#NumberFields(A)]];
+end intrinsic;
+
+intrinsic IsUnit(x::AlgEtElt) -> BoolElt
+{Returns wheter x is a unit in A.}   
+    return forall{ c : c in Coordinates(x) | c ne 0};
+end intrinsic;
+
+intrinsic IsZeroDivisor(x::AlgEtElt) -> BoolElt
+{Returns wheter x is a not unit in A.}   
+    return not IsUnit(x);
+end intrinsic;
+
+//kept for retro-compatbility
+intrinsic IsZeroDivisor2(x::AlgEtElt) -> BoolElt
+{Returns wheter x is a not unit in A.}   
+    return not IsUnit(x);
+end intrinsic;
+
+intrinsic Random(A::AlgEt , bd::RngIntElt) -> AlgEtElt
+{Random element of A. The Coefficients are bounded by the positive integer bd.}   
+    require bd gt 0 : "The bound needs to be a positive integer.";
+    nf:=NumberFields(A);
+    require forall{E:E in nf | BaseRing(E) eq Rationals() } : "The function works only for product of absolute number fiedls'" ;
+    num:=A!< E!Random(EquationOrder(E),bd) : E in nf>;
+    repeat
+        den:=A!< E!Random(EquationOrder(E),bd) : E in nf>;
+    until IsUnit(den);
+    return num/den;
+end intrinsic;
+
+intrinsic RandomUnit(A::AlgEt , bd::RngIntElt) -> AlgEtElt
+{Random unit of A. The Coefficients are bounded by the positive integer bd.}   
+    require bd gt 0 : "The bound needs to be a positive integer.";
+    nf:=NumberFields(A);
+    require forall{E:E in nf | BaseRing(E) eq Rationals() } : "The function works only for product of absolute number fiedls'" ;
+    repeat
+        num:=A!< E!Random(EquationOrder(E),bd) : E in nf>;
+        den:=A!< E!Random(EquationOrder(E),bd) : E in nf>;
+    until IsUnit(den) and IsUnit(num);
+    return num/den;
+end intrinsic;
+
+//------------
+// Equality and Operations
+//------------
+
+intrinsic 'eq'(x1::AlgEtElt,x2::AlgEtElt) -> BoolElt
+{Is x1=x2 ?}
+    A:=Parent(x1);
+    require A cmpeq Parent(x2): "The elements must belong to the same algebra.";
+    return Coordinates(x1) eq Coordinates(x2);
+end intrinsic;
+
+intrinsic 'eq'(x1::.,x2::AlgEtElt) -> BoolElt
+{Is x1=x2 ?}
+    bool,x1:=IsCoercible(Algebra(x2),x1);
+    require bool : "x1 not coercible";
+    return x1 = x2;
+    end intrinsic;
+
+intrinsic 'eq'(x1::AlgEtElt,x2::.) -> BoolElt
+{Is x1=x2 ?}
+    bool,x2:=IsCoercible(Algebra(x2),x1);
+    require bool : "x2 not coercible";
+    return x1 = x2;
+end intrinsic;
+
+intrinsic '+'(x1::AlgEtElt,x2::AlgEtElt) -> AlgEtElt
+{x1+x2}
+    A:=Parent(x1);
+    require A cmpeq Parent(x2): "The elements must belong to the same algebra.";
+    x3:=A!< Coordinates(x1)[i] + Coordinates(x2)[i] : i in [1..#NumberFields(A)] >;
+    return x3;
+end intrinsic;
+
+intrinsic '+'(x1::.,x2::AlgEtElt) -> AlgEtElt
+{x1+x2}
+    bool,x1:=IsCoercible(Algebra(x2),x1);
+    require bool : "x1 not coercible";
+    return x1 + x2;
+end intrinsic;
+
+intrinsic '+'(x1::AlgEtElt,x2::.) -> AlgEtElt
+{x1+x2}
+    bool,x2:=IsCoercible(Algebra(x2),x1);
+    require bool : "x2 not coercible";
+    return x1 + x2;
+end intrinsic;
+
+intrinsic '-'(x::AlgEtElt) -> AlgEtElt
+{-x}
+    A:=Parent(x);
+    y:=A!< - Coordinates(x)[i] : i in [1..#NumberFields(A)] >;
+    return y;
+end intrinsic;
+
+intrinsic '-'(x1::AlgEtElt,x2::AlgEtElt) -> AlgEtElt
+{x1-x2}
+    A:=Parent(x1);
+    require A cmpeq Parent(x2): "The elements must belong to the same algebra.";
+    x3:=A!< Coordinates(x1)[i] - Coordinates(x2)[i] : i in [1..#NumberFields(A)] >;
+    return x3;
+end intrinsic;
+
+intrinsic '-'(x1::.,x2::AlgEtElt) -> AlgEtElt
+{x1-x2}
+    bool,x1:=IsCoercible(Algebra(x2),x1);
+    require bool : "x1 not coercible";
+    return x1 - x2;
+end intrinsic;
+
+intrinsic '-'(x1::AlgEtElt,x2::.) -> AlgEtElt
+{x1-x2}
+    bool,x2:=IsCoercible(Algebra(x2),x1);
+    require bool : "x2 not coercible";
+    return x1 - x2;
+end intrinsic;
+
+intrinsic '*'(x1::AlgEtElt,x2::AlgEtElt) -> AlgEtElt
+{x1*x2}
+    A:=Parent(x1);
+    require A cmpeq Parent(x2): "The elements must belong to the same algebra.";
+    x3:=A!< Coordinates(x1)[i] * Coordinates(x2)[i] : i in [1..#NumberFields(A)] >;
+    return x3;
+end intrinsic;
+
+intrinsic '*'(x1::.,x2::AlgEtElt) -> AlgEtElt
+{x1*x2}
+    bool,x1:=IsCoercible(Algebra(x2),x1);
+    require bool : "x1 not coercible";
+    return x1 * x2;
+end intrinsic;
+
+intrinsic '*'(x1::AlgEtElt,x2::.) -> AlgEtElt
+{x1*x2}
+    bool,x2:=IsCoercible(Algebra(x2),x1);
+    require bool : "x2 not coercible";
+    return x1 * x2;
+end intrinsic;
+
+intrinsic Inverse(x::AlgEtElt) -> AlgEtElt
+{1/x}
+    require IsUnit(x) : "The element is not invertible.";
+    A:=Parent(x);
+    y:=A!< 1/(Coordinates(x)[i]) : i in [1..#NumberFields(A)] >;
+    return y;
+end intrinsic;
+
+intrinsic '^'(x::AlgEtElt,n::RngIntElt) -> AlgEtElt
+{x^n}
+    A:=Algebra(x);
+    if n eq 0 then
+        return One(A);
+    elif n gt 0 then
+        return A!< Coordinates(x)[i]^n : i in [1..#NumberFields(A)] >;
+    elif n lt 0 then
+        require IsUnit(x) : "The element is not invertible.";
+        return A!< Coordinates(x)[i]^n : i in [1..#NumberFields(A)] >;
+    end if;
+end intrinsic;
+
+intrinsic '/'(x1::AlgEtElt,x2::AlgEtElt) -> AlgEtElt
+{x1/x2}
+    require IsUnit(x2) : "The denominator is not invertible.";
+    return x1*Inverse(x2);
+end intrinsic;
+
+intrinsic '/'(x1::.,x2::AlgEtElt) -> AlgEtElt
+{x1/x2}
+    bool,x1:=IsCoercible(Algebra(x2),x1);
+    require bool : "x1 not coercible";
+    return x1 / x2;
+end intrinsic;
+
+intrinsic '/'(x1::AlgEtElt,x2::.) -> AlgEtElt
+{x1/x2}
+    bool,x2:=IsCoercible(Algebra(x1),x2);
+    require bool : "x2 not coercible";
+    return x1 / x2;
+end intrinsic;
+
+/* CONTINUE FROM HERE
+
+*/
+
+
+/*TO MOVE OR REMOVE
 
 intrinsic '.'(A::AlgEt,i::RngIntElt) -> AlgEtElt
 {A.i returns the ith generator of the Algebra A}
@@ -87,194 +283,39 @@ intrinsic '.'(A::AlgEt,i::RngIntElt) -> AlgEtElt
    return y;
 end intrinsic;
 
-//------------
-// Operations
-//------------
 
-intrinsic '+'(x1::AlgEtElt,x2::AlgEtElt) -> AlgEtElt
-{x1+x2}
-   require Parent(x1) cmpeq Parent(x2): "the elements must be defined over the same algebra";
-   x3:=New(AlgEtElt);
-   x3`AlgAssElt:=(x1`AlgAssElt)+(x2`AlgAssElt);
-   x3`Algebra:=Parent(x1);
-   return x3;
-end intrinsic;
-
-intrinsic '+'(x1::.,x2::AlgEtElt) -> AlgEtElt
-{x1+x2}
-   bool,x1:=IsCoercible(Algebra(x2),x1);
-   if bool then
-        return x1 + x2;
-   else
-        error "x1 not coercible";
-   end if;
-end intrinsic;
-
-intrinsic '+'(x1::AlgEtElt,x2::.) -> AlgEtElt
-{x1+x2}
-   bool,x2:=IsCoercible(Algebra(x1),x2);
-   if bool then
-        return x1 + x2;
-   else
-        error "x2 not coercible";
-   end if;
-end intrinsic;
-
-intrinsic '-'(x::AlgEtElt) -> AlgEtElt
-{-x}
-   y:=New(AlgEtElt);
-   y`AlgAssElt:=-(x`AlgAssElt);
-   y`Algebra:=Parent(x);
-   return y;
-end intrinsic;
-
-intrinsic '-'(x1::AlgEtElt,x2::AlgEtElt) -> AlgEtElt
-{x1-x2}
-   require Parent(x1) cmpeq Parent(x2): "the elements must be defined over the same algebra";
-   x3:=New(AlgEtElt);
-   x3`AlgAssElt:=(x1`AlgAssElt)-(x2`AlgAssElt);
-   x3`Algebra:=Parent(x1);
-   return x3;
-end intrinsic;
-
-intrinsic '-'(x1::.,x2::AlgEtElt) -> AlgEtElt
-{x1-x2}
-   bool,x1:=IsCoercible(Algebra(x2),x1);
-   if bool then
-        return x1 - x2;
-   else
-        error "x1 not coercible";
-   end if;
-end intrinsic;
-
-intrinsic '-'(x1::AlgEtElt,x2::.) -> AlgEtElt
-{x1-x2}
-   bool,x2:=IsCoercible(Algebra(x1),x2);
-   if bool then
-        return x1 - x2;
-   else
-        error "x2 not coercible";
-   end if;
-end intrinsic;
-
-intrinsic '*'(x1::AlgEtElt,x2::AlgEtElt) -> AlgEtElt
-{x1*x2}
-   require Parent(x1) cmpeq Parent(x2): "the elements must be defined over the same algebra";
-   x3:=New(AlgEtElt);
-   x3`AlgAssElt:=(x1`AlgAssElt)*(x2`AlgAssElt);
-   x3`Algebra:=Parent(x1);
-   return x3;
-end intrinsic;
-
-intrinsic '*'(x1::.,x2::AlgEtElt) -> AlgEtElt
-{x1*x2}
-   bool,x1:=IsCoercible(Algebra(x2),x1);
-   if bool then
-        return x1 * x2;
-   else
-        error "x1 not coercible";
-   end if;
-end intrinsic;
-
-intrinsic '*'(x1::AlgEtElt,x2::.) -> AlgEtElt
-{x1*x2}
-   bool,x2:=IsCoercible(Algebra(x1),x2);
-   if bool then
-        return x1 * x2;
-   else
-        error "x2 not coercible";
-   end if;
-end intrinsic;
-
-intrinsic '/'(x1::AlgEtElt,x2::AlgEtElt) -> AlgEtElt
-{x1/x2}
-   require Parent(x1) cmpeq Parent(x2): "the elements must be defined over the same algebra";
-   x3:=New(AlgEtElt);
-   x3`AlgAssElt:=(x1`AlgAssElt)*(x2`AlgAssElt)^-1;
-   x3`Algebra:=Parent(x1);
-   return x3;
-end intrinsic;
-
-intrinsic '/'(x1::.,x2::AlgEtElt) -> AlgEtElt
-{x1/x2}
-   bool,x1:=IsCoercible(Algebra(x2),x1);
-   if bool then
-        return x1 / x2;
-   else
-        error "x1 not coercible";
-   end if;
-end intrinsic;
-
-intrinsic '/'(x1::AlgEtElt,x2::.) -> AlgEtElt
-{x1/x2}
-   bool,x2:=IsCoercible(Algebra(x1),x2);
-   if bool then
-        return x1 / x2;
-   else
-        error "x2 not coercible";
-   end if;
-end intrinsic;
-
-intrinsic '^'(x1::AlgEtElt,n::RngIntElt) -> AlgEtElt
-{x1^n}   
-   x3:=New(AlgEtElt);
-   x3`AlgAssElt:=(x1`AlgAssElt)^n;
-   x3`Algebra:=Parent(x1);
-   return x3;
-end intrinsic;
-
-intrinsic One(A::AlgEt) -> AlgEtElt
-{the unit of A}   
-   x3:=New(AlgEtElt);
-   x3`AlgAssElt:=One(AssociativeAlgebra(A));
-   x3`Algebra:=A;
-   return x3;
-end intrinsic;
-
-intrinsic Zero(A::AlgEt) -> AlgEtElt
-{the unit of A}   
-   x3:=New(AlgEtElt);
-   x3`AlgAssElt:=0*A.1;
-   x3`Algebra:=A;
-   return x3;
-end intrinsic;
-
-intrinsic 'eq'(x1::AlgEtElt,x2::AlgEtElt) -> BoolElt
-{x1 eq x2}
-   require Parent(x1) cmpeq Parent(x2): "the elements must be defined over the same algebra";
-   return (x1`AlgAssElt) eq (x2`AlgAssElt);
-end intrinsic;
-
-intrinsic 'eq'(x1::.,x2::AlgEtElt) -> BoolElt
-{x1 eq x2}
-   bool,x1:=IsCoercible(Algebra(x2),x1);
-   if bool then
-        return x1 eq x2;
-   else
-        error "x1 not coercible";
-   end if;
-end intrinsic;
-
-intrinsic 'eq'(x1::AlgEtElt,x2::.) -> BoolElt
-{x1 eq x2}
-   bool,x2:=IsCoercible(Algebra(x1),x2);
-   if bool then
-        return x1 eq x2;
-   else
-        error "x2 not coercible";
-   end if;
-end intrinsic;
-
-intrinsic 'eq'(A1::AlgEt,A2::AlgEt) -> BoolElt
-{A1 eq A2}
-   return A1 cmpeq A2;
-end intrinsic;
-
-intrinsic Eltseq(x1::AlgEtElt) -> SeqEnum
-{rational coordinates of x1}    
-   return Eltseq(x1`AlgAssElt);
-end intrinsic;
+*/
 
 /* TEST
+
+    Attach("~/packages_github/AlgEt/AlgEt.m");
+    Attach("~/packages_github/AlgEt/AlgEtElt.m");
+    _<x>:=PolynomialRing(Integers());
+    f:=(x^8+16)*(x^8+81);
+    A:=EtaleAlgebra(f);
+    A!1,A!(1/2);
+    Random(A,3)+Random(A,3);
+    Random(A,3)-Random(A,3);
+    Random(A,3)*Random(A,3);
+    Random(A,3)/RandomUnit(A,3);
+
+    seq:=[x^2-5,x^2-7];
+    seq:=[NumberField(f) : f in seq];
+    A:=EtaleAlgebra(seq);
+    A!1,A!(1/2),A!<seq[1]!1,seq[2]!(1/2)>,A![1,2];
+    A!1 + A!(1/2);
+    A!<seq[1]!1,seq[2]!(1/2)>/A![1,2];
+
+    K:=NumberField(x^2-5);
+    _<y>:=PolynomialRing(K);
+    p:=y^2-7;
+    A:=EtaleAlgebra(p);
+    A!1 - A!(1/2);
+    A!1 / A!(1/2);
+
+    seq:=[NumberField(p),NumberField(x^2-5)];
+    A:=EtaleAlgebra(seq);
+    A!1 + A!(1/2);
+    A!<seq[1]!1,seq[2]!(1/2)>/A![1,2];
 
 */

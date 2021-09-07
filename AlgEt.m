@@ -26,7 +26,8 @@ declare attributes AlgEt : DefiningPolynomial,
 intrinsic Print(A::AlgEt)
 {Prints the defining polynomial or the number fields defining A.}
     if assigned A`DefiningPolynomial then
-        printf "Etale Algebra over QQ defined by %o", DefiningPolynomial(A);
+        f:=DefiningPolynomial(A);
+        printf "Etale Algebra over (%o) defined by %o", FieldOfFractions(CoefficientRing(f)),f;    
     else
         printf "Etale Algebra product of %o", NumberFields(A);
     end if;
@@ -35,14 +36,16 @@ end intrinsic;
 intrinsic EtaleAlgebra(seq::SeqEnum[FldNum]) -> AlgEt
 {Given a sequence of number fields returns the étale algebra corresponding to the direct product.}
     A:=New(AlgEt);
-    A`NumberFields:=[seq];
+    A`NumberFields:=seq;
     return A;
 end intrinsic;
 
 intrinsic EtaleAlgebra(f::RngUPolElt) -> AlgEt
 {Given a squarefree polynomial returns the product of the number fields defined by the irreducible factors.}
     require IsSquarefree(f) : "The polynomial must be squarefree.";
-    return EtaleAlgebra([NumberField(g[1]) : g in Factorization(f)]);
+    A:=EtaleAlgebra([NumberField(g[1]) : g in Factorization(f)]);
+    A`DefiningPolynomial:=f;
+    return A;
 end intrinsic;
 
 //------------

@@ -99,8 +99,8 @@ intrinsic HasBaseField(A::AlgEt) -> BoolElt,FldNum
         if A`HasBaseField then
             A`BaseField:=F;
         end if;
-        return A`HasBaseField;
     end if;
+    return A`HasBaseField;
 end intrinsic;
 
 intrinsic BaseField(A::AlgEt) -> FldNum

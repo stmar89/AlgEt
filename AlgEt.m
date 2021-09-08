@@ -42,7 +42,7 @@ end intrinsic;
 intrinsic EtaleAlgebra(seq::SeqEnum[FldNum]) -> AlgEt
 {Given a sequence of number fields returns the étale algebra corresponding to the direct product.}
     A:=New(AlgEt);
-    embs:=[ map< seq[i]->A | x:-> A! ([seq[j]!0 : j in [1..i-1]] cat [x] cat [seq[j]!0 : j in [i+1..#seq]])  > : i in [1..#seq] ];
+    embs:=[ map< seq[i]->A | x:-> A! (<seq[j]!0 : j in [1..i-1]> cat <x> cat <seq[j]!0 : j in [i+1..#seq]>)  > : i in [1..#seq] ];
     projs:=[ map< A->seq[i] | y:-> Coordinates(y)[i] > : i in [1..#seq] ];
     A`NumberFields:=<seq,embs,projs>;
     return A;
@@ -217,7 +217,7 @@ end intrinsic;
     _<x>:=PolynomialRing(Integers());
     f:=(x^8+16)*(x^8+81);
     A:=EtaleAlgebra(f);
-    A;
+    assert #Basis(A) eq Dimension(A);
 
     seq:=[x^2-5,x^2-7];
     seq:=[NumberField(f) : f in seq];

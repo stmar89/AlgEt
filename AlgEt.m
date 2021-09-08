@@ -17,6 +17,7 @@ declare type AlgEt[AlgEtElt];
 
 declare attributes AlgEt : DefiningPolynomial, 
                            // ass_algebra, 
+                           Dimension,
                            NumberFields;
 
 //------------
@@ -67,9 +68,26 @@ intrinsic NumberFields(A::AlgEt) -> SeqEnum
     return A`NumberFields;
 end intrinsic;
 
+intrinsic Dimension(A::AlgEt)->RngInt
+{Dimension of A}    
+    if not assigned A`Dimension then
+        nf:=NumberFields(Algebra(x));
+        require forall{ E : E in nf[2..#nf] | BaseRing(E) eq BaseRing(nf[1]) } : "The number fields of A shoud all be defined over the same base ring.";
+        A`Dimension:=&+[Degree(E) : E in nf];
+    end if;
+    return A`Dimension;
+end intrinsic;
+
+intrinsic AbsoluteDimension(A::AlgEt)->RngInt
+{Dimension of A over the prime field}    
+    if not assigned A`AbsoluteDimension then
+        A`AbsoluteDimension:=&+[AbsoluteDegree(E) : E in nf];
+    end if;
+    return A`AbsoluteDimension;
+end intrinsic;
 
 //------------
-// Access attributes
+// Equality
 //------------
 
 intrinsic 'eq'(A1::AlgEt,A2::AlgEt) -> BoolElt
@@ -97,15 +115,6 @@ intrinsic OrthogonalIdempotents(A::AlgEt)->SeqEnum
     return [L[2](One(L[1])) : L in A`NumberFields ];
 end intrinsic;
 
-intrinsic Dimension(A::AlgEt)->RngInt
-{Dimenison of A}    
-    return Dimension(AssociativeAlgebra(A));
-end intrinsic;
-
-intrinsic Degree(A::AlgEt)->RngInt
-{Dimenison of A}    
-    return Degree(AssociativeAlgebra(A));
-end intrinsic;
 
 intrinsic PrimitiveElement(A::AlgEt) -> AlgEtElt
 { it returns an element which corresponds to the class of X in Q[X]/(f(X)) }

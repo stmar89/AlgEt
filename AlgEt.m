@@ -19,10 +19,10 @@ declare attributes AlgEt : DefiningPolynomial,
                            // ass_algebra, 
                            Dimension,
                            AbsoluteDimension,
-                           BaseField,
+                           BaseField, //a tup : <F,m> where F is the Base fiedl and m is the diagonal embedding into A
                            HasBaseField, //a boolean
                            PrimeField,
-                           NumberFields; //a seq of 3 sequences: the first are the NF, 
+                           NumberFields; //a tup of 3 sequences: the first are the NF, 
                                          //the second are embeddings and the third are projections
 
 //------------
@@ -96,11 +96,12 @@ end intrinsic;
 intrinsic HasBaseField(A::AlgEt) -> BoolElt,FldNum
 {Returns whether A has common base field. If this is the case it returns it.}
     if not assigned A`HasBaseField then
-        nf:=NumberFields(A);
+        nf,embs:=NumberFields(A);
         F:=BaseRing(nf[1]);
         A`HasBaseField:=forall{ E : E in nf[2..#nf] | BaseRing(E) eq F };
         if A`HasBaseField then
-            A`BaseField:=F;
+            diag:=map< F->A : x:-> A!<embs[i](nf[i]!x) : i in [1..#nf]> >;
+            A`BaseField:=<F,diag>;
         end if;
     end if;
     return A`HasBaseField;
@@ -112,7 +113,7 @@ intrinsic BaseField(A::AlgEt) -> FldNum
         require HasBaseField(A) : "The number fields should all be defined over the same Base ring/field.";
         // if HasBaseField is true, then it is assiged
     end if;
-    return A`BaseField;
+    return Explode(A`BaseField);
 end intrinsic;
 
 intrinsic PrimeField(A::AlgEt) -> FldNum

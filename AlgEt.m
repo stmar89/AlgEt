@@ -76,7 +76,7 @@ intrinsic Dimension(A::AlgEt)->RngInt
 {Dimension of A}    
     if not assigned A`Dimension then
         nf:=NumberFields(A);
-        require HasBaseField : "The number fields of A shoud all be defined over the same base ring.";
+        require HasBaseField(A) : "The number fields of A shoud all be defined over the same base ring.";
         A`Dimension:=&+[Degree(E) : E in nf];
     end if;
     return A`Dimension;
@@ -96,20 +96,18 @@ intrinsic HasBaseField(A::AlgEt) -> BoolElt,FldNum
         nf:=NumberFields(A);
         F:=BaseRing(nf[1]);
         A`HasBaseField:=forall{ E : E in nf[2..#nf] | BaseRing(E) eq F };
-    end if;
-    if A`HasBaseField then
-        return true,F;
-    else
-        return false,_;
+        if A`HasBaseField then
+            A`BaseField:=F;
+        end if;
+        return A`HasBaseField;
     end if;
 end intrinsic;
 
 intrinsic BaseField(A::AlgEt) -> FldNum
 {Returns the common base field of the Algebra, if it exists.}
     if not assigned A`BaseField then
-        t,F:=HasBaseField(A);
-        require t : "The number fields should all be defined over the same Base ring/field.";
-        A`BaseField:=F;
+        require HasBaseField(A) : "The number fields should all be defined over the same Base ring/field.";
+        // if HasBaseField is true, then it is assiged
     end if;
     return A`BaseField;
 end intrinsic;
@@ -231,6 +229,7 @@ end intrinsic;
     E:=NumberField(p);
     seq:=[E,K];
     A:=EtaleAlgebra(seq);
+    HasBaseField(A);
     AbsoluteDimension(A);
     PrimeField(A);
 

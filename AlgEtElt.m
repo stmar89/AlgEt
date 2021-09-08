@@ -51,7 +51,7 @@ end intrinsic;
 intrinsic AbsoluteCoordinates(x::AlgEtElt) -> SeqEnum
 {Given an element x returns the coordinates relative to the absolute basis, which are elements of the prime field.}
     if not assigned x`AbsoluteCoordinates then
-        x`AbsoluteCoordintes:=[ Flat(c) : c in Coordinates(x) ];
+        x`AbsoluteCoordinates:=&cat[ Flat(c) : c in Coordinates(x) ];
     end if;
     return x`AbsoluteCoordinates;
 end intrinsic;
@@ -413,6 +413,9 @@ end intrinsic;
     A!1 + A!(1/2);
     A!<seq[1]!1,seq[2]!(1/2)>/A![1,2];
     assert #AbsoluteBasis(A) eq AbsoluteDimension(A);
+    e:=A!<K.1+E.1,K.1^2>;
+    assert #AbsoluteCoordinates(e) eq AbsoluteDimension(A);
+    assert e eq &+[AbsoluteCoordinates(e)[i]*AbsoluteBasis(A)[i] : i in [1..AbsoluteDimension(A)]];
 
     A:=EtaleAlgebra([E,E]);
     assert #Basis(A) eq Dimension(A);

@@ -100,7 +100,7 @@ intrinsic HasBaseField(A::AlgEt) -> BoolElt,FldNum
         F:=BaseRing(nf[1]);
         A`HasBaseField:=forall{ E : E in nf[2..#nf] | BaseRing(E) eq F };
         if A`HasBaseField then
-            diag:=map< F->A : x:-> A!<embs[i](nf[i]!x) : i in [1..#nf]> >;
+            diag:=map< F->A | x:-> A!<embs[i](nf[i]!x) : i in [1..#nf]> >;
             A`BaseField:=<F,diag>;
         end if;
     end if;

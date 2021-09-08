@@ -19,6 +19,8 @@ declare attributes AlgEt : DefiningPolynomial,
                            // ass_algebra, 
                            Dimension,
                            AbsoluteDimension,
+                           BaseField,
+                           PrimeField,
                            NumberFields;
 
 //------------
@@ -85,6 +87,28 @@ intrinsic AbsoluteDimension(A::AlgEt)->RngInt
         A`AbsoluteDimension:=&+[AbsoluteDegree(E) : E in NumberFields(A)];
     end if;
     return A`AbsoluteDimension;
+end intrinsic;
+
+intrinsic BaseField(A::AlgEt) -> FldNum
+{Returns the common base field of the Algebra, if it exists.}
+    if not assigned A`BaseField then
+        nf:=NumberFields(A);
+        F:=BaseRing(nf[1]);
+        require forall{ E : E in nf[2..#nf] | BaseRing(E) eq F } : "The number fields of A shoud all be defined over the same base ring.";
+        A`BaseField:=F;
+    end if;
+    return A`BaseField;
+end intrinsic;
+
+intrinsic PrimeField(A::AlgEt) -> FldNum
+{Returns the prime field of the Algebra}
+    if not assigned A`PrimeField then
+        nf:=NumberFields(A);
+        F:=PrimeField(nf[1]);
+        require forall{ E : E in nf[2..#nf] | PrimeField(E) eq F } : "The number fields of A shoud all be defined over the same prime field.";
+        A`PrimeField:=F;
+    end if;
+    return A`PrimeField;
 end intrinsic;
 
 //------------
@@ -191,7 +215,16 @@ end intrinsic;
     A:=EtaleAlgebra(p);
     A;
 
-    A:=EtaleAlgebra([NumberField(p),NumberField(x^2-5)]);
-    A;
+    E:=NumberField(p);
+    seq:=[E,K];
+    A:=EtaleAlgebra(seq);
+    AbsoluteDimension(A);
+    PrimeField(A);
+
+    A:=EtaleAlgebra([E,E]);
+    Dimension(A);
+    AbsoluteDimension(A);
+    BaseField(A);
+    PrimeField(A);
 
 */

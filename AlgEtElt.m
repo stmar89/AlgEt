@@ -14,6 +14,7 @@ declare verbose AlgEtElt, 1;
 */
 
 declare attributes AlgEtElt : Algebra, // AlgEt
+                              AbsoluteCoordinates,
                               Coordinates; // Tup
 
 declare attributes AlgEt : Basis,
@@ -45,6 +46,14 @@ end intrinsic;
 intrinsic Coordinates(x::AlgEtElt) -> SeqEnum
 {Given an element x returns its coordinates, which are elements of number fields.}
   return x`Coordinates;
+end intrinsic;
+
+intrinsic AbsoluteCoordinates(x::AlgEtElt) -> SeqEnum
+{Given an element x returns the coordinates relative to the absolute basis, which are elements of the prime field.}
+    if not assigned x`AbsoluteCoordinates then
+        x`AbsoluteCoordintes:=[ Flat(c) : c in Coordinates(x) ];
+    end if;
+    return x`AbsoluteCoordinates;
 end intrinsic;
 
 //------------

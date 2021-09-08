@@ -22,7 +22,8 @@ declare attributes AlgEt : DefiningPolynomial,
                            BaseField,
                            HasBaseField, //a boolean
                            PrimeField,
-                           NumberFields;
+                           NumberFields; //a seq of 3 sequences: the first are the NF, 
+                                         //the second are embeddings and the third are projections
 
 //------------
 // Creation and Printig for AlgEt
@@ -41,7 +42,9 @@ end intrinsic;
 intrinsic EtaleAlgebra(seq::SeqEnum[FldNum]) -> AlgEt
 {Given a sequence of number fields returns the étale algebra corresponding to the direct product.}
     A:=New(AlgEt);
-    A`NumberFields:=seq;
+    embs:=[ map< seq[i]->A | x:-> A! ([seq[j]!0 : j in [1..i-1]] cat [x] cat [seq[j]!0 : j in [i+1..#seq]])  > : i in [1..#seq] ];
+    projs:=[ map< A->seq[i] | y:-> Coordinates(y)[i] > : i in [1..#seq] ];
+    A`NumberFields:=<seq,embs,projs>;
     return A;
 end intrinsic;
 
@@ -68,8 +71,8 @@ intrinsic DefiningPolynomial(A::AlgEt) -> RngUPolElt
 end intrinsic;
 
 intrinsic NumberFields(A::AlgEt) -> SeqEnum
-{Returns the number fields of which A is a product of.}
-    return A`NumberFields;
+{Returns the number fields of which A is a product of,together with embeddings and projections}
+    return Explode(A`NumberFields);
 end intrinsic;
 
 intrinsic Dimension(A::AlgEt)->RngInt

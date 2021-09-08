@@ -20,6 +20,7 @@ declare attributes AlgEt : DefiningPolynomial,
                            Dimension,
                            AbsoluteDimension,
                            BaseField,
+                           HasBaseField, //a boolean
                            PrimeField,
                            NumberFields;
 
@@ -75,7 +76,7 @@ intrinsic Dimension(A::AlgEt)->RngInt
 {Dimension of A}    
     if not assigned A`Dimension then
         nf:=NumberFields(A);
-        require forall{ E : E in nf[2..#nf] | BaseRing(E) eq BaseRing(nf[1]) } : "The number fields of A shoud all be defined over the same base ring.";
+        require HasBaseField : "The number fields of A shoud all be defined over the same base ring.";
         A`Dimension:=&+[Degree(E) : E in nf];
     end if;
     return A`Dimension;
@@ -89,12 +90,25 @@ intrinsic AbsoluteDimension(A::AlgEt)->RngInt
     return A`AbsoluteDimension;
 end intrinsic;
 
+intrinsic HasBaseField(A::AlgEt) -> BoolElt,FldNum
+{Returns whether A has common base field. If this is the case it returns it.}
+    if not assigned A`HasBaseField then
+        nf:=NumberFields(A);
+        F:=BaseRing(nf[1]);
+        A`HasBaseField:=forall{ E : E in nf[2..#nf] | BaseRing(E) eq F };
+    end if;
+    if A`HasBaseField then
+        return true,F;
+    else
+        return false,_;
+    end if;
+end intrinsic;
+
 intrinsic BaseField(A::AlgEt) -> FldNum
 {Returns the common base field of the Algebra, if it exists.}
     if not assigned A`BaseField then
-        nf:=NumberFields(A);
-        F:=BaseRing(nf[1]);
-        require forall{ E : E in nf[2..#nf] | BaseRing(E) eq F } : "The number fields of A shoud all be defined over the same base ring.";
+        t,F:=HasBaseField(A);
+        require t : "The number fields should all be defined over the same Base ring/field.";
         A`BaseField:=F;
     end if;
     return A`BaseField;
@@ -104,8 +118,7 @@ intrinsic PrimeField(A::AlgEt) -> FldNum
 {Returns the prime field of the Algebra}
     if not assigned A`PrimeField then
         nf:=NumberFields(A);
-        F:=PrimeField(nf[1]);
-        require forall{ E : E in nf[2..#nf] | PrimeField(E) eq F } : "The number fields of A shoud all be defined over the same prime field.";
+        F:=PrimeField(nf[1]); //this should always be Rationals()
         A`PrimeField:=F;
     end if;
     return A`PrimeField;

@@ -16,6 +16,9 @@ declare verbose AlgEtElt, 1;
 declare attributes AlgEtElt : Algebra, // AlgEt
                               Coordinates; // Tup
 
+declare attributes AlgEt : Basis,
+                           AbsoluteBasis;
+
 //------------
 // Printing for AlgEtElt
 //------------
@@ -120,7 +123,7 @@ intrinsic Random(A::AlgEt , bd::RngIntElt) -> AlgEtElt
 {Random element of A. The Coefficients are bounded by the positive integer bd.}   
     require bd gt 0 : "The bound needs to be a positive integer.";
     nf:=NumberFields(A);
-    require forall{E:E in nf | BaseRing(E) eq Rationals() } : "The function works only for product of absolute number fiedls'" ;
+    require BaseField(A) eq Rationals() : "The function works only for product of absolute number fiedls'" ;
     num:=A!< E!Random(EquationOrder(E),bd) : E in nf>;
     repeat
         den:=A!< E!Random(EquationOrder(E),bd) : E in nf>;
@@ -132,7 +135,7 @@ intrinsic RandomUnit(A::AlgEt , bd::RngIntElt) -> AlgEtElt
 {Random unit of A. The Coefficients are bounded by the positive integer bd.}   
     require bd gt 0 : "The bound needs to be a positive integer.";
     nf:=NumberFields(A);
-    require forall{E:E in nf | BaseRing(E) eq Rationals() } : "The function works only for product of absolute number fiedls'" ;
+    require BaseField(A) eq Rationals() : "The function works only for product of absolute number fiedls'" ;
     repeat
         num:=A!< E!Random(EquationOrder(E),bd) : E in nf>;
         den:=A!< E!Random(EquationOrder(E),bd) : E in nf>;
@@ -286,8 +289,9 @@ end intrinsic;
 
 intrinsic MinimalPolynomial(x::AlgEtElt) -> RngUPolElt
 {Returns the minimal polynommial over the common base ring of the number fields defining A of the element x.}
-    nf:=NumberFields(Algebra(x));
-    require forall{ E : E in nf[2..#nf] | BaseRing(E) eq BaseRing(nf[1]) } : "The number fields of A shoud all be defined over the same base ring.";
+    A:=Algebra(x);
+    nf:=NumberFields(A);
+    require HasBaseField(A) : "The number fields of A shoud all be defined over the same base ring.";
     m:=LCM( [ MinimalPolynomial(c) : c in Coordinates(x) ] );
     return m;
 end intrinsic;
@@ -300,10 +304,7 @@ end intrinsic;
 
 intrinsic AbsoluteMinimalPolynomial(x::AlgEtElt) -> RngUPolElt
 {Returns the minimal polynommial over the prime field of the element x.}
-    nf:=NumberFields(Algebra(x));
-    F:=PrimeField(nf[1]);
-    require forall{ E : E in nf[2..#nf] | PrimeField(E) eq F } : "The number fields need to be over the same prime field.";
-    return MinimalPolynomial(x,F);
+    return MinimalPolynomial(x,PrimeField(Algebra(x)));
 end intrinsic;
 
 intrinsic IsIntegral(x::AlgEtElt) -> BoolElt
@@ -312,6 +313,30 @@ intrinsic IsIntegral(x::AlgEtElt) -> BoolElt
     return IsMonic(m) and IsCoercible(PolynomialRing(Integers()),m);
 end intrinsic;
 
+//------------
+// Basis and Vector Representations
+//------------
+
+intrinsic Basis(A::AlgEt) -> SeqEnum
+{Returns a basis of the algebra over the common base field.}
+    if not assigned A`Basis then
+        nf,embs:=NumberFields(A);
+        require HasBaseField(A) : "The number fields do not have a common base field.";
+        cc:= &cat[ [embs[i](b) : b in Basis(nf[i])] : i in [1..#nf]]; 
+        A`Basis := [ A ! c : c in cc ];
+    end if;
+    return A`Basis;
+end intrinsic;
+
+intrinsic AbsoluteBasis(A::AlgEt) -> SeqEnum
+{Returns a basis of the algebra over the prime field.}
+    if not assigned A`AbsoluteBasis then
+        nf,embs:=NumberFields(A);
+        cc:= &cat[ [embs[i](b) : b in AbsoluteBasis(nf[i])] : i in [1..#nf]]; 
+        A`AbsoluteBasis := [ A ! c : c in cc ];
+    end if;
+    return A`AbsoluteBasis;
+end intrinsic;
 
 /* CONTINUE FROM HERE
 
@@ -366,12 +391,22 @@ end intrinsic;
     e:=A!<K.1,K.1^2>;
     MinimalPolynomial(e);
     IsIntegral(e);
-    e:=A!<K.1^2,K.1^2>;
-    assert MinimalPolynomial(e) eq MinimalPolynomial(K.1^2);
+    e2:=A!<K.1^2,K.1^2>;
+    assert MinimalPolynomial(e2) eq MinimalPolynomial(K.1^2);
+    _,embs,projs:=NumberFields(A);
+    assert embs[1](K.1)+embs[2](K.1^2) eq e;
+    assert projs[1](e) eq K.1;
+    assert projs[2](e) eq K.1^2;
 
-    seq:=[NumberField(p),NumberField(x^2-5)];
+    E:=NumberField(p);
+    seq:=[E,K];
     A:=EtaleAlgebra(seq);
     A!1 + A!(1/2);
     A!<seq[1]!1,seq[2]!(1/2)>/A![1,2];
+    assert #AbsoluteBasis(A) eq AbsoluteDimension(A);
+
+    A:=EtaleAlgebra([E,E]);
+    assert #Basis(A) eq Dimension(A);
+    assert #AbsoluteBasis(A) eq AbsoluteDimension(A);
 
 */

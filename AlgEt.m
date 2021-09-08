@@ -71,7 +71,7 @@ end intrinsic;
 intrinsic Dimension(A::AlgEt)->RngInt
 {Dimension of A}    
     if not assigned A`Dimension then
-        nf:=NumberFields(Algebra(x));
+        nf:=NumberFields(A);
         require forall{ E : E in nf[2..#nf] | BaseRing(E) eq BaseRing(nf[1]) } : "The number fields of A shoud all be defined over the same base ring.";
         A`Dimension:=&+[Degree(E) : E in nf];
     end if;
@@ -81,7 +81,7 @@ end intrinsic;
 intrinsic AbsoluteDimension(A::AlgEt)->RngInt
 {Dimension of A over the prime field}    
     if not assigned A`AbsoluteDimension then
-        A`AbsoluteDimension:=&+[AbsoluteDegree(E) : E in nf];
+        A`AbsoluteDimension:=&+[AbsoluteDegree(E) : E in NumberFields(A)];
     end if;
     return A`AbsoluteDimension;
 end intrinsic;

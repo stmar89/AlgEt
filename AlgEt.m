@@ -18,6 +18,7 @@ declare type AlgEt[AlgEtElt];
 declare attributes AlgEt : DefiningPolynomial, 
                            // ass_algebra, 
                            Dimension,
+                           AbsoluteDimension,
                            NumberFields;
 
 //------------

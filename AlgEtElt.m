@@ -52,15 +52,27 @@ intrinsic IsCoercible(A::AlgEt, x::.) -> BoolElt, .
 {Return whether x is coercible into A and the result of the coercion if so.}
     if Parent(x) cmpeq A then
         return true,x;
-    elif Type(x) in {List,Tup,SeqEnum} and forall{i : i in [1..#x] | IsCoercible(NumberFields(A)[i],x[i])} then 
+    elif Type(x) in {List,Tup,SeqEnum} then
+        coordinates:=<>;
+        for i in [1..#x] do
+            t,xi:=IsCoercible(NumberFields(A)[i],x[i]); 
+            if not t then
+                return false,_; // early exit if not coercible
+            else
+                Append(~coordinates,xi);
+            end if;
+        end for;
+        // now we know the elt is coercible in A
         x1:=New(AlgEtElt);
         x1`Algebra:=A;
-        x1`Coordinates:=<x[i]:i in [1..#x]>;
+        x1`Coordinates:=coordinates;
         return true,x1;
     elif Type(x) eq RngIntElt or Type(x) eq FldRatElt then
+        coordinates:=<>;
+        nf:=NumberFields(A);
         x1:=New(AlgEtElt);
         x1`Algebra:=A;
-        x1`Coordinates:=<x:i in [1..#NumberFields(A)]>; //diagonal embedding
+        x1`Coordinates:=<nf[i]!x : i in [1..#nf]>; //diagonal embedding
         return true,x1;
     else 
         return false,_;
@@ -267,6 +279,40 @@ intrinsic '/'(x1::AlgEtElt,x2::.) -> AlgEtElt
     return x1 / x2;
 end intrinsic;
 
+
+//------------
+// Minimal polynomials and integrability
+//------------
+
+intrinsic MinimalPolynomial(x::AlgEtElt) -> RngUPolElt
+{Returns the minimal polynommial over the common base ring of the number fields defining A of the element x.}
+    nf:=NumberFields(Algebra(x));
+    require forall{ E : E in nf[2..#nf] | BaseRing(E) eq BaseRing(nf[1]) } : "The number fields of A shoud all be defined over the same base ring.";
+    m:=LCM( [ MinimalPolynomial(c) : c in Coordinates(x) ] );
+    return m;
+end intrinsic;
+
+intrinsic MinimalPolynomial(x::AlgEtElt, F::Rng) -> RngUPolElt
+{Returns the minimal polynommial over the ring F of the element x.}
+    m:=LCM( [ MinimalPolynomial(c,F) : c in Coordinates(x) ] );
+    return m;
+end intrinsic;
+
+intrinsic AbsoluteMinimalPolynomial(x::AlgEtElt) -> RngUPolElt
+{Returns the minimal polynommial over the prime field of the element x.}
+    nf:=NumberFields(Algebra(x));
+    F:=PrimeField(nf[1]);
+    require forall{ E : E in nf[2..#nf] | PrimeField(E) eq F } : "The number fields need to be over the same prime field.";
+    return MinimalPolynomial(x,F);
+end intrinsic;
+
+intrinsic IsIntegral(x::AlgEtElt) -> BoolElt
+{Returns whether the element x is integral (over the integers).}
+    m:=AbsoluteMinimalPolynomial(x);
+    return IsMonic(m) and IsCoercible(PolynomialRing(Integers()),m);
+end intrinsic;
+
+
 /* CONTINUE FROM HERE
 
 */
@@ -298,13 +344,16 @@ end intrinsic;
     Random(A,3)-Random(A,3);
     Random(A,3)*Random(A,3);
     Random(A,3)/RandomUnit(A,3);
+    IsIntegral(A!1/2);
+    IsIntegral(A!2);
 
     seq:=[x^2-5,x^2-7];
     seq:=[NumberField(f) : f in seq];
     A:=EtaleAlgebra(seq);
     A!1,A!(1/2),A!<seq[1]!1,seq[2]!(1/2)>,A![1,2];
     A!1 + A!(1/2);
-    A!<seq[1]!1,seq[2]!(1/2)>/A![1,2];
+    e:=A!<seq[1]!1,seq[2]!(1/2)>/A![1,2];
+    IsIntegral(e);
 
     K:=NumberField(x^2-5);
     _<y>:=PolynomialRing(K);
@@ -312,6 +361,13 @@ end intrinsic;
     A:=EtaleAlgebra(p);
     A!1 - A!(1/2);
     A!1 / A!(1/2);
+    
+    A:=EtaleAlgebra([K,K]);
+    e:=A!<K.1,K.1^2>;
+    MinimalPolynomial(e);
+    IsIntegral(e);
+    e:=A!<K.1^2,K.1^2>;
+    assert MinimalPolynomial(e) eq MinimalPolynomial(K.1^2);
 
     seq:=[NumberField(p),NumberField(x^2-5)];
     A:=EtaleAlgebra(seq);

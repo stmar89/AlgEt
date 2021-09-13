@@ -100,7 +100,7 @@ intrinsic HasBaseField(A::AlgEt) -> BoolElt,FldNum
         F:=BaseRing(nf[1]);
         A`HasBaseField:=forall{ E : E in nf[2..#nf] | BaseRing(E) eq F };
         if A`HasBaseField then
-            diag:=map< F->A | x:-> A!<embs[i](nf[i]!x) : i in [1..#nf]> >;
+            diag:=map< F->A | x:-> A!<nf[i]!x : i in [1..#nf]> >;
             A`BaseField:=<F,diag>;
         end if;
     end if;
@@ -229,6 +229,8 @@ end intrinsic;
     p:=y^2-7;
     A:=EtaleAlgebra(p);
     A;
+    F,mFA:=BaseField(A);
+    [ mFA(b) : b in Basis(MaximalOrder(F)) ];
 
     E:=NumberField(p);
     seq:=[E,K];
@@ -236,6 +238,7 @@ end intrinsic;
     HasBaseField(A);
     AbsoluteDimension(A);
     PrimeField(A);
+    F,mFA:=BaseField(A);
 
     A:=EtaleAlgebra([E,E]);
     Dimension(A);

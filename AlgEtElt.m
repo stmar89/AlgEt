@@ -18,7 +18,9 @@ declare attributes AlgEtElt : Algebra, // AlgEt
                               Coordinates; // Tup
 
 declare attributes AlgEt : Basis,
-                           AbsoluteBasis;
+                           AbsoluteBasis,
+                           PrimitiveElement,
+                           PowerBasis;
 
 //------------
 // Printing for AlgEtElt
@@ -302,6 +304,7 @@ intrinsic MinimalPolynomial(x::AlgEtElt) -> RngUPolElt
     nf:=NumberFields(A);
     require HasBaseField(A) : "The number fields of A shoud all be defined over the same base ring.";
     m:=LCM( [ MinimalPolynomial(c) : c in Coordinates(x) ] );
+    assert2 Evaluate
     return m;
 end intrinsic;
 
@@ -320,6 +323,40 @@ intrinsic IsIntegral(x::AlgEtElt) -> BoolElt
 {Returns whether the element x is integral (over the integers).}
     m:=AbsoluteMinimalPolynomial(x);
     return IsMonic(m) and IsCoercible(PolynomialRing(Integers()),m);
+end intrinsic;
+
+intrinsic Evaluate(f::RngUPolElt,a::AlgEtElt) -> AlgEtElt
+{Evaluate the polynomial f at the element a.}
+    A:=Algebra(a);
+    deg:=Degree(f);
+    coeff:=Coefficients(f); 
+    pow_a:=[];
+    Append(~pow_a,[ i gt 1 select Self(i-1)*a else One(A) : i in [1..deg]]);
+    //Self makes it much more efficient
+    return &+[ coeff[i]*pow_a[i] : i in [1..deg] ];
+end intrinsic;
+
+//------------
+// Primitive Element and Power Basis
+//------------
+
+intrinsic PrimitiveElement(A::AlgEt) -> AlgEtElt
+{Returns the primitive element of the étale algebra A. Note that A has a primitive element only if it is the product of distinct number fields.}
+    if not assigned A`PrimitiveElement then
+        nf,embs:=NumberFields(A);
+        require #Seqset(nf) eq #nf : "The number fields defining the algebra are not distinct. Hence the algebra does not have a primitive element";
+        A`PrimitiveElement:= A!<PrimitiveElement(F) : F in nf>;
+    end if;
+    return A`PrimitiveElement;
+end intrinsic;
+
+intrinsic PowerBasis(A::AlgEt) -> SeqEnum[AlgEtElt]
+{Returns the power basis of the étale algebra A, consisting of powers of the PrimitiveElement of A}
+    if not assigned A`PowerBasis then
+        a:=PrimitiveElement(A);
+        A`PowerBasis:=[a^i : i in [0..Dimension(A)-1]];
+    end if;
+    return A`PowerBasis;
 end intrinsic;
 
 //------------
@@ -394,6 +431,8 @@ end intrinsic;
     _<x>:=PolynomialRing(Integers());
     f:=(x^8+16)*(x^8+81);
     A:=EtaleAlgebra(f);
+    a:=PrimitiveElement(A);
+    assert MinimalPolynomial(a) eq f;
     A!1,A!(1/2);
     Random(A,3)+Random(A,3);
     Random(A,3)-Random(A,3);
@@ -404,23 +443,34 @@ end intrinsic;
 
     for n in [1..100] do
         a:=Random(A,3);
-        coord:=AbsoluteCoordinates([a],Basis(A));
+        coord1:=AbsoluteCoordinates([a],Basis(A));
+        coord2:=AbsoluteCoordinates([a],PowerBasis(A));
     end for;
 
     seq:=[x^2-5,x^2-7];
     seq:=[NumberField(f) : f in seq];
     A:=EtaleAlgebra(seq);
+    a:=PrimitiveElement(A);
+    assert MinimalPolynomial(a) eq DefiningPolynomial(A);
     A!1,A!(1/2),A!<seq[1]!1,seq[2]!(1/2)>,A![1,2];
     A!1 + A!(1/2);
     e:=A!<seq[1]!1,seq[2]!(1/2)>/A![1,2];
     IsIntegral(e);
+    for n in [1..100] do
+        a:=Random(A,3);
+        coord1:=AbsoluteCoordinates([a],Basis(A));
+        coord2:=AbsoluteCoordinates([a],PowerBasis(A));
+    end for;
 
     K:=NumberField(x^2-5);
     _<y>:=PolynomialRing(K);
     p:=y^2-7;
     A:=EtaleAlgebra(p);
+    a:=PrimitiveElement(A);
+    assert MinimalPolynomial(a) eq f;
     A!1 - A!(1/2);
     A!1 / A!(1/2);
+
     
     A:=EtaleAlgebra([K,K]);
     e:=A!<K.1,K.1^2>;

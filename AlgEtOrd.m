@@ -364,10 +364,6 @@ intrinsic IsProductOfOrders(O::AlgEtOrd)->BoolElt, Tup
     return Explode(O`IsProductOfOrders);
 end intrinsic;
 
-/* CONTINUE from HERE
-
-
-
 //----------
 // Index
 //----------
@@ -375,19 +371,11 @@ end intrinsic;
 intrinsic Index(T::AlgEtOrd) -> FldRatElt
 {given an order T computes its index with respect to the basis of the algebra of T as a free Z-module}
   if not assigned T`Index then
-    matT:=Matrix(ZBasis(T));
+    matT:=MatrixAtoQ(ZBasis(T));
     T`Index := Abs(Rationals() ! Determinant(matT));
   end if;
   return T`Index;
 end intrinsic;
-    B := ZBasis(O);
-    if ZeroDivisorsAllowed then
-       elt:=&+[ Random([-CoeffRange..CoeffRange])*b : b in B];
-    else 
-        repeat
-            elt:=&+[ Random([-CoeffRange..CoeffRange])*b : b in B];
-        until not IsZeroDivisor(elt);
-    end if;
 
 intrinsic Index(S::AlgEtOrd, T::AlgEtOrd) -> Any
 {given two orders T \subset S, returns [S:T] = #S/T }
@@ -398,6 +386,11 @@ intrinsic Index(S::AlgEtOrd, T::AlgEtOrd) -> Any
   end if;
   return elt;
 end intrinsic;
+
+/* CONTINUE from HERE
+
+
+
 
 //----------
 // Basic functions
@@ -487,6 +480,7 @@ end intrinsic;
 
 /*
 //TO MOVE OR REMOVE
+
 intrinsic IsBass(S::AlgEtOrd) -> BoolElt
 {check if the order is Bass}
 // we compute the maximal order O and check if O/PO is at most 2-dimensional over S/P for every singular prime P
@@ -572,19 +566,27 @@ end intrinsic;
     end for;
 
 
-    seq:=[x^2-5,x^2-7];
+    seq:=[x^2-5*25,x^2-7*49];
     seq:=[NumberField(f) : f in seq];
     A:=EtaleAlgebra(seq);
     time O1:=Order(Basis(A));
     time O2:=Order(AbsoluteBasis(A));
     time O1 eq O2;
-    EquationOrder(A);
-    MaximalOrder(A);
     for O in [O1,O2] do
         for i in [1..100] do
             assert Random(O) in O;
         end for;
     end for;
+    
+    E1:=EquationOrder(A);
+    E2:=ProductOfEquationOrders(A);
+    E3:=Order(A,<EquationOrder(seq[1]) , MaximalOrder(seq[2])>);
+    E4:=Order(A,<MaximalOrder(seq[1]) , EquationOrder(seq[2])>);
+    OA:=MaximalOrder(A);
+    for E in [E1,E2,E3,E4] do 
+        Index(OA,E);
+    end for;
+
 
 
     K:=NumberField(x^2-5);

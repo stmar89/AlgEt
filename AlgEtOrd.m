@@ -388,7 +388,7 @@ intrinsic Index(S::AlgEtOrd, T::AlgEtOrd) -> Any
 end intrinsic;
 
 //----------
-// Binary operation
+// Subset and product of orders
 //----------
 
 intrinsic 'subset'(O1 :: AlgEtOrd, O2 :: AlgEtOrd) -> BoolElt
@@ -424,7 +424,31 @@ intrinsic '*'(O1::AlgEtOrd,O2::AlgEtOrd)->BoolElt
     return Order(gens);
 end intrinsic;
 
-/* CONTINUE from HERE
+//----------
+// Intersection
+//----------
+
+meet_zbasis:=function(zb1,zb2)
+//Returns the ZBasis of the intersection of the lattices gerated by the gven two Z-bases.
+    A:=Algebra(zb1[1]);
+    N:=#zb1;
+    MI:=crZQ(MatrixAtoQ(zb1));
+    MJ:=crZQ(MatrixAtoQ(zb2));
+    dI:=Integers() ! Denominator(MI);
+    dJ:=Integers() ! Denominator(MJ);
+    d:=LCM(dI,dJ);
+    MI:=crQZ(d*MI);
+    MJ:=crQZ(d*MJ);
+    MZ:=ZeroMatrix(Integers(),N,N);
+    M:=Matrix(HorizontalJoin(VerticalJoin(MI,MJ),VerticalJoin(MI,MZ)));
+    M:=hnf(M);
+    //the hnf of zb1 meet zb2 is the lower-right quadrant of M
+    P:=Matrix(N,N,[M[i,j] : i,j in [N+1..2*N]]);
+    P:=(1/d)*crZQ(P);
+    zb:=MatrixQToA(A,P);
+    return zb;
+end function;
+
 
 intrinsic 'meet'(O1::AlgEtOrd,O2::AlgEtOrd)->BoolElt
 {checks equality of orders in an etale Algebra}
@@ -436,15 +460,22 @@ intrinsic 'meet'(O1::AlgEtOrd,O2::AlgEtOrd)->BoolElt
     if assigned O2`IsMaximal and O2`IsMaximal then
         return O1;
     end if;
+    if O1 eq O2 then
+        return O1;
+    end if;
     if O1 subset O2 then
         return O1;
     end if;
     if O2 subset O1 then
         return O2;
     end if;
-    return Order(Algebra(O1),AssociativeOrder(O1) meet AssociativeOrder(O2));
+    zb:=meet_zbasis(ZBasis(O1),ZBasis(O2));
+    O:=Order(zb : Check:=0 ); //the intersecion of two orders is multiplicatively closed
+    assert2 O eq Order(zb);
+    return O;
 end intrinsic;
 
+/* CONTINUE from HERE
 
 
 
@@ -590,6 +621,9 @@ end intrinsic;
     E1 subset E2;
     E1 subset E3;
     E3*E4 eq OA;
+    OA meet E1 eq E1;
+    E2 meet E1 eq E2;
+    E3 meet E4 eq E2;
 
 
 

@@ -26,7 +26,7 @@ declare attributes AlgEt : MaximalOrder,
 
 declare attributes AlgEtOrd : OneIdeal,
                               IsMaximal,
-                              IsProducOfOrders,
+                              IsProductOfOrders,
                               Index,
                               ZBasis,
                               Generators,
@@ -225,7 +225,7 @@ intrinsic 'eq'(O1::AlgEtOrd,O2::AlgEtOrd)->BoolElt
     else
         out:=false;
     end if;
-    vprintf AlgEtOrd,2 : "output of equality = ",out;
+    vprintf AlgEtOrd,3 : "output of equality = %o\n",out;
     if out then //we copy the attributes
         for att in GetAttributes(AlgEtOrd) do
             if assigned O1``att and not assigned O2``att then
@@ -321,23 +321,48 @@ end intrinsic;
 intrinsic MaximalOrder(A::AlgEt)->AlgEtOrd
 {Returns the maximal order of the étale algebra A.}
     if not assigned A`MaximalOrder then    
-        O:=Order( A , <Maximal(E) : E in NumberFields(A)> );
+        O:=Order( A , <MaximalOrder(E) : E in NumberFields(A)> );
         O`IsMaximal:=true;
         A`MaximalOrder:=O;
     end if;
-    return A`MaximalOrder; A`ProductOfEquationOrders
+    return A`MaximalOrder;
 end intrinsic;
 
 intrinsic IsMaximal(S::AlgEtOrd) -> BoolElt
 {Returns wheter the given order is the maximal order of the étale algebra.}
     if not assigned S`IsMaximal then
-        O:=MaximalOrder(S);
+        O:=MaximalOrder(Algebra(S));
         S`IsMaximal:=S eq O;
     end if;
     return S`IsMaximal;
 end intrinsic;
 
+//----------
+// IsProduct
+//----------
 
+intrinsic IsProductOfOrders(O::AlgEtOrd)->BoolElt, Tup
+{Return if the argument is a product of orders in number fields, and if so return also the sequence of these orders.}
+    if not assigned O`IsProductOfOrders then
+        A:=Algebra(O);
+        idem:=OrthogonalIdempotents(A);
+        test:=forall{x : x in idem | x in O};
+        if test then
+            nf,_,projs:=NumberFields(A); 
+            if #nf eq 1 then
+                orders:=<O>;
+            else
+                zb:=ZBasis(O);
+                orders:=< Order( [ projs[i](z) : z in zb ] ) : i in [1..#idem] >;
+                assert2 O eq Order(A,orders);
+            end if;
+            O`IsProductOfOrders:=<true,orders>;
+        else
+            O`IsProductOfOrders:=<false>;
+        end if;
+    end if;
+    return Explode(O`IsProductOfOrders);
+end intrinsic;
 
 /* CONTINUE from HERE
 
@@ -457,39 +482,6 @@ intrinsic '*'(O1::AlgEtOrd,O2::AlgEtOrd)->BoolElt
     return Order(gens);
 end intrinsic;
 
-//----------
-// Others
-//----------
-
-
-intrinsic IsProductOfOrders(O::AlgEtOrd)->BoolElt, Tup
-{return if the argument is a product of orders in number fields, and if so return also the sequence of these orders}
-    A:=Algebra(O);
-    idem:=OrthogonalIdempotents(A);
-    test:=forall{x : x in idem | x in O};
-    O_asProd:=<>;
-    is_max:=IsMaximal(O);
-    if test then
-        for i in [1..#A`NumberFields] do
-            L:=A`NumberFields[i];
-            gen_L:=[(x*idem[i])@@L[2]: x in Generators(O)];
-            O_L:=Order(gen_L);
-            if is_max then
-                if not assigned O_L`Maximal then O_L`Maximal:=true;
-                else assert O_L`Maximal eq true;
-                end if;
-                if not assigned L[1]`MaximalOrder then L[1]`MaximalOrder:=O_L;
-                else assert2 L[1]`MaximalOrder eq O_L;
-                end if;
-                //note: is not is_max it might still happen than OL is the maximal order of L. that's why we don't set it
-            end if;
-            Append(~O_asProd,O_L);
-        end for;
-        return true, O_asProd;
-    else
-        return false,<>;
-    end if;
-end intrinsic;
 
 */
 
@@ -561,7 +553,16 @@ end intrinsic;
     time O1 eq O2;
     time O2 eq O3;
     assert EquationOrder(A) eq ProductOfEquationOrders(A);
-    MaximalOrder(A);
+    
+    OA:=MaximalOrder(A);
+    O:=Order(ZBasis(OA));
+    assert not assigned O`IsMaximal;
+    assert O eq OA;
+    assert assigned O`IsMaximal;
+
+    O:=Order(ZBasis(OA));
+    assert IsProductOfOrders(O);
+    assert IsMaximal(O);
 
     assert forall{z : z in ZBasis(O1) | z in O1 };
     for O in [O1,O2,O3] do

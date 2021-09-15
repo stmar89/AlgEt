@@ -276,7 +276,34 @@ intrinsic Random(O::AlgEtOrd : CoeffRange:=3, ZeroDivisorsAllowed:=false ) -> Al
       return Random(O,CoeffRange : ZeroDivisorsAllowed:=ZeroDivisorsAllowed);
 end intrinsic;
 
+//----------
+// Equation Orders
+//----------
+
+intrinsic EquationOrder(A::AlgEt) -> AlgEtOrd
+{Given an étale algebra defined by a polynomial, returns the monogenic order defined by the same polynomial}
+    require PrimeField(A) eq BaseField(A) : "Defined only for algebras over the Rationals()";
+    pow:=PowerBasis(A);
+    E:=Order(pow : Check:=0); //the PowerBasis genertes a mutliplicativelyclosed lattice
+    assert2 E eq Order([pow[2]]);
+    return E;
+end intrinsic;
+
+
+
+
+
 /* CONTINUE from HERE
+
+intrinsic ProductOfEquationOrders(A::AlgEt)->AlgEtOrd
+{Given a product of number field A, returns the order consisting of the product of the equation orders of the number fields.}
+    gen_inA:=[];
+    for L in A`NumberFields do
+        EL:=EquationOrder(L[1]);
+        gen_inA:=gen_inA cat [L[2](y) : y in Basis(EL,L[1])];
+    end for;
+    return Order(gen_inA);
+end intrinsic;
 
 intrinsic IsMaximal(S::AlgEtOrd) -> BoolElt
 {}
@@ -432,22 +459,6 @@ end intrinsic;
 // Others
 //----------
 
-intrinsic ProdEqOrders(A::AlgEt)->AlgEtOrd
-{given a product of number fields A, returns the order consisting of the product of the equation orders of the number fields}
-    gen_inA:=[];
-    for L in A`NumberFields do
-        EL:=EquationOrder(L[1]);
-        gen_inA:=gen_inA cat [L[2](y) : y in Basis(EL,L[1])];
-    end for;
-    return Order(gen_inA);
-end intrinsic;
-
-intrinsic EquationOrder(A::AlgEt) -> AlgEtOrd
-{given an associative algebra defined by a polynomial, returns the monogenic order defined by the same polynomial}
-    F:=PrimitiveElement(A);
-    E:=Order([F]);
-    return E;
-end intrinsic;
 
 intrinsic IsProductOfOrders(O::AlgEtOrd)->BoolElt, Tup
 {return if the argument is a product of orders in number fields, and if so return also the sequence of these orders}
@@ -547,6 +558,7 @@ end intrinsic;
     Hash(O3);
     time O1 eq O2;
     time O2 eq O3;
+    EquationOrder(A);
     assert forall{z : z in ZBasis(O1) | z in O1 };
     for O in [O1,O2,O3] do
         for i in [1..100] do
@@ -561,6 +573,7 @@ end intrinsic;
     time O1:=Order(Basis(A));
     time O2:=Order(AbsoluteBasis(A));
     time O1 eq O2;
+    EquationOrder(A);
     for O in [O1,O2] do
         for i in [1..100] do
             assert Random(O) in O;
@@ -573,6 +586,7 @@ end intrinsic;
     p:=y^2-7;
     assert forall{z : z in ZBasis(O1) | z in O1 };
     A:=EtaleAlgebra(p);
+    EquationOrder(A);
     time O1:=Order(Basis(A)); //this should trigger an error
     time O2:=Order(AbsoluteBasis(A));
     assert forall{z : z in ZBasis(O2) | z in O2 };

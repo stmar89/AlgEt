@@ -20,7 +20,9 @@ declare attributes AlgEtElt : Algebra, // AlgEt
 declare attributes AlgEt : Basis,
                            AbsoluteBasis,
                            PrimitiveElement,
-                           PowerBasis;
+                           PowerBasis,
+                           OrthogonalIdempotents,
+                           Idempotents;
 
 //------------
 // Printing for AlgEtElt
@@ -403,6 +405,32 @@ intrinsic AbsoluteCoordinates(seq::SeqEnum[AlgEtElt] , basis::SeqEnum[AlgEtElt])
     return out;
 end intrinsic;
 
+
+//------------
+// Idempotents
+//------------
+
+intrinsic OrthogonalIdempotents(A::AlgEt) -> SeqEnum
+{Returns the orthogonal ideampotent element of the étale algebra A}
+    if not assigned A`OrthogonalIdempotents then
+        nf,embs:=NumberFields(A);
+        A`OrthogonalIdempotents := [embs[i](One(nf[i])) : i in [1..#nf]];
+    end if;
+    return A`OrthogonalIdempotents;
+end intrinsic;
+
+intrinsic Idempotents(A::AlgEt) -> SeqEnum
+{Returns the ideampotent element of the étale algebra A}
+    if not assigned A`Idempotents then
+        ortid:=Seqset(OrthogonalIdempotents(A));
+        ss:=Subsets(ortid);
+        id:=[ Zero(A) + &+(Setseq(S)) : S in ss ];
+        assert One(A) in id;
+        A`Idempotents := id;
+    end if;
+    return A`Idempotents;
+end intrinsic;
+
 /* CONTINUE FROM HERE
 
 intrinsic CoordinatesOverBaseRing(seq::SeqEnum[AlgEtElt] , basis::SeqEnum[AlgEtElt]) -> SeqEnum
@@ -446,6 +474,9 @@ end intrinsic;
     Random(A);
     IsIntegral(A!1/2);
     IsIntegral(A!2);
+
+    OrthogonalIdempotents(A);
+    Idempotents(A);
 
     for n in [1..100] do
         a:=Random(A,3);
@@ -498,9 +529,13 @@ end intrinsic;
     e:=A!<K.1+E.1,K.1^2>;
     assert #AbsoluteCoordinates(e) eq AbsoluteDimension(A);
     assert e eq &+[AbsoluteCoordinates(e)[i]*AbsoluteBasis(A)[i] : i in [1..AbsoluteDimension(A)]];
+    OrthogonalIdempotents(A);
+    Idempotents(A);
 
     A:=EtaleAlgebra([E,E]);
     assert #Basis(A) eq Dimension(A);
     assert #AbsoluteBasis(A) eq AbsoluteDimension(A);
+    OrthogonalIdempotents(A);
+    Idempotents(A);
 
 */

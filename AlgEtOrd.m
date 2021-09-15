@@ -387,7 +387,63 @@ intrinsic Index(S::AlgEtOrd, T::AlgEtOrd) -> Any
   return elt;
 end intrinsic;
 
+//----------
+// Binary operation
+//----------
+
+intrinsic 'subset'(O1 :: AlgEtOrd, O2 :: AlgEtOrd) -> BoolElt
+{Checks if the first argument is inside the second.}
+  require Algebra(O1) cmpeq Algebra(O2) : "The orders must be in the same algebra.";
+  if not Index(O2, O1) in Integers() then
+    return false;
+  end if;
+  mat := Matrix(AbsoluteCoordinates(Generators(O1), ZBasis(O2)));
+  return &and[IsCoercible(Integers(), elt) : elt in Eltseq(mat)];
+end intrinsic;
+
+intrinsic '*'(O1::AlgEtOrd,O2::AlgEtOrd)->BoolElt
+{checks equality of orders in an etale Algebra}
+    require Algebra(O1) cmpeq Algebra(O2) : "the orders must be defined in the same algebra";
+    if O1 eq O2 then
+        return O1;
+    end if;
+    if assigned O1`IsMaximal and O1`IsMaximal then 
+    //calling IsMaximal(O1) would trigger the computation of the maximal order, which might be expensive
+        return O1;
+    end if;
+    if assigned O2`IsMaximal and O2`IsMaximal then
+        return O2;
+    end if;
+    if O1 subset O2 then
+        return O2;
+    end if;
+    if O2 subset O1 then
+        return O1;
+    end if;
+    gens:=Setseq( Seqset(Generators(O1) cat Generators(O2)) );
+    return Order(gens);
+end intrinsic;
+
 /* CONTINUE from HERE
+
+intrinsic 'meet'(O1::AlgEtOrd,O2::AlgEtOrd)->BoolElt
+{checks equality of orders in an etale Algebra}
+    require Algebra(O1) cmpeq Algebra(O2) : "the orders must be defined in the same algebra";
+    if assigned O1`IsMaximal and O1`IsMaximal then 
+    //calling IsMaximal(O1) would trigger the computation of the maximal order, which might be expensive
+        return O2;
+    end if;
+    if assigned O2`IsMaximal and O2`IsMaximal then
+        return O1;
+    end if;
+    if O1 subset O2 then
+        return O1;
+    end if;
+    if O2 subset O1 then
+        return O2;
+    end if;
+    return Order(Algebra(O1),AssociativeOrder(O1) meet AssociativeOrder(O2));
+end intrinsic;
 
 
 
@@ -419,61 +475,6 @@ intrinsic Discriminant(R::AlgEtOrd) -> RngInt
     return Discriminant(AssOrder(R));
 end intrinsic;
 
-//----------
-// Binary operation
-//----------
-
-intrinsic 'subset'(O1 :: AlgEtOrd, O2 :: AlgEtOrd) -> BoolElt
-{Checks if the first argument is inside the second.}
-  require Algebra(O1) cmpeq Algebra(O2) : "The orders must be in the same algebra.";
-  if not Index(O2, O1) in Integers() then
-    return false;
-  end if;
-  mat := Matrix(Coordinates(Generators(O1), ZBasis(O2)));
-  return &and[IsCoercible(Integers(), elt) : elt in Eltseq(mat)];
-end intrinsic;
-
-intrinsic 'meet'(O1::AlgEtOrd,O2::AlgEtOrd)->BoolElt
-{checks equality of orders in an etale Algebra}
-    require Algebra(O1) cmpeq Algebra(O2) : "the orders must be defined in the same algebra";
-    if assigned O1`IsMaximal and O1`IsMaximal then 
-    //calling IsMaximal(O1) would trigger the computation of the maximal order, which might be expensive
-        return O2;
-    end if;
-    if assigned O2`IsMaximal and O2`IsMaximal then
-        return O1;
-    end if;
-    if O1 subset O2 then
-        return O1;
-    end if;
-    if O2 subset O1 then
-        return O2;
-    end if;
-    return Order(Algebra(O1),AssociativeOrder(O1) meet AssociativeOrder(O2));
-end intrinsic;
-
-intrinsic '*'(O1::AlgEtOrd,O2::AlgEtOrd)->BoolElt
-{checks equality of orders in an etale Algebra}
-    require Algebra(O1) cmpeq Algebra(O2) : "the orders must be defined in the same algebra";
-    if O1 eq O2 then
-        return O1;
-    end if;
-    if assigned O1`IsMaximal and O1`IsMaximal then 
-    //calling IsMaximal(O1) would trigger the computation of the maximal order, which might be expensive
-        return O1;
-    end if;
-    if assigned O2`IsMaximal and O2`IsMaximal then
-        return O2;
-    end if;
-    if O1 subset O2 then
-        return O2;
-    end if;
-    if O2 subset O1 then
-        return O1;
-    end if;
-    gens:=Setseq( Seqset(Generators(O1) cat Generators(O2)) );
-    return Order(gens);
-end intrinsic;
 
 
 */
@@ -586,6 +587,9 @@ end intrinsic;
     for E in [E1,E2,E3,E4] do 
         Index(OA,E);
     end for;
+    E1 subset E2;
+    E1 subset E3;
+    E3*E4 eq OA;
 
 
 

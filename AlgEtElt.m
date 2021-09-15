@@ -7,7 +7,7 @@
 // http://www.staff.science.uu.nl/~marse004/
 /////////////////////////////////////////////////////
 
-declare verbose AlgEtElt, 1;
+declare verbose AlgEtElt, 3;
 
 /*TODO:
 
@@ -347,7 +347,26 @@ intrinsic AbsoluteBasis(A::AlgEt) -> SeqEnum
     return A`AbsoluteBasis;
 end intrinsic;
 
+intrinsic AbsoluteCoordinates(seq::SeqEnum[AlgEtElt] , basis::SeqEnum[AlgEtElt]) -> SeqEnum
+{Given a sequence of elements and a basis over the PrimeField returns a sequence whose entries are the coordinates in the PrimeField with respect to the given basis.}
+//FIXME
+    A:=Algebra(seq[1]);
+    require #basis eq AbsoluteDimension(A) : "the elements given do not form a basis";
+    Mbasis:=Matrix([ AbsoluteCoordinates(b) : b in basis ]);
+    Mseq:=[ Matrix([AbsoluteCoordinates(b)]) : b in seq ];
+    Mcoeff:=[ Solution(Mbasis,S) : S in Mseq ];
+    out:=[ Eltseq(C) : C in Mcoeff ];
+    vprintf AlgEtElt,3 : "Mbasis=\n%o\nMseq=\n%o\nMcoeff=\n%o\nout=\n%o\n",Mbasis,Mseq,Mcoeff,out;
+    assert2 forall{i : i in [1..#seq] | seq[i] eq &+[out[i][j]*basis[j] : j in [1..#basis]]};
+    return out;
+end intrinsic;
+
 /* CONTINUE FROM HERE
+
+intrinsic CoordinatesOverBaseRing(seq::SeqEnum[AlgEtElt] , basis::SeqEnum[AlgEtElt]) -> SeqEnum
+{//TODO I am not sure what this function should do}
+    return ;
+end intrinsic;
 
 */
 
@@ -370,6 +389,8 @@ end intrinsic;
 
     Attach("~/packages_github/AlgEt/AlgEt.m");
     Attach("~/packages_github/AlgEt/AlgEtElt.m");
+    SetVerbose("AlgEtElt",2);
+
     _<x>:=PolynomialRing(Integers());
     f:=(x^8+16)*(x^8+81);
     A:=EtaleAlgebra(f);
@@ -380,6 +401,11 @@ end intrinsic;
     Random(A,3)/RandomUnit(A,3);
     IsIntegral(A!1/2);
     IsIntegral(A!2);
+
+    for n in [1..100] do
+        a:=Random(A,3);
+        coord:=AbsoluteCoordinates([a],Basis(A));
+    end for;
 
     seq:=[x^2-5,x^2-7];
     seq:=[NumberField(f) : f in seq];

@@ -475,13 +475,18 @@ intrinsic 'meet'(O1::AlgEtOrd,O2::AlgEtOrd)->BoolElt
     return O;
 end intrinsic;
 
+//----------
+// Others
+//----------
+
+intrinsic MultiplicatorRing(R::AlgEtOrd) -> AlgEtOrd
+{Returns the MultiplicatorRing of an order R, that is R itself.}
+    return R;
+end intrinsic;
+
 /* CONTINUE from HERE
 
 
-
-//----------
-// Basic functions
-//----------
 
 intrinsic OneIdeal(S::AlgEtOrd) -> AlgEtOrdIdl
 {given an S returns the ideal 1*S which will be cached}
@@ -489,11 +494,6 @@ intrinsic OneIdeal(S::AlgEtOrd) -> AlgEtOrdIdl
     S`OneIdeal := Ideal(S,One(S));
   end if;
   return S`OneIdeal;
-end intrinsic;
-
-intrinsic MultiplicatorRing(R::AlgEtOrd) -> AlgEtOrd
-{returns the MultiplicatorRing of an order R, that is R itself}
-    return R;
 end intrinsic;
 
 intrinsic ListToSequence(L::List)->SeqEnum
@@ -505,9 +505,6 @@ intrinsic Discriminant(R::AlgEtOrd) -> RngInt
 {returns the discriminant of the order}
     return Discriminant(AssOrder(R));
 end intrinsic;
-
-
-
 */
 
 /*

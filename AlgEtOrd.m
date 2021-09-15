@@ -239,6 +239,43 @@ intrinsic 'in'(x::AlgEtElt,O::AlgEtOrd) -> BoolElt
     return &and[IsCoercible(Integers(), elt) : elt in Eltseq(mat)];
 end intrinsic;
 
+//----------
+// Elements in orders
+//----------
+
+intrinsic One(S::AlgEtOrd)->AlgEtElt
+{unit element of S}
+    A:=Algebra(S);
+    return One(A);
+end intrinsic;
+
+intrinsic Zero(S::AlgEtOrd)->AlgEtElt
+{zero element of S}
+    A:=Algebra(S);
+    return Zero(A);
+end intrinsic;
+
+intrinsic Random(O::AlgEtOrd , bd::RngIntElt : ZeroDivisorsAllowed:=false ) -> AlgEtElt
+{Random element of O. The Coefficients are bounded by the positive integer bd. One can allow zero-divisors using the optional argument "ZeroDivisorsAllowed", which by default is set to false }
+    require bd gt 0 : "The bound needs to be a positive integer.";
+    B := ZBasis(O);
+    if ZeroDivisorsAllowed then
+       elt:=&+[ Random([-bd..bd])*b : b in B];
+    else 
+        repeat
+            elt:=&+[ Random([-bd..bd])*b : b in B];
+        until not IsZeroDivisor(elt);
+    end if;
+    return elt;
+end intrinsic;
+
+intrinsic Random(O::AlgEtOrd : CoeffRange:=3, ZeroDivisorsAllowed:=false ) -> AlgEtElt
+{ Returns a random (small coefficient) element of O. 
+  The range of the random coefficients can be increased by giving the optional argument CoeffRange.
+  One can allow zero-divisors using the optional argument "ZeroDivisorsAllowed", which by default is set to false }
+      return Random(O,CoeffRange : ZeroDivisorsAllowed:=ZeroDivisorsAllowed);
+end intrinsic;
+
 /* CONTINUE from HERE
 
 intrinsic IsMaximal(S::AlgEtOrd) -> BoolElt
@@ -258,6 +295,14 @@ intrinsic Index(T::AlgEtOrd) -> FldRatElt
   end if;
   return T`Index;
 end intrinsic;
+    B := ZBasis(O);
+    if ZeroDivisorsAllowed then
+       elt:=&+[ Random([-CoeffRange..CoeffRange])*b : b in B];
+    else 
+        repeat
+            elt:=&+[ Random([-CoeffRange..CoeffRange])*b : b in B];
+        until not IsZeroDivisor(elt);
+    end if;
 
 intrinsic Index(S::AlgEtOrd, T::AlgEtOrd) -> Any
 {given two orders T \subset S, returns [S:T] = #S/T }
@@ -272,18 +317,6 @@ end intrinsic;
 //----------
 // Basic functions
 //----------
-
-intrinsic One(S::AlgEtOrd)->AlgEtElt
-{unit element of S}
-    A:=Algebra(S);
-    return One(A);
-end intrinsic;
-
-intrinsic Zero(S::AlgEtOrd)->AlgEtElt
-{zero element of S}
-    A:=Algebra(S);
-    return Zero(A);
-end intrinsic;
 
 intrinsic OneIdeal(S::AlgEtOrd) -> AlgEtOrdIdl
 {given an S returns the ideal 1*S which will be cached}
@@ -306,21 +339,6 @@ end intrinsic;
 intrinsic Discriminant(R::AlgEtOrd) -> RngInt
 {returns the discriminant of the order}
     return Discriminant(AssOrder(R));
-end intrinsic;
-
-intrinsic Random(O::AlgEtOrd : CoeffRange:=3, ZeroDivisorsAllowed:=false ) -> AlgEtElt
-{ Returns a random (small coefficient) element of O. 
-  The range of the random coefficients can be increased by giving the optional argument CoeffRange.
-  One can allow zero-divisors using the optional argument "ZeroDivisorsAllowed", which by default is set to false }
-    B := ZBasis(O);
-    if ZeroDivisorsAllowed then
-       elt:=&+[ Random([-CoeffRange..CoeffRange])*b : b in B];
-    else 
-        repeat
-            elt:=&+[ Random([-CoeffRange..CoeffRange])*b : b in B];
-        until not IsZeroDivisor(elt);
-    end if;
-    return elt;
 end intrinsic;
 
 //----------
@@ -510,12 +528,12 @@ end intrinsic;
 */
 
 /* TEST TO MODIFy
-
-    SetVerbose(AlgEtOrd,2);
-
+    
     Attach("~/packages_github/AlgEt/AlgEt.m");
     Attach("~/packages_github/AlgEt/AlgEtElt.m");
     Attach("~/packages_github/AlgEt/AlgEtOrd.m");
+    SetVerbose("AlgEtOrd",2);
+
     _<x>:=PolynomialRing(Integers());
     f:=(x^8+16)*(x^8+81);
     A:=EtaleAlgebra(f);
@@ -530,6 +548,11 @@ end intrinsic;
     time O1 eq O2;
     time O2 eq O3;
     assert forall{z : z in ZBasis(O1) | z in O1 };
+    for O in [O1,O2,O3] do
+        for i in [1..100] do
+            assert Random(O) in O;
+        end for;
+    end for;
 
 
     seq:=[x^2-5,x^2-7];
@@ -538,6 +561,12 @@ end intrinsic;
     time O1:=Order(Basis(A));
     time O2:=Order(AbsoluteBasis(A));
     time O1 eq O2;
+    for O in [O1,O2] do
+        for i in [1..100] do
+            assert Random(O) in O;
+        end for;
+    end for;
+
 
     K:=NumberField(x^2-5);
     _<y>:=PolynomialRing(K);
@@ -547,6 +576,12 @@ end intrinsic;
     time O1:=Order(Basis(A)); //this should trigger an error
     time O2:=Order(AbsoluteBasis(A));
     assert forall{z : z in ZBasis(O2) | z in O2 };
+    for O in [O2] do
+        for i in [1..100] do
+            assert Random(O) in O;
+        end for;
+    end for;
+
     
     
     A:=EtaleAlgebra([K,K]);
@@ -555,10 +590,22 @@ end intrinsic;
     time O1 eq O2;
     assert forall{z : z in ZBasis(O1) | z in O1 };
     assert forall{z : z in ZBasis(O2) | z in O2 };
+    for O in [O1,O2] do
+        for i in [1..100] do
+            assert Random(O) in O;
+        end for;
+    end for;
+
 
     seq:=[NumberField(p),NumberField(x^2-5)];
     A:=EtaleAlgebra(seq);
     time O2:=Order(AbsoluteBasis(A));
+    for O in [O2] do
+        for i in [1..100] do
+            assert Random(O) in O;
+        end for;
+    end for;
+
 
     K:=NumberField(x^2-25*5);
     _<y>:=PolynomialRing(K);
@@ -576,6 +623,12 @@ end intrinsic;
     time O3 eq O2;
     time O4 eq O2;
     assert forall{ O : O in [O2,O3,O4] | forall{z : z in ZBasis(O) | z in O}};
+    for O in [O2,O3,O4] do
+        for i in [1..100] do
+            assert Random(O) in O;
+        end for;
+    end for;
+
 
 */
 

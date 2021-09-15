@@ -142,6 +142,11 @@ intrinsic Random(A::AlgEt , bd::RngIntElt) -> AlgEtElt
     return num/den;
 end intrinsic;
 
+intrinsic Random(A::AlgEt : bd:=3) -> AlgEtElt
+{Random element of A. The Coefficients are bounded by VarArg bd (default 3).}   
+    return Random(A,bd);
+end intrinsic;
+
 intrinsic RandomUnit(A::AlgEt , bd::RngIntElt) -> AlgEtElt
 {Random unit of A. The Coefficients are bounded by the positive integer bd.}   
     require bd gt 0 : "The bound needs to be a positive integer.";
@@ -438,6 +443,7 @@ end intrinsic;
     Random(A,3)-Random(A,3);
     Random(A,3)*Random(A,3);
     Random(A,3)/RandomUnit(A,3);
+    Random(A);
     IsIntegral(A!1/2);
     IsIntegral(A!2);
 

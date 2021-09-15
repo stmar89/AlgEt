@@ -304,13 +304,14 @@ intrinsic MinimalPolynomial(x::AlgEtElt) -> RngUPolElt
     nf:=NumberFields(A);
     require HasBaseField(A) : "The number fields of A shoud all be defined over the same base ring.";
     m:=LCM( [ MinimalPolynomial(c) : c in Coordinates(x) ] );
-    assert2 Evaluate
+    assert2 Evaluate(m,x);
     return m;
 end intrinsic;
 
 intrinsic MinimalPolynomial(x::AlgEtElt, F::Rng) -> RngUPolElt
 {Returns the minimal polynommial over the ring F of the element x.}
     m:=LCM( [ MinimalPolynomial(c,F) : c in Coordinates(x) ] );
+    assert2 Evaluate(m,x);
     return m;
 end intrinsic;
 
@@ -386,7 +387,6 @@ end intrinsic;
 
 intrinsic AbsoluteCoordinates(seq::SeqEnum[AlgEtElt] , basis::SeqEnum[AlgEtElt]) -> SeqEnum
 {Given a sequence of elements and a basis over the PrimeField returns a sequence whose entries are the coordinates in the PrimeField with respect to the given basis.}
-//FIXME
     A:=Algebra(seq[1]);
     require #basis eq AbsoluteDimension(A) : "the elements given do not form a basis";
     Mbasis:=Matrix([ AbsoluteCoordinates(b) : b in basis ]);
@@ -467,7 +467,7 @@ end intrinsic;
     p:=y^2-7;
     A:=EtaleAlgebra(p);
     a:=PrimitiveElement(A);
-    assert MinimalPolynomial(a) eq f;
+    assert MinimalPolynomial(a) eq p;
     A!1 - A!(1/2);
     A!1 / A!(1/2);
 

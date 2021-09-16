@@ -11,10 +11,6 @@
 declare verbose AlgEtOrd, 3;
 
 /*TODO:
-- one should try to avoid constructing the AssOrder.
-- modify ZBasis : don't use AssIdeal and add the Hash
-- in MaximalOrder use the product of number fields instead of the AssAlg
-- check that the attributes are all ok and needed
 */
 
 
@@ -24,14 +20,12 @@ declare attributes AlgEt : MaximalOrder,
                            ProductOfEquationOrders,
                            EquationOrder;
 
-declare attributes AlgEtOrd : OneIdeal,
-                              IsMaximal,
+declare attributes AlgEtOrd : IsMaximal,
                               IsProductOfOrders,
                               Index,
                               ZBasis,
                               Generators,
                               Algebra,
-                              Conductor,
                               Hash;
 
 //----------
@@ -301,6 +295,7 @@ intrinsic EquationOrder(A::AlgEt) -> AlgEtOrd
         pow:=PowerBasis(A);
         E:=Order(pow : Check:=0); //the PowerBasis genertes a mutliplicativelyclosed lattice
         assert2 E eq Order([pow[2]]);
+        E`Generators:=[pow[2]]; // I want the genertor set to be small, so I put only the primitive element
         A`EquationOrder:=E;
     end if;
     return A`EquationOrder;

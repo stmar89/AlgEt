@@ -21,6 +21,7 @@ declare attributes AlgEtIdl : Index, //stores the index
                               Generators,
                               ZBasis,
                               IsPrime,
+                              IsInvertible,
                               PrimesAbove,
                               Factorization,
                               IsProductOfIdeals,
@@ -593,6 +594,32 @@ intrinsic IsProductOfIdeals(I::AlgEtIdl) -> BoolElt, Tup
     return Explode(I`IsProductOfIdeals);
 end intrinsic;
 
+//----------
+// Random Elemnts
+//----------
+
+intrinsic Random(I::AlgEtIdl , bd::RngIntElt : ZeroDivisorsAllowed:=false ) -> AlgEtElt
+{Random element of I. The Coefficients are bounded by the positive integer bd. One can allow zero-divisors using the optional argument "ZeroDivisorsAllowed", which by default is set to false }
+    require bd gt 0 : "The bound needs to be a positive integer.";
+    B := ZBasis(I);
+    if ZeroDivisorsAllowed then
+       elt:=&+[ Random([-bd..bd])*b : b in B];
+    else 
+        repeat
+            elt:=&+[ Random([-bd..bd])*b : b in B];
+        until not IsZeroDivisor(elt);
+    end if;
+    return elt;
+end intrinsic;
+
+intrinsic Random(I::AlgEtIdl : CoeffRange:=3, ZeroDivisorsAllowed:=false ) -> AlgEtElt
+{ Returns a random (small coefficient) element of I. 
+  The range of the random coefficients can be increased by giving the optional argument CoeffRange.
+  One can allow zero-divisors using the optional argument "ZeroDivisorsAllowed", which by default is set to false }
+      return Random(I,CoeffRange : ZeroDivisorsAllowed:=ZeroDivisorsAllowed);
+end intrinsic;
+
+
 /* Continue from here
 
 //----------
@@ -856,49 +883,6 @@ intrinsic IsPrime(I::AlgEtIdl) -> BoolElt
         I`IsPrime:=bool;
     end if;
     return I`IsPrime;
-end intrinsic;
-//----------
-//
-// Weak Equiv testing
-//
-//----------
-
-intrinsic IsWeakEquivalent(I::AlgEtIdl,J::AlgEtIdl)->BoolElt
-{ checks if 1 \in (I:J)*(J:I). This function does not require that the ideals are defined over the same order. }
-    S := MultiplicatorRing(I);
-    if MultiplicatorRing(J) ne S then
-        return false;
-    else
-        IS:=S!!I;
-        JS:=S!!J;
-        CIJ:=ColonIdeal(IS,JS);
-        CJI:=ColonIdeal(JS,IS);
-        //test := OneIdeal(S) eq (CIJ*CJI); //note that this test does not depend on the order of definition of the ideals.
-        id:=(CIJ*CJI);
-        test:=One(Algebra(I)) in id; //faster!
-        return test;
-    end if;
-end intrinsic;
-
-intrinsic IsWeakEquivalent(O1::AlgEtOrd,O2::AlgEtOrd)->BoolElt
-{ check if the two orders are weakly equivalent, that is equal }
-    return O1 eq O2;
-end intrinsic;
-
-intrinsic IsWeakEquivalent(O::AlgEtOrd,J::AlgEtIdl)->BoolElt
-{ checks if the second argument is weakly equivalent to the first argument }
-    return IsWeakEquivalent(OneIdeal(O), J);
-end intrinsic;
-
-intrinsic IsWeakEquivalent(J::AlgEtIdl,O::AlgEtOrd)->BoolElt
-{ checks if the second argument is weakly equivalent to the first argument }
-    return IsWeakEquivalent(OneIdeal(O), J);
-end intrinsic;
-
-intrinsic IsInvertible(I::AlgEtIdl) ->AlgEtIdl
-{ checks if the ideal is invertible in its order of definition }
-    O:=Order(I);
-    return IsWeakEquivalent(I,O);
 end intrinsic;
 */
 

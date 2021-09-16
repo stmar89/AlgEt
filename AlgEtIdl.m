@@ -50,7 +50,7 @@ CreateAlgEtOrdIdl:=function(S,gens)
     I`Algebra:=A;
     I`Order:=S;
     gens:=Setseq(Seqset(gens));
-    if #gens gt Dimension(A) then
+    if #gens gt AbsoluteDimension(A) then
         vprintf AlgEtIdl, 2: "too many gens";
         gens:=[g*s : g in gens, s in ZBasis(S) ];
         dim:=AbsoluteDimension(A);
@@ -128,7 +128,7 @@ end intrinsic;
 // Coercion
 //----------
 
-intrinsic '!!'(T::AlgEtOrd,I::AlgEtOrdIdl) -> AlgEtOrdIdl
+intrinsic '!!'(T::AlgEtOrd,I::AlgEtIdl) -> AlgEtIdl
 {Given an S-ideal I and an order T, returns the extension IT as a T-ideal. Note that if T is in S, then IT=I}
     if Order(I) eq T then
         return I;
@@ -145,119 +145,88 @@ intrinsic '!!'(T::AlgEtOrd,I::AlgEtOrdIdl) -> AlgEtOrdIdl
     end if;
 end intrinsic;
 
-
-/* Continue fro here
-
 //----------
-//
 // Access the attributes
-//
 //----------
 
-intrinsic Algebra(I::AlgEtOrdIdl) -> AlgEt
-{ returns the algebra for ideals }
+intrinsic Algebra(I::AlgEtIdl) -> AlgEt
+{Returns the étale algebra in which the ideal lives.}
     return I`Algebra;
 end intrinsic;
 
-intrinsic Order(I::AlgEtOrdIdl) -> AlgEtOrd
-{ returns the order of definition of the ideals }
+intrinsic Order(I::AlgEtIdl) -> AlgEtOrd
+{Returns the order of definition of the ideal.}
     return I`Order;
 end intrinsic;
 
-intrinsic AssociativeIdeal(I::AlgEtOrdIdl) -> AlgEtOrdIdl
-{ returns the associative ideal underlying the etale ideal }
-    vprintf et_ideals : "AssIdeal";
-    if not assigned I`ideal then
-        I`ideal:=ideal<AssOrder(Order(I)) | [ x`AlgAssElt : x in Generators(I) ]>;
-    end if;
-    return I`ideal;
-end intrinsic;
-
-intrinsic AssIdeal(I::AlgEtOrdIdl) -> AlgEtOrdIdl
-{ returns the associative ideal underlying the etale ideal }
-    return AssociativeIdeal(I);
-end intrinsic;
-
-intrinsic ZBasis(I::AlgEtOrdIdl)->SeqEnum[AlgEtElt]
-{return a Z-basis of the ideal}    
+intrinsic ZBasis(I::AlgEtIdl)->SeqEnum[AlgEtElt]
+{Returns a Z-basis of the ideal.}    
     if not assigned I`ZBasis then
         assert assigned I`Generators;
+        assert not assigned I`Hash; //if Hash is assigned then a ZBasis has been computed
         A:=Algebra(I);
         S:=Order(I);
         gens:=[g*s : g in Generators(I) , s in ZBasis(S) ];
         if #Generators(I) eq 1 then
-            zb:=gens; //it is a ZBasis of I
+            zb:=gens; //gens is a ZBasis of I
         else
-            M:=MatrixQ(gens);
+            dim:=AbsoluteDimension(A);
+            M:=MatrixAtoQ(gens);
             d:=Integers()!Denominator(M);
             P:=hnf(crQZ(d*M));
             P:=(1/d)*crZQ(P);
-            if not assigned I`Hash then
-                d:=Denominator(P);
-                N:=Dimension(A);
-                entries:=[d] cat [(Integers()!(d*P[i,j])) : j in [i..N] , i in [1..N]];
-                hash:=Integers() ! eval(&cat[Sprint(s) : s in entries]);
-                I`Hash:=hash;
-            end if;
-            zb:=MatrixToA(A,P);
+            d:=Denominator(P); //this d might be different from Denomintor(M)
+            hash:=[d] cat [(Integers()!(d*P[i,j])) : j in [i..dim] , i in [1..dim]];
+            zb:=MatrixQToA(A,P);
+            assert #zb eq AbsoluteDimension(A);
+            I`Hash:=hash;
         end if;
-        assert #zb eq Dimension(A);
         I`ZBasis:=zb;
     end if;
     return I`ZBasis;
 end intrinsic;
 
-intrinsic Generators(I::AlgEtOrdIdl) -> SeqEnum[AlgEtElt]
-{ returns the associative ideal underlying the etale ideal }
+intrinsic Generators(I::AlgEtIdl) -> SeqEnum[AlgEtElt]
+{Returns the generators of the ideal.}
     if not assigned I`Generators then 
         I`Generators:=ZBasis(I);
     end if;
-    assert #I`Generators le Dimension(Algebra(I));
+    assert2 #I`Generators le AbsoluteDimension(Algebra(I));
     return I`Generators;
 end intrinsic;
 
-intrinsic Hash(I::AlgEtOrdIdl)->RngInt
-{hash function for AlgEtOrd}
+intrinsic myHash(I::AlgEtIdl)->RngInt
+{Hash function}
     if not assigned I`Hash then
-        N:=Dimension(Algebra(I));
-        P:=MatrixQ(ZBasis(I));
+        dim:=AbsoluteDimension(Algebra(I));
+        P:=MatrixAtoQ(ZBasis(I));
         d:=Integers() ! Denominator(P);
         P:=(1/d)*hnf(crQZ(d*P));
-        d:=Integers() ! Denominator(P);
         assert2 IsUpperTriangular(P);
-        entries:=[d] cat [(Integers()!(d*P[i,j])) : j in [i..N] , i in [1..N]];
-        hash:=Integers() ! eval(&cat[Sprint(s) : s in entries]);
+        d:=Integers() ! Denominator(P); //this d might be different from Denomintor(M)
+        hash:=[d] cat [(Integers()!(d*P[i,j])) : j in [i..dim] , i in [1..dim]];
         I`Hash:=hash;
     end if;
     return I`Hash;
 end intrinsic;
 
 //----------
-//
 // Binary operations
-//
 //----------
 
-intrinsic 'eq'(I::AlgEtOrdIdl , J::AlgEtOrdIdl ) -> BoolElt
-{equality testing for ideals of orders in etale algebras }
-    require Algebra(I) cmpeq Algebra(J) : "they must be ideals of the same algebra";
-    require Order(I) cmpeq Order(J) : "they must be ideals of the same order";
-    if Hash(I) eq Hash(J) then
-        if assigned I`Generators and assigned J`Generators and I`Generators eq J`Generators then
-            out:=true;
-        end if;
-        if assigned I`ZBasis and assigned J`ZBasis and I`ZBasis eq J`ZBasis then
-            out:=true;
-        end if;
-        m1:=MatrixQ(ZBasis(I));
-        m2:=MatrixQ(ZBasis(J));
-        d:=Denominator(m1)*Denominator(m2);
-        out:=hnf(crQZ(d*m1)) eq hnf(crQZ(d*m2));
+intrinsic 'eq'(I::AlgEtIdl , J::AlgEtIdl ) -> BoolElt
+{Equality testing.}
+    require Algebra(I) cmpeq Algebra(J) : "The ideals are not in the same algebra.";
+    require Order(I) cmpeq Order(J) : "The ideals are not over the same order.";
+    if (assigned I`Generators and assigned J`Generators and Generators(I) eq Generators(J))
+        or myHash(I) eq myHash(J) then
+        // we do not check over the ZBasis, because it will turn out to be slower, too many elments in there.
+        out:=true;
     else
         out:=false;
     end if;
     if out then //we copy the attributes
-        for att in GetAttributes(AlgEtOrdIdl) do
+        for att in GetAttributes(AlgEtIdl) do
             if assigned I``att and not assigned J``att then
                 J``att:=I``att;
             elif assigned J``att and not assigned I``att then
@@ -268,10 +237,12 @@ intrinsic 'eq'(I::AlgEtOrdIdl , J::AlgEtOrdIdl ) -> BoolElt
     return out;
 end intrinsic;
 
-intrinsic 'ne'(I::AlgEtOrdIdl , J::AlgEtOrdIdl ) -> BoolElt
-{equality testing for ideals of orders in etale algebras }
+intrinsic 'ne'(I::AlgEtIdl , J::AlgEtIdl ) -> BoolElt
+{Equality testing}
     return not I eq J;
 end intrinsic;
+/* Continue fro here
+
 
 intrinsic 'in'(x::AlgEtElt , I::AlgEtOrdIdl ) -> BoolElt
 { returns if x is in I }
@@ -969,10 +940,10 @@ end intrinsic;
     E2:=ProductOfEquationOrders(A);
     for i in [1..100] do
         a:=Random(A);
-        b:=Random(A);
-        I:=Ideal(E1,a);
-        I:=a*E1;
-        I:=E1*a;
+        assert 1 eq #{Ideal(E1,a),a*E1,E1*a};
+        assert 1 eq #{Ideal(E2,a),a*E2,E2*a};
+        assert a*E2 eq E2!!(a*E1);
+        assert E1!!(E2!!(a*E1)) ne a*E1;
     end for;
 
     K:=NumberField(x^2-5);

@@ -768,116 +768,6 @@ end intrinsic;
 //      return e;
 //  end intrinsic;
 
-
-//----------
-// Factorization and Prime
-//----------
-
-function factorizationMaximalOrder(I)
-//given an ideal of the maximal order of an algebra, returns the factorization into a product of prime ideals
-    O:=Order(I);
-    assert IsMaximal(O);
-//to be removed
-_,OasProd:=IsProductOfOrders(O);
-assert forall{OL : OL in OasProd | IsMaximal(OL)};
-//
-    A:=Algebra(O);
-    _,IasProd:=IsProductOfIdeals(I);
-    fac:=[]; //this will be the factorization of I
-    for i in [1..#A`NumberFields] do
-        L:=A`NumberFields[i,1];
-        mL:=A`NumberFields[i,2];
-        IL:=IasProd[i];
-        assert IsMaximal(Order(IL));
-        facL:=Factorization(IL);
-        for p in facL do
-            genPinA:=[mL(x) : x in Basis(p[1],L)] cat [F[2](One(F[1])) : F in A`NumberFields | F[1] ne L];
-            P:=Ideal(O,genPinA);
-            assert2 IsPrimePower(Integers() ! Index(O,P));
-            Append(~fac,<P,p[2]>);
-        end for;
-    end for;
-    assert2 I eq &*[p[1]^p[2] : p in fac];
-    return fac;
-end function;
-
-intrinsic Factorization(I::AlgEtIdl) -> Tup
-{given a proper integral S-ideal I coprime with the conductor of S (hence invertible in S), returns its factorization into a product of primes of S}
-    S:=Order(I);
-    require IsIntegral(I) and I ne OneIdeal(S): "the argument must be a proper integral ideal";
-    if not assigned I`Factorization then    
-        if IsMaximal(S) then
-        I`Factorization:=factorizationMaximalOrder(I);
-        else
-            fS:=Conductor(S);
-            require IsCoprime(fS,I): "the ideal must be coprime with the conductor of the order of definition";
-            O:=MaximalOrder(Algebra(I));
-            IO:=O !! I;
-            facO:=factorizationMaximalOrder(IO);
-            primesO:=[ p[1] : p in facO ];
-            primesS:=Setseq({ OneIdeal(S) meet (S!!PO) : PO in primesO }); //this should cancel the doubles
-            facS:=<>;
-            for i in [1..#primesS] do
-                P:=primesS[i];
-                P`IsPrime:=true;
-                expP:=&+([ pO[2] : pO in facO | (S meet (S!!pO[1])) eq P ]);
-                Append(~facS, <P,expP>);
-            end for;
-            assert2 I eq &*([ p[1]^p[2] : p in facS ]);
-            I`Factorization:=facS;
-        end if;
-     end if;
-     return I`Factorization;
-end intrinsic;
-
-intrinsic PrimesAbove(I::AlgEtIdl) -> SeqEnum[AlgAssEtOrdIdl]
-{given an integral S-ideal, returns the sequence of maximal ideals P of S above I}
-    require IsIntegral(I): "the ideal must be integral";
-    if not assigned I`PrimesAbove then
-        if assigned I`Factorization then
-            primes:=[P[1] : P in I`Factorization];
-        end if;
-        S:=Order(I);
-        if I eq OneIdeal(S) then
-            primes:=[];
-        else
-            if IsMaximal(S) then
-                O:=S;
-                IO:=I;
-            else
-                O:=MaximalOrder(Algebra(I));
-                IO:=O!!I;
-            end if;
-            fac:=Factorization(IO);
-            primes:= Setseq({ OneIdeal(S) meet (S!!PO[1]) : PO in fac });
-            assert2 forall{P : P in primes | IsIntegral(P)};
-            assert2 forall{P : P in primes | Index(S,P) gt 1};
-            for i in [1..#primes] do
-                P:=primes[i];
-                P`IsPrime:=true;
-            end for;
-            assert2 forall{P : P in primes | I subset P};
-            assert2 forall{P : P in primes | IsPrimePower(Integers() ! Index(S,P))};
-        end if;
-        I`PrimesAbove:=primes;
-    end if;
-    return I`PrimesAbove;
-end intrinsic;
-
-intrinsic IsPrime(I::AlgEtIdl) -> BoolElt
-{given an integral S-ideal, returns if the ideal is a prime fractional ideal of S, that is a maximal S ideal}
-    require IsIntegral(I): "the ideal must be integral";
-    if not assigned I`IsPrime then
-        prim:=PrimesAbove(I);
-        if #prim eq 1 and I eq prim[1] then
-            bool:=true;
-        else
-            bool:=false;
-        end if;
-        I`IsPrime:=bool;
-    end if;
-    return I`IsPrime;
-end intrinsic;
 */
 
 /* TEST
@@ -889,6 +779,7 @@ end intrinsic;
     Attach("~/packages_github/AlgEt/Idl.m");
     Attach("~/packages_github/AlgEt/WkTesting.m");
     SetVerbose("AlgEtIdl",2);
+    SetAssertions(2);
 
     _<x>:=PolynomialRing(Integers());
     f:=(x^8+16)*(x^8+81);

@@ -155,6 +155,7 @@ end intrinsic;
 /* TEST
 
     Attach("~/packages_github/AlgEt/AlgEt.m");
+    SetAssertions(2);
     _<x>:=PolynomialRing(Integers());
     f:=(x^8+16)*(x^8+81);
     A:=EtaleAlgebra(f);

@@ -542,8 +542,8 @@ end intrinsic
 /* TEST
     
     Attach("~/packages_github/AlgEt/AlgEt.m");
-    Attach("~/packages_github/AlgEt/AlgEtElt.m");
-    Attach("~/packages_github/AlgEt/AlgEtOrd.m");
+    Attach("~/packages_github/AlgEt/Elt.m");
+    Attach("~/packages_github/AlgEt/Ord.m");
     SetVerbose("AlgEtOrd",2);
 
     _<x>:=PolynomialRing(Integers());

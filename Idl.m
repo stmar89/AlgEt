@@ -672,6 +672,39 @@ intrinsic CoprimeRepresentative(I::AlgEtIdl,J::AlgEtIdl) -> AlgEtElt
     return x;
 end intrinsic;
 
+//----------
+// Residue Ring
+//----------
+
+intrinsic ResidueRing(S::AlgEtOrd,I::AlgEtIdl) -> GrpAb , Map
+{given an integral ideal I of S, returns the abelian group S/I and the epimorphism pi:S -> S/I (with inverse map). Important: the domain of pi is the Algebra of S, since the elements of S are usually expressed al elements of A. For eg Parent(Random(S)) = Algebra(S)}
+    require Order(I) eq S : "wrong order";
+    require IsIntegral(I): "I must be an integral ideal of S";
+    A:=Algebra(S);
+    N:=AbsoluteDimension(A);
+    F:=FreeAbelianGroup(N);
+    matS:=Transpose(MatrixAtoQ(ZBasis(S)));
+    matP:=Transpose(MatrixAtoQ(ZBasis(I)));
+    S_to_F:=function(x0)
+        assert Parent(x0) eq A;
+        x_inS:=AbsoluteCoordinates([x0],ZBasis(S));
+        return (F ! Eltseq(x_inS)) ;
+    end function;
+    F_to_S:=function(y)
+        clmn_vec_y:=Transpose(Matrix(Vector(Eltseq(y))));
+        y_inA:=&+[ZBasis(S)[i]*Eltseq(clmn_vec_y)[i] : i in [1..N]];
+        return y_inA;
+    end function;
+    StoF:=map< A -> F | x :-> S_to_F(x), y :-> F_to_S(y)>;
+    rel:=[F ! Eltseq(x) : x in Rows(Transpose(matS^-1 * matP))];
+    Q,q:=quo<F|rel>; //Q=S/I
+    m:=StoF*q; //m is a map from S to Q
+    assert #Q eq Index(S,I);
+    assert2 forall{x : x in ZBasis(I) | m(x) eq Zero(Q)};
+    assert2 forall{x : x in ZBasis(S) | ((m(x))@@m - x) in I};
+    return Q,m;
+end intrinsic;
+
 /* Continue from here
 
 
@@ -734,35 +767,6 @@ end intrinsic;
 //      assert e-b in J;
 //      return e;
 //  end intrinsic;
-
-intrinsic ResidueRing(S::AlgEtOrd,I::AlgEtIdl) -> GrpAb , Map
-{given an integral ideal I of S, returns the abelian group S/I and the epimorphism pi:S -> S/I (with inverse map). Important: the domain of pi is the Algebra of S, since the elements of S are usually expressed al elements of A. For eg Parent(Random(S)) = Algebra(S)}
-    require Order(I) eq S : "wrong order";
-    require IsIntegral(I): "I must be an integral ideal of S";
-    A:=Algebra(S);
-    N:=Degree(A);
-    F:=FreeAbelianGroup(N);
-    matS:=Transpose(Matrix(ZBasis(S)));
-    matP:=Transpose(Matrix(ZBasis(I)));
-    S_to_F:=function(x0)
-        assert Parent(x0) eq A;
-        x_inS:=Coordinates([x0],ZBasis(S));
-        return (F ! Eltseq(x_inS)) ;
-    end function;
-    F_to_S:=function(y)
-        clmn_vec_y:=Transpose(Matrix(Vector(Eltseq(y))));
-        y_inA:=&+[ZBasis(S)[i]*Eltseq(clmn_vec_y)[i] : i in [1..N]];
-        return y_inA;
-    end function;
-    StoF:=map< A -> F | x :-> S_to_F(x), y :-> F_to_S(y)>;
-    rel:=[F ! Eltseq(x) : x in Rows(Transpose(matS^-1 * matP))];
-    Q,q:=quo<F|rel>; //Q=S/I
-    m:=StoF*q; //m is a map from S to Q
-    assert #Q eq Index(S,I);
-    assert2 forall{x : x in ZBasis(I) | m(x) eq Zero(Q)};
-    assert2 forall{x : x in ZBasis(S) | ((m(x))@@m - x) in I};
-    return Q,m;
-end intrinsic;
 
 
 //----------
@@ -879,11 +883,11 @@ end intrinsic;
 /* TEST
 
     Attach("~/packages_github/AlgEt/AlgEt.m");
-    Attach("~/packages_github/AlgEt/AlgEtElt.m");
-    Attach("~/packages_github/AlgEt/AlgEtOrd.m");
-    Attach("~/packages_github/AlgEt/AlgEtTraceNorm.m");
-    Attach("~/packages_github/AlgEt/AlgEtIdl.m");
-    Attach("~/packages_github/AlgEt/AlgEtIdlWkTesting.m");
+    Attach("~/packages_github/AlgEt/Elt.m");
+    Attach("~/packages_github/AlgEt/Ord.m");
+    Attach("~/packages_github/AlgEt/TraceNorm.m");
+    Attach("~/packages_github/AlgEt/Idl.m");
+    Attach("~/packages_github/AlgEt/WkTesting.m");
     SetVerbose("AlgEtIdl",2);
 
     _<x>:=PolynomialRing(Integers());
@@ -913,9 +917,9 @@ end intrinsic;
     time _:=[IsIntegral(Random(E1)*E1+Random(E1)*E1) : i in [1..100]];
     time _:=[MakeIntegral(Random(E1)*E1+Random(E1)*E1) : i in [1..100]];
 
-    time ids:=[ Ideal(E1,[Random(E1) : i in [1..10]]) : i in [1..100]]; 
+    time ids:=[ Ideal(E1,[Random(E1) : i in [1..10]]) : i in [1..20]]; 
+    time rr:=[ResidueRing(E1,I) : I in ids ];
     time cc:=[ ColonIdeal(I,J) : I,J in ids  ];
-    time cc2:=[ TraceDualIdeal(TraceDualIdeal(I)*J) : I,J in ids ];
 
 
     K:=NumberField(x^2-5);

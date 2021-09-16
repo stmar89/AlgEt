@@ -59,6 +59,15 @@ intrinsic IsInvertible(I::AlgEtIdl) ->BoolElt,AlgEtIdl
     return Explode(I`IsInvertible);
 end intrinsic;
 
+intrinsic IsGorenstein(O::AlgEtOrd)->BoolElt
+{ checks if the order O is Gorenstein }
+    if not assigned O`IsGorenstein then
+        T:=TraceDualIdeal(O);
+        O`IsGorenstein:=IsInvertible(T);
+    end if;
+    return O`IsGorenstein;
+end intrinsic
+
 
 
 /* TEST

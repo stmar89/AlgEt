@@ -111,16 +111,19 @@ intrinsic Order( gens::SeqEnum[AlgEtElt] : Check:=100 ) -> AlgEtOrd
             gens0:=[One(A)] cat gens0;
         end if;
         M:=MatrixAtoQ(gens0);
-        d:=Integers()!Denominator(M);
-        P:=hnf(crQZ(d*M));
+        d:=Denominator(M);
+        P:=crZQ(hnf(crQZ(d*M)))/d;
         gens0:=MatrixQToA(A,P);
         fail:=0;
         repeat
             P_old:=P;
-            gens0 cat:= [(g1*g2)/d : g1,g2 in gens0];
-            M:=MatrixAtoZ(gens0);
-            P:=hnf(M);
+            gens0 cat:= [(g1*g2) : g1,g2 in gens0[2..#gens0]]; //One is always at the first place
+            M:=MatrixAtoQ(gens0);
+            d:=Denominator(M);
+            M:=crQZ(M*d);
+            P:=crZQ(hnf(M))/d;
             gens0:=MatrixQToA(A,P);
+            assert2 gens0[1] eq One(A);
             fail +:=1;
             go:=Rank(P_old) eq dim and P eq P_old;
         until go or fail gt Check;
@@ -128,7 +131,6 @@ intrinsic Order( gens::SeqEnum[AlgEtElt] : Check:=100 ) -> AlgEtOrd
             error "The program could not generate a multiplicatively closed set from the given generators. Try to increase the value of Check, or choose different generators.";
         end if;
 
-        P:=(1/d)*crZQ(P);
         d:=Denominator(P); //this d might be different from Denomintor(M)
         // we compute the Hash
         R`Hash:=[d] cat [(Integers()!(d*P[i,j])) : j in [i..dim] , i in [1..dim]];
@@ -138,15 +140,15 @@ intrinsic Order( gens::SeqEnum[AlgEtElt] : Check:=100 ) -> AlgEtOrd
         zb:=gens;
     end if;
 
-  assert #zb eq dim;
-  if #gens le dim then
-    R`Generators:=gens;
-  else
-    R`Generators:=zb;
-  end if;
-  R`ZBasis:=zb;
-  assert2 One(A) in R;
-  return R;
+    assert #zb eq dim;
+    if #gens le dim then
+        R`Generators:=gens;
+    else
+        R`Generators:=zb;
+    end if;
+        R`ZBasis:=zb;
+    assert2 One(A) in R;
+    return R;
 end intrinsic;
 
 intrinsic Order(A::AlgEt , orders::Tup) -> AlgEtOrd
@@ -579,6 +581,11 @@ end intrinsic;
     assert IsProductOfOrders(O);
     assert IsMaximal(O);
 
+    O:=MaximalOrder(A);
+    time G:=[[ Random(O) : i in [1..3] ] : i in [1..100]];
+    time S:=[ Order(s) : s in G ];
+    time #Seqset(S);
+
     assert forall{z : z in ZBasis(O1) | z in O1 };
     for O in [O1,O2,O3] do
         for i in [1..100] do
@@ -613,6 +620,8 @@ end intrinsic;
     OA meet E1 eq E1;
     E2 meet E1 eq E2;
     E3 meet E4 eq E2;
+    O:=MaximalOrder(A);
+    time #{ Order([ Random(O) : i in [1..3] ]) : i in [1..1000] };
 
 
 

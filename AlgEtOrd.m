@@ -180,7 +180,7 @@ intrinsic Algebra(S::AlgEtOrd) -> AlgEt
   return S`Algebra;
 end intrinsic;
 
-intrinsic Hash(S::AlgEtOrd)->SeqEnum[RngInt]
+intrinsic myHash(S::AlgEtOrd)->SeqEnum[RngInt]
 {hash function for AlgEtOrd}
 // two orders have the hash iff they are equal
     if not assigned S`Hash then
@@ -214,7 +214,7 @@ end intrinsic;
 intrinsic 'eq'(O1::AlgEtOrd,O2::AlgEtOrd)->BoolElt
 {checks equality of orders in an etale Algebra}
     require Algebra(O1) cmpeq Algebra(O2) : "the orders must be defined in the same etale algebra";
-    if O1`Generators eq O2`Generators or O1`ZBasis eq O2`ZBasis or Hash(O1) eq Hash(O2) then 
+    if O1`Generators eq O2`Generators or O1`ZBasis eq O2`ZBasis or myHash(O1) eq myHash(O2) then 
         out:=true;
     else
         out:=false;
@@ -561,13 +561,10 @@ end intrinsic;
     f:=(x^8+16)*(x^8+81);
     A:=EtaleAlgebra(f);
     time O1:=Order(Basis(A));
-    Hash(O1);
     ZBasis(O1);
     Generators(O1);
     time O2:=Order(AbsoluteBasis(A) : Check:=0);
-    Hash(O2);
     time O3:=Order(AbsoluteBasis(A));
-    Hash(O3);
     time O1 eq O2;
     time O2 eq O3;
     assert EquationOrder(A) ne ProductOfEquationOrders(A);

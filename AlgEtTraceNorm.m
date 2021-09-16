@@ -40,6 +40,36 @@ intrinsic AbsoluteNorm(x::AlgEtElt) -> Any
 end intrinsic;
 
 
+//------------
+// Trace dual ideal
+//------------
+
+intrinsic TraceDualIdeal(I::AlgEtIdl) -> AlgEtIdl
+{Returns the trace dual ideal of an ideal in an order in an etale algebra.}
+    if not assigned I`TraceDualIdeal then
+        A:=Algebra(I);
+        S:=Order(I);
+        B:=ZBasis(I);
+        n:=#B;
+        Q:=MatrixRing(RationalField(), n)![AbsoluteTrace(B[i]*B[j]): i, j in [1..n] ];
+        QQ:=Q^-1;
+        BB:=[A ! (&+[ (QQ[i,j]*B[j]): j in [1..n]]) : i in [1..n]] ;
+        It:=Ideal(S,BB);
+        It`ZBasis:=BB; //we know that BB is a ZBasis
+        I`TraceDualIdeal:=It;
+        assert2 (I*It) eq TraceDualIdeal(MultiplicatorRing(I));
+    end if;
+    return I`TraceDualIdeal;
+end intrinsic;
+
+intrinsic TraceDualIdeal(O::AlgEtOrd) -> AlgEtIdl
+{Returns the trace dual ideal of an order in an etale algebra.}
+    if not assigned O`TraceDualIdeal then
+        O`TraceDualIdeal := TraceDualIdeal(OneIdeal(O));
+    end if;
+    return O`TraceDualIdeal;
+end intrinsic;
+
 /* TEST
 
     Attach("~/packages_github/AlgEt/AlgEt.m");
@@ -73,6 +103,7 @@ end intrinsic;
         assert AbsoluteNorm(a)*AbsoluteNorm(b) eq AbsoluteNorm(a*b);
         assert Norm(a)*Norm(b) eq Norm(a*b);
     end for;
+    _:=TraceDualIdeal(O);
     
     A:=EtaleAlgebra([K,K]);
     for i in [1..100] do

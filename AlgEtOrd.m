@@ -26,6 +26,10 @@ declare attributes AlgEtOrd : IsMaximal,
                               ZBasis,
                               Generators,
                               Algebra,
+                              TraceDualIdeal,
+                              Conductor,
+                              IsGorenstein,
+                              IsBass,
                               Hash;
 
 //----------
@@ -530,16 +534,6 @@ intrinsic IsGorenstein(O::AlgEtOrd)->BoolElt
     T:=TraceDualIdeal(O);
     return IsInvertible(T);
 end intrinsic
-
-intrinsic Conductor(O::AlgEtOrd) ->AlgEtOrdIdl
-{computes the conductor of an order}
-    if not assigned O`Conductor then
-        A:=Algebra(O);
-        OA:=MaximalOrder(A);
-        O`Conductor:=ColonIdeal(O,Ideal(O,ZBasis(OA)));
-    end if;
-    return O`Conductor;
-end intrinsic;
 
 
 */

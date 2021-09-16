@@ -24,9 +24,8 @@ declare attributes AlgEtIdl : Index, //stores the index
                               PrimesAbove,
                               Factorization,
                               IsProductOfIdeals,
+                              TraceDualIdeal,
                               Hash;
- 
-declare attributes AlgEtOrd : OneIdeal;
 
 import "AlgEtOrd.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQToA , meet_zbasis ;
 
@@ -340,6 +339,16 @@ intrinsic OneIdeal(S::AlgEtOrd) -> AlgEtIdl
   return S`OneIdeal;
 end intrinsic;
 
+intrinsic Conductor(O::AlgEtOrd) ->AlgEtOrdIdl
+{computes the conductor of an order}
+    if not assigned O`Conductor then
+        A:=Algebra(O);
+        OA:=MaximalOrder(A);
+        O`Conductor:=ColonIdeal(O,Ideal(O,ZBasis(OA)));
+    end if;
+    return O`Conductor;
+end intrinsic;
+
 //----------
 // Binary operations
 //----------
@@ -589,26 +598,6 @@ end intrinsic;
 //----------
 // Other
 //----------
- 
-
-intrinsic TraceDualIdeal(I::AlgEtIdl) -> AlgEtIdl
-{ returns the trace dual ideal of an ideal in an order in an associative algebra }
-    A:=Algebra(I);
-    S:=Order(I);
-    B:=[z`AlgAssElt : z in ZBasis(I)];
-    n:=#B;
-    Q:=MatrixRing(RationalField(), n)![Trace(B[i]*B[j]): i, j in [1..n] ];
-    QQ:=Q^-1;
-    BB:=[A ! (&+[ (QQ[i,j]*B[j]): j in [1..n]]) : i in [1..n]] ;
-    It:=Ideal(S,BB);
-    It`ZBasis:=BB; //we know that BB is a ZBasis
-    return It;
-end intrinsic;
-
-intrinsic TraceDualIdeal(O::AlgEtOrd) -> AlgEtIdl
-{ returns the trace dual ideal of an order in an associative algebra }
-    return TraceDualIdeal(OneIdeal(O));
-end intrinsic;
 
 intrinsic MinimalInteger(I::AlgEtIdl) -> RngIntElt
 {returns the smallest integer contained in the ideal I}
@@ -944,7 +933,8 @@ end intrinsic;
     time assert J eq JJ;
     time _:=&meet[(Random(E1)*E1+Random(E1)*E1) : i in [1..100]];
     time assert forall{ I : I in [Random(E1)*E1 : i in [1..100]] | not IsProductOfIdeals(I)};
-    time assert forall{ I : I in [Random(E2)*E2 : i in [1..100]] | IsProductOfIdeals(I)};
+    time assert forall{ I : I in [Random(E2)*E2 : i in [1..100]] | IsProductOfIdeals(I)};A
+    time _:=[TraceDualIdeal(Random(E1)*E1+Random(E1)*E1) : i in [1..100]];
 
     
 
@@ -963,6 +953,16 @@ end intrinsic;
         I:=a*O;
         I:=O*a;
     end for;
+    time #{ Random(O)*O : i in [1..100] };
+    a*O + O!!(a*O);
+    time _:=&*[Random(O)*O : i in [1..100]];
+    time _:=&*[(Random(O)*O+Random(O)*O) : i in [1..100]];
+    time I:=Ideal(O,[Random(O) : i in [1..100]]);
+    time J:=&*[I : i in [1..100]];
+    time JJ:=I^100;
+    time assert J eq JJ;
+    time _:=&meet[(Random(O)*O+Random(O)*O) : i in [1..100]];
+    time assert forall{ I : I in [Random(O)*O : i in [1..100]] | IsProductOfIdeals(I)};
 
 //to modify from here on    
     A:=EtaleAlgebra([K,K]);

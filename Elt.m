@@ -172,18 +172,24 @@ intrinsic 'eq'(x1::AlgEtElt,x2::AlgEtElt) -> BoolElt
     return Components(x1) eq Components(x2);
 end intrinsic;
 
-intrinsic 'eq'(x1::.,x2::AlgEtElt) -> BoolElt
+intrinsic 'eq'(x1::RngIntElt,x2::AlgEtElt) -> BoolElt
 {Is x1=x2 ?}
-    bool,x1:=IsCoercible(Algebra(x2),x1);
-    require bool : "x1 not coercible";
-    return x1 = x2;
-    end intrinsic;
+    return (Algebra(x2)!x1) eq x2;
+end intrinsic;
 
-intrinsic 'eq'(x1::AlgEtElt,x2::.) -> BoolElt
+intrinsic 'eq'(x1::FldRatElt,x2::AlgEtElt) -> BoolElt
 {Is x1=x2 ?}
-    bool,x2:=IsCoercible(Algebra(x1),x2);
-    require bool : "x2 not coercible";
-    return x1 = x2;
+    return (Algebra(x2)!x1) eq x2;
+end intrinsic;
+
+intrinsic 'eq'(x1::AlgEtElt,x2::RngIntElt) -> BoolElt
+{Is x1=x2 ?}
+    return x1 eq (Algebra(x1)!x2);
+end intrinsic;
+
+intrinsic 'eq'(x1::AlgEtElt,x2::FldRatElt) -> BoolElt
+{Is x1=x2 ?}
+    return x1 eq (Algebra(x1)!x2);
 end intrinsic;
 
 intrinsic '+'(x1::AlgEtElt,x2::AlgEtElt) -> AlgEtElt
@@ -308,17 +314,16 @@ end intrinsic;
 intrinsic MinimalPolynomial(x::AlgEtElt) -> RngUPolElt
 {Returns the minimal polynommial over the common base ring of the number fields defining A of the element x.}
     A:=Algebra(x);
-    nf:=NumberFields(A);
     require HasBaseField(A) : "The number fields of A shoud all be defined over the same base ring.";
     m:=LCM( [ MinimalPolynomial(c) : c in Components(x) ] );
-    assert2 Evaluate(m,x);
+    assert2 (0 eq Evaluate(m,x));
     return m;
 end intrinsic;
 
 intrinsic MinimalPolynomial(x::AlgEtElt, F::Rng) -> RngUPolElt
 {Returns the minimal polynommial over the ring F of the element x.}
     m:=LCM( [ MinimalPolynomial(c,F) : c in Components(x) ] );
-    assert2 Evaluate(m,x);
+    assert2 (0 eq Evaluate(m,x));
     return m;
 end intrinsic;
 
@@ -338,10 +343,9 @@ intrinsic Evaluate(f::RngUPolElt,a::AlgEtElt) -> AlgEtElt
     A:=Algebra(a);
     deg:=Degree(f);
     coeff:=Coefficients(f); 
-    pow_a:=[];
-    Append(~pow_a,[ i gt 1 select Self(i-1)*a else One(A) : i in [1..deg]]);
+    pow_a:=[ i gt 1 select Self(i-1)*a else One(A) : i in [1..deg]];
     //Self makes it much more efficient
-    return &+[ coeff[i]*pow_a[i] : i in [1..deg] ];
+    return A!&+[ coeff[i]*pow_a[i] : i in [1..deg+1] ];
 end intrinsic;
 
 //------------

@@ -505,6 +505,7 @@ end intrinsic;
     Attach("~/packages_github/AlgEt/Elt.m");
     Attach("~/packages_github/AlgEt/Ord.m");
     SetVerbose("AlgEtOrd",2);
+    SetAssertion(2);
 
     _<x>:=PolynomialRing(Integers());
     f:=(x^8+16)*(x^8+81);

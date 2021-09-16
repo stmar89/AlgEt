@@ -22,6 +22,7 @@ declare attributes AlgEtIdl : Index, //stores the index
                               ZBasis,
                               IsPrime,
                               IsInvertible,
+                              IsIntegral,
                               PrimesAbove,
                               Factorization,
                               IsProductOfIdeals,
@@ -619,34 +620,43 @@ intrinsic Random(I::AlgEtIdl : CoeffRange:=3, ZeroDivisorsAllowed:=false ) -> Al
       return Random(I,CoeffRange : ZeroDivisorsAllowed:=ZeroDivisorsAllowed);
 end intrinsic;
 
-
-/* Continue from here
-
 //----------
-// Other
+// Integral, Coprime, Minimal Integer and Coprime Representative
 //----------
+
+intrinsic IsCoprime(I::AlgEtIdl,J::AlgEtIdl) -> BoolElt
+{given two integral ideals I and J of an order S, returns whether I+J=R}
+    require Algebra(I) cmpeq Algebra(J) : "the ideals must lie in the same algebra";
+    S:=Order(J);
+    require Order(I) eq S: "the ideals must be over the same order";
+    require IsIntegral(I) and IsIntegral(J): "the ideals must be integral";
+    return (One(S) in I+J);
+end intrinsic;
+
+intrinsic IsIntegral(I::AlgEtIdl) -> BoolElt
+{returns wheter the ideal I of S is integral, that is I \subseteq S}
+    if not assigned I`IsIntegral then
+        S:=Order(I);
+        I`IsIntegral:=I subset S;
+    end if;
+    return I`IsIntegral;
+end intrinsic;
+
+intrinsic MakeIntegral(I::AlgEtIdl) -> AlgEtIdl,RngIntElt
+{given a fractional S ideal I, returns the ideal d*I,d when d is the smallest integer such that d*I is integral in S}
+    if IsIntegral(I) then return I; end if;
+    S:=Order(I);
+    d:=Denominator(ChangeRing(Matrix(AbsoluteCoordinates(Generators(I),ZBasis(S))),Rationals()));
+    return d*I, d;
+end intrinsic;
 
 intrinsic MinimalInteger(I::AlgEtIdl) -> RngIntElt
 {returns the smallest integer contained in the ideal I}
     require IsIntegral(I): "the ideal must be integral";
-    coord:=Coordinates([One(Algebra(I))],ZBasis(I))[1];
+    coord:=AbsoluteCoordinates([One(Algebra(I))],ZBasis(I))[1];
     min:=LCM([ Denominator(c) : c in Eltseq(coord)]);
+    assert2 min in I;
     return min;
-end intrinsic;
-
-intrinsic Random(I::AlgEtIdl : CoeffRange:=3, ZeroDivisorsAllowed:=false ) -> AlgEtElt
-{ Returns a random (small coefficient) element of I. 
-  The range of the random coefficients can be increased by giving the optional argument CoeffRange.
-  One can allow zero-divisors using the optional argument "ZeroDivisorsAllowed", which by default is set to false }
-    B := ZBasis(I);
-    if ZeroDivisorsAllowed then
-       elt:=&+[ Random([-CoeffRange..CoeffRange])*b : b in B];
-    else 
-        repeat
-            elt:=&+[ Random([-CoeffRange..CoeffRange])*b : b in B];
-        until not IsZeroDivisor(elt);
-    end if;
-    return elt;
 end intrinsic;
 
 intrinsic CoprimeRepresentative(I::AlgEtIdl,J::AlgEtIdl) -> AlgEtElt
@@ -654,13 +664,16 @@ intrinsic CoprimeRepresentative(I::AlgEtIdl,J::AlgEtIdl) -> AlgEtElt
     require IsIntegral(J) : "the second ideal must be integral";
     S:=Order(I);
     require S eq Order(J): "the ideals must be defined over the same order";
-    require IsInvertible(I): "The first ideal must be invertible";
-    invI:=ColonIdeal(S,I);
+    test,invI:=IsInvertible(I);
+    require test: "The first ideal must be invertible";
     repeat
         x:=Random(invI);
     until IsCoprime(x*I,J); //integrality of x*I is checked in IsCoprime
     return x;
 end intrinsic;
+
+/* Continue from here
+
 
 //  intrinsic ChineseRemainderTheorem(I::AlgEtIdl,J::AlgEtIdl,a::AlgEtElt,b::AlgEtElt)-> AlgEtElt
 //  {given two coprime ideals I and J of S, two elements a,b in S, finds e such that (e-a) in I and (e-b) in J}
@@ -749,29 +762,6 @@ intrinsic ResidueRing(S::AlgEtOrd,I::AlgEtIdl) -> GrpAb , Map
     assert2 forall{x : x in ZBasis(I) | m(x) eq Zero(Q)};
     assert2 forall{x : x in ZBasis(S) | ((m(x))@@m - x) in I};
     return Q,m;
-end intrinsic;
-
-intrinsic IsCoprime(I::AlgEtIdl,J::AlgEtIdl) -> BoolElt
-{given two integral ideals I and J of an order S, returns whether I+J=R}
-    require Algebra(I) cmpeq Algebra(J) : "the ideals must lie in the same algebra";
-    S:=Order(J);
-    require Order(I) eq S: "the ideals must be over the same order";
-    require IsIntegral(I) and IsIntegral(J): "the ideals must be integral";
-    return (One(S) in I+J);
-end intrinsic;
-
-intrinsic IsIntegral(I::AlgEtIdl) -> BoolElt
-{returns wheter the ideal I of S is integral, that is I \subseteq S}
-    S:=Order(I);
-    return I subset S;
-end intrinsic;
-
-intrinsic MakeIntegral(I::AlgEtIdl) -> AlgEtIdl
-{given a fractional S ideal I, returns the ideal d*I,d when d is the smallest integer such that d*I is integral in S}
-    if IsIntegral(I) then return I; end if;
-    S:=Order(I);
-    d:=Denominator(ChangeRing(Matrix(Coordinates(Generators(I),ZBasis(S))),Rationals()));
-    return d*I, d;
 end intrinsic;
 
 
@@ -893,6 +883,7 @@ end intrinsic;
     Attach("~/packages_github/AlgEt/AlgEtOrd.m");
     Attach("~/packages_github/AlgEt/AlgEtTraceNorm.m");
     Attach("~/packages_github/AlgEt/AlgEtIdl.m");
+    Attach("~/packages_github/AlgEt/AlgEtIdlWkTesting.m");
     SetVerbose("AlgEtIdl",2);
 
     _<x>:=PolynomialRing(Integers());
@@ -917,10 +908,14 @@ end intrinsic;
     time assert J eq JJ;
     time _:=&meet[(Random(E1)*E1+Random(E1)*E1) : i in [1..100]];
     time assert forall{ I : I in [Random(E1)*E1 : i in [1..100]] | not IsProductOfIdeals(I)};
-    time assert forall{ I : I in [Random(E2)*E2 : i in [1..100]] | IsProductOfIdeals(I)};A
+    time assert forall{ I : I in [Random(E2)*E2 : i in [1..100]] | IsProductOfIdeals(I)};
     time _:=[TraceDualIdeal(Random(E1)*E1+Random(E1)*E1) : i in [1..100]];
+    time _:=[IsIntegral(Random(E1)*E1+Random(E1)*E1) : i in [1..100]];
+    time _:=[MakeIntegral(Random(E1)*E1+Random(E1)*E1) : i in [1..100]];
 
-    
+    time ids:=[ Ideal(E1,[Random(E1) : i in [1..10]]) : i in [1..100]]; 
+    time cc:=[ ColonIdeal(I,J) : I,J in ids  ];
+    time cc2:=[ TraceDualIdeal(TraceDualIdeal(I)*J) : I,J in ids ];
 
 
     K:=NumberField(x^2-5);

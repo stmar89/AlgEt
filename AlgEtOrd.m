@@ -355,7 +355,7 @@ intrinsic IsProductOfOrders(O::AlgEtOrd)->BoolElt, Tup
             end if;
             O`IsProductOfOrders:=<true,orders>;
         else
-            O`IsProductOfOrders:=<false>;
+            O`IsProductOfOrders:=<false,<>>;
         end if;
     end if;
     return Explode(O`IsProductOfOrders);
@@ -484,14 +484,6 @@ end intrinsic;
 /* CONTINUE from HERE
 
 
-
-intrinsic OneIdeal(S::AlgEtOrd) -> AlgEtOrdIdl
-{given an S returns the ideal 1*S which will be cached}
-  if not assigned S`OneIdeal then
-    S`OneIdeal := Ideal(S,One(S));
-  end if;
-  return S`OneIdeal;
-end intrinsic;
 
 intrinsic ListToSequence(L::List)->SeqEnum
 {given a list of elements returns the same sequence}

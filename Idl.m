@@ -29,7 +29,7 @@ declare attributes AlgEtIdl : Index, //stores the index
                               TraceDualIdeal,
                               Hash;
 
-import "AlgEtOrd.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQToA , meet_zbasis ;
+import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQToA , meet_zbasis ;
 
 /*TODO
     - ChineseRemThm to be fixed

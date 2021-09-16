@@ -341,11 +341,10 @@ end intrinsic;
 intrinsic Evaluate(f::RngUPolElt,a::AlgEtElt) -> AlgEtElt
 {Evaluate the polynomial f at the element a.}
     A:=Algebra(a);
-    deg:=Degree(f);
     coeff:=Coefficients(f); 
-    pow_a:=[ i gt 1 select Self(i-1)*a else One(A) : i in [1..deg]];
+    pow_a:=[ i gt 1 select Self(i-1)*a else One(A) : i in [1..#coeff]];
     //Self makes it much more efficient
-    return A!&+[ coeff[i]*pow_a[i] : i in [1..deg+1] ];
+    return A!&+[ coeff[i]*pow_a[i] : i in [1..#coeff] ];
 end intrinsic;
 
 //------------

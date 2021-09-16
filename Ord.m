@@ -122,13 +122,12 @@ intrinsic Order( gens::SeqEnum[AlgEtElt] : Check:=100 ) -> AlgEtOrd
         fail:=0;
         repeat
             P_old:=P;
-            gens0 cat:= [(g1*g2) : g1,g2 in gens0[2..#gens0]]; //One is always at the first place
+            gens0 cat:= [(g1*g2) : g1,g2 in gens0];
             M:=MatrixAtoQ(gens0);
             d:=Denominator(M);
             M:=crQZ(M*d);
             P:=crZQ(hnf(M))/d;
             gens0:=MatrixQToA(A,P);
-            assert2 gens0[1] eq One(A);
             fail +:=1;
             go:=Rank(P_old) eq dim and P eq P_old;
         until go or fail gt Check;

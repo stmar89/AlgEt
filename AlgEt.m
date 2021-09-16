@@ -43,7 +43,7 @@ intrinsic EtaleAlgebra(seq::SeqEnum[FldNum]) -> AlgEt
 {Given a sequence of number fields returns the étale algebra corresponding to the direct product.}
     A:=New(AlgEt);
     embs:=[ map< seq[i]->A | x:-> A! (<seq[j]!0 : j in [1..i-1]> cat <x> cat <seq[j]!0 : j in [i+1..#seq]>)  > : i in [1..#seq] ];
-    projs:=[ map< A->seq[i] | y:-> Coordinates(y)[i] > : i in [1..#seq] ];
+    projs:=[ map< A->seq[i] | y:-> Components(y)[i] > : i in [1..#seq] ];
     A`NumberFields:=<seq,embs,projs>;
     return A;
 end intrinsic;
@@ -150,66 +150,6 @@ intrinsic HomsToC(A::AlgEt : Precision:=30)->SeqEnum[Map]
     return maps;
 end intrinsic;
 
-intrinsic OrthogonalIdempotents(A::AlgEt)->SeqEnum
-{returns a sequence containing the orthogonal ideampotents of the algebra, that is the image of the units of the number fields the algebra is product of}
-    return [L[2](One(L[1])) : L in A`NumberFields ];
-end intrinsic;
-
-
-intrinsic PrimitiveElement(A::AlgEt) -> AlgEtElt
-{ it returns an element which corresponds to the class of X in Q[X]/(f(X)) }
-    assert IsSquarefree(DefiningPolynomial(A));
-    return &+[L[2](PrimitiveElement(L[1])) : L in A`NumberFields];
-end intrinsic;
-
-intrinsic Components(x::AlgEtElt) -> SeqEnum
-{returns the components of the element as in the product of number fields}
-    A:=Parent(x);
-    idem:=OrthogonalIdempotents(A);
-    x_asProd:=[**];
-    for i in [1..#A`NumberFields] do
-        L:=A`NumberFields[i];
-        x_L:=(x*idem[i])@@L[2];
-        Append(~x_asProd,x_L);
-    end for;
-    return x_asProd;
-end intrinsic;
-
-intrinsic Idempotents(A::AlgEt)->SeqEnum
-{returns a sequence containing the ideampotents of the algebra, zero included}
-    ort_idem:=OrthogonalIdempotents(A);
-    cc:=CartesianProduct([[A!0,oi] : oi in ort_idem]);
-    idem:=[&+([cj : cj in c]) : c in cc];
-    return idem;
-end intrinsic;
-
-intrinsic Coordinates(seq::SeqEnum[AlgEtElt],basis::SeqEnum[AlgEtElt]) -> SeqEnum
-{ the coordinates of the sequence S of elements in an etale algebra A, relative to the given basis of A over the rationals. }
-    vprintf et_algebras: "Coordinates";
-    require Universe(seq) eq Universe(basis) : "the sequences must be defined over the same algebra";
-    A:=AssAlgebra(Universe(seq));
-    seq:=[A ! x : x in seq ];
-    basis:=[A ! x : x in basis ];
-    coord:=Coordinates(seq,basis);
-    return coord;
-end intrinsic;
-
-intrinsic IsZeroDivisor(x::AlgEtElt) -> BoolElt
-{returns if the element x is a zero divisor}
-    return exists{c : c in Components(x)|c eq Zero(Parent(c))};
-end intrinsic;
-
-intrinsic IsZeroDivisor2(x::AlgEtElt) -> BoolElt
-{returns if the element x is a zero divisor}
-    return IsZeroDivisor(x);
-end intrinsic;
-
-intrinsic Evaluate(p::RngUPolElt, y::AlgEtElt) -> AlgEtElt
-{evaluates a polynomial at y}
-    evl:=Evaluate(p,AssElt(y));
-    return Algebra(y)!evl;
-end intrinsic;
-
 */
 
 /* TEST
@@ -238,7 +178,6 @@ end intrinsic;
     HasBaseField(A);
     AbsoluteDimension(A);
     PrimeField(A);
-    F,mFA:=BaseField(A);
 
     A:=EtaleAlgebra([E,E]);
     Dimension(A);

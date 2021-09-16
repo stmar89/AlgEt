@@ -555,7 +555,7 @@ end intrinsic;
 
 */
 
-/* TEST TO MODIFy
+/* TEST
     
     Attach("~/packages_github/AlgEt/AlgEt.m");
     Attach("~/packages_github/AlgEt/AlgEtElt.m");
@@ -575,7 +575,7 @@ end intrinsic;
     Hash(O3);
     time O1 eq O2;
     time O2 eq O3;
-    assert EquationOrder(A) eq ProductOfEquationOrders(A);
+    assert EquationOrder(A) ne ProductOfEquationOrders(A);
     
     OA:=MaximalOrder(A);
     O:=Order(ZBasis(OA));
@@ -629,7 +629,6 @@ end intrinsic;
     p:=y^2-7;
     assert forall{z : z in ZBasis(O1) | z in O1 };
     A:=EtaleAlgebra(p);
-    EquationOrder(A);
     MaximalOrder(A);
     time O1:=Order(Basis(A)); //this should trigger an error
     time O2:=Order(AbsoluteBasis(A));
@@ -690,26 +689,3 @@ end intrinsic;
 
 */
 
-
-/*OLD TEST
-
-Attach("et_algebras.m");
-Attach("et_orders.m");
-Attach("et_ideals.m");
-_<x>:=PolynomialRing(Integers());
-f:=(x^8+16)*(x^8+81);
-A:=EtaleAlgebra(f);
-O:=EquationOrder(A);
-ZBasis(O);
-ZBasis(O)[1] in O;
-One(O);
-OneIdeal(O);
-
-
-
-
-
-
-
-
-*/

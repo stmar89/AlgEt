@@ -15,7 +15,7 @@ declare verbose AlgEtElt, 3;
 
 declare attributes AlgEtElt : Algebra, // AlgEt
                               AbsoluteCoordinates,
-                              Coordinates; // Tup
+                              Components; // Tup
 
 declare attributes AlgEt : Basis,
                            AbsoluteBasis,
@@ -30,7 +30,7 @@ declare attributes AlgEt : Basis,
 
 intrinsic Print(x::AlgEtElt)
 {Print the AlgEtElt.}
-    printf "%o", Coordinates(x);
+    printf "%o", Components(x);
 end intrinsic;
 
 //------------
@@ -47,15 +47,15 @@ intrinsic Algebra(x::AlgEtElt) -> AlgEt
   return x`Algebra;
 end intrinsic;
 
-intrinsic Coordinates(x::AlgEtElt) -> SeqEnum
-{Given an element x returns its coordinates, which are elements of number fields.}
-  return x`Coordinates;
+intrinsic Components(x::AlgEtElt) -> SeqEnum
+{Given an element x returns its components, which are elements of number fields.}
+  return x`Components;
 end intrinsic;
 
 intrinsic AbsoluteCoordinates(x::AlgEtElt) -> SeqEnum
 {Given an element x returns the coordinates relative to the absolute basis, which are elements of the prime field.}
     if not assigned x`AbsoluteCoordinates then
-        x`AbsoluteCoordinates:=&cat[ Flat(c) : c in Coordinates(x) ];
+        x`AbsoluteCoordinates:=&cat[ Flat(c) : c in Components(x) ];
     end if;
     return x`AbsoluteCoordinates;
 end intrinsic;
@@ -69,26 +69,26 @@ intrinsic IsCoercible(A::AlgEt, x::.) -> BoolElt, .
     if Parent(x) cmpeq A then
         return true,x;
     elif Type(x) in {List,Tup,SeqEnum} then
-        coordinates:=<>;
+        comp:=<>;
         for i in [1..#x] do
             t,xi:=IsCoercible(NumberFields(A)[i],x[i]); 
             if not t then
                 return false,_; // early exit if not coercible
             else
-                Append(~coordinates,xi);
+                Append(~comp,xi);
             end if;
         end for;
         // now we know the elt is coercible in A
         x1:=New(AlgEtElt);
         x1`Algebra:=A;
-        x1`Coordinates:=coordinates;
+        x1`Components:=comp;
         return true,x1;
     elif Type(x) eq RngIntElt or Type(x) eq FldRatElt then
         coordinates:=<>;
         nf:=NumberFields(A);
         x1:=New(AlgEtElt);
         x1`Algebra:=A;
-        x1`Coordinates:=<nf[i]!x : i in [1..#nf]>; //diagonal embedding
+        x1`Components:=<nf[i]!x : i in [1..#nf]>; //diagonal embedding
         return true,x1;
     else 
         return false,_;
@@ -118,7 +118,7 @@ end intrinsic;
 
 intrinsic IsUnit(x::AlgEtElt) -> BoolElt
 {Returns wheter x is a unit in A.}   
-    return forall{ c : c in Coordinates(x) | c ne 0};
+    return forall{ c : c in Components(x) | c ne 0};
 end intrinsic;
 
 intrinsic IsZeroDivisor(x::AlgEtElt) -> BoolElt
@@ -169,7 +169,7 @@ intrinsic 'eq'(x1::AlgEtElt,x2::AlgEtElt) -> BoolElt
 {Is x1=x2 ?}
     A:=Parent(x1);
     require A cmpeq Parent(x2): "The elements must belong to the same algebra.";
-    return Coordinates(x1) eq Coordinates(x2);
+    return Components(x1) eq Components(x2);
 end intrinsic;
 
 intrinsic 'eq'(x1::.,x2::AlgEtElt) -> BoolElt
@@ -190,7 +190,7 @@ intrinsic '+'(x1::AlgEtElt,x2::AlgEtElt) -> AlgEtElt
 {x1+x2}
     A:=Parent(x1);
     require A cmpeq Parent(x2): "The elements must belong to the same algebra.";
-    x3:=A!< Coordinates(x1)[i] + Coordinates(x2)[i] : i in [1..#NumberFields(A)] >;
+    x3:=A!< Components(x1)[i] + Components(x2)[i] : i in [1..#NumberFields(A)] >;
     return x3;
 end intrinsic;
 
@@ -211,7 +211,7 @@ end intrinsic;
 intrinsic '-'(x::AlgEtElt) -> AlgEtElt
 {-x}
     A:=Parent(x);
-    y:=A!< - Coordinates(x)[i] : i in [1..#NumberFields(A)] >;
+    y:=A!< - Components(x)[i] : i in [1..#NumberFields(A)] >;
     return y;
 end intrinsic;
 
@@ -219,7 +219,7 @@ intrinsic '-'(x1::AlgEtElt,x2::AlgEtElt) -> AlgEtElt
 {x1-x2}
     A:=Parent(x1);
     require A cmpeq Parent(x2): "The elements must belong to the same algebra.";
-    x3:=A!< Coordinates(x1)[i] - Coordinates(x2)[i] : i in [1..#NumberFields(A)] >;
+    x3:=A!< Components(x1)[i] - Components(x2)[i] : i in [1..#NumberFields(A)] >;
     return x3;
 end intrinsic;
 
@@ -241,7 +241,7 @@ intrinsic '*'(x1::AlgEtElt,x2::AlgEtElt) -> AlgEtElt
 {x1*x2}
     A:=Parent(x1);
     require A cmpeq Parent(x2): "The elements must belong to the same algebra.";
-    x3:=A!< Coordinates(x1)[i] * Coordinates(x2)[i] : i in [1..#NumberFields(A)] >;
+    x3:=A!< Components(x1)[i] * Components(x2)[i] : i in [1..#NumberFields(A)] >;
     return x3;
 end intrinsic;
 
@@ -263,7 +263,7 @@ intrinsic Inverse(x::AlgEtElt) -> AlgEtElt
 {1/x}
     require IsUnit(x) : "The element is not invertible.";
     A:=Parent(x);
-    y:=A!< 1/(Coordinates(x)[i]) : i in [1..#NumberFields(A)] >;
+    y:=A!< 1/(Components(x)[i]) : i in [1..#NumberFields(A)] >;
     return y;
 end intrinsic;
 
@@ -273,10 +273,10 @@ intrinsic '^'(x::AlgEtElt,n::RngIntElt) -> AlgEtElt
     if n eq 0 then
         return One(A);
     elif n gt 0 then
-        return A!< Coordinates(x)[i]^n : i in [1..#NumberFields(A)] >;
+        return A!< Components(x)[i]^n : i in [1..#NumberFields(A)] >;
     elif n lt 0 then
         require IsUnit(x) : "The element is not invertible.";
-        return A!< Coordinates(x)[i]^n : i in [1..#NumberFields(A)] >;
+        return A!< Components(x)[i]^n : i in [1..#NumberFields(A)] >;
     end if;
 end intrinsic;
 
@@ -310,14 +310,14 @@ intrinsic MinimalPolynomial(x::AlgEtElt) -> RngUPolElt
     A:=Algebra(x);
     nf:=NumberFields(A);
     require HasBaseField(A) : "The number fields of A shoud all be defined over the same base ring.";
-    m:=LCM( [ MinimalPolynomial(c) : c in Coordinates(x) ] );
+    m:=LCM( [ MinimalPolynomial(c) : c in Components(x) ] );
     assert2 Evaluate(m,x);
     return m;
 end intrinsic;
 
 intrinsic MinimalPolynomial(x::AlgEtElt, F::Rng) -> RngUPolElt
 {Returns the minimal polynommial over the ring F of the element x.}
-    m:=LCM( [ MinimalPolynomial(c,F) : c in Coordinates(x) ] );
+    m:=LCM( [ MinimalPolynomial(c,F) : c in Components(x) ] );
     assert2 Evaluate(m,x);
     return m;
 end intrinsic;

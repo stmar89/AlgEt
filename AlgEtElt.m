@@ -181,7 +181,7 @@ intrinsic 'eq'(x1::.,x2::AlgEtElt) -> BoolElt
 
 intrinsic 'eq'(x1::AlgEtElt,x2::.) -> BoolElt
 {Is x1=x2 ?}
-    bool,x2:=IsCoercible(Algebra(x2),x1);
+    bool,x2:=IsCoercible(Algebra(x1),x2);
     require bool : "x2 not coercible";
     return x1 = x2;
 end intrinsic;
@@ -203,7 +203,7 @@ end intrinsic;
 
 intrinsic '+'(x1::AlgEtElt,x2::.) -> AlgEtElt
 {x1+x2}
-    bool,x2:=IsCoercible(Algebra(x2),x1);
+    bool,x2:=IsCoercible(Algebra(x1),x2);
     require bool : "x2 not coercible";
     return x1 + x2;
 end intrinsic;
@@ -232,7 +232,7 @@ end intrinsic;
 
 intrinsic '-'(x1::AlgEtElt,x2::.) -> AlgEtElt
 {x1-x2}
-    bool,x2:=IsCoercible(Algebra(x2),x1);
+    bool,x2:=IsCoercible(Algebra(x1),x2);
     require bool : "x2 not coercible";
     return x1 - x2;
 end intrinsic;
@@ -254,7 +254,7 @@ end intrinsic;
 
 intrinsic '*'(x1::AlgEtElt,x2::.) -> AlgEtElt
 {x1*x2}
-    bool,x2:=IsCoercible(Algebra(x2),x1);
+    bool,x2:=IsCoercible(Algebra(x1),x2);
     require bool : "x2 not coercible";
     return x1 * x2;
 end intrinsic;

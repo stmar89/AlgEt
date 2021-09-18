@@ -96,7 +96,7 @@ intrinsic Ideal(S::AlgEtOrd, idls::Tup) -> AlgEtIdl
     require forall{ i : i in [1..#idls] | Order(idls[i]) eq SasProd[i]} : "The ideals are not defined over the components of S.";
     A:=Algebra(S);
     _,embs:=NumberFields(A);
-    gens:=&cat[ [embs[i](g) : g in Basis(idls[i])] : i in [1..#idls] ];
+    gens:=&cat[ [embs[i](g) : g in Generators(idls[i])] : i in [1..#idls] ];
     I:=Ideal(S,gens);
     I`IsProductOfIdeals:=<true,idls>;
     return I;

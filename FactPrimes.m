@@ -32,15 +32,20 @@ function factorizationMaximalOrder(I)
     tup_one_ideals:=< 1*O : O in OasProd >;
     for i in [1..#nf] do
         IL:=IasProd[i];
-        facL:=Factorization(IL); // < <P,e> : ... >;
-        for p in facL do
-            tup_p:=tup_one_ideals;
-            tup_p[i]:=p[1]; // we replace the i-th ideal with P
-            P:=Ideal(O,tup_p);
-            P`IsPrime:=true; //we know P is prime
-            assert2 IsPrimePower(Integers() ! Index(O,P));
-            Append(~fac,<P,p[2]>);
-        end for;
+        if not One(Order(IL)) in IL then
+            facL:=Factorization(IL); // < <P,e> : ... >;
+            assert #facL gt 0;
+            for p in facL do
+                tup_p:=tup_one_ideals;
+                tup_p[i]:=p[1]; // we replace the i-th ideal with P
+                assert2 tup_p ne tup_one_ideals;
+                P:=Ideal(O,tup_p);
+                assert2 P ne OneIdeal(O);
+                P`IsPrime:=true; //we know P is prime
+                assert2 IsPrimePower(Integers() ! Index(O,P));
+                Append(~fac,<P,p[2]>);
+            end for;
+         end if;
     end for;
     assert2 I eq &*[p[1]^p[2] : p in fac];
     return fac;
@@ -222,6 +227,12 @@ end intrinsic;
     time ids:=[ Ideal(O,[Random(O) : i in [1..10]]) : i in [1..100]]; 
     time facs:=[ Factorization(I) : I in ids | I ne OneIdeal(O) ];
 
+    repeat 
+        E:=Order( [Random(O) : i in [1..3]] );
+    until not IsMaximal(E);
+    IsGorenstein(E);
+    IsBass(E);
+    PrimesAbove(Conductor(E));
 
 
 

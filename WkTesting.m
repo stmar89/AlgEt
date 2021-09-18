@@ -62,8 +62,12 @@ end intrinsic;
 intrinsic IsGorenstein(O::AlgEtOrd)->BoolElt
 { checks if the order O is Gorenstein }
     if not assigned O`IsGorenstein then
-        T:=TraceDualIdeal(O);
-        O`IsGorenstein:=IsInvertible(T);
+        if assigned O`IsMaximal and O`IsMaximal then
+            O`IsGorenstein:=true;
+        else
+            T:=TraceDualIdeal(O);
+            O`IsGorenstein:=IsInvertible(T);
+        end if;
     end if;
     return O`IsGorenstein;
 end intrinsic

@@ -569,7 +569,7 @@ intrinsic MultiplicatorRing(I::AlgEtIdl) -> AlgEtOrd
         R:=Order(I);
         if #Generators(I) eq 1 then
             I`MultiplicatorRing:=R;
-        elif assigned IsMaximal(R) and R`IsMaximal then
+        elif assigned R`IsMaximal and R`IsMaximal then
             I`MultiplicatorRing:=R;
         else 
             A:=Algebra(I);
@@ -595,7 +595,7 @@ intrinsic IsProductOfIdeals(I::AlgEtIdl) -> BoolElt, Tup
 {Return if the argument is a product of ideals in number fields, and if so return also the sequence of these ideals (in the appropriate orders). Note: we require the Order(I) to be the MultiplicatorRing(I).}
     if not assigned I`IsProductOfIdeals then
         O:=Order(I);
-        require O eq MultiplicatorRing(I) "The ideal needs to be defined over its multiplicator ring.";
+        require O eq MultiplicatorRing(I) : "The ideal needs to be defined over its multiplicator ring.";
         A:=Algebra(O);
         test,orders:=IsProductOfOrders(O);
         if test then

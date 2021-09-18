@@ -26,6 +26,7 @@ function factorizationMaximalOrder(I)
     assert test;
     fac:=[]; //this will be the factorization of I
     nf,embs:=NumberFields(A);
+    tup_one_ideals:=<   >;
     for i in [1..#nf] do
         IL:=IasProd[i];
         facL:=Factorization(IL); // < <P,e> : ... >;

@@ -568,11 +568,13 @@ intrinsic MultiplicatorRing(I::AlgEtIdl) -> AlgEtOrd
     if not assigned I`MultiplicatorRing then
         R:=Order(I);
         if #Generators(I) eq 1 then
-            return R;
-        end if;
-        A:=Algebra(I);
-        zbS:=ZBasis(ColonIdeal(I,I));
-        S:=Order(zbS : Check:=0 );
+            I`MultiplicatorRing:=R;
+        elif assigned IsMaximal(R) and R`IsMaximal then
+            I`MultiplicatorRing:=R;
+        else 
+            A:=Algebra(I);
+            zbS:=ZBasis(ColonIdeal(I,I));
+            S:=Order(zbS : Check:=0 );
 //FIXME        if assigned R`OverOrders then
 //        //this is to move the attributes
 //            ooR:=FindOverOrders(R);
@@ -580,6 +582,7 @@ intrinsic MultiplicatorRing(I::AlgEtIdl) -> AlgEtOrd
 //            S:=ooR[pos];
 //        end if;
         I`MultiplicatorRing:=S;
+        end if;
     end if;
     return I`MultiplicatorRing;
 end intrinsic;
@@ -589,9 +592,10 @@ end intrinsic;
 //----------
 
 intrinsic IsProductOfIdeals(I::AlgEtIdl) -> BoolElt, Tup
-{Return if the argument is a product of ideals in number fields, and if so return also the sequence of these ideals (in the appropriate orders).}
+{Return if the argument is a product of ideals in number fields, and if so return also the sequence of these ideals (in the appropriate orders). Note: we require the Order(I) to be the MultiplicatorRing(I).}
     if not assigned I`IsProductOfIdeals then
-        O:=MultiplicatorRing(I);
+        O:=Order(I);
+        require O eq MultiplicatorRing(I) "The ideal needs to be defined over its multiplicator ring.";
         A:=Algebra(O);
         test,orders:=IsProductOfOrders(O);
         if test then

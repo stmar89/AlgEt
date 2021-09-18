@@ -135,11 +135,13 @@ end intrinsic;
 intrinsic Random(A::AlgEt , bd::RngIntElt) -> AlgEtElt
 {Random element of A. The Coefficients are bounded by the positive integer bd.}   
     require bd gt 0 : "The bound needs to be a positive integer.";
-    nf:=NumberFields(A);
-    require BaseField(A) eq Rationals() : "The function works only for product of absolute number fiedls'" ;
-    num:=A!< E!Random(EquationOrder(E),bd) : E in nf>;
+    abs:=AbsoluteBasis(A);
+    coeff:=[ Random(-bd,bd) : i in [1..#abs] ];
+    num:=&+[abs[i]*coeff[i] : i in [1..#abs]];
     repeat
-        den:=A!< E!Random(EquationOrder(E),bd) : E in nf>;
+        abs:=AbsoluteBasis(A);
+        coeff:=[ Random(-bd,bd) : i in [1..#abs] ];
+        den:=&+[abs[i]*coeff[i] : i in [1..#abs]];
     until IsUnit(den);
     return num/den;
 end intrinsic;

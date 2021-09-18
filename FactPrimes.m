@@ -1,13 +1,13 @@
 /* vim: set syntax=magma :*/
 
-freeze;
+//freeze;
 
 /////////////////////////////////////////////////////
 // Stefano Marseglia, Utrecht University, s.marseglia@uu.nl
 // http://www.staff.science.uu.nl/~marse004/
 /////////////////////////////////////////////////////
 
-declare verbose ?????, 1;
+declare verbose FactPrimes, 3;
 
 /*TODO:
 
@@ -18,19 +18,23 @@ declare verbose ?????, 1;
 //----------
 
 function factorizationMaximalOrder(I)
-//given an ideal of the maximal order of an algebra, returns the factorization into a product of prime ideals
+//given an ideal of the maximal order of an étale algebra, returns the factorization into a product of prime ideals
     O:=Order(I);
     assert IsMaximal(O);
     A:=Algebra(O);
     test,IasProd:=IsProductOfIdeals(I);
     assert test;
     fac:=[]; //this will be the factorization of I
-    for i in [1..#A`NumberFields] do
+    nf,embs:=NumberFields(A);
+    for i in [1..#nf] do
+        IL:=IasProd[i];
+        facL:=Factorization(IL); // < <P,e> : ... >;
+
+
+
         L:=A`NumberFields[i,1];
         mL:=A`NumberFields[i,2];
-        IL:=IasProd[i];
         assert IsMaximal(Order(IL));
-        facL:=Factorization(IL);
         for p in facL do
             genPinA:=[mL(x) : x in Basis(p[1],L)] cat [F[2](One(F[1])) : F in A`NumberFields | F[1] ne L];
             P:=Ideal(O,genPinA);

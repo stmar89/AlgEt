@@ -16,7 +16,7 @@ declare attributes AlgEtIdl : CRT_data;
 
 */
 
-import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQToA , meet_zbasis ;
+import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQtoA , meet_zbasis ;
 
 //------------
 // Chinese RemainderTheorem

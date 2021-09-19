@@ -91,7 +91,7 @@ MatrixAtoZ:=function(gens)
     return crQZ(MatrixAtoQ(gens));
 end function;
 
-MatrixQToA:=function(A,P)
+MatrixQtoA:=function(A,P)
 //given a matrix with Integer or Rational entries, returns a sequence of elements of A, corresponding to the rows.
     abs:=AbsoluteBasis(A);
     abs_dim:=AbsoluteDimension(A);
@@ -129,7 +129,7 @@ intrinsic Order( gens::SeqEnum[AlgEtElt] : Check:=100 ) -> AlgEtOrd
         M:=MatrixAtoQ(gens0);
         d:=Denominator(M);
         P:=crZQ(hnf(crQZ(d*M)))/d;
-        gens0:=MatrixQToA(A,P);
+        gens0:=MatrixQtoA(A,P);
         fail:=0;
         repeat
             P_old:=P;
@@ -138,7 +138,7 @@ intrinsic Order( gens::SeqEnum[AlgEtElt] : Check:=100 ) -> AlgEtOrd
             d:=Denominator(M);
             M:=crQZ(M*d);
             P:=crZQ(hnf(M))/d;
-            gens0:=MatrixQToA(A,P);
+            gens0:=MatrixQtoA(A,P);
             fail +:=1;
             go:=Rank(P_old) eq dim and P eq P_old;
         until go or fail gt Check;
@@ -149,7 +149,7 @@ intrinsic Order( gens::SeqEnum[AlgEtElt] : Check:=100 ) -> AlgEtOrd
         d:=Denominator(P); //this d might be different from Denomintor(M)
         // we compute the Hash
         R`Hash:=[d] cat [(Integers()!(d*P[i,j])) : j in [i..dim] , i in [1..dim]];
-        zb:=MatrixQToA(A,P);
+        zb:=MatrixQtoA(A,P);
     else
     //we assume that gens is a ZBasis of a multiplicativly closed lattice
         zb:=gens;
@@ -274,10 +274,17 @@ intrinsic 'in'(x::AlgEtElt,O::AlgEtOrd) -> BoolElt
     end if;
     */
     ZZ:=Integers();
-    Minv:=inclusion_matrix(O);
-    M:=MatrixAtoQ([x])*Minv;
-    is_in:=forall{m : m in Eltseq(M) | IsCoercible(ZZ,m)};
+    coord:=AbsoluteCoordinates([x],O)[1];
+    is_in:=forall{m : m in coord | IsCoercible(ZZ,m)};
     return is_in;
+end intrinsic;
+
+intrinsic AbsoluteCoordinates(seq::SeqEnum[AlgEtElt],O::AlgEtOrd) -> SeqEnum
+{AbsoluteCoordinates with respect to the ZBasis}
+    require forall{ x : x in seq | Algebra(x) cmpeq Algebra(O)} : "the algebra is not the same";
+    Minv:=inclusion_matrix(O);
+    M:=MatrixAtoQ(seq)*Minv;
+    return [Eltseq(r) : r in Rows(M)];
 end intrinsic;
 
 intrinsic 'in'(x::RngIntElt,O::AlgEtOrd) -> BoolElt
@@ -483,7 +490,7 @@ meet_zbasis:=function(zb1,zb2)
     //the hnf of zb1 meet zb2 is the lower-right quadrant of M
     P:=Matrix(N,N,[M[i,j] : i,j in [N+1..2*N]]);
     P:=(1/d)*crZQ(P);
-    zb:=MatrixQToA(A,P);
+    zb:=MatrixQtoA(A,P);
     return zb;
 end function;
 

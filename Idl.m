@@ -31,7 +31,7 @@ declare attributes AlgEtIdl : Index, //stores the index
                               Hash,
                               inclusion_matrix;
 
-import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQToA , meet_zbasis , inclusion_matrix;
+import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQtoA , meet_zbasis , inclusion_matrix;
 
 /*TODO
     - MinimalGenerators
@@ -63,7 +63,7 @@ CreateAlgEtIdl:=function(S,gens)
         P:=(1/d)*crZQ(P);
         d:=Denominator(P); //this d might be different from Denomintor(M)
         hash:=[d] cat [(d*P[i,j]) : j in [i..dim] , i in [1..dim]];
-        zb:=MatrixQToA(A,P);
+        zb:=MatrixQtoA(A,P);
         assert #zb eq AbsoluteDimension(A);
         I`Hash:=hash;
         I`ZBasis:=zb;
@@ -197,7 +197,7 @@ intrinsic ZBasis(I::AlgEtIdl)->SeqEnum[AlgEtElt]
             P:=(1/d)*crZQ(P);
             d:=Denominator(P); //this d might be different from Denomintor(M)
             hash:=[d] cat [(Integers()!(d*P[i,j])) : j in [i..dim] , i in [1..dim]];
-            zb:=MatrixQToA(A,P);
+            zb:=MatrixQtoA(A,P);
             assert #zb eq AbsoluteDimension(A);
             I`Hash:=hash;
         end if;
@@ -277,6 +277,14 @@ intrinsic 'eq'(S::AlgEtOrd,I::AlgEtIdl) -> BoolElt
     return I eq S;
 end intrinsic;
 
+intrinsic AbsoluteCoordinates(seq::SeqEnum[AlgEtElt],I::AlgEtIdl) -> SeqEnum
+{AbsoluteCoordiantes with respect to the ZBasis} 
+    require forall{x : x in seq | Algebra(x) cmpeq Algebra(I)} : "the algebra is not the same";
+    Minv:=inclusion_matrix(I);
+    M:=MatrixAtoQ(seq)*Minv;
+    return [Eltseq(r) : r in Rows(M)];
+end intrinsic;
+
 intrinsic 'in'(x::AlgEtElt , I::AlgEtIdl ) -> BoolElt
 {Returns if x is in I.}
     require Algebra(x) eq Algebra(I) : "the elements must lie in the same algebra of definition";
@@ -290,9 +298,8 @@ intrinsic 'in'(x::AlgEtElt , I::AlgEtIdl ) -> BoolElt
     return &and[IsCoercible(Integers(), elt) : elt in Eltseq(mat)];
     */
     ZZ:=Integers();
-    Minv:=inclusion_matrix(I);
-    M:=MatrixAtoQ([x])*Minv;
-    is_in:=forall{m : m in Eltseq(M) | IsCoercible(ZZ,m)};
+    coord:=AbsoluteCoordinates([x],I)[1];
+    is_in:=forall{m : m in coord | IsCoercible(ZZ,m)};
     return is_in;
 end intrinsic;
 
@@ -406,6 +413,11 @@ intrinsic '*'(I::AlgEtIdl , J::AlgEtIdl ) -> AlgEtIdl
     require Algebra(I) cmpeq Algebra(J) : "they must be ideals of the same algebra";
     require Order(I) cmpeq Order(J) : "they must be ideals of the same order";
     S:=Order(I);
+    if I eq OneIdeal(S) then
+        return J;
+    elif J eq OneIdeal(S) then
+        return I;
+    end if;
     gI:=Generators(I);
     gJ:=Generators(J);
     if #gI eq 1 then //better for passing the attributes
@@ -554,7 +566,7 @@ intrinsic ColonIdeal(I::AlgEtIdl,J::AlgEtIdl)->AlgEtIdl
     d:=Denominator(M);
     P:=(1/d)*crZQ(hnf(crQZ(d*M)));
     P:=Transpose(P)^-1;
-    zbIJ:=MatrixQToA(A,P);
+    zbIJ:=MatrixQtoA(A,P);
     IJ:=Ideal(O,zbIJ);
     IJ`ZBasis:=zbIJ; //we know that zbIJ is a ZBasisA
     assert2 IJ*J subset I;
@@ -693,7 +705,8 @@ intrinsic MakeIntegral(I::AlgEtIdl) -> AlgEtIdl,RngIntElt
 {given a fractional S ideal I, returns the ideal d*I,d when d is the smallest integer such that d*I is integral in S}
     if IsIntegral(I) then return I; end if;
     S:=Order(I);
-    d:=Denominator(MatrixAtoQ(Generators(I))*inclusion_matrix(S));
+    //d:=Denominator(MatrixAtoQ(Generators(I))*inclusion_matrix(S));
+    d:=LCM([Denominator(x) : x in AbsoluteCoordinates(Generators(I),S)]);
     //d:=Denominator(ChangeRing(Matrix(AbsoluteCoordinates(Generators(I),ZBasis(S))),Rationals())); //old code
     dI:=d*I;
     assert2 dI subset S;
@@ -705,8 +718,9 @@ intrinsic MinimalInteger(I::AlgEtIdl) -> RngIntElt
     if not assigned I`MinimalInteger then
         require IsIntegral(I): "the ideal must be integral";
         ZZ:=Integers();
-        Minv:=inclusion_matrix(I);
-        coord:=MatrixAtoQ([One(Algebra(I))])*Minv;
+        coord:=AbsoluteCoordinates([One(Algebra(I))],I)[1];
+        //Minv:=inclusion_matrix(I);
+        //coord:=MatrixAtoQ([One(Algebra(I))])*Minv;
         min:=LCM([ Denominator(c) : c in Eltseq(coord)]);
         assert2 min in I;
         I`MinimalInteger:=min;
@@ -738,12 +752,11 @@ intrinsic ResidueRing(S::AlgEtOrd,I::AlgEtIdl) -> GrpAb , Map
     A:=Algebra(S);
     N:=AbsoluteDimension(A);
     F:=FreeAbelianGroup(N);
-    matS:=inclusion_matrix(S);
-    matP:=MatrixAtoQ(ZBasis(I));
+    //matS:=inclusion_matrix(S);
+    //matP:=MatrixAtoQ(ZBasis(I));
     S_to_F:=function(x0)
         assert Parent(x0) eq A;
-        x_inS:=Eltseq(MatrixAtoQ([x0])*matS);
-        //x_inS:=AbsoluteCoordinates([x0],ZBasis(S));
+        x_inS:=AbsoluteCoordinates([x0],S)[1];
         return (F ! Eltseq(x_inS)) ;
     end function;
     F_to_S:=function(y)
@@ -752,7 +765,8 @@ intrinsic ResidueRing(S::AlgEtOrd,I::AlgEtIdl) -> GrpAb , Map
         return y_inA;
     end function;
     StoF:=map< A -> F | x :-> S_to_F(x), y :-> F_to_S(y)>;
-    rel:=[F ! Eltseq(x) : x in Rows(matP * matS)];
+    //rel:=[F ! Eltseq(x) : x in Rows(matP * matS)];
+    rel:=[F ! x : x in AbsoluteCoordinates(ZBasis(I),S)];
     Q,q:=quo<F|rel>; //Q=S/I
     m:=StoF*q; //m is a map from S to Q
     assert #Q eq Index(S,I);

@@ -556,19 +556,23 @@ intrinsic ColonIdeal(I::AlgEtIdl,J::AlgEtIdl)->AlgEtIdl
         j:=J`Generators[1];
         return (1/j)*I;
     end if;
-// based on jv code
-    N:=AbsoluteDimension(A);
-    zbI:=ZBasis(I);
-    mIinv:=MatrixAtoQ(zbI)^-1;
-    zbJ:=ZBasis(J);
-    bas:=AbsoluteBasis(A);
-    M:=VerticalJoin([ Transpose( MatrixAtoQ([zj*bas[i] : i in [1..N]])*mIinv) : zj in zbJ] );
-    d:=Denominator(M);
-    P:=(1/d)*crZQ(hnf(crQZ(d*M)));
-    P:=Transpose(P)^-1;
-    zbIJ:=MatrixQtoA(A,P);
-    IJ:=Ideal(O,zbIJ);
-    IJ`ZBasis:=zbIJ; //we know that zbIJ is a ZBasisA
+// // based on jv code
+//     N:=AbsoluteDimension(A);
+//     zbI:=ZBasis(I);
+//     //mIinv:=MatrixAtoQ(zbI)^-1;
+//     mIinv:=inclusion_matrix(I);
+//     zbJ:=ZBasis(J);
+//     bas:=AbsoluteBasis(A);
+//     M:=VerticalJoin([ Transpose( MatrixAtoQ([zj*bas[i] : i in [1..N]])*mIinv) : zj in zbJ] );
+//     d:=Denominator(M);
+//     P:=(1/d)*crZQ(hnf(crQZ(d*M)));
+//     P:=Transpose(P)^-1;
+//     zbIJ:=MatrixQtoA(A,P);
+//     IJ:=Ideal(O,zbIJ);
+//     IJ`ZBasis:=zbIJ; //we know that zbIJ is a ZBasisA
+//
+//     the following code tends to be much faster because TraceDualIdeal is cached.
+    IJ:=TraceDualIdeal(TraceDualIdeal(I)*J);
     assert2 IJ*J subset I;
     return IJ;
 end intrinsic;
@@ -829,6 +833,11 @@ end intrinsic;
         _:=Ideal(O,<ideal< O_prod[i] | [Random(O_prod[i],3): j in [1..3]]> : i in [1..#O_prod] >);
     end for;
 
+    SetAssertions(1);
+    time ids:=[ Ideal(E1,[Random(E1) : i in [1..10]]) : i in [1..20]]; 
+    time cc2:=[ TraceDualIdeal(TraceDualIdeal(I)*J) : I,J in ids  ];
+    time cc:=[ ColonIdeal(I,J) : I,J in ids  ];
+    assert cc eq cc2;
 
 
     K:=NumberField(x^2-5);

@@ -537,9 +537,14 @@ intrinsic 'meet'(I::AlgEtIdl, J::AlgEtIdl) -> AlgEtIdl
     if J subset I then
         return J;
     end if;
-    zb:=meet_zbasis(ZBasis(I),ZBasis(J));
-    id:=Ideal(Order(I),zb);
-    id`ZBasis:=zb;
+
+    id:=TraceDualIdeal(TraceDualIdeal(I)+TraceDualIdeal(J)); // it seems to be faster
+    if GetAssertions() gt 1 then
+        zb:=meet_zbasis(ZBasis(I),ZBasis(J));
+        id0:=Ideal(Order(I),zb);
+        id0`ZBasis:=zb;
+        assert id eq id0;
+    end if;
     return id;
 end intrinsic;
 
@@ -822,7 +827,8 @@ end intrinsic;
     time _:=[IsIntegral(Random(E1)*E1+Random(E1)*E1) : i in [1..100]];
     time _:=[MakeIntegral(Random(E1)*E1+Random(E1)*E1) : i in [1..100]];
 
-    time ids:=[ Ideal(E1,[Random(E1) : i in [1..10]]) : i in [1..20]]; 
+    time ids:=[ Ideal(E1,[Random(E1) : i in [1..10]]) : i in [1..2000]]; 
+    time _:=&meet(ids);
     time rr:=[ResidueRing(E1,I) : I in ids ];
     time cc:=[ ColonIdeal(I,J) : I,J in ids  ];
 

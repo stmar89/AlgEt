@@ -63,7 +63,6 @@ intrinsic TraceDualIdeal(I::AlgEtIdl) -> AlgEtIdl
         It:=Ideal(S,BB);
         It`ZBasis:=BB; //we know that BB is a ZBasis
         I`TraceDualIdeal:=It;
-        assert2 (I*It) eq S!!TraceDualIdeal(MultiplicatorRing(I));
     end if;
     return I`TraceDualIdeal;
 end intrinsic;

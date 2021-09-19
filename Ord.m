@@ -436,8 +436,7 @@ intrinsic 'subset'(O1 :: AlgEtOrd, O2 :: AlgEtOrd) -> BoolElt
   if not Index(O2, O1) in Integers() then
     return false;
   end if;
-  mat := Matrix(AbsoluteCoordinates(Generators(O1), ZBasis(O2)));
-  return &and[IsCoercible(Integers(), elt) : elt in Eltseq(mat)];
+  return forall{z : z in Generators(O1) | z in O2 };
 end intrinsic;
 
 intrinsic '*'(O1::AlgEtOrd,O2::AlgEtOrd)->BoolElt

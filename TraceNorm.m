@@ -13,6 +13,8 @@ declare verbose AlgEtTraceNorm, 3;
 
 */
 
+import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQtoA , meet_zbasis , inclusion_matrix;
+
 //------------
 // Trace and Norm
 //------------
@@ -50,10 +52,14 @@ intrinsic TraceDualIdeal(I::AlgEtIdl) -> AlgEtIdl
         A:=Algebra(I);
         S:=Order(I);
         B:=ZBasis(I);
+        Nnf:=#NumberFields(A);
         n:=#B;
         Q:=MatrixRing(RationalField(), n)![AbsoluteTrace(B[i]*B[j]): i, j in [1..n] ];
         QQ:=Q^-1;
-        BB:=[A ! (&+[ (QQ[i,j]*B[j]): j in [1..n]]) : i in [1..n]] ;
+        //BB:=[A ! (&+[ (QQ[i,j]*B[j]): j in [1..n]]) : i in [1..n]] ; //too many coercions
+        B_comp:=[Components(b) : b in B];
+        BB:=< [(&+[ (QQ[i,j]*B_comp[j][k]): j in [1..n]]) : i in [1..n]] : k in [1..Nnf]>;
+        BB:=[ A ! < BB[k][i] : k in [1..Nnf] > : i in [1..n] ];
         It:=Ideal(S,BB);
         It`ZBasis:=BB; //we know that BB is a ZBasis
         I`TraceDualIdeal:=It;

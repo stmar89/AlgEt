@@ -73,7 +73,7 @@ intrinsic IsCoercible(A::AlgEt, x::.) -> BoolElt, .
         for i in [1..#x] do
             t,xi:=IsCoercible(NumberFields(A)[i],x[i]); 
             if not t then
-                return false,_; // early exit if not coercible
+                return false,""; // early exit if not coercible
             else
                 Append(~comp,xi);
             end if;
@@ -91,7 +91,7 @@ intrinsic IsCoercible(A::AlgEt, x::.) -> BoolElt, .
         x1`Components:=<nf[i]!x : i in [1..#nf]>; //diagonal embedding
         return true,x1;
     else 
-        return false,_;
+        return false,"";
     end if;
 end intrinsic;
 

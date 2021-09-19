@@ -23,13 +23,15 @@ declare attributes AlgEtIdl : Index, //stores the index
                               IsPrime,
                               IsInvertible,
                               IsIntegral,
+                              MinimalInteger,
                               PrimesAbove,
                               Factorization,
                               IsProductOfIdeals,
                               TraceDualIdeal,
-                              Hash;
+                              Hash,
+                              inclusion_matrix;
 
-import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQToA , meet_zbasis ;
+import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQToA , meet_zbasis , inclusion_matrix;
 
 /*TODO
     - MinimalGenerators
@@ -51,15 +53,16 @@ CreateAlgEtIdl:=function(S,gens)
     I`Order:=S;
     gens:=Setseq(Seqset(gens));
     if #gens gt AbsoluteDimension(A) then
+        ZZ:=Integers();
         vprintf AlgEtIdl,3: "too many gens";
         gens:=[g*s : g in gens, s in ZBasis(S) ];
         dim:=AbsoluteDimension(A);
         M:=MatrixAtoQ(gens);
-        d:=Integers()!Denominator(M);
+        d:=Denominator(M);
         P:=hnf(crQZ(d*M));
         P:=(1/d)*crZQ(P);
         d:=Denominator(P); //this d might be different from Denomintor(M)
-        hash:=[d] cat [(Integers()!(d*P[i,j])) : j in [i..dim] , i in [1..dim]];
+        hash:=[d] cat [(d*P[i,j]) : j in [i..dim] , i in [1..dim]];
         zb:=MatrixQToA(A,P);
         assert #zb eq AbsoluteDimension(A);
         I`Hash:=hash;
@@ -277,7 +280,7 @@ end intrinsic;
 intrinsic 'in'(x::AlgEtElt , I::AlgEtIdl ) -> BoolElt
 {Returns if x is in I.}
     require Algebra(x) eq Algebra(I) : "the elements must lie in the same algebra of definition";
-    if assigned I`Generators and x in I`Generators then 
+    /*if assigned I`Generators and x in I`Generators then 
         return true;
     end if;
     if assigned I`ZBasis and x in I`ZBasis then 
@@ -285,6 +288,12 @@ intrinsic 'in'(x::AlgEtElt , I::AlgEtIdl ) -> BoolElt
     end if;
     mat := AbsoluteCoordinates([x], ZBasis(I))[1];
     return &and[IsCoercible(Integers(), elt) : elt in Eltseq(mat)];
+    */
+    ZZ:=Integers();
+    Minv:=inclusion_matrix(I);
+    M:=MatrixAtoQ([x])*Minv;
+    is_in:=forall{m : m in Eltseq(M) | IsCoercible(ZZ,m)};
+    return is_in;
 end intrinsic;
 
 intrinsic 'in'(x::RngIntElt , I::AlgEtIdl ) -> BoolElt
@@ -317,8 +326,7 @@ intrinsic 'subset'(I1 :: AlgEtIdl, I2 :: AlgEtIdl) -> BoolElt
   if not Index(I2, I1) in Integers() then
     return false;
   end if;
-  mat := Matrix(AbsoluteCoordinates(Generators(I1), ZBasis(I2)));
-  return &and[IsCoercible(Integers(), elt) : elt in Eltseq(mat)];
+  return forall{ x : x in Generators(I1) | x in I2};
 end intrinsic;
 
 //----------
@@ -655,8 +663,21 @@ intrinsic IsCoprime(I::AlgEtIdl,J::AlgEtIdl) -> BoolElt
     require Algebra(I) cmpeq Algebra(J) : "the ideals must lie in the same algebra";
     S:=Order(J);
     require Order(I) eq S: "the ideals must be over the same order";
+    if I eq J then
+        return false;
+    end if;
+    if assigned I`IsPrime and assigned J`IsPrime then
+        if IsPrime(I) and IsPrime(J) then
+            return true; //we already know that the ideals are distinct
+        end if;
+    end if;
     require IsIntegral(I) and IsIntegral(J): "the ideals must be integral";
-    return (One(S) in I+J);
+    g:=GCD(MinimalInteger(I),MinimalInteger(J));
+    if g eq 1 then
+        return true;
+    else
+        return (One(S) in I+J); //here we generate a new ideal, which is expensive.
+    end if;
 end intrinsic;
 
 intrinsic IsIntegral(I::AlgEtIdl) -> BoolElt
@@ -672,17 +693,25 @@ intrinsic MakeIntegral(I::AlgEtIdl) -> AlgEtIdl,RngIntElt
 {given a fractional S ideal I, returns the ideal d*I,d when d is the smallest integer such that d*I is integral in S}
     if IsIntegral(I) then return I; end if;
     S:=Order(I);
-    d:=Denominator(ChangeRing(Matrix(AbsoluteCoordinates(Generators(I),ZBasis(S))),Rationals()));
-    return d*I, d;
+    d:=Denominator(MatrixAtoQ(Generators(I))*inclusion_matrix(S));
+    //d:=Denominator(ChangeRing(Matrix(AbsoluteCoordinates(Generators(I),ZBasis(S))),Rationals())); //old code
+    dI:=d*I;
+    assert2 dI subset S;
+    return dI, d;
 end intrinsic;
 
 intrinsic MinimalInteger(I::AlgEtIdl) -> RngIntElt
 {returns the smallest integer contained in the ideal I}
-    require IsIntegral(I): "the ideal must be integral";
-    coord:=AbsoluteCoordinates([One(Algebra(I))],ZBasis(I))[1];
-    min:=LCM([ Denominator(c) : c in Eltseq(coord)]);
-    assert2 min in I;
-    return min;
+    if not assigned I`MinimalInteger then
+        require IsIntegral(I): "the ideal must be integral";
+        ZZ:=Integers();
+        Minv:=inclusion_matrix(I);
+        coord:=MatrixAtoQ([One(Algebra(I))])*Minv;
+        min:=LCM([ Denominator(c) : c in Eltseq(coord)]);
+        assert2 min in I;
+        I`MinimalInteger:=min;
+    end if;
+    return I`MinimalInteger;
 end intrinsic;
 
 intrinsic CoprimeRepresentative(I::AlgEtIdl,J::AlgEtIdl) -> AlgEtElt
@@ -709,11 +738,12 @@ intrinsic ResidueRing(S::AlgEtOrd,I::AlgEtIdl) -> GrpAb , Map
     A:=Algebra(S);
     N:=AbsoluteDimension(A);
     F:=FreeAbelianGroup(N);
-    matS:=Transpose(MatrixAtoQ(ZBasis(S)));
-    matP:=Transpose(MatrixAtoQ(ZBasis(I)));
+    matS:=inclusion_matrix(S);
+    matP:=MatrixAtoQ(ZBasis(I));
     S_to_F:=function(x0)
         assert Parent(x0) eq A;
-        x_inS:=AbsoluteCoordinates([x0],ZBasis(S));
+        x_inS:=Eltseq(MatrixAtoQ([x0])*matS);
+        //x_inS:=AbsoluteCoordinates([x0],ZBasis(S));
         return (F ! Eltseq(x_inS)) ;
     end function;
     F_to_S:=function(y)
@@ -722,7 +752,7 @@ intrinsic ResidueRing(S::AlgEtOrd,I::AlgEtIdl) -> GrpAb , Map
         return y_inA;
     end function;
     StoF:=map< A -> F | x :-> S_to_F(x), y :-> F_to_S(y)>;
-    rel:=[F ! Eltseq(x) : x in Rows(Transpose(matS^-1 * matP))];
+    rel:=[F ! Eltseq(x) : x in Rows(matP * matS)];
     Q,q:=quo<F|rel>; //Q=S/I
     m:=StoF*q; //m is a map from S to Q
     assert #Q eq Index(S,I);

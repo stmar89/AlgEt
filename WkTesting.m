@@ -54,7 +54,7 @@ intrinsic IsInvertible(I::AlgEtIdl) ->BoolElt,AlgEtIdl
     if not assigned I`IsInvertible then
         O:=Order(I);
         COI:=ColonIdeal(O,I);
-        I`IsInvertible:=<O eq I*COI, COI>;
+        I`IsInvertible:=<One(O) in I*COI, COI>;
     end if;
     return Explode(I`IsInvertible);
 end intrinsic;

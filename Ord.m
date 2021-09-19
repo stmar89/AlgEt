@@ -31,7 +31,8 @@ declare attributes AlgEtOrd : IsMaximal,
                               Conductor,
                               IsGorenstein,
                               IsBass,
-                              Hash;
+                              Hash,
+                              inclusion_matrix;
 
 //----------
 // Basics
@@ -94,8 +95,18 @@ MatrixQToA:=function(A,P)
 //given a matrix with Integer or Rational entries, returns a sequence of elements of A, corresponding to the rows.
     abs:=AbsoluteBasis(A);
     abs_dim:=AbsoluteDimension(A);
+    N:=#NumberFields(A);
+    rows:=[ Eltseq(r) : r in Rows(P)];
+    Nrow:=#rows;
     assert #Columns(P) eq abs_dim;
-    return [ &+[Eltseq(r)[i]*abs[i] : i in [1..abs_dim]] : r in Rows(P)];
+    // we first do the operations componentwise, and then create the element of A
+    // in this way we same many calls of IsCoercible
+    out_new:=<>;
+    for j in [1..N] do
+        Append(~out_new,[ &+[r[i]*Components(abs[i])[j] : i in [1..abs_dim]] : r in rows]);
+    end for;
+    out:= [ A!<out_new[j][r] : j in [1..N]> : r in [1..Nrow] ]; 
+    return out;
 end function;
 
 //----------
@@ -242,15 +253,31 @@ end intrinsic;
 // Inclusion
 //----------
 
+inclusion_matrix:=function(O)
+// the inclusion matrix is simply the inverse of the matrix MatrixAtoQ(ZBasis(O)).
+// This allows to check if an element is in O by simply making one matrix multiplication, rather then
+// solving a system (as in AbsoluteCoordinates). It is much faster.
+// O can also be an ideal.
+    if not assigned O`inclusion_matrix then
+        O`inclusion_matrix:=MatrixAtoQ(ZBasis(O))^-1; 
+    end if;
+    return O`inclusion_matrix;
+end function;
+
 intrinsic 'in'(x::AlgEtElt,O::AlgEtOrd) -> BoolElt
 {inclusion of elements} 
     require Algebra(x) cmpeq Algebra(O) : "the algebra is not the same";
+    /* //this check succeeds very rarely, and makes the code a bit slower.
     if (assigned O`Generators and x in O`Generators)
         or (assigned O`ZBasis and x in O`ZBasis) then
         return true;
     end if;
-    mat := AbsoluteCoordinates([x], ZBasis(O))[1];
-    return &and[IsCoercible(Integers(), elt) : elt in Eltseq(mat)];
+    */
+    ZZ:=Integers();
+    Minv:=inclusion_matrix(O);
+    M:=MatrixAtoQ([x])*Minv;
+    is_in:=forall{m : m in Eltseq(M) | IsCoercible(ZZ,m)};
+    return is_in;
 end intrinsic;
 
 intrinsic 'in'(x::RngIntElt,O::AlgEtOrd) -> BoolElt

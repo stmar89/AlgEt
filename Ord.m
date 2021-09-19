@@ -364,6 +364,7 @@ intrinsic IsProductOfOrders(O::AlgEtOrd)->BoolElt, Tup
                 orders:=<O>;
             else
                 zb:=ZBasis(O);
+                require PrimeField(A) eq BaseField(A) : "We require the algebra to be defined over the Rationals(). The reason is that we don't have a functioning method to create orders in relative number fields which are not over the maximal order of the base field. One can still check if the order O is a product by cehcking if OrthogonalIdempotents(A) are in O."; 
                 orders:=< Order( [ projs[i](z) : z in zb ] ) : i in [1..#idem] >;
                 assert2 O eq Order(A,orders);
             end if;

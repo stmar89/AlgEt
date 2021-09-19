@@ -253,6 +253,16 @@ intrinsic 'in'(x::AlgEtElt,O::AlgEtOrd) -> BoolElt
     return &and[IsCoercible(Integers(), elt) : elt in Eltseq(mat)];
 end intrinsic;
 
+intrinsic 'in'(x::RngIntElt,O::AlgEtOrd) -> BoolElt
+{inclusion of elements} 
+    return (Algebra(O)!x) in O;
+end intrinsic;
+
+intrinsic 'in'(x::FldRatElt,O::AlgEtOrd) -> BoolElt
+{inclusion of elements} 
+    return (Algebra(O)!x) in O;
+end intrinsic;
+
 //----------
 // Elements in orders
 //----------

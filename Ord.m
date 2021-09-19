@@ -190,13 +190,13 @@ intrinsic myHash(S::AlgEtOrd)->SeqEnum[RngInt]
 {hash function for AlgEtOrd}
 // two orders have the hash iff they are equal
     if not assigned S`Hash then
-        N:=Dimension(Algebra(S));
+        dim:=AbsoluteDimension(Algebra(S));
         P:=MatrixAtoQ(ZBasis(S));
-        d:=Integers() ! Denominator(P);
+        d:=Denominator(P);
         P:=(1/d)*hnf(crQZ(d*P));
-        d:=Integers() ! Denominator(P);
+        d:=Denominator(P);
         assert2 IsUpperTriangular(P);
-        S`Hash:=[d] cat [(Integers()!(d*P[i,j])) : j in [i..N] , i in [1..N]];
+        S`Hash:=[d] cat [(Integers()!(d*P[i,j])) : j in [i..dim] , i in [1..dim]];
     end if;
     return S`Hash;
 end intrinsic;
@@ -514,7 +514,7 @@ end intrinsic;
     Attach("~/packages_github/AlgEt/Elt.m");
     Attach("~/packages_github/AlgEt/Ord.m");
     SetVerbose("AlgEtOrd",2);
-    SetAssertion(2);
+    SetAssertions(2);
 
     _<x>:=PolynomialRing(Integers());
     f:=(x^8+16)*(x^8+81);
@@ -587,7 +587,7 @@ end intrinsic;
     p:=y^2-7;
     assert forall{z : z in ZBasis(O1) | z in O1 };
     A:=EtaleAlgebra(p);
-    MaximalOrder(A);
+    OA:=MaximalOrder(A);
     time O1:=Order(Basis(A)); //this should trigger an error
     time O2:=Order(AbsoluteBasis(A));
     assert forall{z : z in ZBasis(O2) | z in O2 };

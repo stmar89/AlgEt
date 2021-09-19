@@ -287,6 +287,16 @@ intrinsic 'in'(x::AlgEtElt , I::AlgEtIdl ) -> BoolElt
     return &and[IsCoercible(Integers(), elt) : elt in Eltseq(mat)];
 end intrinsic;
 
+intrinsic 'in'(x::RngIntElt , I::AlgEtIdl ) -> BoolElt
+{Returns if x is in I.}
+    return (Algebra(I)!x) in I;
+end intrinsic;
+
+intrinsic 'in'(x::FldRatElt , I::AlgEtIdl ) -> BoolElt
+{Returns if x is in I.}
+    return (Algebra(I)!x) in I;
+end intrinsic;
+
 intrinsic 'subset'(S::AlgEtOrd,I::AlgEtIdl) -> BoolElt
 {given an ideal I of S, return if S subseteq I}
     assert Algebra(I) cmpeq Algebra(S);

@@ -84,11 +84,10 @@ intrinsic PrimesAbove(I::AlgEtIdl) -> SeqEnum[AlgAssEtOrdIdl]
 {Given an integral S-ideal, returns the sequence of maximal ideals P of S above I.}
     require IsIntegral(I): "the ideal must be integral";
     if not assigned I`PrimesAbove then
+        S:=Order(I);
         if assigned I`Factorization then
             primes:=[P[1] : P in I`Factorization];
-        end if;
-        S:=Order(I);
-        if I eq OneIdeal(S) then
+        elif I eq OneIdeal(S) then
             primes:=[];
         else
             if IsMaximal(S) then
@@ -201,6 +200,13 @@ end intrinsic;
     SetAssertions(2);
 
     _<x>:=PolynomialRing(Integers());
+    f:=(x^8+16)*(x^8+81);
+    A:=EtaleAlgebra(f);
+    E1:=EquationOrder(A);
+    time _:=PrimesAbove(Conductor(E1)); //TODO Somethign broken here!
+
+
+
     f:=(x^8+16)*(x^8+81);
     A:=EtaleAlgebra(f);
     E1:=EquationOrder(A);

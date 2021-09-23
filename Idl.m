@@ -636,12 +636,8 @@ intrinsic IsProductOfIdeals(I::AlgEtIdl) -> BoolElt, Tup
         test,orders:=IsProductOfOrders(O);
         if test then
             nf,_,projs:=NumberFields(A); 
-            if #nf eq 1 then
-               ideals:=<I>;
-            else
-                zb:=ZBasis(I);
-                ideals:=< ideal< orders[i] | [ projs[i](z) : z in zb ] > : i in [1..#orders] >;
-            end if;
+            zb:=ZBasis(I);
+            ideals:=< ideal< orders[i] | [ projs[i](z) : z in zb ] > : i in [1..#orders] >;
             I`IsProductOfIdeals:=<true, ideals>;
         else
             I`IsProductOfIdeals:=<false,<>>;

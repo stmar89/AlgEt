@@ -200,10 +200,11 @@ end intrinsic;
     SetAssertions(2);
 
     _<x>:=PolynomialRing(Integers());
-    f:=(x^8+16)*(x^8+81);
+    f:=(x^8+16);
     A:=EtaleAlgebra(f);
     E1:=EquationOrder(A);
-    time _:=PrimesAbove(Conductor(E1)); //TODO Somethign broken here!
+    ff:=Conductor(E1);
+    time _:=PrimesAbove(Conductor(E1));
 
 
 

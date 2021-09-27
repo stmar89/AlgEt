@@ -3,10 +3,13 @@ AlgEt.m
 CRT.m
 Elt.m
 FactPrimes.m
+IdealClassMonoid.m
 Idl.m
+LowCohenMacaulayType.m
 Ord.m
 OverOrders.m
 PicardGroup.m
 TraceNorm.m
+WkClasses.m
 WkTesting.m
 }

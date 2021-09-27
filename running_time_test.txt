@@ -1,0 +1,82 @@
+/* vim: set syntax=magma :*/
+
+    AttachSpec("~/packages_github/AbVarFq/packages.spec");
+    SetClassGroupBounds("GRH");
+    t0:=Cputime();
+	_<x>:=PolynomialRing(Integers());
+    f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
+    K:=AssociativeAlgebra(f);
+    E:=EquationOrder(K);
+    SeqWC:=WKICM(E);
+    if #SeqWC ne 25 then
+      test:=false;
+      printf"\nERROR: SeqWC of f=%o\n",f;
+    end if;
+    // _:=ICM(E); //computing the Pics is very slow!
+
+    f:=x^4+291*x^3-988*x^2-1000*x-1000;
+    K:=AssociativeAlgebra(f);
+    E:=EquationOrder(K);
+    SeqWC:=WKICM(E);
+    if #SeqWC ne 20 then
+      test:=false;
+      printf"\nERROR: SeqWC of f=%o\n",f;
+    end if;
+    _:=ICM(E);
+
+    f:=x^3+31*x^2+43*x+77;
+    K:=AssociativeAlgebra(f);
+    E:=EquationOrder(K);
+    if #FindOverOrders(E) ne 15 then 
+      test:=false;
+      printf"\nERROR: OverOrders of f=%o\n",f;
+    end if;
+    SeqWC:=WKICM(E);
+    if #SeqWC ne 23 then
+      test:=false;
+      printf"\nERROR: SeqWC of f=%o\n",f;
+    end if;
+    _:=ICM(E);
+    Cputime(t0);
+
+
+	AttachSpec("~/packages_github/AlgEt/spec");
+    SetClassGroupBounds("GRH");
+    t0:=Cputime();
+	_<x>:=PolynomialRing(Integers());
+    f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
+    K:=EtaleAlgebra(f);
+    E:=EquationOrder(K);
+    SeqWC:=WKICM(E);
+    if #SeqWC ne 25 then
+      test:=false;
+      printf"\nERROR: SeqWC of f=%o\n",f;
+    end if;
+    // _:=ICM(E); //computing the Pics is very slow!
+
+    f:=x^4+291*x^3-988*x^2-1000*x-1000;
+    K:=EtaleAlgebra(f);
+    E:=EquationOrder(K);
+    SeqWC:=WKICM(E);
+    if #SeqWC ne 20 then
+      test:=false;
+      printf"\nERROR: SeqWC of f=%o\n",f;
+    end if;
+    _:=ICM(E);
+
+    f:=x^3+31*x^2+43*x+77;
+    K:=EtaleAlgebra(f);
+    E:=EquationOrder(K);
+    if #FindOverOrders(E) ne 15 then 
+      test:=false;
+      printf"\nERROR: OverOrders of f=%o\n",f;
+    end if;
+    SeqWC:=WKICM(E);
+    if #SeqWC ne 23 then
+      test:=false;
+      printf"\nERROR: SeqWC of f=%o\n",f;
+    end if;
+    _:=ICM(E);
+    Cputime(t0);
+
+

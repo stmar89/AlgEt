@@ -237,6 +237,7 @@ intrinsic 'eq'(O1::AlgEtOrd,O2::AlgEtOrd)->BoolElt
         out:=false;
     end if;
     vprintf AlgEtOrd,3 : "output of equality = %o\n",out;
+    /* There is an issue here: certain attributes are depend on others. For example we cannot pass the inclusion_matrix and not the ZBasis, since the first depends on the second.
     if out then //we copy the attributes
         for att in GetAttributes(AlgEtOrd) do
             if assigned O1``att and not assigned O2``att then
@@ -246,6 +247,7 @@ intrinsic 'eq'(O1::AlgEtOrd,O2::AlgEtOrd)->BoolElt
             end if;
         end for;
     end if;
+    */
     return out;
 end intrinsic;
 

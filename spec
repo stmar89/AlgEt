@@ -1,0 +1,12 @@
+{
+AlgEt.m
+CRT.m
+Elt.m
+FactPrimes.m
+Idl.m
+Ord.m
+OverOrders.m
+PicardGroup.m
+TraceNorm.m
+WkTesting.m
+}

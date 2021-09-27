@@ -711,7 +711,7 @@ intrinsic MakeIntegral(I::AlgEtIdl) -> AlgEtIdl,RngIntElt
     if IsIntegral(I) then return I; end if;
     S:=Order(I);
     //d:=Denominator(MatrixAtoQ(Generators(I))*inclusion_matrix(S));
-    d:=LCM([Denominator(x) : x in AbsoluteCoordinates(Generators(I),S)]);
+    d:=LCM(&cat[ [Denominator(x_coord) : x_coord in x] : x in AbsoluteCoordinates(Generators(I),S)]);
     //d:=Denominator(ChangeRing(Matrix(AbsoluteCoordinates(Generators(I),ZBasis(S))),Rationals())); //old code
     dI:=d*I;
     assert2 dI subset S;

@@ -234,7 +234,7 @@ PicardGroup_prod_internal:=function( O , GRH )
                 idLi:=gLi(Gproj[i](gen));
                 gens_inA:=gens_inA cat[T[4](g) : g in Basis(idLi,T[3])];
             end for;
-            gen_O:=ideal<O|gens_inA>;
+            gen_O:=Ideal(O,gens_inA);
             Append(~geninO,gen_O);
         end for;
         assert #geninO eq #Generators(G);      
@@ -500,6 +500,16 @@ end intrinsic;
             P,p:=PicardGroup(S);
             U,u:=UnitGroup(S);	
         end for;
+	SetProfile(false);
+	ProfilePrintByTotalTime(ProfileGraph());
+
+    // the next one is very slow!
+    f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
+    A:=EtaleAlgebra(f);
+	E:=EquationOrder(A);
+	SetProfile(true);
+        P,p:=PicardGroup(E : GRH:=true);
+        U,u:=UnitGroup(E : GRH:=true);	
 	SetProfile(false);
 	ProfilePrintByTotalTime(ProfileGraph());
 

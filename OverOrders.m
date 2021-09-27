@@ -37,11 +37,11 @@ intrinsic ResidueField(P::AlgEtIdl) -> FldFin, Map
         //the following loop is naive
         for y in Q do
             if q(Evaluate(min_poly,y@@q)) eq Zero(Q) then
-                ptririm_elt_inQ := y;
                 prim_elt_inA := y@@q;
                 break y;
             end if;
         end for;
+        assert assigned prim_elt_inA;
         //now I need to build  the map
         G,gGF := AdditiveGroup(F); //g:G->F
         hGQ := iso<G->Q | [q(prim_elt_inA^i) : i in [0..Degree(min_poly)-1]]>;

@@ -710,9 +710,7 @@ intrinsic MakeIntegral(I::AlgEtIdl) -> AlgEtIdl,RngIntElt
 {given a fractional S ideal I, returns the ideal d*I,d when d is the smallest integer such that d*I is integral in S}
     if IsIntegral(I) then return I; end if;
     S:=Order(I);
-    //d:=Denominator(MatrixAtoQ(Generators(I))*inclusion_matrix(S));
     d:=LCM(&cat[ [Denominator(x_coord) : x_coord in x] : x in AbsoluteCoordinates(Generators(I),S)]);
-    //d:=Denominator(ChangeRing(Matrix(AbsoluteCoordinates(Generators(I),ZBasis(S))),Rationals())); //old code
     dI:=d*I;
     assert2 dI subset S;
     return dI, d;
@@ -724,8 +722,6 @@ intrinsic MinimalInteger(I::AlgEtIdl) -> RngIntElt
         require IsIntegral(I): "the ideal must be integral";
         ZZ:=Integers();
         coord:=AbsoluteCoordinates([One(Algebra(I))],I)[1];
-        //Minv:=inclusion_matrix(I);
-        //coord:=MatrixAtoQ([One(Algebra(I))])*Minv;
         min:=LCM([ Denominator(c) : c in Eltseq(coord)]);
         assert2 min in I;
         I`MinimalInteger:=min;
@@ -757,20 +753,16 @@ intrinsic ResidueRing(S::AlgEtOrd,I::AlgEtIdl) -> GrpAb , Map
     A:=Algebra(S);
     N:=AbsoluteDimension(A);
     F:=FreeAbelianGroup(N);
-    //matS:=inclusion_matrix(S);
-    //matP:=MatrixAtoQ(ZBasis(I));
     S_to_F:=function(x0)
         assert Parent(x0) eq A;
         x_inS:=AbsoluteCoordinates([x0],S)[1];
         return (F ! Eltseq(x_inS)) ;
     end function;
     F_to_S:=function(y)
-        clmn_vec_y:=Transpose(Matrix(Vector(Eltseq(y))));
-        y_inA:=&+[ZBasis(S)[i]*Eltseq(clmn_vec_y)[i] : i in [1..N]];
+        y_inA:=&+[ZBasis(S)[i]*Eltseq(y)[i] : i in [1..N]];
         return y_inA;
     end function;
     StoF:=map< A -> F | x :-> S_to_F(x), y :-> F_to_S(y)>;
-    //rel:=[F ! Eltseq(x) : x in Rows(matP * matS)];
     rel:=[F ! x : x in AbsoluteCoordinates(ZBasis(I),S)];
     Q,q:=quo<F|rel>; //Q=S/I
     m:=StoF*q; //m is a map from S to Q

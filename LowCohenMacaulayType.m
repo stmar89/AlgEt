@@ -21,21 +21,25 @@ declare attributes AlgEtOrd:NonGorensteinPrimes;
 intrinsic NonGorensteinPrimes(S::AlgEtOrd)->SeqEnum,SeqEnum
 { Given an order S it returns two sequences the first containing the primes at which S is locally not Gorenstein and the second containing the CohenMacaulay types of S at this primes, that is, the dimension of S^t/PS^t over S/P, where S^t is the TraceDualIdeal of S}
     if not assigned S`NonGorensteinPrimes then
-        St:=TraceDualIdeal(S);
-        pp0:=PrimesAbove(Conductor(S));
-        pp:=[];
-        dPs:=[];
-        for P in pp0 do
-            k:=Integers() ! Index(S,P);
-            v:=Integers() ! Index(St,P*St);
-            dP:=Ilog(k,v);
-            if dP gt 1 then // don't want P such that S_P is Gorenstein
-                Append(~pp,P);
-                Append(~dPs,dP);
-            end if;
-        end for;
-        assert Min(dPs) ne 1;
-        S`NonGorensteinPrimes:=< pp,dPs >;
+        if IsGorenstein(S) then
+            S`NonGorensteinPrimes:=<[],[]>
+        else
+            St:=TraceDualIdeal(S);
+            pp0:=PrimesAbove(Conductor(S));
+            pp:=[];
+            dPs:=[];
+            for P in pp0 do
+                k:=Integers() ! Index(S,P);
+                v:=Integers() ! Index(St,P*St);
+                dP:=Ilog(k,v);
+                if dP gt 1 then // don't want P such that S_P is Gorenstein
+                    Append(~pp,P);
+                    Append(~dPs,dP);
+                end if;
+            end for;
+            assert Min(dPs) ne 1;
+            S`NonGorensteinPrimes:=< pp,dPs >;
+        end if;
     end if;
     return Explode(S`NonGorensteinPrimes);
 end intrinsic;

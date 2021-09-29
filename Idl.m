@@ -729,8 +729,8 @@ intrinsic MinimalInteger(I::AlgEtIdl) -> RngIntElt
     return I`MinimalInteger;
 end intrinsic;
 
-intrinsic CoprimeRepresentative(I::AlgEtIdl,J::AlgEtIdl) -> AlgEtElt
-{return an element x such that x*I is an integral ideal coprime with J. The first ideal must be invertible and the second should be integral}
+intrinsic CoprimeRepresentative(I::AlgEtIdl,J::AlgEtIdl) -> AlgEtElt,AlgEtIdl
+{return an element x such that x*I is an integral ideal coprime with J, togheter with the product x*I.. The first ideal must be invertible and the second should be integral}
     require IsIntegral(J) : "the second ideal must be integral";
     S:=Order(I);
     require S eq Order(J): "the ideals must be defined over the same order";
@@ -738,8 +738,9 @@ intrinsic CoprimeRepresentative(I::AlgEtIdl,J::AlgEtIdl) -> AlgEtElt
     require test: "The first ideal must be invertible";
     repeat
         x:=Random(invI);
-    until IsCoprime(x*I,J); //integrality of x*I is checked in IsCoprime
-    return x;
+        xI:=x*I;
+    until IsCoprime(xI,J); //integrality of x*I is checked in IsCoprime
+    return x,xI;
 end intrinsic;
 
 //----------

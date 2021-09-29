@@ -60,6 +60,7 @@ intrinsic TraceDualIdeal(I::AlgEtIdl) -> AlgEtIdl
         B_comp:=[Components(b) : b in B];
         BB:=< [(&+[ (QQ[i,j]*B_comp[j][k]): j in [1..n]]) : i in [1..n]] : k in [1..Nnf]>;
         BB:=[ A ! < BB[k][i] : k in [1..Nnf] > : i in [1..n] ];
+        assert2 forall{ i : i,j in [1..n] | AbsoluteTrace( B[i]*BB[j] ) eq KroneckerDelta(i,j) };
         It:=Ideal(S,BB);
         It`ZBasis:=BB; //we know that BB is a ZBasis
         I`TraceDualIdeal:=It;

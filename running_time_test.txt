@@ -42,6 +42,9 @@
 
 	AttachSpec("~/packages_github/AlgEt/spec");
     SetClassGroupBounds("GRH");
+    SetAssertions(1);
+
+    SetProfile(true);
     t0:=Cputime();
 	_<x>:=PolynomialRing(Integers());
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
@@ -52,6 +55,10 @@
       test:=false;
       printf"\nERROR: SeqWC of f=%o\n",f;
     end if;
+    for S in FindOverOrders(E) do
+        #NonGorensteinPrimes(S);
+    end for;
+    #PrimesAbove(Conductor(E)),Index(MaximalOrder(K),E);
     // _:=ICM(E); //computing the Pics is very slow!
 
     f:=x^4+291*x^3-988*x^2-1000*x-1000;
@@ -62,6 +69,10 @@
       test:=false;
       printf"\nERROR: SeqWC of f=%o\n",f;
     end if;
+    for S in FindOverOrders(E) do
+        #NonGorensteinPrimes(S);
+    end for;
+    #PrimesAbove(Conductor(E)),Index(MaximalOrder(K),E);
     _:=ICM(E);
 
     f:=x^3+31*x^2+43*x+77;
@@ -76,7 +87,34 @@
       test:=false;
       printf"\nERROR: SeqWC of f=%o\n",f;
     end if;
+    for S in FindOverOrders(E) do
+        #NonGorensteinPrimes(S);
+    end for;
+    #PrimesAbove(Conductor(E)),Index(MaximalOrder(K),E);
     _:=ICM(E);
     Cputime(t0);
+    SetProfile(false);
+    G:=ProfileGraph();
+    ProfilePrintByTotalTime(G);
+
+
+	AttachSpec("~/packages_github/AlgEt/spec");
+    SetClassGroupBounds("GRH");
+	_<x>:=PolynomialRing(Integers());
+    f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
+    K1:=EtaleAlgebra(f);
+    E1:=EquationOrder(K1);
+    SetProfile(true);
+        P1,p1:=PicardGroup(E1);
+    SetProfile(false);
+    ProfilePrintByTotalTime(ProfileGraph());
+
+    //SLOW compared to FldNum
+    E2:=EquationOrder(f);
+    SetProfile(true);
+        P2,p2:=PicardGroup(E2);
+    SetProfile(false);
+    ProfilePrintByTotalTime(ProfileGraph());
+
 
 

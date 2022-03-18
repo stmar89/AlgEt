@@ -124,6 +124,16 @@ IsPrincipal_prod_internal:=function( I , GRH )
          //The next call is to prevent a bug of the in-built function IsPrincipal (which might have been corrected by now...).
          //Also if one wants to use the GRH bound rather than one needs to precompute the class groups, since IsPrincipal does not accepts varargs )       
         OL,oL:=ClassGroup(Order(IL));
+
+        // TEST we try to make the generators of IL smaller.
+min_IL:=MinimalInteger(IL);
+repeat
+    gen_IL:=Random(IL,3);
+    IL_new:=ideal<Order(IL)|[min_IL,gen_IL]>;
+until IL_new eq IL;
+IL:=IL_new;
+        // the next line seems to be the most time consuming part of the package. 
+        // It is 10/20 times slower than the RngOrdIdl version. Need to investigate
         testL,genL:=IsPrincipal(IL);
         assert2 (Zero(OL) eq (IL@@oL)) eq testL;
         if not testL then
@@ -151,8 +161,7 @@ intrinsic IsPrincipal(I1::AlgEtIdl : GRH:=false )->BoolElt, AlgAssElt
     O:=MaximalOrder(A);
     F:=Conductor(S);
     FO:=O!!F;
-    cop:=CoprimeRepresentative(I1,F);
-    I:=cop*I1;
+    cop,I:=CoprimeRepresentative(I1,F);
     IO:=O!!I; 
     is_princ_IO,gen_IO:=IsPrincipal_prod_internal(IO,GRH);
     if not is_princ_IO then
@@ -281,8 +290,7 @@ intrinsic PicardGroup( S::AlgEtOrd : GRH:=false ) -> GrpAb, Map
         for i in [1..#Generators(GO)] do
             I:=gO(GO.i);
             //c:=CoprimeRepresentative(I,FO);
-            c:=CoprimeRepresentative(I,MinimalInteger(FO)*O);
-            cI:=c*I;
+            c,cI:=CoprimeRepresentative(I,MinimalInteger(FO)*O);
             cISmeetS:=(S!!cI) meet S;
             Append(~gens_GO_in_S,cISmeetS);
             Append(~gens_GO_in_O,cI);//used in building relDglue
@@ -488,20 +496,19 @@ end intrinsic;
 	
 	AttachSpec("~/packages_github/AlgEt/spec");
 
-	SetAssertions(2);
+	SetAssertions(1);
 
 	_<x>:=PolynomialRing(Integers());
 	f:=(x^4+16);
 	A:=EtaleAlgebra(f);
 	E:=EquationOrder(A);
 	oo:=FindOverOrders(E);
-	SetProfile(true);
-        for S in oo do
-            P,p:=PicardGroup(S);
-            U,u:=UnitGroup(S);	
-        end for;
-	SetProfile(false);
-	ProfilePrintByTotalTime(ProfileGraph());
+    t0:=Cputime();
+    for S in oo do
+        P,p:=PicardGroup(S);
+        U,u:=UnitGroup(S);	
+    end for;
+    Cputime(t0);
 
     // the next one is very slow!
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;

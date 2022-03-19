@@ -25,17 +25,16 @@ intrinsic NonGorensteinPrimes(S::AlgEtOrd)->SeqEnum,SeqEnum
             S`NonGorensteinPrimes:=<[],[]>;
         else
             St:=TraceDualIdeal(S);
-            pp0:=PrimesAbove(Conductor(S));
+            pp0:=PrimesAbove(St*ColonIdeal(S,St));
             pp:=[];
             dPs:=[];
             for P in pp0 do
                 k:=Integers() ! Index(S,P);
                 v:=Integers() ! Index(St,P*St);
                 dP:=Ilog(k,v);
-                if dP gt 1 then // don't want P such that S_P is Gorenstein
-                    Append(~pp,P);
-                    Append(~dPs,dP);
-                end if;
+                assert dP gt 1; // don't want P such that S_P is Gorenstein
+                Append(~pp,P);
+                Append(~dPs,dP);
             end for;
             assert Min(dPs) ne 1;
             S`NonGorensteinPrimes:=< pp,dPs >;

@@ -6,5 +6,5 @@ This will be built using direct product of number fields as core, for superior s
 
 TODO:
 - an AlgEtToAlgAss intrinsic which returns an AlgAss and an isomorphism.
-
+- saving and printing
 

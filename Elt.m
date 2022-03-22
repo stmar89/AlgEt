@@ -367,7 +367,9 @@ intrinsic PowerBasis(A::AlgEt) -> SeqEnum[AlgEtElt]
 {Returns the power basis of the étale algebra A, consisting of powers of the PrimitiveElement of A}
     if not assigned A`PowerBasis then
         a:=PrimitiveElement(A);
-        A`PowerBasis:=[a^i : i in [0..Dimension(A)-1]];
+        pow_a:=[ i gt 1 select Self(i-1)*a else One(A) : i in [1..Dimension(A)]];
+        //Self makes it much more efficient
+        A`PowerBasis:=pow_a;
     end if;
     return A`PowerBasis;
 end intrinsic;

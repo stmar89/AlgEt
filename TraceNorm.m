@@ -50,6 +50,7 @@ intrinsic TraceDualIdeal(I::AlgEtIdl) -> AlgEtIdl
 {Returns the trace dual ideal of an ideal in an order in an etale algebra.}
     if not assigned I`TraceDualIdeal then
         A:=Algebra(I);
+        require PrimeField(A) eq BaseField(A) : "implementend only for algebras over the prime field";
         S:=Order(I);
         B:=ZBasis(I);
         Nnf:=#NumberFields(A);

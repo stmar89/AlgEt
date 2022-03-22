@@ -495,11 +495,11 @@ end intrinsic;
 /*TEST
 	
 	AttachSpec("~/packages_github/AlgEt/spec");
-
 	SetAssertions(1);
-
 	_<x>:=PolynomialRing(Integers());
-	f:=(x^4+16);
+
+	// very fast
+    f:=(x^4+16);
 	A:=EtaleAlgebra(f);
 	E:=EquationOrder(A);
 	oo:=FindOverOrders(E);
@@ -510,15 +510,17 @@ end intrinsic;
     end for;
     Cputime(t0);
 
-    // the next one is very slow!
+    // the next one is slower ~190 sec with GRH:=true
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
     A:=EtaleAlgebra(f);
 	E:=EquationOrder(A);
 	SetProfile(true);
+    t0:=Cputime();
         P,p:=PicardGroup(E : GRH:=true);
         U,u:=UnitGroup(E : GRH:=true);	
+    Cputime(t0);
 	SetProfile(false);
-	ProfilePrintByTotalTime(ProfileGraph());
+    ProfilePrintByTotalTime(ProfileGraph());
 
     // 
     AttachSpec("~/packages_github/AlgEt/spec");

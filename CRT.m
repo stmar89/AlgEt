@@ -44,12 +44,13 @@ CRT_data_order:=function(S)
             //replacing zb[pos] with One(K) since they generate the same Z-Span
             temp:=zb[1];
             zb[1]:=One(K);
+            if pos ne 1 then
+                zb[pos]:=temp;
+            end if;
         end if;
         assert2 Order(zb) eq S;
         M:=MatrixAtoQ(zb);
         Minv:=M^-1;
-    pow_a:=[ i gt 1 select Self(i-1)*a else One(A) : i in [1..#coeff]];
-    //Self makes it much more efficient
         S`CRT_data:=<zb,Minv>;
     end if;
     return Explode(S`CRT_data);

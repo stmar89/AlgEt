@@ -520,6 +520,22 @@ end intrinsic;
 	SetProfile(false);
 	ProfilePrintByTotalTime(ProfileGraph());
 
+    // 
+    AttachSpec("~/packages_github/AlgEt/spec");
+    _<x>:=PolynomialRing(Integers());
+    f:=x^6 - 3*x^5 - 3*x^4 + 65*x^3 - 48*x^2 - 768*x + 4096;
+    A:=EtaleAlgebra(f);
+    gensT:=[
+        <[ 1, 0 ], [ 1/9, 5/6, 1, 41/18 ]>,
+        <[ 0, 1 ], [ 0, 1, 0, 0 ]>,
+        <[ 0, 0 ], [ 8/9, 11/6, 4/3, 133/18 ]>,
+        <[ 0, 0 ], [ 0, 8/3, 7/3, 29/3 ]>,
+        <[ 0, 0 ], [ 0, 0, 3, 3 ]>,
+        <[ 0, 0 ], [ 0, 0, 0, 18 ]>
+    ];
+    gensT:=[ A ! g : g in gensT ];
+    T:=Order(gensT);
+    #PicardGroup(T); // this used to trigger a but in CRT. now fixed
 
 
 

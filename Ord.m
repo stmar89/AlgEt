@@ -40,7 +40,7 @@ declare attributes AlgEtOrd : IsMaximal,
 
 intrinsic Print(A::AlgEtOrd)
 {Print the order.}
-  printf"Order in Etale Algebra given by %o", A`Algebra;
+  printf"Order in %o", A`Algebra;
 end intrinsic;
 
 intrinsic IsCoercible(S::AlgEtOrd, x::.) -> BoolElt, Any
@@ -100,7 +100,7 @@ MatrixQtoA:=function(A,P)
     Nrow:=#rows;
     assert #Columns(P) eq abs_dim;
     // we first do the operations componentwise, and then create the element of A
-    // in this way we same many calls of IsCoercible
+    // in this way we save many calls of IsCoercible
     out_new:=<>;
     for j in [1..N] do
         Append(~out_new,[ &+[r[i]*Components(abs[i])[j] : i in [1..abs_dim]] : r in rows]);
@@ -231,7 +231,9 @@ end intrinsic;
 intrinsic 'eq'(O1::AlgEtOrd,O2::AlgEtOrd)->BoolElt
 {checks equality of orders in an etale Algebra}
     require Algebra(O1) cmpeq Algebra(O2) : "the orders must be defined in the same etale algebra";
-    if O1`Generators eq O2`Generators or O1`ZBasis eq O2`ZBasis or myHash(O1) eq myHash(O2) then 
+    if 
+    //O1`Generators eq O2`Generators or O1`ZBasis eq O2`ZBasis or //this seems to be slowe
+    myHash(O1) eq myHash(O2) then 
         out:=true;
     else
         out:=false;

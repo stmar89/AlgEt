@@ -109,11 +109,10 @@ intrinsic ChineseRemainderTheorem(I::AlgEtIdl,J::AlgEtIdl,a::AlgEtElt,b::AlgEtEl
     return e;
 end intrinsic;
 
-
 /* TEST
 
     AttachSpec("~/packages_github/AlgEt/spec");
-    SetVerbose("CRT",2);
+    SetVerbose("CRT",1);
     SetAssertions(1);
 
     ////////////////
@@ -129,7 +128,7 @@ end intrinsic;
     time pp13:=[ P : P in pp | MinimalInteger(P) eq 13 ];
 
     pairs:=[];
-    for i in [1..100] do
+    for i in [1..10000] do
         repeat
             a:=Random(E1);
         until not a in pp13[1];
@@ -138,14 +137,29 @@ end intrinsic;
         until not b in pp13[2];
         Append(~pairs,[a,b]);
     end for;
+    // test 1
     t0:=Cputime();
-    SetProfile(true);
+    out1:=[];
     for pair in pairs do
+        a:=pair[1];
+        b:=pair[2];
         e:=ChineseRemainderTheorem(pp13[1],pp13[2],a,b);
+        Append(~out1,e);
     end for;
-    SetProfile(false);
-    ProfilePrintByTotalTime(ProfileGraph());
     Cputime(t0);
+    // test 2
+    t0:=Cputime();
+    out2:=[];
+    e1:=ChineseRemainderTheorem(pp13[1],pp13[2],A!1,A!0);
+    e2:=ChineseRemainderTheorem(pp13[1],pp13[2],A!0,A!1);
+    for pair in pairs do
+        a:=pair[1];
+        b:=pair[2];
+        e:=a*e1+b*e2;
+        Append(~out2,e);
+    end for;
+    Cputime(t0);
+    assert forall{i : i in [1..#out1] | out1[i] eq out2[i]};
     
     //////////////////
     //Relative setting

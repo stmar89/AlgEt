@@ -49,16 +49,6 @@ intrinsic IsWeakEquivalent(J::AlgEtIdl,O::AlgEtOrd)->BoolElt
     return IsWeakEquivalent(OneIdeal(O), J);
 end intrinsic;
 
-intrinsic IsInvertible(I::AlgEtIdl) ->BoolElt,AlgEtIdl
-{ checks if the ideal I is invertible in its order of definition O, and the colon ideal (O:I) }
-    if not assigned I`IsInvertible then
-        O:=Order(I);
-        COI:=ColonIdeal(O,I);
-        I`IsInvertible:=<One(O) in I*COI, COI>;
-    end if;
-    return Explode(I`IsInvertible);
-end intrinsic;
-
 intrinsic IsGorenstein(O::AlgEtOrd)->BoolElt
 { checks if the order O is Gorenstein }
     if not assigned O`IsGorenstein then

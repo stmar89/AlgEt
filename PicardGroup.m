@@ -110,6 +110,7 @@ end function;
 IsPrincipal_prod_internal:=function( I , GRH )
 //returns if the argument is a principal ideal; if so the function returns also the generator. It works only for products of ideals
     assert IsMaximal(Order(I)); //this function should be called only for ideals of the maximal order
+    if #Generators(I) eq 1 then return true,Generators(I)[1]; end if;
     test,I_asProd:=IsProductOfIdeals(I);
     assert test; //this function should be called only for ideals of the maximal order, hence I is a product
     S:=Order(I);
@@ -124,7 +125,7 @@ IsPrincipal_prod_internal:=function( I , GRH )
          //The next call is to prevent a bug of the in-built function IsPrincipal (which might have been corrected by now...).
          //Also if one wants to use the GRH bound rather than one needs to precompute the class groups, since IsPrincipal does not accepts varargs )       
         OL,oL:=ClassGroup(Order(IL));
-
+/*
         // TEST we try to make the generators of IL smaller.
 min_IL:=MinimalInteger(IL);
 repeat
@@ -132,6 +133,7 @@ repeat
     IL_new:=ideal<Order(IL)|[min_IL,gen_IL]>;
 until IL_new eq IL;
 IL:=IL_new;
+*/
         // the next line seems to be the most time consuming part of the package. 
         // It is 10/20 times slower than the RngOrdIdl version. Need to investigate
         testL,genL:=IsPrincipal(IL);
@@ -142,6 +144,7 @@ IL:=IL_new;
         gen:=gen+embs[i](nf[i] ! genL);
     end for;
     assert2 gen*S eq I;
+    I`Generators:=[gen];
     return true,gen;
 end function;
 
@@ -153,6 +156,8 @@ intrinsic IsPrincipal(I1::AlgEtIdl : GRH:=false )->BoolElt, AlgAssElt
 }
 //wouldn't an LLL test be faster?
     if not IsInvertible(I1) then return false,_; end if;
+    if #Generators(I1) eq 1 then return true,Generators(I1)[1]; end if;
+
     S:=Order(I1);
     if IsMaximal(S) then
         return IsPrincipal_prod_internal(I1,GRH);
@@ -189,6 +194,7 @@ intrinsic IsPrincipal(I1::AlgEtIdl : GRH:=false )->BoolElt, AlgAssElt
         gen_I:=gen_IO*(A ! (elt@@qQ@uO))^-1;
         gen_I1:=gen_I*cop^-1;
         assert2 gen_I1*S eq I1;
+        I1`Generators:=[gen_I1];
         return true,gen_I1;
     else
         return false, _;
@@ -225,6 +231,7 @@ PicardGroup_prod_internal:=function( O , GRH )
             return OneIdeal(O);
         end function;
         from_ideals_to_G:=function(y)
+            //the function is used only for max orders. no need to assert invertibility of y.
             assert Order(y) eq O;
             return Zero(G);
         end function;
@@ -243,7 +250,11 @@ PicardGroup_prod_internal:=function( O , GRH )
                 idLi:=gLi(Gproj[i](gen));
                 gens_inA:=gens_inA cat[T[4](g) : g in Basis(idLi,T[3])];
             end for;
+            // TODO this ideal is invertible, so 2-generated. taking that set instead of gens_inA should be much better
             gen_O:=Ideal(O,gens_inA);
+            assert2 IsInvertible(gen_O); //test using colon ideal
+            gen_O`IsInvertible:=true;
+            gen_O`MultiplicatorRing:=O;
             Append(~geninO,gen_O);
         end for;
         assert #geninO eq #Generators(G);      
@@ -253,6 +264,7 @@ PicardGroup_prod_internal:=function( O , GRH )
             return id;
         end function;
         inverse_map:=function(id)
+            assert IsInvertible(id);
             if not IsIntegral(id) then
                 id:=MakeIntegral(id);
             end if;
@@ -291,7 +303,11 @@ intrinsic PicardGroup( S::AlgEtOrd : GRH:=false ) -> GrpAb, Map
             I:=gO(GO.i);
             //c:=CoprimeRepresentative(I,FO);
             c,cI:=CoprimeRepresentative(I,MinimalInteger(FO)*O);
+            //TODO these are invertible, hence 2-generated
             cISmeetS:=(S!!cI) meet S;
+            assert2 IsInvertible(cISmeetS); //test using colon ideal
+            cISmeetS`IsInvertible:=true;
+            cISmeetS`MultiplicatorRing:=S;
             Append(~gens_GO_in_S,cISmeetS);
             Append(~gens_GO_in_O,cI);//used in building relDglue
         end for;
@@ -343,6 +359,10 @@ intrinsic PicardGroup( S::AlgEtOrd : GRH:=false ) -> GrpAb, Map
             id1:=(S!!( O*(r(mDR(gen))) )) meet S;
             id2:=mGO_to_S(mDH(gen));
             gen_inS:=id1*id2;
+            assert2 IsInvertible(gen_inS); //test using colon ideal
+            gen_inS`IsInvertible:=true;
+            gen_inS`MultiplicatorRing:=S;
+            //TODO this ideal is invertible, hence 2-generated
             Append(~generators_ideals,gen_inS);
         end for;
     else
@@ -358,7 +378,7 @@ intrinsic PicardGroup( S::AlgEtOrd : GRH:=false ) -> GrpAb, Map
 
     disc_log_picard_group:=function(id)
     // (crep*id)^-1 is coprime with F
-        crep:=1/(CoprimeRepresentative(id^-1,F));
+        crep:=1/(CoprimeRepresentative(id^-1,F));//here we check if id is invertible
         idO:=O!!(crep*id); //idO is coprime with FO
         GOrep:=idO@@gO;
         J:=mGO_to_O((H!Eltseq(GOrep))); //no minus signs, so J is coprime with FO
@@ -537,7 +557,7 @@ end intrinsic;
     ];
     gensT:=[ A ! g : g in gensT ];
     T:=Order(gensT);
-    #PicardGroup(T); // this used to trigger a but in CRT. now fixed
+    #PicardGroup(T); // this used to trigger a bug in CRT. now fixed
 
 
 

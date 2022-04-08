@@ -64,6 +64,10 @@ intrinsic TraceDualIdeal(I::AlgEtIdl) -> AlgEtIdl
         assert2 forall{ i : i,j in [1..n] | AbsoluteTrace( B[i]*BB[j] ) eq KroneckerDelta(i,j) };
         It:=Ideal(S,BB);
         It`ZBasis:=BB; //we know that BB is a ZBasis
+        if assigned I`MultiplicatorRing then
+        // the multiplicator ring of I is the same of its trace dual.
+            It`MultiplicatorRing:=I`MultiplicatorRing;
+        end if;
         I`TraceDualIdeal:=It;
     end if;
     return I`TraceDualIdeal;
@@ -79,10 +83,7 @@ end intrinsic;
 
 /* TEST
 
-    Attach("~/packages_github/AlgEt/AlgEt.m");
-    Attach("~/packages_github/AlgEt/Elt.m");
-    Attach("~/packages_github/AlgEt/Ord.m");
-    Attach("~/packages_github/AlgEt/TraceNorm.m");
+    AttachSpec("~/packages_github/AlgEt/spec");
     SetVerbose("AlgEtTraceNorm",2);
 
     _<x>:=PolynomialRing(Integers());
@@ -110,7 +111,6 @@ end intrinsic;
         assert AbsoluteNorm(a)*AbsoluteNorm(b) eq AbsoluteNorm(a*b);
         assert Norm(a)*Norm(b) eq Norm(a*b);
     end for;
-    _:=TraceDualIdeal(O);
     
     A:=EtaleAlgebra([K,K]);
     for i in [1..100] do
@@ -118,16 +118,6 @@ end intrinsic;
         b:=Random(A);
         assert Trace(a)+Trace(b) eq Trace(a+b);
         assert Norm(a)*Norm(b) eq Norm(a*b);
-    end for;
-
-
-    seq:=[NumberField(p),NumberField(x^2-5)];
-    A:=EtaleAlgebra(seq);
-    time O2:=Order(AbsoluteBasis(A));
-    for O in [O2] do
-        for i in [1..100] do
-            assert Random(O) in O;
-        end for;
     end for;
 
     K:=NumberField(x^2-25*5);

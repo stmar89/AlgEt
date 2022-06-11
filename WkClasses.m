@@ -26,7 +26,7 @@ intrinsic WKICM_bar(S::AlgEtOrd) -> SeqEnum
                 // general case
                 //TODO : prime per prime;
                 A:=Algebra(S);
-                degA:=Degree(A);
+                degA:=Dimension(A);
                 seqWk_bar:=[];
                 St:=TraceDualIdeal(S);
                 T:=&meet([ T : T in FindOverOrders(S) | IsInvertible(T ! St) ]);
@@ -39,7 +39,7 @@ intrinsic WKICM_bar(S::AlgEtOrd) -> SeqEnum
                 //OLD CODE
                 //ff_ZBasis:=ZBasis(ff);
                 //seqWk_bar:=[];
-                //F:=FreeAbelianGroup(Degree(Algebra(S)));
+                //F:=FreeAbelianGroup(Dimension(Algebra(S)));
                 //matT:=Matrix(T_ZBasis);
                 //matff:=Matrix(ff_ZBasis);
                 //rel:=[F ! Eltseq(x) : x in Rows(matff*matT^-1)];

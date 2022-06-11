@@ -144,7 +144,7 @@ intrinsic HomsToC(A::AlgEt : Precision:=30)->SeqEnum[Map]
     images:=function(x)
         return &cat[[CC ! z : z in Conjugates(y : Precision:=Precision)] :y in Components(x)];
     end function;
-    maps:=< map< A -> CC | x:-> images(x)[k] > : k in [1..Degree(A)] >;
+    maps:=< map< A -> CC | x:-> images(x)[k] > : k in [1..Dimension(A)] >;
     f:=&*[DefiningPolynomial(L[1]) : L in A`NumberFields];
     assert &and [ Abs(Evaluate(f,g(PrimitiveElement(A)))) lt 10^-10 : g in maps]; //the precision here is quite arbitrary...
     return maps;

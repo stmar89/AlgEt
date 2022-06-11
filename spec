@@ -8,6 +8,7 @@ Idl.m
 LowCohenMacaulayType.m
 Ord.m
 OverOrders.m
+MinimalGenerators.m
 PicardGroup.m
 PrintSave.m
 TraceNorm.m

@@ -122,8 +122,11 @@
 	P<x>:=PolynomialRing(Integers());
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
     c:=Coefficients(f);  
-    time #PicardGroup(EquationOrder(NumberField(P!f)));
-    time #PicardGroup(EquationOrder(EtaleAlgebra(P!f)) : GRH:=true);
+    time Q,q:=PicardGroup(EquationOrder(EtaleAlgebra(P!f)) : GRH:=true);
+    time P,p:=PicardGroup(EquationOrder(NumberField(P!f)));
+    time #[q(g) : g in Q];
+    time #[p(g) : g in P];
+    
     time #PicardGroup(EquationOrder(EtaleAlgebra(P!f)));
     time #PicardGroup(EquationOrder(AssociativeAlgebra(P!f)));
 

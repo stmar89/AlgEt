@@ -23,7 +23,6 @@ import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQ
 
 declare attributes AlgEtOrd : MinimalOverOrders,
                               OverOrders;
-declare attributes AlgEtIdl : ResidueField;
 
 intrinsic MinimalOverOrders(R::AlgEtOrd : singular_primes := [], orders := {@ @}) -> SetIndx[AlgEtOrd]
 { returns the minimal over orders of R given the singular primes of R 

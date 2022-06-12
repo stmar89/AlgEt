@@ -9,6 +9,8 @@ freeze;
 
 declare verbose Quotients, 1;
 
+declare attributes AlgEtIdl : ResidueField;
+
 /*TODO:
 
 */
@@ -17,6 +19,32 @@ declare verbose Quotients, 1;
 //------------
 // Quotients
 //------------
+
+intrinsic ResidueRing(S::AlgEtOrd,I::AlgEtIdl) -> GrpAb , Map
+{given an integral ideal I of S, returns the abelian group S/I and the epimorphism pi:S -> S/I (with inverse map). Important: the domain of pi is the Algebra of S, since the elements of S are usually expressed al elements of A. For eg Parent(Random(S)) = Algebra(S)}
+    require Order(I) eq S : "wrong order";
+    require IsIntegral(I): "I must be an integral ideal of S";
+    A:=Algebra(S);
+    N:=AbsoluteDimension(A);
+    F:=FreeAbelianGroup(N);
+    S_to_F:=function(x0)
+        assert Parent(x0) eq A;
+        x_inS:=AbsoluteCoordinates([x0],S)[1];
+        return (F ! Eltseq(x_inS)) ;
+    end function;
+    F_to_S:=function(y)
+        y_inA:=&+[ZBasis(S)[i]*Eltseq(y)[i] : i in [1..N]];
+        return y_inA;
+    end function;
+    StoF:=map< A -> F | x :-> S_to_F(x), y :-> F_to_S(y)>;
+    rel:=[F ! x : x in AbsoluteCoordinates(ZBasis(I),S)];
+    Q,q:=quo<F|rel>; //Q=S/I
+    m:=StoF*q; //m is a map from S to Q
+    assert #Q eq Index(S,I);
+    assert2 forall{x : x in ZBasis(I) | m(x) eq Zero(Q)};
+    assert2 forall{x : x in ZBasis(S) | ((m(x))@@m - x) in I};
+    return Q,m;
+end intrinsic;
 
 intrinsic ResidueField(P::AlgEtIdl) -> FldFin, Map
 { given P a prime of S, returns a finite field F isomorphic to S/P and a surjection (with inverse) S->F.}

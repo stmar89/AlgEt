@@ -68,7 +68,7 @@ end intrinsic;
 intrinsic WKICM(E::AlgEtOrd)->SeqEnum
 {computes the Weak equivalence class monoid of E}
     if not assigned E`WKICM then
-        seqOO:=FindOverOrders(E);
+        seqOO:=FindOverOrders(E : populateoo_in_oo:=true);
         E`WKICM:=&cat[[(E!!I) : I in WKICM_bar(S)] : S in seqOO ];
     end if;
     return E`WKICM;

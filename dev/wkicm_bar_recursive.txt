@@ -1,0 +1,136 @@
+/* vim: set syntax=magma : */
+/*
+    We test a new method to compute WKICM_bar(S).
+    Each class admits a representative J such that JT=T, for T an overorder of S for which S^tT is invertible.
+    All such J satisfy also ff=(S:T) subset J subset T.
+    We produce all ideals I satisfying IT=T and ff subset I subset T, 
+    by recursively producing the maximal proper sub-S-modules M of T/ff whose lift M' satisfies M'T=T.
+    Note that we can work by recursion, since if M1 subset M2 and M2T ne T then M1T ne T as well.
+
+    20220612 : At the moment this approach is slower than the old one: 9sec vs 34 sec for the ICM(Z[F,2/F])) for F satisfying x^8+16.
+
+*/
+
+    AttachSpec("~/packages_github/AlgEt/spec");
+
+    support:=function(I,ff)
+    // given frac. S-ideals ff \subset I, returns Supp(I/ff)
+    // by Nakayama P in Supp iff I/PI+ff not trivial
+        I,d:=MakeIntegral(I);
+        ff:=d*ff;
+        pp:=PrimesAbove(ff);
+        pp:=[ P : P in pp | Index(I,P*I+ff) ne 1 ]; 
+        return pp;
+    end function;
+
+    max_frac_S_idls_JT_eq_T:=function(S,T,I,ff)
+    // Maximal fractional S-ideals J such that ff subseteq J subset I and JT=T.
+    // Note that we ask J ne I, so only proper sub-ideals.
+    // For each such J, we have that I/J is a siple S-module.
+    // Hence, J is the kernel of an S-linear map I/ff->S/P, from some maximal S-ideal P, belonging to Supp(I/ff).
+    
+        assert2 ff subset I;
+        if I eq ff then 
+            return {@ @};
+        end if;
+        Q,q:=Quotient(I,ff);
+        gens_ff_over_S:=ZBasis(ff); // might be slightly faster to use MinimalGenerators
+        max:={@ @};
+        supp:=support(I,ff);
+        for P in supp do
+            K,k:=ResidueRing(S,P); //repeat for all maximal ideals in Supp(O/ff)
+            // need S-linear morphisms Q->K. is there a smarter way?
+            homs,h:=Hom(Q,K);
+            homs:=[ h(hom) : hom in homs | hom ne Zero(homs) ];
+            homs:=[ phi : phi in homs | forall{ s : s in Generators(S) , g in Generators(Q) | k(s*(phi(g)@@k)) eq phi(q(s*(g@@q))) } ];
+            // homs=Hom_S(Q,K), except the 0-map;
+            for phi in homs do
+                H:=Kernel(phi);
+                // since phi is S linear, then H is an sub-S-module of I/ff.
+                gensHinT:=[ x@@q : x in Generators(H)];
+                JT:=Ideal(T, gensHinT cat gens_ff_over_S);
+                is_HT_eq_T:=1 in JT; // HT=T
+                if is_HT_eq_T then
+                    J:=Ideal(S, gensHinT cat gens_ff_over_S);
+                    Include(~max,J);
+                end if;
+            end for;
+        end for;
+        return max;
+    end function;
+
+
+    frac_idls_S_JT_eq_T:=function(S,T,ff)
+    // recursion: using the function  max_frac_S_idls_JT_eq_T, 
+    // we generate recursively all fractional S-ideals J such that :
+    // ff subset J subseteq T and JT=T.
+        queue:={@ S!!OneIdeal(T) @};
+        output:=queue;
+        done:={@ @};
+        while #queue gt 0 do 
+            output join:=queue;
+            done join:=queue;
+            for I in queue do
+                output join:=max_frac_S_idls_JT_eq_T(S,T,I,ff);
+            end for;
+            queue := output diff done;
+        end while;
+        return output;
+    end function;
+
+    wkicm_bar_new:=function(S)
+    // we compute WKICM_bar(S), using the recursive method.
+        St:=TraceDualIdeal(S);
+        T:=&meet([ T : T in FindOverOrders(S) | IsInvertible(T !! St) ]);
+        //this construction of T is conjectural, hence the next assert. If the assert fails, please report it.
+        assert IsInvertible(T !! St);
+        //T_ZBasis:=ZBasis(T);
+        ff:=ColonIdeal(S,S!!OneIdeal(T)); //the relative conductor (S:T)
+        candidates:=frac_idls_S_JT_eq_T(S,T,ff);
+        wkS:=[];
+        for I in candidates do
+            if MultiplicatorRing(I) eq S and not exists{J : J in wkS | IsWeakEquivalent(I,J) } then
+                Append(~wkS,I);
+            end if;
+        end for;
+        return wkS;
+    end function;
+
+
+/* TESTS
+    // old version, for time comparison
+    PP<x>:=PolynomialRing(Integers());
+    A:=EtaleAlgebra(x^8+16);
+    F:=PrimitiveElement(A);
+    V:=2/F;
+    R:=Order([F,V]);
+    time #WKICM(R);
+
+    // new version
+    PP<x>:=PolynomialRing(Integers());
+    A:=EtaleAlgebra(x^8+16);
+    F:=PrimitiveElement(A);
+    V:=2/F;
+    R:=Order([F,V]);
+    
+    t0:=Cputime();
+    oo:=FindOverOrders(R : populateoo_in_oo:=true);
+    wk:=[]; 
+    for S in oo do
+        assert assigned S`OverOrders;
+        pp,dps:=NonGorensteinPrimes(S);
+        if IsGorenstein(S) then
+            wk cat:=[R!!I : I in WKICM_bar(S)];
+        elif Max(dps) eq 2 then //the Max CohenMacaulay type is 2.
+            wk cat:=[R!!I : I in WKICM_bar(S)];
+        else
+            wkS:=wkicm_bar_new(S);
+            wk cat:=[ R!!I : I in wkS];
+        end if;
+    end for;
+    Cputime(t0),#wk;
+*/
+        
+           
+
+

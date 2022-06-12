@@ -1,0 +1,52 @@
+   
+    .m files from AbVarFq to 'translate':
+
+    - IdealsOfIndex.m
+    - TotRealTotPos.m
+    - CMAlgAss.m
+    - Completion.m
+    - IntegralMatrices.m
+    - RepsZConjugacy.m
+    - PowerBass.m
+    
+    - padictocc.m ?
+    - stuff about AVs 
+
+    TODO:
+    - an AlgEtToAlgAss intrinsic which returns an AlgAss and an isomorphism.
+    - saving and printing
+    - add CMType, CMType at P, MaxCMTypeOverOrders
+    - Make an intrinsic that creates quotiens and takes as input either I,J with J in I, DONE
+      or I and zbJ, with zbJ a ZBasis inside I. NOT DONE YET
+      (sometimes I don't need to create the denominator ideal, as in TwoGenerating Set).
+    - improve power of Ideals: if I is invertible, and I=aS+bS, then I^N=a^NS+b^NS. See Lemma in MinimalGenerators.m
+
+
+    - residue_class_field_primitive_element can probably be upgraded using ResidueField(P);
+      the primitive elemnt should be cached.
+    - residue_class_ring_unit_subgroup_generators can be improved. calling CRT makes a lot of unecessary computations
+      see test2 in CRT.m: currently CRT given (a,b)->e such that e-a in I and e-b in J. 
+      If one needs to run it several times for the same I and J, then it is better to first run it with input (1,0)->e1 and (0,1)->e2.
+      Then for any (a,b) the corresponding e would just be e=a*e1+b*e2.
+    - CRT should be done also for a list of ideals, not just pairs I,J.
+    - is ResidueField cached?
+    - Make a CRT for modules : I/P1*...*Ps*I -> \prod_i (I/Pi*I)
+      This is needed for finding a minimal set of generators of non-necessarly invertible ideals.
+
+    - FindOverOrders is slower than AlgAss: investigate
+      ( eg: 900sec vs 3000sec overorders of EquationOrder of  f:=x^6 - 3*x^5 - 3*x^4 + 65*x^3 - 48*x^2 - 768*x + 4096; )
+
+    - Possible improvement to WKICM(S).
+      Let T be the smallest overorder of S such that St*T is invertible in T. Let ff be the (S:T).
+      For EVERY overorder S' of S such that S't*T is invertible we have that each weak equiv class of S'
+      will have a representative I such that ff \in I \in T.
+      If looping over the subgroups is the most expensie part, then we might save some time in this way.
+
+    - I have made some cahnges in the way ColonIdeals are computed. I need to test with some wkicm
+
+
+    FIXED/DONE: kept for the record.
+    - FIXED: PicardGroup is 10/20 times slower for AlgEt. I don't understand one. It seems to be related to the IsPrincipal call for RngOrdIdl. So I guess that we are feeding it ideals that are much worse.
+    One possible solution is everytime that I generate an invertible idea (by produc of invertibles, or in PicardGroup), to find a set of generators consisting of 2 small elements. this should make our life easier in product etc.
+    I have added several TODOs in Idl.m and PicardGroup.m to try this thing
+    - move quotient stuff from OverOrders.m and MinimalGenerators.m (quo_frac_idl) into a new package.

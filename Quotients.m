@@ -117,6 +117,7 @@ end intrinsic;
 
 intrinsic Quotient(I::AlgEtIdl, J::AlgEtIdl) -> GrpAb, Map
 { given fractional ideals J subset I, returns the abelian group Q=I/J together with the quotient map q:I->J } 
+    // if J is not inside I, an error occurs while forming Q. so no need to check in advance
 	zbI := ZBasis(I);
 	N := #zbI;
 	F := FreeAbelianGroup(N);

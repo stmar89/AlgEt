@@ -7,6 +7,8 @@ freeze;
 // http://www.staff.science.uu.nl/~marse004/
 /////////////////////////////////////////////////////
 
+import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQtoA , meet_zbasis , inclusion_matrix;
+
 declare verbose Quotients, 1;
 
 declare attributes AlgEtIdl : ResidueField;
@@ -146,6 +148,7 @@ end intrinsic;
 intrinsic Quotient(I::AlgEtIdl, J::AlgEtIdl) -> GrpAb, Map
 { given fractional ideals J subset I, returns the abelian group Q=I/J together with the quotient map q:I->J } 
     // if J is not inside I, an error occurs while forming Q. so no need to check in advance
+    A:=Algebra(I);
 	zbI := ZBasis(I);
 	N := #zbI;
 	F := FreeAbelianGroup(N);
@@ -153,7 +156,7 @@ intrinsic Quotient(I::AlgEtIdl, J::AlgEtIdl) -> GrpAb, Map
 	mFI := map<F->A| x:->&+[Eltseq(x)[i]*zbI[i] : i in [1..N]]>;
 	mIF := map<A->F| x:-> F ! AbsoluteCoordinates([x],I)[1]>;
 	Q,qFQ := quo<F|rel>; //q:F->Q. Q is an "abstract" abelian group isomorphic to I/J.
-    q:=map< I->Q | x:->qFQ(mIF(x)) , y:-> mFI(y@@q) >; 
+    q:=map< A->Q | x:->qFQ(mIF(x)) , y:-> mFI(y@@qFQ) >; 
     return Q,q;
 end intrinsic;
 

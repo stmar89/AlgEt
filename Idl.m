@@ -792,7 +792,7 @@ end intrinsic;
 
 intrinsic MakeIntegral(I::AlgEtIdl) -> AlgEtIdl,RngIntElt
 {given a fractional S ideal I, returns the ideal d*I,d when d is the smallest integer such that d*I is integral in S}
-    if IsIntegral(I) then return I; end if;
+    if IsIntegral(I) then return I,1; end if;
     S:=Order(I);
     d:=LCM(&cat[ [Denominator(x_coord) : x_coord in x] : x in AbsoluteCoordinates(Generators(I),S)]);
     dI:=d*I;

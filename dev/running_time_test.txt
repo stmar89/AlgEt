@@ -124,8 +124,8 @@
     c:=Coefficients(f);  
     time Q,q:=PicardGroup(EquationOrder(EtaleAlgebra(P!f)) : GRH:=true);
     time P,p:=PicardGroup(EquationOrder(NumberField(P!f)));
-    time #[q(g) : g in Q];
-    time #[p(g) : g in P];
+    // time #[q(g) : g in Q]; //slow
+    // time #[p(g) : g in P];
     
     time #PicardGroup(EquationOrder(EtaleAlgebra(P!f)));
     time #PicardGroup(EquationOrder(AssociativeAlgebra(P!f)));

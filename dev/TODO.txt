@@ -19,8 +19,12 @@
     - Make an intrinsic that creates quotiens and takes as input either I,J with J in I, DONE
       or I and zbJ, with zbJ a ZBasis inside I. NOT DONE YET
       (sometimes I don't need to create the denominator ideal, as in TwoGenerating Set).
-    - improve power of Ideals: if I is invertible, and I=aS+bS, then I^N=a^NS+b^NS. See Lemma in MinimalGenerators.m
-
+    
+    - CHECK improve power of Ideals: if I is invertible, and I=aS+bS, then I^N=a^NS+b^NS. See Lemma in MinimalGenerators.m
+    - PicardGroup is again slower for AlgEt than for AlgAss and FldNum. 
+      I think that the changes made to how powers of invertible ideals are computed are slowing things down, 
+      instead of speeding them up. 
+      Need to investigate.
 
     - residue_class_field_primitive_element can probably be upgraded using ResidueField(P);
       the primitive elemnt should be cached.
@@ -46,7 +50,4 @@
 
 
     FIXED/DONE: kept for the record.
-    - FIXED: PicardGroup is 10/20 times slower for AlgEt. I don't understand one. It seems to be related to the IsPrincipal call for RngOrdIdl. So I guess that we are feeding it ideals that are much worse.
-    One possible solution is everytime that I generate an invertible idea (by produc of invertibles, or in PicardGroup), to find a set of generators consisting of 2 small elements. this should make our life easier in product etc.
-    I have added several TODOs in Idl.m and PicardGroup.m to try this thing
     - move quotient stuff from OverOrders.m and MinimalGenerators.m (quo_frac_idl) into a new package.

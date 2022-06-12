@@ -29,9 +29,9 @@ intrinsic WKICM_bar(S::AlgEtOrd) -> SeqEnum
                 degA:=Dimension(A);
                 seqWk_bar:=[];
                 St:=TraceDualIdeal(S);
-                T:=&meet([ T : T in FindOverOrders(S) | IsInvertible(T ! St) ]);
+                T:=&meet([ T : T in FindOverOrders(S) | IsInvertible(T !! St) ]);
                 //this construction of T is conjectural, hence the next assert. If the assert fails, please report it.
-                assert IsInvertible(T ! St);
+                assert IsInvertible(T !! St);
                 //T_ZBasis:=ZBasis(T);
                 ff:=ColonIdeal(S,S!!OneIdeal(T)); //the relative conductor (S:T)
                 gens_ff_over_S:=Generators(ff);
@@ -44,7 +44,7 @@ intrinsic WKICM_bar(S::AlgEtOrd) -> SeqEnum
                 //matff:=Matrix(ff_ZBasis);
                 //rel:=[F ! Eltseq(x) : x in Rows(matff*matT^-1)];
                 //Q,q:=quo<F|rel>; //Q=T/(S:T)
-                Q,q:=ResidueRing(ff); //Q=T/(S:T) , q:T->Q
+                Q,q:=ResidueRing(T,T!!ff); //Q=T/(S:T) , q:T->Q
                 QP,f:=FPGroup(Q); //f:QP->Q
                 subg:=LowIndexProcess(QP,<1,#QP>);
                 while not IsEmpty(subg) do

@@ -19,6 +19,7 @@
     - Make an intrinsic that creates quotiens and takes as input either I,J with J in I, DONE
       or I and zbJ, with zbJ a ZBasis inside I. NOT DONE YET
       (sometimes I don't need to create the denominator ideal, as in TwoGenerating Set).
+    - It seems that in the test suit I dont have an order with CMType>2. Add ZFV of x^8+16. (<10 sec for WKICM). 
     
     - CHECK improve power of Ideals: if I is invertible, and I=aS+bS, then I^N=a^NS+b^NS. See Lemma in MinimalGenerators.m
     - PicardGroup is again slower for AlgEt than for AlgAss and FldNum. 
@@ -30,7 +31,8 @@
       the primitive elemnt should be cached.
     - residue_class_ring_unit_subgroup_generators can be improved. calling CRT makes a lot of unecessary computations
       see test2 in CRT.m: currently CRT given (a,b)->e such that e-a in I and e-b in J. 
-      If one needs to run it several times for the same I and J, then it is better to first run it with input (1,0)->e1 and (0,1)->e2.
+      If one needs to run it several times for the same I and J, 
+      then it is better to first run it with input (1,0)->e1 and (0,1)->e2.
       Then for any (a,b) the corresponding e would just be e=a*e1+b*e2.
     - CRT should be done also for a list of ideals, not just pairs I,J.
     - is ResidueField cached?
@@ -39,6 +41,13 @@
 
     - FindOverOrders is slower than AlgAss: investigate
       ( eg: 900sec vs 3000sec overorders of EquationOrder of  f:=x^6 - 3*x^5 - 3*x^4 + 65*x^3 - 48*x^2 - 768*x + 4096; )
+
+    - Possible improvement to WKICM(S).
+      Given a new subgroups H, check first it HT=T. If not, then discard H. 
+      This should be faster than creating I=HS, computing (I:I)=S and check if it is a new class.
+      This is implemented in ~/253_*/AlgEt_new/WkClasses.m (not on git)
+      Incorporate in the main branch, after testing further.
+
 
     - Possible improvement to WKICM(S).
       Let T be the smallest overorder of S such that St*T is invertible in T. Let ff be the (S:T).

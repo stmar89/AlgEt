@@ -1,5 +1,4 @@
-# List of functions
- in AlgEt.m.m:
+# List of instrinsics in AlgEt.m:
 --
 
 <pre>
@@ -75,8 +74,7 @@
 *returns Hom(A,\C) as a sequence of maps. The precision of \C is given by the optional parameter "Precision". Default value is 30*
 
 
-# List of functions
- in Elt.m.m:
+# List of instrinsics in Elt.m:
 --
 
 <pre>
@@ -374,8 +372,7 @@
 *A.i returns the ith generator of the Algebra A*
 
 
-# List of functions
- in TraceNorm.m.m:
+# List of instrinsics in TraceNorm.m:
 --
 
 <pre>
@@ -415,8 +412,7 @@
 *Returns the trace dual ideal of an order in an etale algebra.*
 
 
-# List of functions
- in Ord.m.m:
+# List of instrinsics in Ord.m:
 --
 
 <pre>
@@ -608,8 +604,7 @@
 *returns the discriminant of the order*
 
 
-# List of functions
- in OverOrders.m.m:
+# List of instrinsics in OverOrders.m:
 --
 
 <pre>
@@ -656,8 +651,7 @@
 *given E subset O, returns the sequence of orders between E and O*
 
 
-# List of functions
- in Idl.m.m:
+# List of instrinsics in Idl.m:
 --
 
 <pre>
@@ -1011,8 +1005,7 @@
 *return an element x such that x*I is an integral ideal coprime with J, togheter with the product x*I.. The first ideal must be invertible and the second should be integral*
 
 
-# List of functions
- in MinimalGenerators.m.m:
+# List of instrinsics in MinimalGenerators.m:
 --
 
 <pre>
@@ -1022,8 +1015,7 @@
 *A procedure that given an invertible ideal I put in the attibute I`Generators two non-zerodivisors in I that generate I. If I is known to be principal, that is I`Generators consists of one single element, nothing is done.*
 
 
-# List of functions
- in Quotients.m.m:
+# List of instrinsics in Quotients.m:
 --
 
 <pre>
@@ -1054,8 +1046,7 @@
 *given fractional ideals J subset I, returns the abelian group Q=I/J together with the quotient map q:I->J*
 
 
-# List of functions
- in CRT.m.m:
+# List of instrinsics in CRT.m:
 --
 
 <pre>
@@ -1065,8 +1056,7 @@
 *Given two coprime ideals I and J of S, two elements a,b in S, finds e such that (e-a) in I and (e-b) in J.*
 
 
-# List of functions
- in PicardGroup.m.m:
+# List of instrinsics in PicardGroup.m:
 --
 
 <pre>
@@ -1104,8 +1094,7 @@
     The optional argument "GRH" decides wheter the bound for the IsPrincipal test should be conditional. The default value is "false"*
 
 
-# List of functions
- in FactPrimes.m.m:
+# List of instrinsics in FactPrimes.m:
 --
 
 <pre>
@@ -1145,8 +1134,7 @@
 *Check if the order is Gorenstein at the prime ideal P.*
 
 
-# List of functions
- in PrintSave.m.m:
+# List of instrinsics in PrintSave.m:
 --
 
 <pre>
@@ -1157,8 +1145,7 @@
   Such an output can easily be printed to file.*
 
 
-# List of functions
- in LowCohenMacaulayType.m.m:
+# List of instrinsics in LowCohenMacaulayType.m:
 --
 
 <pre>
@@ -1168,8 +1155,7 @@
 *Given an order S it returns two sequences the first containing the primes at which S is locally not Gorenstein and the second containing the CohenMacaulay types of S at this primes, that is, the dimension of S^t/PS^t over S/P, where S^t is the TraceDualIdeal of S*
 
 
-# List of functions
- in WkClasses.m.m:
+# List of instrinsics in WkClasses.m:
 --
 
 <pre>
@@ -1185,8 +1171,7 @@
 *computes the Weak equivalence class monoid of E*
 
 
-# List of functions
- in WkTesting.m.m:
+# List of instrinsics in WkTesting.m:
 --
 
 <pre>
@@ -1220,8 +1205,7 @@
 *checks if the order O is Gorenstein*
 
 
-# List of functions
- in IdealClassMonoid.m.m:
+# List of instrinsics in IdealClassMonoid.m:
 --
 
 <pre>

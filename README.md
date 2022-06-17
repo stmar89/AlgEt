@@ -28,8 +28,8 @@ References
 Stefano Marseglia,<br>
 *Computing the ideal class monoid of an order*,<br>
 J. Lond. Math. Soc. 101 (2020), no. 3, 984-1007<br>
-[DOI](https://doi.org/10.1112/jlms.12294)
+[`DOI`](https://doi.org/10.1112/jlms.12294)
 
 Stefano Marseglia,<br>
 *Cohen-Macaulay type of orders, generators and ideal classes*,<br>
-[arXiv](https://arxiv.org/abs/2206.03758)
+[`arXiv`](https://arxiv.org/abs/2206.03758)

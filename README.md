@@ -9,7 +9,7 @@ The goal is to make the Ideal Class Monoid algorithm available.
 This will be built using direct product of number fields as core, for superior speed.
 Currently the packages are in the developing stage. More functionalities and faster code is to be expected.
 
-For the theory on which this code is based, see the Reference section at the bottom.
+For the theory on which this code is based, see the `References` section at the bottom.
 
 Please send comments and bug reports to `stefano.marseglia89@gmail.com`.
 

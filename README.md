@@ -16,7 +16,7 @@ Please send comments and bug reports to `stefano.marseglia89@gmail.com`.
 Details
 --
 
-For complete complete descriptions and more details we refer to the [`List of functions`](https://github.com/stmar89/PolsAbVarFpCanLift/blob/main/doc/List_of_commands.md).
+For complete complete descriptions and more details we refer to the [`List of functions`](https://github.com/stmar89/PolsAbVarFpCanLift/blob/main/doc/ListOfCommands.md).
 
 <!---
 In the file [`examples.txt`](https://github.com/stmar89/PolsAbVarFpCanLift/blob/main/doc/examples.txt) there is the code to see how to use the main functions of the package.

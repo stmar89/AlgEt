@@ -26,7 +26,7 @@ declare attributes AlgEt : DefiningPolynomial,
                                          //the second are embeddings and the third are projections
 
 //------------
-// Creation and Printig for AlgEt
+// Creation and Printing for AlgEt
 //------------
 
 intrinsic Print(A::AlgEt)

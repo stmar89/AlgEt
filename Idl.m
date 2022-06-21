@@ -37,7 +37,7 @@ import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQ
 /*TODO
     - MinimalGenerators
     - check which attributes should I pass when I create a new ideal (eg in *,+,colon,...)
-    - in '*' should pass Factorization
+    - in '*' I pass Factorization. How does this affect the time?
     - add LLL?
 */
 

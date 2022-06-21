@@ -131,7 +131,8 @@
     time #PicardGroup(EquationOrder(AssociativeAlgebra(f)));
 
 	
-    //overorders
+    // #### overorders
+    clear;
 	_<x>:=PolynomialRing(Integers());
     f:=x^4-10000*x^3-10000*x^2-10000*x-10000; 
     //30 sec vs 28 w/o profiler. Now AlgEt is faster
@@ -139,43 +140,60 @@
     AttachSpec("~/packages_github/AbVarFq/packages.spec");
     AttachSpec("~/packages_github/AlgEt/spec");
     // no profiler
-    time o:=FindOverOrders(EquationOrder(AssociativeAlgebra(f)));
-    time oo:=FindOverOrders(EquationOrder(EtaleAlgebra(f)));
+    Aass:=AssociativeAlgebra(f);
+    Eass:=EquationOrder(Aass);
+    time ooass:=FindOverOrders(Eass);
+    Aet:=EtaleAlgebra(f);
+    Eet:=EquationOrder(Aet);
+    time ooet:=FindOverOrders(Eet);
+    assert #ooass eq #ooet; 
+
     // with profiler
+    Aass:=AssociativeAlgebra(f);
+    Eass:=EquationOrder(Aass);
     SetProfile(true);
-    time o:=FindOverOrders(EquationOrder(AssociativeAlgebra(f)));
+    ooass:=FindOverOrders(Eass);
     SetProfile(false);
     G1:=ProfileGraph();
     ProfilePrintByTotalTime(ProfilePruneGraphByTime(G1,30));
+
+    Aet:=EtaleAlgebra(f);
+    Eet:=EquationOrder(Aet);
     SetProfile(true);
-    time oo:=FindOverOrders(EquationOrder(EtaleAlgebra(f)));
+    ooet:=FindOverOrders(Eet);
     SetProfile(false);
-    ProfilePrintByTotalTime(ProfilePruneGraphByTime(ProfileGraph(),30));
     G2:=ProfileGraph();
     ProfilePrintByTotalTime(ProfilePruneGraphByTime(G2,30));
-    assert #o eq #oo;
 
     // a bigger test AlgAss ~900sec vs AlgEt 1480sec
     // we are still slower. 
-    AttachSpec("~/packages_github/AlgEt/spec");
-    AttachSpec("~/packages_github/AbVarFq/packages.spec");
+    clear;
 	_<x>:=PolynomialRing(Integers());
     f:=x^6 - 3*x^5 - 3*x^4 + 65*x^3 - 48*x^2 - 768*x + 4096;
-    time oo:=FindOverOrders(EquationOrder(EtaleAlgebra(f)));
-    time o:=FindOverOrders(EquationOrder(AssociativeAlgebra(f)));
-    //with profiler
-	_<x>:=PolynomialRing(Integers());
-    f:=x^6 - 3*x^5 - 3*x^4 + 65*x^3 - 48*x^2 - 768*x + 4096;
-    AttachSpec("~/packages_github/AlgEt/spec");
     AttachSpec("~/packages_github/AbVarFq/packages.spec");
+    AttachSpec("~/packages_github/AlgEt/spec");
+    // no profiler
+    Aass:=AssociativeAlgebra(f);
+    Eass:=EquationOrder(Aass);
+    time ooass:=FindOverOrders(Eass);
+    Aet:=EtaleAlgebra(f);
+    Eet:=EquationOrder(Aet);
+    time ooet:=FindOverOrders(Eet);
+    assert #ooass eq #ooet; 
+
+    // with profiler
+    Aass:=AssociativeAlgebra(f);
+    Eass:=EquationOrder(Aass);
     SetProfile(true);
-    time o:=FindOverOrders(EquationOrder(AssociativeAlgebra(f)));
+    ooass:=FindOverOrders(Eass);
     SetProfile(false);
     G1:=ProfileGraph();
     ProfilePrintByTotalTime(ProfilePruneGraphByTime(G1,30));
+
+    Aet:=EtaleAlgebra(f);
+    Eet:=EquationOrder(Aet);
     SetProfile(true);
-    time oo:=FindOverOrders(EquationOrder(EtaleAlgebra(f)));
+    ooet:=FindOverOrders(Eet);
     SetProfile(false);
     G2:=ProfileGraph();
     ProfilePrintByTotalTime(ProfilePruneGraphByTime(G2,30));
-

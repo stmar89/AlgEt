@@ -37,7 +37,7 @@ intrinsic WKICM_bar(S::AlgEtOrd) -> SeqEnum
                 //T_ZBasis:=ZBasis(T);
                 ff:=ColonIdeal(S,S!!OneIdeal(T)); //the relative conductor (S:T)
                 gens_ff_over_S:=Generators(ff);
-                ff:=T!!ff; //ff is a T module
+                ffT:=T!!ff; //ff is a T module
                 //OLD CODE
                 //ff_ZBasis:=ZBasis(ff);
                 //seqWk_bar:=[];
@@ -46,7 +46,8 @@ intrinsic WKICM_bar(S::AlgEtOrd) -> SeqEnum
                 //matff:=Matrix(ff_ZBasis);
                 //rel:=[F ! Eltseq(x) : x in Rows(matff*matT^-1)];
                 //Q,q:=quo<F|rel>; //Q=T/(S:T)
-                Q,q:=ResidueRing(T,T!!ff); //Q=T/(S:T) , q:T->Q
+                Q,q:=ResidueRing(T,ffT); //Q=T/(S:T) , q:T->Q
+                vprintf WkClasses,2:"T/(S:T) = %o\n",Q;
                 QP,f:=FPGroup(Q); //f:QP->Q
                 subg:=LowIndexProcess(QP,<1,#QP>);
                 while not IsEmpty(subg) do

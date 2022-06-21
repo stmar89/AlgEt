@@ -13,20 +13,29 @@
     - stuff about AVs 
 
     TODO:
+    ### Various ###
     - an AlgEtToAlgAss intrinsic which returns an AlgAss and an isomorphism.
-    - saving and printing
+    - saving and printing (it should be done with MinimalGenerators, that is after CRT)
     - add MaxCMTypeOverOrders
+    - in TwoGenerators, if the ideal is knwon to be principal, then I should only return one generator
     - Make an intrinsic that creates quotiens and takes as input either I,J with J in I, DONE
       or I and zbJ, with zbJ a ZBasis inside I. NOT DONE YET
-      (sometimes I don't need to create the denominator ideal, as in TwoGenerating Set).
+      Sometimes I don't need to create the denominator ideal, as in TwoGenerating Set. Checke where else.
+
+    ### TEST SUIT ###
     - It seems that in the test suit I dont have an order with CMType>2. Add ZFV of x^8+16. (<10 sec for WKICM). 
+    - For each test, track the best running time. 
+      If something get slower or faster than a previous version (up to some error)
     
-    - CHECK improve power of Ideals: if I is invertible, and I=aS+bS, then I^N=a^NS+b^NS. See Lemma in MinimalGenerators.m
+
+    ### PICARD GROUP ###
     - PicardGroup is again slower for AlgEt than for AlgAss and FldNum. 
       I think that the changes made to how powers of invertible ideals are computed are slowing things down, 
       instead of speeding them up. 
       Need to investigate.
+    - CHECK improve power of Ideals: if I is invertible, and I=aS+bS, then I^N=a^NS+b^NS. See Lemma in MinimalGenerators.m
 
+    #### CRT ####
     - residue_class_field_primitive_element can probably be upgraded using ResidueField(P);
       the primitive elemnt should be cached.
     - residue_class_ring_unit_subgroup_generators can be improved. calling CRT makes a lot of unecessary computations
@@ -39,15 +48,16 @@
     - Make a CRT for modules : I/P1*...*Ps*I -> \prod_i (I/Pi*I)
       This is needed for finding a minimal set of generators of non-necessarly invertible ideals.
 
+    #### OverOrders ####
     - FindOverOrders is slower than AlgAss: investigate
       ( eg: 900sec vs 3000sec overorders of EquationOrder of  f:=x^6 - 3*x^5 - 3*x^4 + 65*x^3 - 48*x^2 - 768*x + 4096; )
 
+    ### WKICM ###
     - Possible improvement to WKICM(S).
       Given a new subgroups H, check first it HT=T. If not, then discard H. 
       This should be faster than creating I=HS, computing (I:I)=S and check if it is a new class.
-      This is implemented in ~/253_*/AlgEt_new/WkClasses.m (not on git)
+      This is implemented in ~/253_*/AlgEt_new/WkClasses_new1.m and ..._new2.m (not on git)
       Incorporate in the main branch, after testing further.
-
 
     - Possible improvement to WKICM(S).
       Let T be the smallest overorder of S such that St*T is invertible in T. Let ff be the (S:T).
@@ -58,5 +68,5 @@
     - I have made some cahnges in the way ColonIdeals are computed. I need to test with some wkicm
 
 
-    FIXED/DONE: kept for the record.
+    ### FIXED/DONE: kept for the record. ###
     - move quotient stuff from OverOrders.m and MinimalGenerators.m (quo_frac_idl) into a new package.

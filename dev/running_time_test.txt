@@ -119,16 +119,16 @@
 	AttachSpec("~/packages_github/AlgEt/spec");
     AttachSpec("~/packages_github/AbVarFq/packages.spec");
     SetClassGroupBounds("GRH");
-	P<x>:=PolynomialRing(Integers());
+	_<x>:=PolynomialRing(Integers());
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
     c:=Coefficients(f);  
-    time Q,q:=PicardGroup(EquationOrder(EtaleAlgebra(P!f)) : GRH:=true);
-    time P,p:=PicardGroup(EquationOrder(NumberField(P!f)));
+    time Q,q:=PicardGroup(EquationOrder(EtaleAlgebra(f)) : GRH:=true);
+    time P,p:=PicardGroup(EquationOrder(NumberField(f)));
     // time #[q(g) : g in Q]; //slow
     // time #[p(g) : g in P];
     
-    time #PicardGroup(EquationOrder(EtaleAlgebra(P!f)));
-    time #PicardGroup(EquationOrder(AssociativeAlgebra(P!f)));
+    time #PicardGroup(EquationOrder(EtaleAlgebra(f)));
+    time #PicardGroup(EquationOrder(AssociativeAlgebra(f)));
 
 	
     //overorders

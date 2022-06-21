@@ -8,6 +8,8 @@
 // http://www.staff.science.uu.nl/~marse004/
 /////////////////////////////////////////////////////
 
+declare verbose WkClasses, 3;
+
 declare attributes AlgEtOrd:WKICM,
                             WKICM_bar;
 
@@ -19,9 +21,10 @@ intrinsic WKICM_bar(S::AlgEtOrd) -> SeqEnum
         if IsGorenstein(S) then
             S`WKICM_bar:=[OneIdeal(S)];
         else
-            if CohenMacaulauyType(S) eq 2 then
-                S`WKICM_bar:=wkicm_bar_CM_type2(S,pp);
+            if CohenMacaulayType(S) eq 2 then
+                S`WKICM_bar:=wkicm_bar_CM_type2(S,NonGorensteinPrimes(S));
             else
+                vprintf WkClasses,2:"Order of CohenMacaulayType = %o\n",CohenMacaulayType(S);
                 // general case
                 //TODO : prime per prime;
                 A:=Algebra(S);

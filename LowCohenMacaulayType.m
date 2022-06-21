@@ -14,7 +14,7 @@
 
 */
 
-declare attributes AlgEtOrd:NonGorensteinPrimes, CohenMacaulauyType;
+declare attributes AlgEtOrd:NonGorensteinPrimes, CohenMacaulayType;
 
 //------------
 // NonGorensteinPrimes
@@ -46,20 +46,20 @@ intrinsic NonGorensteinPrimes(S::AlgEtOrd)->SeqEnum,SeqEnum
 end intrinsic;
 
 //------------
-// CohenMacaulauyType
+// CohenMacaulayType
 //------------
 
 intrinsic CohenMacaulayType(S::AlgEtOrd)->RngIntElt
 { Given an order S returns its Cohen-Macaulay Type. This integer equals the max dimension of S^t/P*S^t where S^t is the trace dual of S and P runs over all (non-Gorenstein) primes of S. }
-    if not assigned S`CohenMacaulauyType then
+    if not assigned S`CohenMacaulayType then
         pp,dps:=NonGorensteinPrimes(S);
         if #pp eq 0 then
-            S`CohenMacaulauyType:=1; //S is Gorenstein
+            S`CohenMacaulayType:=1; //S is Gorenstein
         else
-            S`CohenMacaulauyType:=Max(dps);
+            S`CohenMacaulayType:=Max(dps);
         end if;
     end if;
-    return S`CohenMacaulauyType;
+    return S`CohenMacaulayType;
 end intrinsic;
 
 /////////////////////////////////////////////////////

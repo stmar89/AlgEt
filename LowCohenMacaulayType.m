@@ -7,12 +7,14 @@
 // http://www.staff.science.uu.nl/~marse004/
 /////////////////////////////////////////////////////
 
+// Reference: S. Marseglia, "Cohen-Macaulay type of orders, generators and ideal classes".
+// https://arxiv.org/abs/2206.03758
 
 /*TODO:
 
 */
 
-declare attributes AlgEtOrd:NonGorensteinPrimes;
+declare attributes AlgEtOrd:NonGorensteinPrimes, CohenMacaulauyType;
 
 //------------
 // NonGorensteinPrimes
@@ -43,12 +45,26 @@ intrinsic NonGorensteinPrimes(S::AlgEtOrd)->SeqEnum,SeqEnum
     return Explode(S`NonGorensteinPrimes);
 end intrinsic;
 
+//------------
+// CohenMacaulauyType
+//------------
 
+intrinsic CohenMacaulayType(S::AlgEtOrd)->RngIntElt
+{ Given an order S returns its Cohen-Macaulay Type. This integer equals the max dimension of S^t/P*S^t where S^t is the trace dual of S and P runs over all (non-Gorenstein) primes of S. }
+    if not assigned S`CohenMacaulauyType then
+        pp,dps:=NonGorensteinPrimes(S);
+        if #pp eq 0 then
+            S`CohenMacaulauyType:=1; //S is Gorenstein
+        else
+            S`CohenMacaulauyType:=Max(dps);
+        end if;
+    end if;
+    return S`CohenMacaulauyType;
+end intrinsic;
 
 /////////////////////////////////////////////////////
 // functions for orders that locally have CM-type \leq 2
 /////////////////////////////////////////////////////
-// In a so-far-unpublished note I have proved that 
 // if S^t/P*S^t has dimension 2 over S/P then
 // locally at P the only fractional ideals with 
 // multiplicator ring S are S and S^t.

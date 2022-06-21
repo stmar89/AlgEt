@@ -19,9 +19,8 @@ intrinsic WKICM_bar(S::AlgEtOrd) -> SeqEnum
         if IsGorenstein(S) then
             S`WKICM_bar:=[OneIdeal(S)];
         else
-            pp,dps:=NonGorensteinPrimes(S);
-            if Max(dps) eq 2 then //the Max CohenMacaulay type is 2.
-            S`WKICM_bar:=wkicm_bar_CM_type2(S,pp);
+            if CohenMacaulauyType(S) eq 2 then
+                S`WKICM_bar:=wkicm_bar_CM_type2(S,pp);
             else
                 // general case
                 //TODO : prime per prime;

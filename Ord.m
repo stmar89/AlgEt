@@ -145,10 +145,7 @@ intrinsic Order( gens::SeqEnum[AlgEtElt] : Check:=100 ) -> AlgEtOrd
         if fail gt Check then 
             error "The program could not generate a multiplicatively closed set from the given generators. Try to increase the value of Check, or choose different generators.";
         end if;
-
-        d:=Denominator(P); //this d might be different from Denomintor(M)
-        // we compute the Hash
-        R`Hash:=[d] cat [(Integers()!(d*P[i,j])) : j in [i..dim] , i in [1..dim]];
+        R`Hash:=Hash(P);
         zb:=MatrixQtoA(A,P);
     else
     //we assume that gens is a ZBasis of a multiplicativly closed lattice
@@ -205,9 +202,8 @@ intrinsic myHash(S::AlgEtOrd)->SeqEnum[RngInt]
         P:=MatrixAtoQ(ZBasis(S));
         d:=Denominator(P);
         P:=(1/d)*hnf(crQZ(d*P));
-        d:=Denominator(P);
         assert2 IsUpperTriangular(P);
-        S`Hash:=[d] cat [(Integers()!(d*P[i,j])) : j in [i..dim] , i in [1..dim]];
+        S`Hash:=Hash(P);
     end if;
     return S`Hash;
 end intrinsic;

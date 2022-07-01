@@ -122,9 +122,11 @@ IsPrincipal_prod_internal:=function( I , GRH )
     end if;
     for i in [1..#I_asProd] do
         IL:=I_asProd[i];
+        OrdIL:=Order(IL);
+        assert IsMaximal(OrdIL);
          //The next call is to prevent a bug of the in-built function IsPrincipal (which might have been corrected by now...).
          //Also if one wants to use the GRH bound rather than one needs to precompute the class groups, since IsPrincipal does not accepts varargs )       
-        OL,oL:=ClassGroup(Order(IL));
+        OL,oL:=ClassGroup(OrdIL);
 /*
         // TEST we try to make the generators of IL smaller.
 min_IL:=MinimalInteger(IL);

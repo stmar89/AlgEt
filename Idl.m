@@ -610,11 +610,10 @@ intrinsic ColonIdeal(I::AlgEtIdl,J::AlgEtIdl)->AlgEtIdl
         out:=(1/j)*I;
         return out;
     end if;
-    if assigned I`TraceDualIdeal then
-    //The following code tends to be much faster, if we don't have to recompute TraceDualIdeal.
-    //In practice, this should give an advantage while compute the WKICM.
-        IJ:=TraceDualIdeal(TraceDualIdeal(I)*J);
-    else
+    //if assigned I`TraceDualIdeal then
+    // // at a certain point I thought this would be faster, but it does not seem to be the case.
+    //    IJ:=TraceDualIdeal(TraceDualIdeal(I)*J);
+    //else
         // based on jv code
         N:=AbsoluteDimension(A);
         zbI:=ZBasis(I);
@@ -629,7 +628,7 @@ intrinsic ColonIdeal(I::AlgEtIdl,J::AlgEtIdl)->AlgEtIdl
         zbIJ:=MatrixQtoA(A,P);
         IJ:=Ideal(O,zbIJ);
         IJ`ZBasis:=zbIJ; //we know that zbIJ is a ZBasisA
-    end if;
+    //end if;
 
     assert2 IJ*J subset I;
     return IJ;

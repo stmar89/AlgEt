@@ -198,10 +198,15 @@ intrinsic myHash(S::AlgEtOrd)->SeqEnum[RngInt]
 {hash function for AlgEtOrd}
 // two orders have the hash iff they are equal
     if not assigned S`Hash then
-        dim:=AbsoluteDimension(Algebra(S));
+        /* OLD
         P:=MatrixAtoQ(ZBasis(S));
         d:=Denominator(P);
-        P:=(1/d)*hnf(crQZ(d*P));
+        P:=crZQ(hnf(crQZ(d*P)))/d;
+        */
+        M:=MatrixAtoQ(ZBasis(S));
+        d:=Denominator(M);
+        M:=crQZ(M*d);
+        P:=crZQ(hnf(M))/d;
         assert2 IsUpperTriangular(P);
         S`Hash:=Hash(P);
     end if;

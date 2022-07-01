@@ -15,9 +15,8 @@
     TODO:
     ### Various ###
     - an AlgEtToAlgAss intrinsic which returns an AlgAss and an isomorphism.
-    - saving and printing (it should be done with MinimalGenerators, that is after CRT)
+    - Improve saving and printing with LLL or MinimalGenerator (that is after CRT) to get smaller output.
     - add MaxCMTypeOverOrders
-    - in TwoGenerators, if the ideal is knwon to be principal, then I should only return one generator
     - Make an intrinsic that creates quotiens and takes as input either I,J with J in I, DONE
       or I and zbJ, with zbJ a ZBasis inside I. NOT DONE YET
       Sometimes I don't need to create the denominator ideal, as in TwoGenerating Set. Checke where else.
@@ -29,6 +28,8 @@
     
 
     ### PICARD GROUP ###
+    - Update: in th test suit I have made a for loop that shows that the timings for AlgEt is very inconsistent.
+        Sometimes it is faster than RngOld, sometimes it is much slower. I don't understand!
     - PicardGroup is again slower for AlgEt than for AlgAss and FldNum. 
       I think that the changes made to how powers of invertible ideals are computed are slowing things down, 
       instead of speeding them up. 
@@ -65,8 +66,10 @@
       will have a representative I such that ff \in I \in T.
       If looping over the subgroups is the most expensie part, then we might save some time in this way.
 
-    - I have made some cahnges in the way ColonIdeals are computed. I need to test with some wkicm
 
 
     ### FIXED/DONE: kept for the record. ###
     - move quotient stuff from OverOrders.m and MinimalGenerators.m (quo_frac_idl) into a new package.
+    - in TwoGenerators, if the ideal is knwon to be principal, then I should only return one generator. 
+      We act only if #Generators gt 2.
+    - I have made some cahnges in the way ColonIdeals are computed. I need to test with some wkicm

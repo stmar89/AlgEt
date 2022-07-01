@@ -42,7 +42,7 @@
 
 	AttachSpec("~/packages_github/AlgEt/spec");
     SetClassGroupBounds("GRH");
-    SetAssertions(1);
+    SetAssertions(3);
 
     SetProfile(true);
     t0:=Cputime();
@@ -98,56 +98,94 @@
     ProfilePrintByTotalTime(G);
 
 
+    //picard groups
 	AttachSpec("~/packages_github/AlgEt/spec");
     SetClassGroupBounds("GRH");
 	_<x>:=PolynomialRing(Integers());
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
+    for i in [1..10] do
+        i;
+        "AlgEt";
+        K1:=EtaleAlgebra(f);
+        E1:=EquationOrder(K1);
+        // no profiler
+        time P1,p1:=PicardGroup(E1 : GRH:=true );
+        "RngOrd";
+        K2:=NumberField(f);
+        E2:=EquationOrder(K2);
+        time P2,p2:=PicardGroup(E2);
+        "AlgEt";
+        K1:=EtaleAlgebra(f);
+        E1:=EquationOrder(K1);
+        // no profiler
+        time P1,p1:=PicardGroup(E1 : GRH:=true );
+        // for some reason the next line is incredibly much slower!
+        // time #PicardGroup(EquationOrder(EtaleAlgebra(f)));
+    end for;
+
+    // with profiler
     K1:=EtaleAlgebra(f);
     E1:=EquationOrder(K1);
     SetProfile(true);
         P1,p1:=PicardGroup(E1);
     SetProfile(false);
     ProfilePrintByTotalTime(ProfileGraph());
-    //SLOW compared to FldNum // without profiler we are faster....
+    /*
+    //SLOW compared to FldNum
+    E2:=EquationOrder(f);
+    time P2,p2:=PicardGroup(E2);
     E2:=EquationOrder(f);
     SetProfile(true);
         P2,p2:=PicardGroup(E2);
     SetProfile(false);
     ProfilePrintByTotalTime(ProfileGraph());
+    */
 
-    //picard groups
 	AttachSpec("~/packages_github/AlgEt/spec");
     AttachSpec("~/packages_github/AbVarFq/packages.spec");
     SetClassGroupBounds("GRH");
 	_<x>:=PolynomialRing(Integers());
-    f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
+    f:=x^4-1000*x^3-1000*x^2-1000*x-1000; // AlgEt 534 vs NF 14.9
+    //f:=x^3-1000*x^2-1000*x-1000;
     c:=Coefficients(f);  
     time Q,q:=PicardGroup(EquationOrder(EtaleAlgebra(f)) : GRH:=true);
+    time #PicardGroup(EquationOrder(AssociativeAlgebra(f)));
     time P,p:=PicardGroup(EquationOrder(NumberField(f)));
     // time #[q(g) : g in Q]; //slow
     // time #[p(g) : g in P];
     
     time #PicardGroup(EquationOrder(EtaleAlgebra(f)));
-    time #PicardGroup(EquationOrder(AssociativeAlgebra(f)));
 
 	
     // #### overorders
     clear;
 	_<x>:=PolynomialRing(Integers());
     f:=x^4-10000*x^3-10000*x^2-10000*x-10000; 
-    //30 sec vs 28 w/o profiler. Now AlgEt is faster
-    // with the profiler on, AlgEt is much slower. 37 vs 84 go figure :-)
+    // AlgAss 30 sec vs AlgEt 21 no profiler.
+    // with the profiler on, AlgEt is slower.
+    /* 
     AttachSpec("~/packages_github/AbVarFq/packages.spec");
-    AttachSpec("~/packages_github/AlgEt/spec");
-    // no profiler
     Aass:=AssociativeAlgebra(f);
     Eass:=EquationOrder(Aass);
     time ooass:=FindOverOrders(Eass);
+    */
+    AttachSpec("~/packages_github/AlgEt/spec");
+    // no profiler
     Aet:=EtaleAlgebra(f);
     Eet:=EquationOrder(Aet);
-    time ooet:=FindOverOrders(Eet);
-    assert #ooass eq #ooet; 
-
+    t0:=Cputime();
+        ooet:=FindOverOrders(Eet);
+    t1:=Cputime(t0); t1;
+    tprevbest:=19.9;
+    if Abs(t1 - tprevbest) gt 0.1*tprevbest then
+        if t1 lt tprevbest then
+            printf "FindOverOrders for %o got faster. Update the previous best known time\n",f;
+        elif t1 gt tprevbest then
+            printf "FindOverOrders for %o got slower. The previous code was better.\n",f;
+        end if;
+    end if;
+    assert #ooet eq 297;
+    /*
     // with profiler
     Aass:=AssociativeAlgebra(f);
     Eass:=EquationOrder(Aass);
@@ -164,23 +202,40 @@
     SetProfile(false);
     G2:=ProfileGraph();
     ProfilePrintByTotalTime(ProfilePruneGraphByTime(G2,30));
+    */
 
-    // a bigger test AlgAss ~900sec vs AlgEt 1480sec
-    // we are still slower. 
+
+    // a bigger example here we are slower.
     clear;
+    /*
+    AttachSpec("~/packages_github/AbVarFq/packages.spec");
 	_<x>:=PolynomialRing(Integers());
     f:=x^6 - 3*x^5 - 3*x^4 + 65*x^3 - 48*x^2 - 768*x + 4096;
-    AttachSpec("~/packages_github/AbVarFq/packages.spec");
-    AttachSpec("~/packages_github/AlgEt/spec");
-    // no profiler
     Aass:=AssociativeAlgebra(f);
     Eass:=EquationOrder(Aass);
-    time ooass:=FindOverOrders(Eass);
+    time ooass:=FindOverOrders(Eass); //~900 sec
+    assert #ooass eq 3312;
+    */
+    AttachSpec("~/packages_github/AlgEt/spec");
+    // no profiler
+	_<x>:=PolynomialRing(Integers());
+    f:=x^6 - 3*x^5 - 3*x^4 + 65*x^3 - 48*x^2 - 768*x + 4096;
     Aet:=EtaleAlgebra(f);
     Eet:=EquationOrder(Aet);
-    time ooet:=FindOverOrders(Eet);
-    assert #ooass eq #ooet; 
+    t0:=Cputime();
+        ooet:=FindOverOrders(Eet);
+    t1:=Cputime(t0); t1;
+    tprevbest:=1300;
+    if Abs(t1 - tprevbest) gt 0.1*tprevbest then
+        if t1 lt tprevbest then
+            printf "FindOverOrders for %o got faster. Update the previous best known time\n",f;
+        elif t1 gt tprevbest then
+            printf "FindOverOrders for %o got slower. The previous code was better.\n",f;
+        end if;
+    end if;
+    assert #ooet eq 3312; 
 
+    /*
     // with profiler
     Aass:=AssociativeAlgebra(f);
     Eass:=EquationOrder(Aass);
@@ -197,3 +252,40 @@
     SetProfile(false);
     G2:=ProfileGraph();
     ProfilePrintByTotalTime(ProfilePruneGraphByTime(G2,30));
+    */
+
+    // ### WKICM
+    clear;
+	_<x>:=PolynomialRing(Integers());
+    f:=x^8+16; 
+    AttachSpec("~/packages_github/AlgEt/spec");
+
+    // no profiler
+    A:=EtaleAlgebra(f);
+    F:=PrimitiveElement(A);
+    R:=Order([F,2/F]); 
+    oo:=FindOverOrders(R);
+    t0:=Cputime();
+        #WKICM(R);
+    t1:=Cputime(t0); t1;
+    tprevbest:=5.9;
+    if Abs(t1 - tprevbest) gt 0.1*tprevbest then
+        if t1 lt tprevbest then
+            printf "WKICM for %o got faster. Update the previous best known time\n",f;
+        elif t1 gt tprevbest then
+            printf "WKICM for %o got slower. The previous code was better.\n",f;
+        end if;
+    end if;
+    /* 
+    // with profiler
+    A:=EtaleAlgebra(f);
+    F:=PrimitiveElement(A);
+    R:=Order([F,2/F]); 
+    oo:=FindOverOrders(R);
+    SetProfile(true);
+        #WKICM(R);
+    SetProfile(false);
+    G2:=ProfileGraph();
+    ProfilePrintByTotalTime(ProfilePruneGraphByTime(G2,30));
+    */
+

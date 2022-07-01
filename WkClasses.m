@@ -57,8 +57,10 @@ intrinsic WKICM_bar(S::AlgEtOrd) -> SeqEnum
                     //coeff:=[Eltseq(x) : x in geninF];
                     //I:=ideal<S| [&+[T_ZBasis[i]*x[i] : i in [1..degA]] : x in coeff] cat ff_ZBasis>;
                     I:=Ideal(S, [ (f(QP!x))@@q : x in Generators(H) ] cat gens_ff_over_S);
-                    if MultiplicatorRing(I) eq S and not exists{J : J in seqWk_bar | IsWeakEquivalent(I,J)} then 
-                        Append(~seqWk_bar,I);
+                    if not I in seqWk_bar and 
+                        MultiplicatorRing(I) eq S and 
+                        not exists{J : J in seqWk_bar | IsWeakEquivalent(I,J)} then 
+                            Append(~seqWk_bar,I);
                     end if;
                 end while;
                 S`WKICM_bar:=seqWk_bar;

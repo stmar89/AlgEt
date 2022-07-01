@@ -15,6 +15,7 @@ declare verbose AlgEtElt, 3;
 
 declare attributes AlgEtElt : Algebra, // AlgEt
                               AbsoluteCoordinates,
+                              Hash,
                               Components; // Tup
 
 declare attributes AlgEt : Basis,
@@ -69,6 +70,7 @@ function CreateAlgEtElt(A,comp)
     x1:=New(AlgEtElt);
     x1`Algebra:=A;
     x1`Components:=comp;
+    x1`Hash:=Hash(comp);
     return x1;
 end function;
 
@@ -176,7 +178,8 @@ intrinsic 'eq'(x1::AlgEtElt,x2::AlgEtElt) -> BoolElt
 {Is x1=x2 ?}
     A:=Parent(x1);
     require A cmpeq Parent(x2): "The elements must belong to the same algebra.";
-    return Components(x1) eq Components(x2);
+    //return Components(x1) eq Components(x2);
+    return x1`Hash eq x2`Hash;
 end intrinsic;
 
 intrinsic 'eq'(x1::RngIntElt,x2::AlgEtElt) -> BoolElt
@@ -481,8 +484,7 @@ end intrinsic;
 
 /* TEST
 
-    Attach("~/packages_github/AlgEt/AlgEt.m");
-    Attach("~/packages_github/AlgEt/Elt.m");
+    AttachSpec("~/packages_github/AlgEt/spec");
     SetVerbose("AlgEtElt",2);
 
     _<x>:=PolynomialRing(Integers());

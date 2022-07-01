@@ -1138,11 +1138,22 @@
 --
 
 <pre>
-<b>PrintSeqAlgEtElt</b>(seq::SeqEnum[AlgEtElt]) -> SeqEnum
+<b>PrintSeqAlgEtElt</b>(seq::SeqEnum[AlgEtElt]) -> SeqEnum,MonStgElt
 </pre>
 
-*Given a sequence of elements of an AlgEt, returns a sequence of tuples of sequence of integers that can be coerced into the original algebra to obtain the input sequece.
-  Such an output can easily be printed to file.*
+*Given a sequence of elements of an AlgEt, returns a sequence of tuples of sequence of integers that can be coerced into the original algebra to obtain the input sequece. As a second output it reuturns a string that can be printed to file.*
+
+<pre>
+<b>PrintWKICM</b>(R::AlgEtOrd) -> MonStgElt
+</pre>
+
+*Given an order R in an AlgEt, it returns a string that contains the weak equivalence classes of R, sorted by multiplicator ring. In particular, the overorders of R can be recovered fro this string. Such string can be easily printed to file. To load the string, after using Read() on the file, use the intrinsic LoadWKICM*
+
+<pre>
+<b>LoadWKICM</b>(str::MonStgElt) -> AlgEtOrd
+</pre>
+
+*Given a string produced with PrintWKICM it returns the corresponding order R. In the attributes of R, its algebra and its overorders one can find the weak equivalence classes. This can be recovered with the approriate intrinsics.*
 
 
 # List of instrinsics in LowCohenMacaulayType.m:
@@ -1153,6 +1164,12 @@
 </pre>
 
 *Given an order S it returns two sequences the first containing the primes at which S is locally not Gorenstein and the second containing the CohenMacaulay types of S at this primes, that is, the dimension of S^t/PS^t over S/P, where S^t is the TraceDualIdeal of S*
+
+<pre>
+<b>CohenMacaulayType</b>(S::AlgEtOrd)->RngIntElt
+</pre>
+
+*Given an order S returns its Cohen-Macaulay Type. This integer equals the max dimension of S^t/P*S^t where S^t is the trace dual of S and P runs over all (non-Gorenstein) primes of S.*
 
 
 # List of instrinsics in WkClasses.m:

@@ -64,6 +64,14 @@ end intrinsic;
 // Coercion
 //------------
 
+function CreateAlgEtElt(A,comp)
+// given an AlgEt A and a Tup comp containing the components in the number fields of A, returns the corresponding elemnt
+    x1:=New(AlgEtElt);
+    x1`Algebra:=A;
+    x1`Components:=comp;
+    return x1;
+end function;
+
 intrinsic IsCoercible(A::AlgEt, x::.) -> BoolElt, .
 {Return whether x is coercible into A and the result of the coercion if so.}
     if Parent(x) cmpeq A then
@@ -79,16 +87,13 @@ intrinsic IsCoercible(A::AlgEt, x::.) -> BoolElt, .
             end if;
         end for;
         // now we know the elt is coercible in A
-        x1:=New(AlgEtElt);
-        x1`Algebra:=A;
-        x1`Components:=comp;
+        x1:=CreateAlgEtElt(A,comp);
         return true,x1;
     elif Type(x) eq RngIntElt or Type(x) eq FldRatElt then
         coordinates:=<>;
         nf:=NumberFields(A);
-        x1:=New(AlgEtElt);
-        x1`Algebra:=A;
-        x1`Components:=<nf[i]!x : i in [1..#nf]>; //diagonal embedding
+        comp:=<nf[i]!x : i in [1..#nf]>; //diagonal embedding
+        x1:=CreateAlgEtElt(A,comp);
         return true,x1;
     else 
         return false,"";
@@ -198,7 +203,7 @@ intrinsic '+'(x1::AlgEtElt,x2::AlgEtElt) -> AlgEtElt
 {x1+x2}
     A:=Parent(x1);
     require A cmpeq Parent(x2): "The elements must belong to the same algebra.";
-    x3:=A!< Components(x1)[i] + Components(x2)[i] : i in [1..#NumberFields(A)] >;
+    x3:=CreateAlgEtElt(A,< Components(x1)[i] + Components(x2)[i] : i in [1..#NumberFields(A)] >);
     return x3;
 end intrinsic;
 
@@ -219,7 +224,8 @@ end intrinsic;
 intrinsic '-'(x::AlgEtElt) -> AlgEtElt
 {-x}
     A:=Parent(x);
-    y:=A!< - Components(x)[i] : i in [1..#NumberFields(A)] >;
+    comp:=< - Components(x)[i] : i in [1..#NumberFields(A)] >;
+    y:=CreateAlgEtElt(A,comp);
     return y;
 end intrinsic;
 
@@ -227,7 +233,8 @@ intrinsic '-'(x1::AlgEtElt,x2::AlgEtElt) -> AlgEtElt
 {x1-x2}
     A:=Parent(x1);
     require A cmpeq Parent(x2): "The elements must belong to the same algebra.";
-    x3:=A!< Components(x1)[i] - Components(x2)[i] : i in [1..#NumberFields(A)] >;
+    comp:=< Components(x1)[i] - Components(x2)[i] : i in [1..#NumberFields(A)] >;
+    x3:=CreateAlgEtElt(A,comp);
     return x3;
 end intrinsic;
 
@@ -249,7 +256,8 @@ intrinsic '*'(x1::AlgEtElt,x2::AlgEtElt) -> AlgEtElt
 {x1*x2}
     A:=Parent(x1);
     require A cmpeq Parent(x2): "The elements must belong to the same algebra.";
-    x3:=A!< Components(x1)[i] * Components(x2)[i] : i in [1..#NumberFields(A)] >;
+    comp:=< Components(x1)[i] * Components(x2)[i] : i in [1..#NumberFields(A)] >;
+    x3:=CreateAlgEtElt(A,comp);
     return x3;
 end intrinsic;
 
@@ -271,7 +279,8 @@ intrinsic Inverse(x::AlgEtElt) -> AlgEtElt
 {1/x}
     require IsUnit(x) : "The element is not invertible.";
     A:=Parent(x);
-    y:=A!< 1/(Components(x)[i]) : i in [1..#NumberFields(A)] >;
+    comp:=< 1/(Components(x)[i]) : i in [1..#NumberFields(A)] >;
+    y:=CreateAlgEtElt(A,comp);
     return y;
 end intrinsic;
 
@@ -281,17 +290,25 @@ intrinsic '^'(x::AlgEtElt,n::RngIntElt) -> AlgEtElt
     if n eq 0 then
         return One(A);
     elif n gt 0 then
-        return A!< Components(x)[i]^n : i in [1..#NumberFields(A)] >;
+        comp:=< Components(x)[i]^n : i in [1..#NumberFields(A)] >;
+        y:=CreateAlgEtElt(A,comp);
+        return y;
     elif n lt 0 then
         require IsUnit(x) : "The element is not invertible.";
-        return A!< Components(x)[i]^n : i in [1..#NumberFields(A)] >;
+        comp:=< Components(x)[i]^n : i in [1..#NumberFields(A)] >;
+        y:=CreateAlgEtElt(A,comp);
+        return y;
     end if;
 end intrinsic;
 
 intrinsic '/'(x1::AlgEtElt,x2::AlgEtElt) -> AlgEtElt
 {x1/x2}
+    A:=Parent(x1);
+    require A cmpeq Parent(x2): "The elements must belong to the same algebra.";
     require IsUnit(x2) : "The denominator is not invertible.";
-    return x1*Inverse(x2);
+    comp:=< Components(x1)[i]/Components(x2)[i] : i in [1..#NumberFields(A)] >;
+    y:=CreateAlgEtElt(A,comp);
+    return y;
 end intrinsic;
 
 intrinsic '/'(x1::.,x2::AlgEtElt) -> AlgEtElt
@@ -358,7 +375,7 @@ intrinsic PrimitiveElement(A::AlgEt) -> AlgEtElt
     if not assigned A`PrimitiveElement then
         nf,embs:=NumberFields(A);
         require #Seqset(nf) eq #nf : "The number fields defining the algebra are not distinct. Hence the algebra does not have a primitive element";
-        A`PrimitiveElement:= A!<PrimitiveElement(F) : F in nf>;
+        A`PrimitiveElement:= CreateAlgEtElt(A,<PrimitiveElement(F) : F in nf>);
     end if;
     return A`PrimitiveElement;
 end intrinsic;

@@ -62,8 +62,7 @@ CreateAlgEtIdl:=function(S,gens)
         d:=Denominator(M);
         P:=hnf(crQZ(d*M));
         P:=(1/d)*crZQ(P);
-        d:=Denominator(P); //this d might be different from Denomintor(M)
-        hash:=[d] cat [(d*P[i,j]) : j in [i..dim] , i in [1..dim]];
+        hash:=Hash(P);
         zb:=MatrixQtoA(A,P);
         assert #zb eq AbsoluteDimension(A);
         I`Hash:=hash;
@@ -205,8 +204,7 @@ intrinsic ZBasis(I::AlgEtIdl)->SeqEnum[AlgEtElt]
             d:=Integers()!Denominator(M);
             P:=hnf(crQZ(d*M));
             P:=(1/d)*crZQ(P);
-            d:=Denominator(P); //this d might be different from Denomintor(M)
-            hash:=[d] cat [(Integers()!(d*P[i,j])) : j in [i..dim] , i in [1..dim]];
+            hash:=Hash(P);
             zb:=MatrixQtoA(A,P);
             assert #zb eq AbsoluteDimension(A);
             I`Hash:=hash;
@@ -233,8 +231,7 @@ intrinsic myHash(I::AlgEtIdl)->RngInt
         d:=Integers() ! Denominator(P);
         P:=(1/d)*crZQ(hnf(crQZ(d*P)));
         assert2 IsUpperTriangular(P);
-        d:=Integers() ! Denominator(P); //this d might be different from Denomintor(M)
-        hash:=[d] cat [(Integers()!(d*P[i,j])) : j in [i..dim] , i in [1..dim]];
+        hash:=Hash(P);
         I`Hash:=hash;
     end if;
     return I`Hash;
@@ -831,12 +828,7 @@ end intrinsic;
 
 /* TEST
 
-    Attach("~/packages_github/AlgEt/AlgEt.m");
-    Attach("~/packages_github/AlgEt/Elt.m");
-    Attach("~/packages_github/AlgEt/Ord.m");
-    Attach("~/packages_github/AlgEt/TraceNorm.m");
-    Attach("~/packages_github/AlgEt/Idl.m");
-    Attach("~/packages_github/AlgEt/WkTesting.m");
+    AttachSpec("~/packages_github/AlgEt/spec");
     SetVerbose("AlgEtIdl",2);
     SetAssertions(2);
 
@@ -856,6 +848,11 @@ end intrinsic;
     a*E1 + E1!!(a*E2);
     time _:=&*[Random(E1)*E1 : i in [1..100]];
     time _:=&*[(Random(E1)*E1+Random(E1)*E1) : i in [1..100]];
+    l:=[(Random(E1)*E1+Random(E1)*E1) : i in [1..100]];
+    assert forall{ I : I in l | not assigned I`ZBasis };
+    assert forall{ I : I in l | I eq Ideal(E1,ZBasis(I))};
+    assert forall{ I : I in l | assigned I`ZBasis };
+    time _:=&+[ i eq j select 1 else 0 : i,j in l ];
     time I:=Ideal(E1,[Random(E1) : i in [1..100]]);
     time J:=&*[I : i in [1..100]];
     time JJ:=I^100;

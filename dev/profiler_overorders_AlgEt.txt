@@ -1,0 +1,318 @@
+/*f;
+x^6 - 3*x^5 - 3*x^4 + 65*x^3 - 48*x^2 - 768*x + 4096 */
+
+> ProfilePrintByTotalTime(G2);
+Index Name                                                 Time        Count
+1     <main>                                               4770.04     1
+2     FindOverOrders(<AlgEtOrd> E) -> SetIndx              4770.04     1
+4     FindOverOrders_Minimal(<AlgEtOrd> R) -> SetIndx      4769.93     1
+76    eq(<AlgEtOrd> O1, <AlgEtOrd> O2) -> BoolElt          2960.75     121813293
+223   MinimalOverOrders(<AlgEtOrd> R) -> SetIndx           2093.18     3312
+280   diff(<SetIndx> S, <SetIndx> T) -> SetIndx            1477.63     24
+7     Constructor (sub)                                    1440.42     42268260
+222   join:=(<SetIndx>~S, <SetIndx> T)                     828.89      3360
+77    myHash(<AlgEtOrd> S) -> SeqEnum                      735.16      243633090
+278   Index(<SetIndx> S, <Any> x) -> RngIntElt             572.39      12812
+112   IsVerbose(<MonStgElt> V, <RngIntElt> l) -> BoolElt   510.69      121829502
+115   *(<AlgEtElt> x1, <AlgEtElt> x2) -> AlgEtElt          454.86      4666920
+65    Ideal(<AlgEtOrd> S, <SeqEnum> gens) -> AlgEtIdl      414.85      145241
+236   *(<AlgEtIdl> I, <AlgEtIdl> J) -> AlgEtIdl            405.42      12957
+31    IsCoercible(<AlgEt> A, <Any> x) -> BoolElt, .        402.52      10848068
+67    CreateAlgEtIdl                                       389.90      145241
+238   ResidueField(<AlgEtIdl> P) -> FldFin, Map            371.31      16232
+239   IsPrime(<AlgEtIdl> I) -> BoolElt                     298.14      8116
+141   PrimesAbove(<AlgEtIdl> I) -> SeqEnum                 285.19      8117
+5     Algebra(<AlgEtOrd> S) -> AlgEt                       233.33      245134061
+3     not(<BoolElt> x) -> BoolElt                          213.96      268139001
+267   QuotientVS(<Any> I, <Any> J, <AlgEtIdl> P) -> ModFld, Map185.82      8116
+78    MatrixAtoQ                                           165.34      1004152
+132   !!(<AlgEtOrd> T, <AlgEtIdl> I) -> AlgEtIdl           163.72      49630
+113   ZBasis(<AlgEtIdl> I) -> SeqEnum                      156.74      374220
+123   MatrixQtoA                                           153.74      122648
+33    cmpeq(<Any> x, <Any> y) -> BoolElt                   149.39      147621325
+40    Order(<SeqEnum> gens) -> AlgEtOrd                    148.88      19317
+228   meet(<AlgEtIdl> I, <AlgEtIdl> J) -> AlgEtIdl         145.31      41513
+305   join(<SetIndx> S, <SetIndx> T) -> SetIndx            143.56      1
+111   eq(<SeqEnum> S, <SeqEnum> T) -> BoolElt              138.94      122012919
+42    Seqset(<SeqEnum> Q) -> SetEnum                       137.76      167869
+144   subset(<AlgEtIdl> I1, <AlgEtIdl> I2) -> BoolElt      118.53      99259
+19    Constructor (elt)                                    116.95      8965978
+248   @@(<Any> x, <Map> f) -> .                            116.83      103150
+44    eq(<AlgEtElt> x1, <AlgEtElt> x2) -> BoolElt          103.51      7771670
+259   *(<Any> x1, <AlgEtElt> x2) -> AlgEtElt               101.88      646228
+249   F_to_S                                               101.12      70182
+153   Factorization(<AlgEtIdl> I) -> Tup                   95.31       8117
+79    AbsoluteCoordinates(<AlgEtElt> x) -> SeqEnum         90.11       5579552
+129   &+(<SeqEnum> S) -> .                                 89.44       1694775
+145   Index(<AlgEtIdl> J, <AlgEtIdl> I) -> .               86.59       133289
+252   InternalAdd(<Setq> S) -> .                           86.10       212064
+253   reduct                                               85.36       212064
+142   IsIntegral(<AlgEtIdl> I) -> BoolElt                  83.94       32466
+158   MultiplicatorRing(<AlgEtIdl> I) -> AlgEtOrd          83.83       16233
+143   subset(<AlgEtIdl> I, <AlgEtOrd> S) -> BoolElt        83.76       16233
+229   meet_zbasis                                          82.46       41513
+254   +(<AlgEtElt> x1, <AlgEtElt> x2) -> AlgEtElt          80.60       898456
+146   Index(<AlgEtIdl> T) -> FldRatElt                     79.34       266578
+282   mVI                                                  73.25       21600
+85    Denominator(<Mtrx> X) -> RngElt                      69.81       277597
+73    ColonIdeal(<AlgEtIdl> I, <AlgEtIdl> J) -> AlgEtIdl   67.36       8117
+133   subset(<AlgEtOrd> O1, <AlgEtOrd> O2) -> BoolElt      63.20       60998
+227   AbsoluteCoordinates(<SeqEnum> seq, <AlgEtOrd> O) -> SeqEnum
+                                                           61.05       461383
+251   *(<AlgEtElt> x1, <Any> x2) -> AlgEtElt               59.62       421092
+226   in(<AlgEtElt> x, <AlgEtOrd> O) -> BoolElt            55.49       317201
+81    Matrix(<SeqEnum> Q) -> Mtrx                          54.44       1004152
+45    Components(<AlgEtElt> x) -> SeqEnum                  52.37       50568421
+285   [/home/stmar/packages_github/AlgEt/Quotients.m:144]  39.36       10920
+286   mIV                                                  39.18       10920
+38    Parent(<AlgEtElt> x) -> AlgEt                        37.05       36408411
+99    Rows(<Mtrx> X) -> SeqEnum                            33.83       997765
+147   in(<AlgEtElt> x, <AlgEtIdl> I) -> BoolElt            31.93       138571
+8     NumberFields(<AlgEt> A) -> SeqEnum                   27.93       19673324
+151   eq(<AlgEtIdl> I, <AlgEtIdl> J) -> BoolElt            26.36       112465
+100   Rows(<Mtrx> X, <SeqEnum> Q) -> SeqEnum               24.18       997765
+149   AbsoluteCoordinates(<SeqEnum> seq, <AlgEtIdl> I) -> SeqEnum
+                                                           24.16       138571
+116   *(<FldAlgElt> x, <FldAlgElt> y) -> FldAlgElt         22.44       18164496
+91    Denominator(<FldRatElt> x) -> RngIntElt              21.77       26290272
+155   factorizationMaximalOrder                            21.71       8117
+32    Parent(<Any> x) -> .                                 20.32       14997095
+96    hnf                                                  19.99       144399
+152   myHash(<AlgEtIdl> I) -> RngInt                       17.29       167818
+273   [/home/stmar/packages_github/AlgEt/Quotients.m:100]  16.75       11368
+80    Flat(<FldAlgElt> a) -> SeqEnum                       16.50       7366646
+256   Evaluate(<RngUPolElt> f, <AlgEtElt> a) -> AlgEtElt   16.16       18866
+35    IsCoercible(<Str> S, <Any> x) -> BoolElt, .          14.65       15800359
+49    IsIntegral(<AlgEtElt> x) -> BoolElt                  14.45       130354
+36    Append(<Tup>~T, <Any> x)                             13.92       13071766
+117   inclusion_matrix                                     13.73       608071
+12    #(<SeqEnum> Q) -> RngIntElt                          13.72       15625948
+274   [/home/stmar/packages_github/AlgEt/Quotients.m:101]  11.39       68208
+165   Ideal(<AlgEtOrd> S, <Tup> idls) -> AlgEtIdl          11.17       18343
+50    AbsoluteMinimalPolynomial(<AlgEtElt> x) -> RngUPolElt11.14       130354
+66    Append(<SeqEnum>~Q, <Any> x)                         10.81       1287524
+260   Internal maps of type 10                             10.78       48822
+53    MinimalPolynomial(<AlgEtElt> x, <Rng> F) -> RngUPolElt9.84        130354
+261   S_to_F                                               8.66        48822
+22    Type(<Any> T) -> Cat                                 8.60        10108555
+37    New(<Cat> T) -> .                                    7.62        7645113
+46    eq(<Tup> x, <Tup> y) -> BoolElt                      7.53        7771670
+34    in(<Any> x, <SetEnum> M) -> BoolElt                  7.12        7480555
+39    &cat(<SeqEnum> S) -> SeqEnum                         6.77        4717190
+97    Rank(<Mtrx> X) -> RngIntElt                          6.47        155599
+27    [/home/stmar/packages_github/AlgEt/AlgEt.m:45]       5.77        55041
+54    MinimalPolynomial(<FldAlgElt> a, <Rng> R) -> RngUPolElt5.66        260708
+164   Factorization(<RngOrdFracIdl> I) -> SeqEnum          5.59        15670
+17    #(<Tup> T) -> RngIntElt                              5.37        6448716
+118   ^(<AlgMatElt> x, <RngIntElt> n) -> AlgMatElt         5.33        82623
+84    Matrix(<RngIntElt> m, <RngIntElt> n, <SeqEnum> Q) -> Mtrx5.26
+1045665
+98    HermiteForm(<Mtrx> X) -> Mtrx, AlgMatElt             5.15        160631
+134   Index(<AlgEtOrd> S, <AlgEtOrd> T) -> .               5.13        64310
+240   ResidueRing(<AlgEtOrd> S, <AlgEtIdl> I) -> GrpAb, Map4.93        8116
+18    eq(<RngIntElt> x, <RngIntElt> y) -> BoolElt          4.65        5294518
+127   Columns                                              4.13        122648
+243   Constructor (quo)                                    3.79        27600
+265   ^(<AlgEtElt> x, <RngIntElt> n) -> AlgEtElt           3.67        19036
+135   Index(<AlgEtOrd> T) -> FldRatElt                     3.62        144852
+157   IsProductOfIdeals(<AlgEtIdl> I) -> BoolElt, Tup      3.53        8117
+71    One(<AlgEt> A) -> AlgEtElt                           3.25        46010
+150   *(<ModMatRngElt> x, <AlgMatElt> y) -> ModMatRngElt   2.90        583722
+43    Hash(<Any> x) -> RngIntElt                           2.84        3181320
+55    LCM(<Setq> S) -> RngElt                              2.49        407951
+60    Integers() -> RngInt                                 2.45        3006526
+51    Algebra(<AlgEtElt> x) -> AlgEt                       2.40        2413975
+94    crQZ                                                 2.40        202144
+95    ChangeRing(<Mtrx> X, <Rng> S) -> Mtrx                2.28        437683
+114   Generators(<AlgEtIdl> I) -> SeqEnum                  2.23        612429
+237   Index(<AlgEtOrd> S, <AlgEtIdl> I) -> .               2.14        21073
+255   +(<FldAlgElt> x, <FldAlgElt> y) -> FldAlgElt         2.05        1796912
+88    Nrows(<Mtrx> X) -> RngIntElt                         2.01        2273133
+279   Include(<SetIndx>~S, <Any> x)                        1.90        27264
+120   crZQ                                                 1.85        235539
+122   *(<FldRatElt> x, <FldRatElt> y) -> FldRatElt         1.84        1752744
+126   Eltseq(<ModTupRngElt> v) -> SeqEnum                  1.77        1417070
+75    Order(<AlgEtIdl> I) -> AlgEtOrd                      1.64        1128542
+294   Submodules(<ModRng> M) -> SeqEnum                    1.61        7344
+48    AbsoluteDimension(<AlgEt> A) -> RngInt               1.55        415226
+102   Min(<SeqEnum> S) -> ., RngIntElt                     1.44        997765
+23    eq(<Cat> x, <Cat> y) -> BoolElt                      1.38        1607616
+104   Max(<SeqEnum> S) -> ., RngIntElt                     1.36        997765
+72    Ideal(<AlgEtOrd> S, <Any> gen) -> AlgEtIdl           1.33        14680
+250   Eltseq(<GrpAbElt> x) -> SeqEnum                      1.28        489300
+56    IsMonic(<RngUPolElt> f) -> BoolElt                   1.25        130354
+119   *(<RngElt> c, <ModMatRngElt> X) -> ModMatRngElt      1.20        66851
+69    OneIdeal(<AlgEtOrd> S) -> AlgEtIdl                   1.20        120968
+159   [/home/stmar/packages_github/AlgEt/AlgEt.m:46]       1.20        97404
+205   in(<Any> x, <SeqEnum> M) -> BoolElt                  1.13        14456
+13    gt(<RngIntElt> x, <RngIntElt> y) -> BoolElt          1.03        1244327
+74    Algebra(<AlgEtIdl> I) -> AlgEt                       1.01        759081
+160   Constructor (ideal)                                  1.00        16238
+62    le(<RngIntElt> x, <RngIntElt> y) -> BoolElt          0.98        1017082
+277   Include(<SetEnum>~S, <Any> x)                        0.98        12812
+82    IsNull(<SeqEnum> S) -> BoolElt                       0.96        1216216
+83    ISA(<Cat> t, <Cat> u) -> BoolElt                     0.95        1004152
+90    Eltseq(<Mtrx> X) -> SeqEnum                          0.91        277597
+41    Universe(<SeqEnum> M) -> Str                         0.90        1023469
+103   ge(<RngIntElt> i, <RngIntElt> j) -> BoolElt          0.89        1010199
+140   IsMaximal(<AlgEtOrd> S) -> BoolElt                   0.86        181018
+130   *(<AlgMatElt> x, <AlgMatElt> y) -> AlgMatElt         0.86        72971
+136   Determinant(<Mtrx> X) -> RngElt                      0.77        95087
+148   eq(<AlgEt> A1, <AlgEt> A2) -> BoolElt                0.73        228906
+93    *(<RngElt> c, <AlgMatVElt> X) -> AlgMatVElt          0.72        238079
+109   *(<RngIntElt> x, <RngIntElt> y) -> RngIntElt         0.69        711262
+64    ZBasis(<AlgEtOrd> S) -> SeqEnum                      0.68        549169
+295   SubmoduleLattice(<ModRng> M) -> SubModLat, BoolElt   0.68        7344
+101   ne(<RngIntElt> x, <RngIntElt> y) -> BoolElt          0.67        1014034
+30    +(<RngIntElt> x, <RngIntElt> y) -> RngIntElt         0.61        802044
+193   Sort(<SeqEnum>~Q, <UserProgram> compare)             0.60        7346
+194   Sort(<SeqEnum>~Q, <UserProgram> compare, ~permut)    0.57        7346
+105   Matrix(<SeqEnum> Q) -> Mtrx                          0.50        152519
+124   AbsoluteBasis(<AlgEt> A) -> SeqEnum                  0.48        130765
+52    PrimeField(<AlgEt> A) -> FldNum                      0.48        130354
+154   ne(<AlgEtIdl> I, <AlgEtIdl> J) -> BoolElt            0.47        8117
+47    Setseq(<SetEnum> S) -> SeqEnum                       0.42        179237
+128   Transpose(<AlgMatElt> X) -> AlgMatElt                0.32        179467
+235   GetAttributes(<Cat> T) -> SeqEnum                    0.30        28556
+139   in(<Any> x, <Str> M) -> BoolElt                      0.29        160257
+70    One(<AlgEtOrd> S) -> AlgEtElt                        0.27        3312
+110   cat(<SeqEnum> s, <SeqEnum> t) -> SeqEnum             0.26        118769
+217   VerticalJoin(<Mtrx> X, <Mtrx> Y) -> Mtrx             0.26        83030
+138   /(<FldRatElt> x, <FldRatElt> y) -> FldRatElt         0.25        205715
+86    BaseRing(<Mtrx> X) -> Rng                            0.25        277597
+121   Rationals() -> FldRat                                0.23        330626
+89    Ncols(<Mtrx> X) -> RngIntElt                         0.22        277603
+87    IntegerRing(<FldRat> K) -> RngInt                    0.22        277492
+242   ->(<Str> S, <Str> T) -> SetCart                      0.20        47924
+276   *(<AlgMatElt> x, <ModMatRngElt> y) -> ModMatRngElt   0.19        8116
+92    /(<RngIntElt> x, <RngIntElt> y) -> FldRatElt         0.17        121999
+301   *(<ModMatRngElt> X, <RngElt> c) -> ModMatRngElt      0.17        11200
+61    PolynomialRing(<Rng> R) -> RngUPol                   0.17        138470
+225   Generators(<AlgEtOrd> S) -> SeqEnum                  0.16        52881
+156   IsProductOfOrders(<AlgEtOrd> O) -> BoolElt, Tup      0.15        34577
+284   ^(<FldAlgElt> x, <RngIntElt> n) -> FldAlgElt         0.15        21840
+163   in(<RngOrdElt> x, <RngOrdIdl> M) -> BoolElt          0.15        16234
+264   AdditiveGroup(<FldFin> R) -> GrpAb, Map              0.14        8116
+231   ZeroMatrix(<Rng> R, <RngIntElt> m, <RngIntElt> n) -> Mtrx0.14        41513
+283   Eltseq(<ModRngElt> v) -> SeqEnum                     0.14        43200
+59    IsOne(<FldRatElt> x) -> BoolElt                      0.11        130354
+29    cat(<Tup> T1, <Tup> T2) -> Tup                       0.11        110082
+300   /(<AlgMatVElt> X, <RngElt> c) -> AlgMatVElt          0.11        22400
+167   Generators(<RngOrdFracIdl> I) -> SeqEnum             0.10        36686
+58    LeadingCoefficient(<RngUPolElt> f) -> RngElt         0.09        130354
+131   VerticalJoin(<SeqEnum> Q) -> Mtrx                    0.09        8117
+234   Matrix(<Mtrx> X) -> Mtrx                             0.09        41513
+298   [/opt/magma/current/package/Module/ModRng/misc.m:38] 0.08        10428
+247   DefiningPolynomial(<FldFin> F) -> RngUPolElt         0.08        8116
+244   *(<Map> f, <Map> g) -> Map                           0.08        24348
+28    -(<RngIntElt> x, <RngIntElt> y) -> RngIntElt         0.08        162185
+304   ne(<AlgEtOrd> O1, <AlgEtOrd> O2) -> BoolElt          0.07        3252
+299   in(<ModRngElt> x, <ModRng> M) -> BoolElt             0.07        4416
+233   HorizontalJoin(<Mtrx> X, <Mtrx> Y) -> Mtrx           0.07        41513
+137   Abs(<FldRatElt> x) -> FldRatElt                      0.06        95087
+281   Basis(<ModRng> M) -> SeqEnum                         0.06        10596
+290   Eigenvalues(<Mtrx> X) -> SetEnum                     0.06        3252
+172   Dimension(<ModRng> M) -> RngIntElt                   0.05        68794
+6     MaximalOrder(<AlgEt> A) -> AlgEtOrd                  0.05        14743
+230   LCM(<RngIntElt> x, <RngIntElt> y) -> RngIntElt       0.05        41513
+272   .(<GrpAb> G, <RngIntElt> i) -> GrpAbElt              0.05        11368
+57    IsZero(<RngUPolElt> x) -> BoolElt                    0.05        130354
+232   Matrix(<Rng> R, <RngIntElt> m, <RngIntElt> n, <SeqEnum> Q) -> Mtrx
+                                                           0.04        41513
+262   Eltseq(<SeqEnum> Q) -> SeqEnum                       0.04        48822
+245   #(<GrpAb> G) -> RngIntElt                            0.04        16232
+297   Module(<SubModLatElt> e) -> ModRng                   0.03        17772
+197   Sym(<RngIntElt> n) -> GrpPerm                        0.03        7346
+161   Order(<RngOrdIdl> I) -> RngOrd                       0.03        52920
+287   .(<ModRng> M, <RngIntElt> i) -> ModRngElt            0.03        30432
+288   *(<RngElt> c, <ModRngElt> u) -> ModRngElt            0.03        30024
+258   Self(<RngIntElt> i) -> .                             0.02        18866
+211   cat:=(<SeqEnum>~Q1, <SeqEnum> Q2)                    0.02        11208
+271   KModule(<Rng> K, <RngIntElt> n) -> ModFld            0.02        8116
+292   -(<ModRngElt> x, <ModRngElt> y) -> ModRngElt         0.02        8184
+180   Degree(<RngUPolElt> f) -> RngIntElt                  0.02        8146
+246   FiniteField(<RngIntElt> q) -> FldFin                 0.02        8116
+266   Inverse(<Map> m) -> Map                              0.02        8116
+195   Max(<RngIntElt> x, <RngIntElt> y) -> RngIntElt       0.02        7346
+212   +:=(<RngIntElt>~x, <RngIntElt> y)                    0.02        11216
+63    Conductor(<AlgEtOrd> O) -> AlgEtOrdIdl               0.02        1
+68    ColonIdeal(<AlgEtOrd> O, <AlgEtIdl> J) -> AlgEtIdl   0.02        1
+263   eq(<GrpAbElt> x, <GrpAbElt> y) -> BoolElt            0.02        18866
+270   Ilog(<RngIntElt> b, <RngIntElt> n) -> RngIntElt      0.02        8116
+303   PrimesUpTo(<RngIntElt> m) -> SeqEnum                 0.01        3252
+275   IsTrivial(<GrpAb> G) -> BoolElt                      0.01        8116
+25    *(<RngElt> e, <RngOrd> O) -> RngOrdFracIdl           0.01        16236
+296   #(<SubModLat> L) -> RngIntElt                        0.01        7344
+166   eq(<RngOrd> x, <RngOrd> y) -> BoolElt                0.01        36686
+162   One(<Str> R) -> .                                    0.01        16234
+257   Coefficients(<RngUPolElt> f) -> SeqEnum              0.01        18866
+268   subset(<SetEnum> S, <SetEnum> T) -> BoolElt          0.01        8116
+168   InternalIndecomposableSummands(<ModRng> M) -> SeqEnum0.01        2
+173   EndomorphismRingBasisMatrix(<ModRng> M) -> Mtrx      0.01        6
+302   eq(<AlgMatVElt> x, <AlgMatVElt> y) -> BoolElt        0.01        11200
+215   Zero(<Str> R) -> .                                   0.01        18870
+16    Order(<AlgEt> A, <Tup> orders) -> AlgEtOrd           0.00        1
+189   RegularRepresentation(<SeqEnum> Q) -> SeqEnum        0.00        4
+9     MaximalOrder(<FldAlg> K) -> RngOrd                   0.00        2
+108   Denominator(<RngIntElt> x) -> RngIntElt              0.00        3780
+11    cmpne(<Any> x, <Any> y) -> BoolElt                   0.00        18
+24    AbsoluteBasis(<RngOrd> O) -> SeqEnum                 0.00        2
+26    AbsoluteBasis(<RngOrdFracIdl> I) -> SeqEnum          0.00        2
+14    eq(<MonStgElt> x, <MonStgElt> y) -> BoolElt          0.00        2
+201   BaseRing(<AlgMatV> A) -> Rng                         0.00        4
+174   Infinity() -> Infty                                  0.00        6
+15    InternalMaximalOrder(<FldAlg> K) -> RngOrd           0.00        2
+176   Random(<ModTupRng> M) -> ModTupRngElt                0.00        60
+107   eq(<RngInt> x, <RngInt> y) -> BoolElt                0.00        105
+178   Matrix(<RngIntElt> n, <SeqEnum> Q) -> Mtrx           0.00        68
+179   FactoredCharacteristicPolynomial(<MtrxS> X) -> SeqEnum0.00        60
+21    eq(<FldAlg> x, <FldAlg> y) -> BoolElt                0.00        2
+169   BaseRing(<ModRng> M) -> Rng                          0.00        12
+10    HasAttribute(<Any> M, <MonStgElt> A) -> BoolElt, .   0.00        2
+170   IsVerbose(<MonStgElt> V) -> BoolElt                  0.00        73
+171   IsIrreducible(<ModRng> M) -> BoolElt, ModRng, ModRng 0.00        10
+106   IntegerRing(<RngInt> Z) -> RngInt                    0.00        105
+213   NullspaceOfTranspose(<ModMatRngElt> X) -> ModTupRng  0.00        4
+187   IndentPush()                                         0.00        2
+188   InternalIndecomposableSummands                       0.00        4
+269   #(<FldFin> R) -> RngIntElt                           0.00        11368
+190   RModule(<SeqEnum> Q) -> ModRng                       0.00        4
+191   JacobsonRadical(<ModRng> M) -> ModRng, Map           0.00        4
+192   /(<ModRng> M, <ModRng> N) -> ModRng                  0.00        4
+20    NumberField(<RngOrd> O) -> FldNum                    0.00        2
+181   ^(<RngIntElt> x, <RngIntElt> n) -> RngIntElt         0.00        38
+209   Vector(<Mtrx> X) -> Mtrx                             0.00        8
+196   [/opt/magma/current/package/Module/ModRng/decomp.m:88]0.00        2
+184   FactoredMinimalPolynomial(<MtrxS> X) -> SeqEnum      0.00        2
+198   IndentPop()                                          0.00        2
+186   Kernel(<AlgMatVElt> X) -> ModTupRng                  0.00        4
+200   Degree(<AlgMatV> X) -> RngIntElt                     0.00        4
+241   FreeAbelianGroup(<RngIntElt> n) -> GrpAb             0.00        16232
+202   IsFinite(<Rng> R) -> BoolElt, RngIntElt              0.00        4
+203   Ngens(<Rng> R) -> RngIntElt                          0.00        4
+204   Dimension(<AlgMatV> A) -> RngIntElt                  0.00        4
+125   AbsoluteBasis(<FldAlg> K) -> SeqEnum                 0.00        2
+206   Basis(<AlgMatV> A) -> SeqEnum                        0.00        4
+207   RModule(<AlgMatV> A) -> ModRng                       0.00        4
+208   CompositionSeries(<ModRng> M) -> SeqEnum, SeqEnum, AlgMatElt
+                                                           0.00        4
+289   Matrix(<Map> f) -> Mtrx                              0.00        3252
+210   BlockInfo                                            0.00        4
+291   Internal maps of type 4                              0.00        8184
+199   JacobsonRadicalOverFiniteField(<AlgMat> A) -> AlgMat 0.00        4
+293   Kernel(<Map> f) -> .                                 0.00        4092
+214   KMatrixSpace(<Rng> K, <RngIntElt> m, <RngIntElt> n) -> ModMatFld
+                                                           0.00        4
+175   RSpace(<Rng> R, <RngIntElt> n) -> ModTupRng          0.00        60
+216   BasisMatrix(<ModTupRng> M) -> ModMatRngElt           0.00        4
+177   *(<ModTupRngElt> v, <ModMatRngElt> X) -> ModTupRngElt0.00        60
+218   NullspaceOfTranspose(<AlgMatVElt> X) -> ModTupRng    0.00        4
+219   Basis(<ModTupRng> M) -> SeqEnum                      0.00        4
+220   Matrix(<RngIntElt> m, <RngIntElt> n, <Mtrx> V) -> Mtrx0.00        4
+221   #(<SetIndx> S) -> RngIntElt                          0.00        25
+182   lt(<Any> x, <Infty> y) -> BoolElt                    0.00        2
+183   lt(<RngIntElt> i, <RngIntElt> j) -> BoolElt          0.00        17787
+224   ne(<SeqEnum> S, <SeqEnum> T) -> BoolElt              0.00        3311
+185   Evaluate(<RngUPolElt> f, <RngElt> x) -> RngElt       0.00        4
+306   SetProfile(<BoolElt> v)                              0.00        1
+>

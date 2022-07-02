@@ -62,7 +62,9 @@ CreateAlgEtIdl:=function(S,gens)
         d:=Denominator(M);
         P:=hnf(crQZ(d*M));
         P:=(1/d)*crZQ(P);
-        hash:=Hash(P);
+        d:=Denominator(P); //this d might be different from Denomintor(M)
+        hash:=[d] cat [(d*P[i,j]) : j in [i..dim] , i in [1..dim]];
+        // UNSAFE hash:=Hash(P);
         zb:=MatrixQtoA(A,P);
         assert #zb eq AbsoluteDimension(A);
         I`Hash:=hash;
@@ -204,7 +206,9 @@ intrinsic ZBasis(I::AlgEtIdl)->SeqEnum[AlgEtElt]
             d:=Integers()!Denominator(M);
             P:=hnf(crQZ(d*M));
             P:=(1/d)*crZQ(P);
-            hash:=Hash(P);
+            d:=Denominator(P); //this d might be different from Denomintor(M)
+            hash:=[d] cat [(d*P[i,j]) : j in [i..dim] , i in [1..dim]];
+            // UNSAFE hash:=Hash(P);
             zb:=MatrixQtoA(A,P);
             assert #zb eq AbsoluteDimension(A);
             I`Hash:=hash;
@@ -231,7 +235,9 @@ intrinsic myHash(I::AlgEtIdl)->RngInt
         d:=Integers() ! Denominator(P);
         P:=(1/d)*crZQ(hnf(crQZ(d*P)));
         assert2 IsUpperTriangular(P);
-        hash:=Hash(P);
+        d:=Denominator(P); //this d might be different from Denomintor(M)
+        hash:=[d] cat [(d*P[i,j]) : j in [i..dim] , i in [1..dim]];
+        // UNSAFE hash:=Hash(P);
         I`Hash:=hash;
     end if;
     return I`Hash;
@@ -246,7 +252,7 @@ intrinsic 'eq'(I::AlgEtIdl , J::AlgEtIdl ) -> BoolElt
     require Algebra(I) cmpeq Algebra(J) : "The ideals are not in the same algebra.";
     require Order(I) cmpeq Order(J) : "The ideals are not over the same order.";
     if (assigned I`Generators and assigned J`Generators and Generators(I) eq Generators(J)) then
-        // we do not check over the ZBasis, because it will turn out to be slower, too many elments in there.
+        // to compute myHash we need compute an HNF. In this way we might avoid it.
         out:=true;
         //note that the set of generators is not unique for an ideal.
     else

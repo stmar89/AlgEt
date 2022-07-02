@@ -178,8 +178,8 @@ intrinsic 'eq'(x1::AlgEtElt,x2::AlgEtElt) -> BoolElt
 {Is x1=x2 ?}
     A:=Parent(x1);
     require A cmpeq Parent(x2): "The elements must belong to the same algebra.";
-    //return Components(x1) eq Components(x2);
-    return x1`Hash eq x2`Hash;
+    return (x1`Hash eq x2`Hash) and (Components(x1) eq Components(x2)); // first part is faster for negatives 
+                                                                        // and second is safer for positive
 end intrinsic;
 
 intrinsic 'eq'(x1::RngIntElt,x2::AlgEtElt) -> BoolElt

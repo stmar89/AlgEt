@@ -176,7 +176,7 @@
     t0:=Cputime();
         ooet:=FindOverOrders(Eet);
     t1:=Cputime(t0); t1;
-    tprevbest:=19.9;
+    tprevbest:=21.5;
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "FindOverOrders for %o got faster. Update the previous best known time\n",f;

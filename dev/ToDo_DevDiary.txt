@@ -50,8 +50,9 @@
       This is needed for finding a minimal set of generators of non-necessarly invertible ideals.
 
     #### OverOrders ####
-    - FindOverOrders is slower than AlgAss: investigate
-      ( eg: 900sec vs 3000sec overorders of EquationOrder of  f:=x^6 - 3*x^5 - 3*x^4 + 65*x^3 - 48*x^2 - 768*x + 4096; )
+    - FindOverOrders is slower than AlgAss in some big cases. 
+      Eg: EquationOrder of f:=x^6 - 3*x^5 - 3*x^4 + 65*x^3 - 48*x^2 - 768*x + 4096;
+      For smaller caseses we aare faster. Go figure!
 
     ### WKICM ###
     - Possible improvement to WKICM(S).
@@ -59,17 +60,28 @@
       This should be faster than creating I=HS, computing (I:I)=S and check if it is a new class.
       This is implemented in ~/253_*/AlgEt_new/WkClasses_new1.m and ..._new2.m (not on git)
       Incorporate in the main branch, after testing further.
+      UPDATE: It seems that the OLD code, i.e. the one on the repo is faster. 
+      Preliminary results suggest that often all subgroups are S-modules, and many satisfy TH=T. 
+      On the other hand, several fail to have S as MultiplicatorRing. 
+      This explains why the old code (where this was the first test) is faster.
 
     - Possible improvement to WKICM(S).
       Let T be the smallest overorder of S such that St*T is invertible in T. Let ff be the (S:T).
       For EVERY overorder S' of S such that S't*T is invertible we have that each weak equiv class of S'
       will have a representative I such that ff \in I \in T.
       If looping over the subgroups is the most expensie part, then we might save some time in this way.
+      UPDATE: it seems that generating the subgroups is not the most expensive part.
+      I am doubtful that this idea will speed up the computation.
 
-
+    - Possible improvement to WKICM(S).
+      Doing the computation prime per prime should help.
+      But there are many cases where this is still too slow with only one non-Gorestein prime.
 
     ### FIXED/DONE: kept for the record. ###
-    - move quotient stuff from OverOrders.m and MinimalGenerators.m (quo_frac_idl) into a new package.
+    - I tryed to speed up equality checking using the inbuild Hash function of the output of myHash function 
+      for both AlgEtIdl and AlgEtOrd. But for EquationOrder of  f:=x^6 - 3*x^5 - 3*x^4 + 65*x^3 - 48*x^2 - 768*x + 4096 
+      I got some collisions, so I reverted it. Also, the gain in speed was very small.
+    - moved quotient stuff from OverOrders.m and MinimalGenerators.m (quo_frac_idl) into a new package.
     - in TwoGenerators, if the ideal is knwon to be principal, then I should only return one generator. 
       We act only if #Generators gt 2.
     - I have made some cahnges in the way ColonIdeals are computed. I need to test with some wkicm

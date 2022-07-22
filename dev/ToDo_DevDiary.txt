@@ -13,6 +13,13 @@
     - stuff about AVs 
 
     TODO:
+    ### Priority ###
+    - the results of 253_test_new3.txt are quite revealing. The raw output is contained in OUTPUT_new3.txt.
+      In particular for Z[F] of x^8+16 we see that there are some orders S such the quotient T/(S:T) has a giganting number of
+      subgroups, of which only a tiny numbers are S-modules. This contrary to the behaviour we see when the quotient is smaller.
+      It seems to happen for all orders S where the quotient is big.
+      This make the coding of SubModules/StableSubGroups a top priority.
+
     ### Various ###
     - an AlgEtToAlgAss intrinsic which returns an AlgAss and an isomorphism.
     - Improve saving and printing with LLL or MinimalGenerator (that is after CRT) to get smaller output.

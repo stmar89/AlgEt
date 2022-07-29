@@ -108,10 +108,9 @@ intrinsic FindOverOrders_Minimal(R::AlgEtOrd) -> SetIndx[AlgEtOrd]
     A := Algebra(R);
     singular_primes := PrimesAbove(MaximalOrder(A)!!Conductor(R));
     queue := {@ R @};
-    output:={@ @};
+    output:={@ R @};
     done:={@ @};
     while #queue gt 0 do
-        output join:=queue;
         pot_new:=&join[ MinimalOverOrders(elt : singular_primes := singular_primes, orders := output) : elt in queue ];
         output join:=pot_new;
         done join:=queue;

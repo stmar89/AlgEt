@@ -74,7 +74,67 @@ intrinsic ResidueField(P::AlgEtIdl) -> FldFin, Map
     end if;
     return Explode(P`ResidueField);
 end intrinsic;
+    
+intrinsic QuotientVS(I::Any, J::Any, P::AlgEtIdl) -> ModRng, Map
+{Let I, J, P be fractional R-ideals such that:
+ - P is prime of of some order R, with residue field K;
+ - J in I and I/J is a vector space V over K, say of dimension d.
+ The function returns the KModule K^d=V and the natural surjection I->V (with pre-image)}
+    require forall{ z : z in ZBasis(J) | z in I} : "Teh second argument should be a subset of the first.";
+	S := Order(P);
+    assert2 P*(Ideal(S,ZBasis(I))) subset Ideal(S,ZBasis(J));
+    assert2 S subset MultiplicatorRing(I);
+    assert2 S subset MultiplicatorRing(J);
+    K,k:=ResidueField(P);
+	A := Algebra(S);
+    Q,q:=Quotient(I,J);
+	d := Ilog(#K,#Q); // d = dim(I/J) over (S/P)
+    matrices:=[Matrix(K,[ Eltseq(Q!(q(zS*(Q.j@@q)))) : j in [1..Ngens(Q)]]) : zS in ZBasis(S) ];
+    matrices:=Setseq(Seqset(matrices)); //possibly there are repetiions.
+    V:=RModule(matrices);
+    assert Dimension(V) eq d;
+    assert #Basis(V) eq Ngens(Q);
+    bijVQ:=function(y)
+        eltseq:=Eltseq(y);
+        N:=#Eltseq(eltseq[1]);
+        // y is represented in V wrt to generators that are in bijection with Q. 
+        // So even if a priori the coeficients of each coordinates of y are in the finite field K, 
+        // they are actually all in the prime field of K, and hence can be coerced into integers.
+        assert forall{i : i in [1..Ngens(Q)] | IsZero(Eltseq(eltseq[i])[2..N]) };
+        out:=&+[Q.i*(Integers()!Eltseq(eltseq[i])[1]) : i in [1..Ngens(Q)]];
+        return out; 
+    end function;
+    bij:=map< Q->V | x :-> &+[V.i*Eltseq(x)[i] : i in [1..Ngens(Q)]],
+                     y :-> bijVQ(y) >;
+    v:=map< A-> V | x:->bij(q(x)) , y:->(y@@bij)@@q >;
+    return V,v;
+end intrinsic;
 
+intrinsic QuotientVS(I::AlgEtOrd, J::AlgEtOrd, P::AlgEtIdl) -> ModRng, Map
+{Let I, J be orders, P a fractional R-ideals such that:
+ - P is prime of of some order R, with residue field K;
+ - J in I and I/J is a vector space V over K, say of dimension d.
+ The function returns the KModule K^d=V and the natural surjection I->V (with pre-image)}
+    return QuotientVS(OneIdeal(I),OneIdeal(J),P);
+end intrinsic;
+
+intrinsic QuotientVS(I::AlgEtOrd, J::AlgEtIdl, P::AlgEtIdl) -> ModRng, Map
+{Let I be an order, J and  P be fractional R-ideals such that:
+ - P is prime of of some order R, with residue field K;
+ - J in I and I/J is a vector space V over K, say of dimension d.
+ The function returns the KModule K^d=V and the natural surjection I->V (with pre-image)}
+    return QuotientVS(OneIdeal(I),J,P);
+end intrinsic;
+
+intrinsic QuotientVS(I::AlgEtIdl, J::AlgEtOrd, P::AlgEtIdl) -> ModRng, Map
+{Let J be an order, I and  P be fractional R-ideals such that:
+ - P is prime of of some order R, with residue field K;
+ - J in I and I/J is a vector space V over K, say of dimension d.
+ The function returns the KModule K^d=V and the natural surjection I->V (with pre-image)}
+    return QuotientVS(I,OneIdeal(J),P);
+end intrinsic;
+
+/* OLD version. Much more complicated 
 intrinsic QuotientVS(I::Any, J::Any, P::AlgEtIdl) -> ModFld, Map
 {
  let I, J, P be fractional R-ideals such that:
@@ -143,6 +203,7 @@ intrinsic QuotientVS(I::Any, J::Any, P::AlgEtIdl) -> ModFld, Map
     end function;
     return V, map<A->V | x:->mIV(x), y:->mVI(y) >;
 end intrinsic;
+*/
 
 
 intrinsic Quotient(I::AlgEtIdl, J::AlgEtIdl) -> GrpAb, Map

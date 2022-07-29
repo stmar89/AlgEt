@@ -3,10 +3,11 @@ AlgEt.m
 Elt.m
 TraceNorm.m
 Ord.m
+Quotients.m
 OverOrders.m
 Idl.m
+IntermediateIdeals.m
 MinimalGenerators.m
-Quotients.m
 CRT.m
 PicardGroup.m
 FactPrimes.m

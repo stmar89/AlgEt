@@ -176,7 +176,7 @@
     t0:=Cputime();
         ooet:=FindOverOrders(Eet);
     t1:=Cputime(t0); t1;
-    tprevbest:=19.4;
+    tprevbest:=16.7;
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "FindOverOrders for %o got faster. Update the previous best known time\n",f;
@@ -225,7 +225,7 @@
     t0:=Cputime();
         ooet:=FindOverOrders(Eet);
     t1:=Cputime(t0); t1;
-    tprevbest:=896;
+    tprevbest:=802.480;
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "FindOverOrders for %o got faster. Update the previous best known time\n",f;
@@ -288,4 +288,45 @@
     G2:=ProfileGraph();
     ProfilePrintByTotalTime(ProfilePruneGraphByTime(G2,30));
     */
+
+    // much bigger example
+    clear;
+	_<x>:=PolynomialRing(Integers());
+    f:=x^8+16; 
+    AttachSpec("~/packages_github/AlgEt/spec");
+    A:=EtaleAlgebra(f);
+    R:=EquationOrder(A);
+    ooR:=FindOverOrders(R);
+    data:=eval(Read("~/packages_github/AlgEt/dev/input_big_test_WKICM.txt"));
+    // data contains a Seq with entries <S,T,ff,out> where
+    // S is the ZBasis of the order S
+    // T (resp. ff) is the ZBasis of the overorder T of S (resp ff=(S:T))
+    // out is the number of intermedite S-modules between T and ff.
+    // data is already sorted wrt to the size of out.
+    oo:={@ @};
+    for x in data do
+        S:=Order([ A!z:z in x[1]]);
+        S`OverOrders:={@ T :T in ooR | S subset T @};
+        Include(~oo,S);
+    end for;
+    "IntermediateIdeals";
+    outputIntermediateIdeals:=[]; //oo[15] takes ~3200 seconds
+    for i->S in oo do
+        t0:=Cputime();
+        N:=#WKICM_bar(S : Method:="IntermediateIdeals");
+        t1:=Cputime(t0);
+        delete S`WKICM_bar;
+        out:=<i,N,t1>; out;
+        Append(~outputIntermediateIdeals,out);
+    end for;
+    "LowIndexProcess";
+    outputLowIndexProcess:=[];
+    for i->S in oo[1..14] do //the last five are very slow. oo[14] takes 400 second
+        t0:=Cputime();
+        N:=#WKICM_bar(S : Method:="LowIndexProcess");
+        t1:=Cputime(t0);
+        out:=<i,N,t1>; out;
+        Append(~outputLowIndexProcess,out);
+        assert N eq outputIntermediateIdeals[i][2];
+    end for;
 

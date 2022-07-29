@@ -105,6 +105,21 @@ end intrinsic;
 intrinsic FindOverOrders_Minimal(R::AlgEtOrd) -> SetIndx[AlgEtOrd]
 { Given an order R returns all the over orders by a recursive search of the minimal overordes.
   Based on "On the computations of overorders" by TommyHofmann and Carlo Sircana}
+    A := Algebra(R);
+    singular_primes := PrimesAbove(MaximalOrder(A)!!Conductor(R));
+    queue := {@ R @};
+    output:={@ @};
+    done:={@ @};
+    while #queue gt 0 do
+        output join:=queue;
+        pot_new:=&join[ MinimalOverOrders(elt : singular_primes := singular_primes, orders := output) : elt in queue ];
+        output join:=pot_new;
+        done join:=queue;
+        queue := pot_new diff done;
+    end while;
+    output:={@ T : T in output | Index(MaximalOrder(A),T) ne 1 @} join {@ MaximalOrder(A) @};
+    return output;
+  /*OLD
   A := Algebra(R);
   singular_primes := PrimesAbove(MaximalOrder(A)!!Conductor(R));
   queue := {@ R @};
@@ -121,6 +136,7 @@ intrinsic FindOverOrders_Minimal(R::AlgEtOrd) -> SetIndx[AlgEtOrd]
   // remove and add the maximal order to avoid creating it twice.
   output:={@ T : T in output | Index(MaximalOrder(A),T) ne 1 @} join {@ MaximalOrder(A) @};
   return output;
+  */
 end intrinsic;
 
 

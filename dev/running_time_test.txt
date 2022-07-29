@@ -176,7 +176,7 @@
     t0:=Cputime();
         ooet:=FindOverOrders(Eet);
     t1:=Cputime(t0); t1;
-    tprevbest:=21.5;
+    tprevbest:=19.4;
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "FindOverOrders for %o got faster. Update the previous best known time\n",f;
@@ -205,7 +205,7 @@
     */
 
 
-    // a bigger example here we are slower.
+    // a bigger example. after improving the recursion in FindOverOrders we have reached the timings of AlgAss (with the old method for recursion). So I believe we could still improve a lot if the equality testing is done on a lower level..
     clear;
     /*
     AttachSpec("~/packages_github/AbVarFq/packages.spec");
@@ -225,7 +225,7 @@
     t0:=Cputime();
         ooet:=FindOverOrders(Eet);
     t1:=Cputime(t0); t1;
-    tprevbest:=1300;
+    tprevbest:=896;
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "FindOverOrders for %o got faster. Update the previous best known time\n",f;

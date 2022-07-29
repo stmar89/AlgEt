@@ -57,9 +57,7 @@
       This is needed for finding a minimal set of generators of non-necessarly invertible ideals.
 
     #### OverOrders ####
-    - FindOverOrders is slower than AlgAss in some big cases. 
-      Eg: EquationOrder of f:=x^6 - 3*x^5 - 3*x^4 + 65*x^3 - 48*x^2 - 768*x + 4096;
-      For smaller caseses we aare faster. Go figure!
+    - I think that implenting equality testing for orders on a lower level would improve the situation a lot.
 
     ### WKICM ###
     - Possible improvement to WKICM(S).
@@ -92,3 +90,6 @@
     - in TwoGenerators, if the ideal is knwon to be principal, then I should only return one generator. 
       We act only if #Generators gt 2.
     - I have made some cahnges in the way ColonIdeals are computed. I need to test with some wkicm
+    - FindOverOrders seems now faster or comparable with the AlgAss version. We have improved the recursion, 
+      by lowering the number of equality testing performed. 
+      Note that if the same improvement is applied to AlgAss then we would probably lose the advantage.

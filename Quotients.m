@@ -74,13 +74,13 @@ intrinsic ResidueField(P::AlgEtIdl) -> FldFin, Map
     end if;
     return Explode(P`ResidueField);
 end intrinsic;
-    
-intrinsic QuotientVS(I::Any, J::Any, P::AlgEtIdl) -> ModRng, Map
+/* The following version is promising, but still bugged. One assertions fails.
+intrinsic QuotientVS(I::AlgEtIdl, J::AlgEtIdl, P::AlgEtIdl) -> ModRng, Map
 {Let I, J, P be fractional R-ideals such that:
  - P is prime of of some order R, with residue field K;
  - J in I and I/J is a vector space V over K, say of dimension d.
  The function returns the KModule K^d=V and the natural surjection I->V (with pre-image)}
-    require forall{ z : z in ZBasis(J) | z in I} : "Teh second argument should be a subset of the first.";
+    require J subset I : "Teh second argument should be a subset of the first.";
 	S := Order(P);
     assert2 P*(Ideal(S,ZBasis(I))) subset Ideal(S,ZBasis(J));
     assert2 S subset MultiplicatorRing(I);
@@ -89,6 +89,7 @@ intrinsic QuotientVS(I::Any, J::Any, P::AlgEtIdl) -> ModRng, Map
 	A := Algebra(S);
     Q,q:=Quotient(I,J);
 	d := Ilog(#K,#Q); // d = dim(I/J) over (S/P)
+    // SOMETHING WRONG IN HERE. I Think that there are issues when K is not a prime field
     matrices:=[Matrix(K,[ Eltseq(Q!(q(zS*(Q.j@@q)))) : j in [1..Ngens(Q)]]) : zS in ZBasis(S) ];
     matrices:=Setseq(Seqset(matrices)); //possibly there are repetiions.
     V:=RModule(matrices);
@@ -109,13 +110,15 @@ intrinsic QuotientVS(I::Any, J::Any, P::AlgEtIdl) -> ModRng, Map
     v:=map< A-> V | x:->bij(q(x)) , y:->(y@@bij)@@q >;
     return V,v;
 end intrinsic;
+*/
 
 intrinsic QuotientVS(I::AlgEtOrd, J::AlgEtOrd, P::AlgEtIdl) -> ModRng, Map
 {Let I, J be orders, P a fractional R-ideals such that:
  - P is prime of of some order R, with residue field K;
  - J in I and I/J is a vector space V over K, say of dimension d.
  The function returns the KModule K^d=V and the natural surjection I->V (with pre-image)}
-    return QuotientVS(OneIdeal(I),OneIdeal(J),P);
+	S := Order(P);
+    return QuotientVS(S!!OneIdeal(I),S!!OneIdeal(J),P);
 end intrinsic;
 
 intrinsic QuotientVS(I::AlgEtOrd, J::AlgEtIdl, P::AlgEtIdl) -> ModRng, Map
@@ -123,7 +126,8 @@ intrinsic QuotientVS(I::AlgEtOrd, J::AlgEtIdl, P::AlgEtIdl) -> ModRng, Map
  - P is prime of of some order R, with residue field K;
  - J in I and I/J is a vector space V over K, say of dimension d.
  The function returns the KModule K^d=V and the natural surjection I->V (with pre-image)}
-    return QuotientVS(OneIdeal(I),J,P);
+	S := Order(P);
+    return QuotientVS(S!!OneIdeal(I),S!!J,P);
 end intrinsic;
 
 intrinsic QuotientVS(I::AlgEtIdl, J::AlgEtOrd, P::AlgEtIdl) -> ModRng, Map
@@ -131,22 +135,21 @@ intrinsic QuotientVS(I::AlgEtIdl, J::AlgEtOrd, P::AlgEtIdl) -> ModRng, Map
  - P is prime of of some order R, with residue field K;
  - J in I and I/J is a vector space V over K, say of dimension d.
  The function returns the KModule K^d=V and the natural surjection I->V (with pre-image)}
-    return QuotientVS(I,OneIdeal(J),P);
+	S := Order(P);
+    return QuotientVS(S!!I,S!!OneIdeal(J),P);
 end intrinsic;
 
-/* OLD version. Much more complicated 
-intrinsic QuotientVS(I::Any, J::Any, P::AlgEtIdl) -> ModFld, Map
+// OLD version. Much more complicated 
+intrinsic QuotientVS(I::AlgEtIdl, J::AlgEtIdl, P::AlgEtIdl) -> ModRng, Map
 {
  let I, J, P be fractional R-ideals such that:
  - P is prime of of some order R;
  - J in I and I/J is a vector space over R/P, say of dimension d;
  the function returns the KModule K^d=V and the natural surjection I->V (with pre-image)}
-    require {Type(I),Type(J)} subset {AlgEtOrd,AlgEtIdl} : "I and J must be either orders (AlgEtOrd) or ideals (AlgEtIdl)";
-    require J subset I : "Teh second argument should be a subset of the first.";
 	S := Order(P);
-    assert2 P*(Ideal(S,ZBasis(I))) subset Ideal(S,ZBasis(J));
-    assert2 S subset MultiplicatorRing(I);
-    assert2 S subset MultiplicatorRing(J);
+    require Order(I) eq S and Order(J) eq S : "the ideals must be over the same order ";
+    require J subset I : "Teh second argument should be a subset of the first.";
+    assert2 P*I subset J;
     K,k:=ResidueField(P);
 	A := Algebra(S);
 	d := Ilog(#K,Integers() ! (Index(J)/Index(I))); // d = dim(I/J) over (S/P)
@@ -203,8 +206,6 @@ intrinsic QuotientVS(I::Any, J::Any, P::AlgEtIdl) -> ModFld, Map
     end function;
     return V, map<A->V | x:->mIV(x), y:->mVI(y) >;
 end intrinsic;
-*/
-
 
 intrinsic Quotient(I::AlgEtIdl, J::AlgEtIdl) -> GrpAb, Map
 { given fractional ideals J subset I, returns the abelian group Q=I/J together with the quotient map q:I->J } 
@@ -221,7 +222,20 @@ intrinsic Quotient(I::AlgEtIdl, J::AlgEtIdl) -> GrpAb, Map
     return Q,q;
 end intrinsic;
 
-
+intrinsic Quotient(I::AlgEtMod, J::AlgEtMod) -> GrpAb, Map
+{ given S-modules J subset I, returns the abelian group Q=I/J together with the quotient map q:I->J } 
+    // if J is not inside I, an error occurs while forming Q. so no need to check in advance
+    A:=UniverseAlgebra(I);
+	zbI := ZBasis(I);
+	N := #zbI;
+	F := FreeAbelianGroup(N);
+	rel := [F ! cc : cc in AbsoluteCoordinates(ZBasis(J),I)];
+	mFI := map<F->A| x:->&+[Eltseq(x)[i]*zbI[i] : i in [1..N]]>;
+	mIF := map<A->F| x:-> F ! AbsoluteCoordinates([x],I)[1]>;
+	Q,qFQ := quo<F|rel>; //q:F->Q. Q is an "abstract" abelian group isomorphic to I/J.
+    q:=map< A->Q | x:->qFQ(mIF(x)) , y:-> mFI(y@@qFQ) >; 
+    return Q,q;
+end intrinsic;
 
 
 /* TEST

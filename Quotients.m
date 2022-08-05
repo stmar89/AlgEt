@@ -222,22 +222,6 @@ intrinsic Quotient(I::AlgEtIdl, J::AlgEtIdl) -> GrpAb, Map
     return Q,q;
 end intrinsic;
 
-intrinsic Quotient(I::AlgEtMod, J::AlgEtMod) -> GrpAb, Map
-{ given S-modules J subset I, returns the abelian group Q=I/J together with the quotient map q:I->J } 
-    // if J is not inside I, an error occurs while forming Q. so no need to check in advance
-    A:=UniverseAlgebra(I);
-	zbI := ZBasis(I);
-	N := #zbI;
-	F := FreeAbelianGroup(N);
-	rel := [F ! cc : cc in AbsoluteCoordinates(ZBasis(J),I)];
-	mFI := map<F->A| x:->&+[Eltseq(x)[i]*zbI[i] : i in [1..N]]>;
-	mIF := map<A->F| x:-> F ! AbsoluteCoordinates([x],I)[1]>;
-	Q,qFQ := quo<F|rel>; //q:F->Q. Q is an "abstract" abelian group isomorphic to I/J.
-    q:=map< A->Q | x:->qFQ(mIF(x)) , y:-> mFI(y@@qFQ) >; 
-    return Q,q;
-end intrinsic;
-
-
 /* TEST
 
 */

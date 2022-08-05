@@ -14,26 +14,23 @@
 
     TODO:
     ### Priority ###
-    - the results of 253_test_new3.txt are quite revealing. The raw output is contained in OUTPUT_new3.txt.
-      In particular for Z[F] of x^8+16 we see that there are some orders S such the quotient T/(S:T) has a giganting number of
-      subgroups, of which only a tiny numbers are S-modules. This contrary to the behaviour we see when the quotient is smaller.
-      It seems to happen for all orders S where the quotient is big.
-      This make the coding of SubModules/StableSubGroups a top priority.
+    - I have recently added the Type AlgEtMod. A lot more refinement is needed.
+    - Then I should convert PowerOfBass.m
+    
+    ### Reorganize Quotients.m ###
+    - Make Quotient(ZBasis(I),ZBAsis(J)), which returns Q,q. Note that q has domain AlgEt, so even if I is not created, we are fine.
+    - Then Quotient for AlgEtIdl, AlgEtOrd and AlgEtMod should call this intrinsic.
 
     ### Various ###
     - an AlgEtToAlgAss intrinsic which returns an AlgAss and an isomorphism.
     - Improve saving and printing with LLL or MinimalGenerator (that is after CRT) to get smaller output.
     - add MaxCMTypeOverOrders
-    - Make an intrinsic that creates quotiens and takes as input either I,J with J in I, DONE
-      or I and zbJ, with zbJ a ZBasis inside I. NOT DONE YET
-      Sometimes I don't need to create the denominator ideal, as in TwoGenerating Set. Checke where else.
 
     ### TEST SUIT ###
     - It seems that in the test suit I dont have an order with CMType>2. Add ZFV of x^8+16. (<10 sec for WKICM). 
     - For each test, track the best running time. 
       If something get slower or faster than a previous version (up to some error)
     
-
     ### PICARD GROUP ###
     - Update: in th test suit I have made a for loop that shows that the timings for AlgEt is very inconsistent.
         Sometimes it is faster than RngOld, sometimes it is much slower. I don't understand!
@@ -61,16 +58,6 @@
 
     ### WKICM ###
     - Possible improvement to WKICM(S).
-      Given a new subgroups H, check first it HT=T. If not, then discard H. 
-      This should be faster than creating I=HS, computing (I:I)=S and check if it is a new class.
-      This is implemented in ~/253_*/AlgEt_new/WkClasses_new1.m and ..._new2.m (not on git)
-      Incorporate in the main branch, after testing further.
-      UPDATE: It seems that the OLD code, i.e. the one on the repo is faster. 
-      Preliminary results suggest that often all subgroups are S-modules, and many satisfy TH=T. 
-      On the other hand, several fail to have S as MultiplicatorRing. 
-      This explains why the old code (where this was the first test) is faster.
-
-    - Possible improvement to WKICM(S).
       Let T be the smallest overorder of S such that St*T is invertible in T. Let ff be the (S:T).
       For EVERY overorder S' of S such that S't*T is invertible we have that each weak equiv class of S'
       will have a representative I such that ff \in I \in T.
@@ -93,3 +80,9 @@
     - FindOverOrders seems now faster or comparable with the AlgAss version. We have improved the recursion, 
       by lowering the number of equality testing performed. 
       Note that if the same improvement is applied to AlgAss then we would probably lose the advantage.
+    - IntermediateIdeals the results of 253_test_new3.txt are quite revealing. The raw output is contained in OUTPUT_new3.txt.
+      In particular for Z[F] of x^8+16 we see that there are some orders S such the quotient T/(S:T) has a giganting number of
+      subgroups, of which only a tiny numbers are S-modules. This contrary to the behaviour we see when the quotient is smaller.
+      This has been implemented. The recomputation of 148_* took around 30hours, compared to the 9 original months. 
+      I have restart the recomputation of the whole set.
+

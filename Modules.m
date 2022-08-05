@@ -273,33 +273,49 @@ intrinsic Index(J::AlgEtMod, I::AlgEtMod) -> Any
   return out;
 end intrinsic;
 
-/* CONTINUE from here
 
 //----------
 // Coercion
 //----------
 
-intrinsic '!!'(T::AlgEtOrd,I::AlgEtIdl) -> AlgEtIdl
-{Given an S-ideal I and an order T, returns the extension IT as a T-ideal. Note that if T is in S, then IT=I}
+intrinsic '!!'(T::AlgEtOrd,I::AlgEtMod) -> AlgEtMod
+{Given an S-module I and an order T, returns the extension IT as a T-module. Note that if T is in S, then IT=I}
     if Order(I) eq T then
         return I;
     elif T subset Order(I) then
         //in this case, Generators of I might not be a generating set over T
-        id:=Ideal(T,ZBasis(I));
+        _,m:=UniverseAlgebra(I);
+        id:=Module(T,m,ZBasis(I));
         id`ZBasis:=ZBasis(I); //the ZBasis stays the same..
-        if assigned I`MultiplicatorRing then
-            id`MultiplicatorRing:=I`MultiplicatorRing; //..as well as the MultiplicatorRing
-        end if;
         return id;
     else //in this case Order(I) is strictly contained in T
-        out:=Ideal(T,Generators(I));
-        if (assigned T`IsMaximal and IsMaximal(T)) or (assigned I`IsInvertible and IsInvertible(I)) then
-            out`IsInvertible:=true;
-            out`MultiplicatorRing:=T;
-        end if;
+        _,m:=UniverseAlgebra(I);
+        out:=Module(T,m,Generators(I));
         return out;
     end if;
 end intrinsic;
+
+//----------
+// Quotients
+//----------
+intrinsic Quotient(I::AlgEtMod, J::AlgEtMod) -> GrpAb, Map
+{ given S-modules J subset I, returns the abelian group Q=I/J together with the quotient map q:I->J } 
+    // if J is not inside I, an error occurs while forming Q. so no need to check in advance
+    A:=UniverseAlgebra(I);
+	zbI := ZBasis(I);
+	N := #zbI;
+	F := FreeAbelianGroup(N);
+	rel := [F ! cc : cc in AbsoluteCoordinates(ZBasis(J),I)];
+	mFI := map<F->A| x:->&+[Eltseq(x)[i]*zbI[i] : i in [1..N]]>;
+	mIF := map<A->F| x:-> F ! AbsoluteCoordinates([x],I)[1]>;
+	Q,qFQ := quo<F|rel>; //q:F->Q. Q is an "abstract" abelian group isomorphic to I/J.
+    q:=map< A->Q | x:->qFQ(mIF(x)) , y:-> mFI(y@@qFQ) >; 
+    return Q,q;
+end intrinsic;
+
+
+/* CONTINUE from here
+
 //----------
 // Special ideals
 //----------
@@ -603,6 +619,5 @@ end intrinsic;
     assert N2 ne NE;
     assert N2 subset NE;
     assert not NE subset N2;
-    Q,q:=Quotient(NE,N2);
     
 */

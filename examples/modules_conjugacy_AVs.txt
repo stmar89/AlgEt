@@ -1,0 +1,158 @@
+/* vim: set syntax=magma :*/
+
+/////////////////////////////////////////////////////
+// Stefano Marseglia, Utrecht University, s.marseglia@uu.nl
+// http://www.staff.science.uu.nl/~marse004/
+/////////////////////////////////////////////////////
+
+/*
+    Here you can find the code to reproduce the examples in the paper:
+        "Modules over orders, conjugacy classes of integral matrices, and abelian varieties over finite fields",
+        Stefano Marseglia
+        https://arxiv.org/abs/2208.05409
+    One needs several functionalities for étle algebra.
+    Please download the following repository on your machine:
+        https://github.com/stmar89/AlgEt
+
+    WARNING: Some parts of the code requires significant optimizations. In other words, as of now, it is very slow...
+    In particular, the isomorphism testing (IsIsomorphic) is based on results from 
+        "The conjugacy problem in GL(n, Z)", T. Hofmann, B. Eick and E. A. O’Brien, J. Lond. Math. Soc. (2) 100 (2019), no. 3, 731–756.
+    and the corresponding implementation of their code, which is in MAGMA.
+    In the paper, we suggest to use instead the results from
+        "Computation of lattice isomorphisms and the integral matrix similarity problem", T. Hofmann, W. Bley and H. Johnston,
+        https://arxiv.org/abs/2202.03526
+    Their code at the moment is not implemented in MAGMA, but only in HECKE/OSCAR. If speed is crucial for your purposes, we advise to print the list of candidate representatives, (variable "candidates" below) and load it in HECKE/OSCAR.
+    We have not tested this procedure.
+*/
+
+// The following code reproduces the computations for Examples 6.1 and 6.2. See comments below for more details.
+
+// Modify the following lines with the folder where you have downloaded the repository https://github.com/stmar89/AlgEt
+AttachSpec("~/packages_github/AlgEt/spec");
+Attach("~/packages_github/AlgEt/Modules.m");
+Attach("~/packages_github/AlgEt/IntermediateModules.m");
+Attach("~/packages_github/AlgEt/IsomModules.m");
+
+_<x>:=PolynomialRing(Integers());
+m1:=x^2-x+3;
+m2:=x^2+x-3;
+s1:=2;
+s2:=1;
+h:=m1^s1*m2^s2; h;
+q:=Integers() ! Truncate( ConstantCoefficient(h)^(2/Degree(h)) );
+
+// Example 6.1
+// We want to compute the Fq-isomorphism classes of abelian varieties in the isogeny class determined by h.
+
+K1:=NumberField(m1);
+K2:=NumberField(m2);
+K:=EtaleAlgebra([K1,K2]); // K = K1 x K2
+pi:=PrimitiveElement(K); //
+R:=Order([pi,q/pi]);
+O:=MaximalOrder(K);
+V:=EtaleAlgebra([K1,K1,K2]); // V = K1^s1 x K2^s2
+m:=NaturalAction(K,V); // m:K -> V component-wise diagonal action of K on V
+Vnf,Ve:=NumberFields(V);
+MO:=Module(R,m,<1*MaximalOrder(Vnf[i]) : i in [1..#Vnf]>);
+ff:=O!!Conductor(R);
+test,ff_prod:=IsProductOfIdeals(ff); 
+// we write ff = ff1 x ff2 with ff1 in K1 and ff2 in K2.
+assert test;
+
+// The following works for this Example, not in general.
+// It will be updated shortly.
+// We use Theorem 3.2 from the paper.
+Mff:=Module(R,m,<ff_prod[1],ff_prod[1],ff_prod[2]>);
+gensMff:=Generators(Mff);
+//candidates:=IntermediateModules(MO,Mff); 
+// The above line is very slow for some reason.
+// I will instead list the subgroups and generate the R modules from them.
+Q,q:=Quotient(MO,Mff); Q;
+subs:=Subgroups(Q);
+candidates:=[ Module(R,m,[ g@@q : g in Generators(H`subgroup)] cat gensMff) : H in subs ];
+#candidates;
+// We remove duplicates
+time candidates:=Seqset(candidates);
+candidates:=Setseq(candidates);
+#candidates;
+MO:=O!!MO;
+// We keep only the candidates whose extension to O equals MO. See Theorem 3.2
+candidates:=[ I : I in candidates | O!!I eq MO ];
+#candidates;
+
+// We sieve out a minimal set of representatives of the isomorphism classes.
+// This look will take some time.
+classes:=[];
+for I in candidates do
+    printf ".";
+    if not exists{ J : J in classes | IsIsomorphic(I,J) } then
+        printf "!";
+        Append(~classes,I);
+    end if;
+end for;
+// classes now contains the representatives of the isomorphism classes of the sub-R-modules of V.
+// By Theorem 5.1, they correspond to the Fq-isomorphism classes of abelian varieties in the isogeny class determined by h.
+
+
+// Example 6.2
+// We want to find the representatives of the conjugacy classes of integral matrices with minimal polynomial m1*m2 and characteristic polynomial h.
+// This code is essentially the same of the one from the previous example, but replacing R=Z[pi,q/pi] with R=Z[pi]. Since E is smaller than R, there will be more candidates. So this computation will take more time to run than the previous one.
+
+K1:=NumberField(m1);
+K2:=NumberField(m2);
+K:=EtaleAlgebra([K1,K2]); // K = K1 x K2
+pi:=PrimitiveElement(K); //
+R:=Order([pi]);
+O:=MaximalOrder(K);
+V:=EtaleAlgebra([K1,K1,K2]); // V = K1^s1 x K2^s2
+m:=NaturalAction(K,V); // m:K -> V component-wise diagonal action of K on V
+Vnf,Ve:=NumberFields(V);
+MO:=Module(R,m,<1*MaximalOrder(Vnf[i]) : i in [1..#Vnf]>);
+ff:=O!!Conductor(R);
+test,ff_prod:=IsProductOfIdeals(ff); 
+// we write ff = ff1 x ff2 with ff1 in K1 and ff2 in K2.
+assert test;
+
+// The following works for this Example, not in general.
+// It will be updated shortly.
+// We use Theorem 3.2 from the paper.
+Mff:=Module(R,m,<ff_prod[1],ff_prod[1],ff_prod[2]>);
+gensMff:=Generators(Mff);
+//candidates:=IntermediateModules(MO,Mff); 
+// The above line is very slow for some reason.
+// I will instead list the subgroups and generate the R modules from them.
+Q,q:=Quotient(MO,Mff); Q;
+subs:=Subgroups(Q);
+candidates:=[ Module(R,m,[ g@@q : g in Generators(H`subgroup)] cat gensMff) : H in subs ];
+#candidates;
+// We remove duplicates
+time candidates:=Seqset(candidates);
+candidates:=Setseq(candidates);
+#candidates;
+MO:=O!!MO;
+// We keep only the candidates whose extension to O equals MO. See Theorem 3.2
+candidates:=[ I : I in candidates | O!!I eq MO ];
+#candidates;
+
+// We sieve out a minimal set of representatives of the isomorphism classes.
+// This look will take some time.
+classes:=[];
+for I in candidates do
+    printf ".";
+    if not exists{ J : J in classes | IsIsomorphic(I,J) } then
+        printf "!";
+        Append(~classes,I);
+    end if;
+end for;
+// classes now contains the representatives of the isomorphism classes of the sub-R-modules of V.
+// By Theorem 4.1, they correspond to the conjugacy classes of matrices with with minimal polynomial m1*m2 and characteristic polynomial h.
+// We now print the 4 matrices:
+for I in classes do
+   mat:=Matrix(AbsoluteCoordinates([m(F)*z : z in ZBasis(I)],ZBasis(I)));
+   assert MinimalPolynomial(mat) eq m1*m2;
+   assert CharacteristicPolynomial(mat) eq h;
+   mat;
+end for;
+
+
+

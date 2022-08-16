@@ -25,7 +25,9 @@
     We have not tested this procedure.
 */
 
-// The following code reproduces the computations for Examples 6.1 and 6.2. See comments below for more details.
+// ###################
+// ### Example 6.1 ###
+// ###################
 
 // Modify the following lines with the folder where you have downloaded the repository https://github.com/stmar89/AlgEt
 AttachSpec("~/packages_github/AlgEt/spec");
@@ -40,9 +42,6 @@ s1:=2;
 s2:=1;
 h:=m1^s1*m2^s2; h;
 q:=Integers() ! Truncate( ConstantCoefficient(h)^(2/Degree(h)) );
-
-// Example 6.1
-// We want to compute the Fq-isomorphism classes of abelian varieties in the isogeny class determined by h.
 
 K1:=NumberField(m1);
 K2:=NumberField(m2);
@@ -93,11 +92,24 @@ end for;
 // classes now contains the representatives of the isomorphism classes of the sub-R-modules of V.
 // By Theorem 5.1, they correspond to the Fq-isomorphism classes of abelian varieties in the isogeny class determined by h.
 
-
-// Example 6.2
+// ###################
+// ### Example 6.2 ###
+// ###################
 // We want to find the representatives of the conjugacy classes of integral matrices with minimal polynomial m1*m2 and characteristic polynomial h.
 // This code is essentially the same of the one from the previous example, but replacing R=Z[pi,q/pi] with R=Z[pi]. Since E is smaller than R, there will be more candidates. So this computation will take more time to run than the previous one.
 
+// Modify the following lines with the folder where you have downloaded the repository https://github.com/stmar89/AlgEt
+AttachSpec("~/packages_github/AlgEt/spec");
+Attach("~/packages_github/AlgEt/Modules.m");
+Attach("~/packages_github/AlgEt/IntermediateModules.m");
+Attach("~/packages_github/AlgEt/IsomModules.m");
+_<x>:=PolynomialRing(Integers());
+m1:=x^2-x+3;
+m2:=x^2+x-3;
+s1:=2;
+s2:=1;
+h:=m1^s1*m2^s2; h;
+q:=Integers() ! Truncate( ConstantCoefficient(h)^(2/Degree(h)) );
 K1:=NumberField(m1);
 K2:=NumberField(m2);
 K:=EtaleAlgebra([K1,K2]); // K = K1 x K2
@@ -134,8 +146,10 @@ MO:=O!!MO;
 candidates:=[ I : I in candidates | O!!I eq MO ];
 #candidates;
 
-// We sieve out a minimal set of representatives of the isomorphism classes.
-// This look will take some time.
+// We sieve out a minimal set of representatives of the isomorphism classes
+
+// ### MAGMA only: very slow (a week or so)
+// We recommend to use the julia+Oscar version below
 classes:=[];
 for I in candidates do
     printf ".";
@@ -146,13 +160,56 @@ for I in candidates do
 end for;
 // classes now contains the representatives of the isomorphism classes of the sub-R-modules of V.
 // By Theorem 4.1, they correspond to the conjugacy classes of matrices with with minimal polynomial m1*m2 and characteristic polynomial h.
-// We now print the 4 matrices:
+// We now print the 6 matrices:
 for I in classes do
-   mat:=Matrix(AbsoluteCoordinates([m(F)*z : z in ZBasis(I)],ZBasis(I)));
+   mat:=Matrix(AbsoluteCoordinates([m(pi)*z : z in ZBasis(I)],ZBasis(I)));
    assert MinimalPolynomial(mat) eq m1*m2;
    assert CharacteristicPolynomial(mat) eq h;
-   mat;
+   printf "%o\n\n",mat;
 end for;
 
+// ### julia+Oscar: a few minutes
+// we first print the entries of candidates in a file that will be loaded in julia
+    file:="Ex6_2_candidates.txt"; 
+    Pipe("rm " cat file cat " || true ",""); 
+    str:="[\n";
+    for i->I in candidates do
+        mat:=Matrix(AbsoluteCoordinates([m(F)*z : z in ZBasis(I)],ZBasis(I)));
+        str cat:=Sprintf("%o,\n", Eltseq(mat));
+    end for;
+    str:=Prune(Prune(str)) cat "\n]\n";
+    fprintf file, "%o",str;
+// Copy the file "Ex6_2_candidates.txt" on a machine with julia+Oscar installed.
+// Open julia and run the following code
+    using Oscar;
+    coeffs = eval(Meta.parse(open(f->read(f, String), "Ex6_2_candidates.txt")));
+    n = Int(sqrt(length(coeffs[1])));
+    candidates = [ matrix(ZZ,n,n,coeffs[1]) ];
+    for i in 2:length(coeffs)
+        push!(candidates,matrix(ZZ,n,n,coeffs[i]));
+    end
+    classes = [candidates[1]];
+    perc_old=0;
+    for i in 2:length(candidates)
+        perc = Int(trunc(100*i/length(candidates)));
+        if perc > perc_old
+            perc_old = perc;
+            print(perc,"% ")
+        end
+        I = candidates[i];
+        test = true;
+        for j in 1:length(classes)
+            J = classes[j];
+            fl , T = is_GLZ_conjugate(I,J);
+            if fl
+                test = false;
+                break; # break J
+            end;
+        end;
+        if test
+            push!(classes,I);
+        end;
+    end;
+    classes
 
 

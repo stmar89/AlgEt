@@ -492,8 +492,8 @@ intrinsic IsIsomorphic(I::AlgEtIdl, J::AlgEtIdl : GRH:=false ) -> BoolElt, AlgAs
     test:=IsWeakEquivalent(I,J); //if so I=(I:J)*J and (I:J) is invertible in its MultiplicatorRing
     if test then
         S:=MultiplicatorRing(I);
-        IS:=S!I;
-        JS:=S!J;
+        IS:=S!!I;
+        JS:=S!!J;
         CIJ:=ColonIdeal(IS,JS);
         test2,x:= IsPrincipal(CIJ : GRH:=GRH );
         if test2 then

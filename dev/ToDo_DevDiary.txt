@@ -15,6 +15,7 @@
     TODO:
     ### Priority ###
     - I have recently added the Type AlgEtMod. A lot more refinement is needed.
+    - Make an intrinsic IntermediateModulesWithTrivialExtension to list M s.t. O!!M=MO. Experiments shows that the number of such modules is much smaller.
     - Then I should convert PowerOfBass.m
     
     ### Reorganize Quotients.m ###

@@ -33,7 +33,6 @@ intrinsic MinimalIntermediateModules(I::AlgEtMod,J::AlgEtMod)->SetIndx[AlgEtMod]
         // The first case occurs if p does not divide the order of N.
         // The second occurs if p divides the order of N.
         // QED
-print "."; 
         for p in PrimeDivisors(Index(I,J)) do
             mp:=hom<Q->Q | x:->p*x>;
             Qp:=Kernel(mp);

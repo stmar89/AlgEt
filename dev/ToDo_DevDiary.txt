@@ -16,9 +16,6 @@
     ### Priority ###
     - I have recently added the Type AlgEtMod. A lot more refinement is needed.
     - Then I should convert PowerOfBass.m
-    - In IntermediateModulesWithPrescribedExtension it would be better to list the modules from the maximal submodules: 
-      Let M0 be the top extension.
-      if M1 c M2 and O!!M2 ne MO then O!!M1 ne MO as well. This means that I can remove M2 from the queue and make the recursion much smaller! 
     
     ### Reorganize Quotients.m ###
     - Make Quotient(ZBasis(I),ZBAsis(J)), which returns Q,q. Note that q has domain AlgEt, so even if I is not created, we are fine.
@@ -73,6 +70,7 @@
       But there are many cases where this is still too slow with only one non-Gorestein prime.
 
     ### FIXED/DONE: kept for the record. ###
+    - Introduced IntermediateModulesWithTrivialExtension, which uses MaximalIntermediateModules. Faster since we can skip some part of the recursion.
     - Introduced IntermediateIdealsWithTrivialExtension, which uses MaximalIntermediateIdeals. Faster since we can skip some part of the recursion.
     - I tryed to speed up equality checking using the inbuild Hash function of the output of myHash function 
       for both AlgEtIdl and AlgEtOrd. But for EquationOrder of  f:=x^6 - 3*x^5 - 3*x^4 + 65*x^3 - 48*x^2 - 768*x + 4096 

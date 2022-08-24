@@ -15,7 +15,7 @@ declare verbose IntermediateIdeals, 2;
 
 
 intrinsic MinimalIntermediateIdeals(I::AlgEtIdl,J::AlgEtIdl)->SetIndx[AlgEtIdl]
-{ Given fractional S-ideals J subset I, returns the minimal with respect to inclusion fractional S-ideals K such that J subset K subset I. }
+{ Given fractional S-ideals J subset I, returns the minimal (with respect to inclusion) fractional S-ideals K such that J subset K subset I. }
     assert2 J subset I; // "the ideal J needs to be inside I";
     S:=Order(I);
     assert2 S eq Order(J); // "The ideals must be over the same order";
@@ -56,6 +56,21 @@ intrinsic MinimalIntermediateIdeals(I::AlgEtIdl,J::AlgEtIdl)->SetIndx[AlgEtIdl]
     end if;
 end intrinsic;
 
+intrinsic MaximalIntermediateIdeals(I::AlgEtIdl,J::AlgEtIdl)->SetIndx[AlgEtIdl]
+{ Given fractional S-ideals J subset I, returns the maximal (with respect to inclusion) fractional S-ideals K such that J subset K subset I. }
+    assert2 J subset I; // "the ideal J needs to be inside I";
+    S:=Order(I);
+    assert2 S eq Order(J); // "The ideals must be over the same order";
+    if J eq I then 
+        return {@ @};
+    else
+        // I c K c J is a maximal intermediate module iff K^t is a minimal intermediate module J^t c K^t c I^t.
+        min_duals:=MinimalIntermediateIdeals(TraceDualIdeal(J), TraceDualIdeal(I));
+        max:=[ TraceDualIdeal(K) : K in min_duals ];
+        return max;
+    end if;
+end intrinsic;
+
 intrinsic IntermediateIdeals(I::AlgEtIdl,J::AlgEtIdl)->SetIndx[AlgEtIdl]
 { Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that J subset K subset I. They are produced recursively using from the minimal ones }
     require J subset I : "The ideal J needs to be inside I";
@@ -89,6 +104,57 @@ intrinsic IntermediateIdealsWithPrescribedMultiplicatorRing(I::AlgEtIdl,J::AlgEt
     end while;
     return output;
 end intrinsic;
+
+intrinsic IntermediateIdealsWithTrivialExtension(I::AlgEtIdl,J::AlgEtIdl, O::AlgEtOrd)->SetIndx[AlgEtIdl]
+{ Given fractional S-ideals J subset I, returns all the fractional S-ideals K J subset K subset I, and O!!K = I. 
+  Note that we need O subset (J:J).
+  They are produced recursively using from the maximal ones }
+    require J subset I : "The ideal J needs to be inside I";
+    require S eq Order(J) : "The ideals must be over the same order";
+    S:=Order(I);
+    require S subset O : "O is not an overorder of Order(I)";
+    IO:=O!!I;
+    require S!!IO eq I : "J is not an O-ideal";
+    queue:={@ I @};
+    output:={@  @};
+    done:={@ @};
+    while #queue gt 0 do
+        pot_new:=&join[MaximalIntermediateIdeals(elt,J) : elt in queue ];
+        pot_new:=[ K : K in pot_new | O!!K eq IO ]; //we keep only the ones with trivial extension
+        output join:={@ K : K in pot_new | not K in done @};
+        done join:=queue;
+        // Note: if O!!K is not IO, then all the submodules of K will also not have trivial extension IO.
+        // Hence we don't need to continue the recursion on K.
+        queue := pot_new diff done; 
+    end while;
+    return output;
+end intrinsic;
+
+intrinsic IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing(I::AlgEtIdl,J::AlgEtIdl, O::AlgEtOrd)->SetIndx[AlgEtIdl]
+{ Given fractional S-ideals J subset I, returns all the fractional S-ideals K J subset K subset I, O!!K = I, and (K:K) eq S.
+  Note that we need O subset (J:J).
+  They are produced recursively using from the maximal ones }
+    require J subset I : "The ideal J needs to be inside I";
+    S:=Order(I);
+    require S eq Order(J) : "The ideals must be over the same order";
+    require S subset O : "O is not an overorder of Order(I)";
+    IO:=O!!I;
+    require S!!IO eq I : "J is not an O-ideal";
+    queue:={@ I @};
+    output:={@  @};
+    done:={@ @};
+    while #queue gt 0 do
+        pot_new:=&join[MaximalIntermediateIdeals(elt,J) : elt in queue ];
+        pot_new:=[ K : K in pot_new | O!!K eq IO ]; //we keep only the ones with trivial extension
+        output join:={@ K : K in pot_new | not K in done and MultiplicatorRing(K) eq S @};
+        done join:=queue;
+        // Note: if O!!K is not IO, then all the submodules of K will also not have trivial extension IO.
+        // Hence we don't need to continue the recursion on K.
+        queue := pot_new diff done; 
+    end while;
+    return output;
+end intrinsic;
+
 /* // this version of the code seems to be a tiny bit slower
 
 intrinsic MinimalIntermediateIdealsVS(I::AlgEtIdl,J::AlgEtIdl : primes:=[])->SetIndx[AlgEtIdl]

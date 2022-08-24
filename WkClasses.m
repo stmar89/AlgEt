@@ -64,9 +64,12 @@ intrinsic WKICM_bar(S::AlgEtOrd : Method:="Auto") -> SeqEnum
                     //     end if;
                     // end for;
                      
-                    // NEW CODE based on IntermediateIdealsWithPrescribedMultiplicatorRing
-                    vprintf WkClasses,2:"Using code with IntermediateIdealsWithPrescribedMultiplicatorRing: T/(S:T) = %o\n",Q;
-                    idls:=IntermediateIdealsWithPrescribedMultiplicatorRing(T1,ff);
+                    // // NEW CODE based on IntermediateIdealsWithPrescribedMultiplicatorRing
+                    // vprintf WkClasses,2:"Using code with IntermediateIdealsWithPrescribedMultiplicatorRing: T/(S:T) = %o\n",Q;
+                    // idls:=IntermediateIdealsWithPrescribedMultiplicatorRing(T1,ff);
+                    // NEW CODE based on IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing
+                    vprintf WkClasses,2:"Using code with IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing: T/(S:T) = %o\n",Q;
+                    idls:=IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing(T1,ff,T);
                     for I in idls do
                         if not exists{ J : J in seqWk_bar | IsWeakEquivalent(I,J) } then
                             Append(~seqWk_bar,I);

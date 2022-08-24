@@ -66,7 +66,7 @@ intrinsic MaximalIntermediateIdeals(I::AlgEtIdl,J::AlgEtIdl)->SetIndx[AlgEtIdl]
     else
         // I c K c J is a maximal intermediate module iff K^t is a minimal intermediate module J^t c K^t c I^t.
         min_duals:=MinimalIntermediateIdeals(TraceDualIdeal(J), TraceDualIdeal(I));
-        max:=[ TraceDualIdeal(K) : K in min_duals ];
+        max:={@ TraceDualIdeal(K) : K in min_duals @};
         return max;
     end if;
 end intrinsic;
@@ -110,8 +110,8 @@ intrinsic IntermediateIdealsWithTrivialExtension(I::AlgEtIdl,J::AlgEtIdl, O::Alg
   Note that we need O subset (J:J).
   They are produced recursively using from the maximal ones }
     require J subset I : "The ideal J needs to be inside I";
-    require S eq Order(J) : "The ideals must be over the same order";
     S:=Order(I);
+    require S eq Order(J) : "The ideals must be over the same order";
     require S subset O : "O is not an overorder of Order(I)";
     IO:=O!!I;
     require S!!IO eq I : "J is not an O-ideal";
@@ -120,7 +120,7 @@ intrinsic IntermediateIdealsWithTrivialExtension(I::AlgEtIdl,J::AlgEtIdl, O::Alg
     done:={@ @};
     while #queue gt 0 do
         pot_new:=&join[MaximalIntermediateIdeals(elt,J) : elt in queue ];
-        pot_new:=[ K : K in pot_new | O!!K eq IO ]; //we keep only the ones with trivial extension
+        pot_new:={@ K : K in pot_new | O!!K eq IO @}; //we keep only the ones with trivial extension
         output join:={@ K : K in pot_new | not K in done @};
         done join:=queue;
         // Note: if O!!K is not IO, then all the submodules of K will also not have trivial extension IO.
@@ -145,7 +145,7 @@ intrinsic IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing(I
     done:={@ @};
     while #queue gt 0 do
         pot_new:=&join[MaximalIntermediateIdeals(elt,J) : elt in queue ];
-        pot_new:=[ K : K in pot_new | O!!K eq IO ]; //we keep only the ones with trivial extension
+        pot_new:={@ K : K in pot_new | O!!K eq IO @}; //we keep only the ones with trivial extension
         output join:={@ K : K in pot_new | not K in done and MultiplicatorRing(K) eq S @};
         done join:=queue;
         // Note: if O!!K is not IO, then all the submodules of K will also not have trivial extension IO.

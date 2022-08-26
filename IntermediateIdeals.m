@@ -170,7 +170,7 @@ end intrinsic;
 intrinsic IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing(I::AlgEtIdl,J::AlgEtIdl, O::AlgEtOrd)->SetIndx[AlgEtIdl]
 { Given fractional S-ideals J subset I, returns all the fractional S-ideals K J subset K subset I, O!!K = I, and (K:K) eq S.
   Note that we need O subset (J:J).
-  They are produced recursively using from the maximal ones }
+  They are produced recursively using from the maximal ones. }
     require J subset I : "The ideal J needs to be inside I";
     S:=Order(I);
     require S eq Order(J) : "The ideals must be over the same order";

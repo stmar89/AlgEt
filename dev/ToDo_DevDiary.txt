@@ -70,8 +70,11 @@
       But there are many cases where this is still too slow with only one non-Gorestein prime.
 
     ### FIXED/DONE: kept for the record. ###
-    - Introduced IntermediateModulesWithTrivialExtension, which uses MaximalIntermediateModules. Faster since we can skip some part of the recursion.
-    - Introduced IntermediateIdealsWithTrivialExtension, which uses MaximalIntermediateIdeals. Faster since we can skip some part of the recursion.
+    - For WKIC_bar: I changed the recursion in Intermediate...WithTrivial...AndPrescr... so that in output one would store only the wkclasses. I thought this would speed up a bit the computation, since less equalities would have to be checked. But it seems that it slowed it down a bit, instead. So reverted to the previous version, were we generate all the intermediate modules (with mult ring and trivial ext) and then mod out by weak equivalence.
+    - Introduced IntermediateModulesWithTrivialExtension, which uses MaximalIntermediateModules. 
+      Faster since we can skip some part of the recursion.
+    - Introduced IntermediateIdealsWithTrivialExtension, which uses MaximalIntermediateIdeals. 
+      Faster since we can skip some part of the recursion.
     - I tryed to speed up equality checking using the inbuild Hash function of the output of myHash function 
       for both AlgEtIdl and AlgEtOrd. But for EquationOrder of  f:=x^6 - 3*x^5 - 3*x^4 + 65*x^3 - 48*x^2 - 768*x + 4096 
       I got some collisions, so I reverted it. Also, the gain in speed was very small.

@@ -21,8 +21,7 @@
     In the paper, we suggest to use instead the results from
         "Computation of lattice isomorphisms and the integral matrix similarity problem", T. Hofmann, W. Bley and H. Johnston,
         https://arxiv.org/abs/2202.03526
-    Their code at the moment is not implemented in MAGMA, but only in HECKE/OSCAR. If speed is crucial for your purposes, we advise to print the list of candidate representatives, (variable "candidates" below) and load it in HECKE/OSCAR.
-    We have not tested this procedure.
+    Their code at the moment is not implemented in MAGMA, but only in julia package Hecke/Nemo. Requires julia 1.7.0 or higher and Hecke http://www.thofma.com/Hecke.jl/dev/ 
 */
 
 // ###################
@@ -37,7 +36,7 @@ Attach("~/packages_github/AlgEt/IsomModules.m");
 
 _<x>:=PolynomialRing(Integers());
 m1:=x^2-x+3;
-m2:=x^2+x-3;
+m2:=x^2+x+3;
 s1:=2;
 s2:=1;
 h:=m1^s1*m2^s2; h;
@@ -51,46 +50,15 @@ R:=Order([pi,q/pi]);
 O:=MaximalOrder(K);
 V:=EtaleAlgebra([K1,K1,K2]); // V = K1^s1 x K2^s2
 m:=NaturalAction(K,V); // m:K -> V component-wise diagonal action of K on V
-Vnf,Ve:=NumberFields(V);
-MO:=Module(R,m,<1*MaximalOrder(Vnf[i]) : i in [1..#Vnf]>);
-ff:=O!!Conductor(R);
-test,ff_prod:=IsProductOfIdeals(ff); 
-// we write ff = ff1 x ff2 with ff1 in K1 and ff2 in K2.
-assert test;
-
-// The following works for this Example, not in general.
-// It will be updated shortly.
-// We use Theorem 3.2 from the paper.
-Mff:=Module(R,m,<ff_prod[1],ff_prod[1],ff_prod[2]>);
-gensMff:=Generators(Mff);
-//candidates:=IntermediateModules(MO,Mff); 
-// The above line is very slow for some reason.
-// I will instead list the subgroups and generate the R modules from them.
-Q,q:=Quotient(MO,Mff); Q;
-subs:=Subgroups(Q);
-candidates:=[ Module(R,m,[ g@@q : g in Generators(H`subgroup)] cat gensMff) : H in subs ];
-#candidates;
-// We remove duplicates
-time candidates:=Seqset(candidates);
-candidates:=Setseq(candidates);
-#candidates;
-MO:=O!!MO;
-// We keep only the candidates whose extension to O equals MO. See Theorem 3.2
-candidates:=[ I : I in candidates | O!!I eq MO ];
-#candidates;
-
-// We sieve out a minimal set of representatives of the isomorphism classes.
-// This look will take some time.
-classes:=[];
-for I in candidates do
-    printf ".";
-    if not exists{ J : J in classes | IsIsomorphic(I,J) } then
-        printf "!";
-        Append(~classes,I);
-    end if;
-end for;
+time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/"); // changes this line accordingly to wheter you have used Hecke.Build() or not,
+                                                                                                   // and to the appriopriate path to the the packages AlgEt. 
+                                                                                                   // It should take ~12 seconds.
+#classes;
 // classes now contains the representatives of the isomorphism classes of the sub-R-modules of V.
 // By Theorem 5.1, they correspond to the Fq-isomorphism classes of abelian varieties in the isogeny class determined by h.
+
+
+
 
 // ###################
 // ### Example 6.2 ###
@@ -105,111 +73,28 @@ Attach("~/packages_github/AlgEt/IntermediateModules.m");
 Attach("~/packages_github/AlgEt/IsomModules.m");
 _<x>:=PolynomialRing(Integers());
 m1:=x^2-x+3;
-m2:=x^2+x-3;
+m2:=x^2+x+3;
 s1:=2;
 s2:=1;
 h:=m1^s1*m2^s2; h;
-q:=Integers() ! Truncate( ConstantCoefficient(h)^(2/Degree(h)) );
 K1:=NumberField(m1);
 K2:=NumberField(m2);
 K:=EtaleAlgebra([K1,K2]); // K = K1 x K2
-pi:=PrimitiveElement(K); //
+pi:=PrimitiveElement(K); 
 R:=Order([pi]);
 O:=MaximalOrder(K);
 V:=EtaleAlgebra([K1,K1,K2]); // V = K1^s1 x K2^s2
 m:=NaturalAction(K,V); // m:K -> V component-wise diagonal action of K on V
-Vnf,Ve:=NumberFields(V);
-MO:=Module(R,m,<1*MaximalOrder(Vnf[i]) : i in [1..#Vnf]>);
-ff:=O!!Conductor(R);
-test,ff_prod:=IsProductOfIdeals(ff); 
-// we write ff = ff1 x ff2 with ff1 in K1 and ff2 in K2.
-assert test;
-
-// The following works for this Example, not in general.
-// It will be updated shortly.
-// We use Theorem 3.2 from the paper.
-Mff:=Module(R,m,<ff_prod[1],ff_prod[1],ff_prod[2]>);
-gensMff:=Generators(Mff);
-//candidates:=IntermediateModules(MO,Mff); 
-// The above line is very slow for some reason.
-// I will instead list the subgroups and generate the R modules from them.
-Q,q:=Quotient(MO,Mff); Q;
-subs:=Subgroups(Q);
-candidates:=[ Module(R,m,[ g@@q : g in Generators(H`subgroup)] cat gensMff) : H in subs ];
-#candidates;
-// We remove duplicates
-time candidates:=Seqset(candidates);
-candidates:=Setseq(candidates);
-#candidates;
-MO:=O!!MO;
-// We keep only the candidates whose extension to O equals MO. See Theorem 3.2
-candidates:=[ I : I in candidates | O!!I eq MO ];
-#candidates;
-
-// We sieve out a minimal set of representatives of the isomorphism classes
-
-// ### MAGMA only: very slow (a week or so)
-// We recommend to use the julia+Oscar version below
-classes:=[];
-for I in candidates do
-    printf ".";
-    if not exists{ J : J in classes | IsIsomorphic(I,J) } then
-        printf "!";
-        Append(~classes,I);
-    end if;
-end for;
-// classes now contains the representatives of the isomorphism classes of the sub-R-modules of V.
+time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/"); // changes this line accordingly to wheter you have used Hecke.Build() or not,
+                                                                                                   // and to the appriopriate path to the the packages AlgEt
+                                                                                                   // It should take ~200 secs
+#classes;
 // By Theorem 4.1, they correspond to the conjugacy classes of matrices with with minimal polynomial m1*m2 and characteristic polynomial h.
-// We now print the 6 matrices:
+// We now print the 6 matrices. These matrices might not be the same one as in the paper, but they are conjugate to them.
 for I in classes do
    mat:=Matrix(AbsoluteCoordinates([m(pi)*z : z in ZBasis(I)],ZBasis(I)));
    assert MinimalPolynomial(mat) eq m1*m2;
    assert CharacteristicPolynomial(mat) eq h;
    printf "%o\n\n",mat;
 end for;
-
-// ### julia+Oscar: a few minutes
-// we first print the entries of candidates in a file that will be loaded in julia
-    file:="Ex6_2_candidates.txt"; 
-    Pipe("rm " cat file cat " || true ",""); 
-    str:="[\n";
-    for i->I in candidates do
-        mat:=Matrix(AbsoluteCoordinates([m(F)*z : z in ZBasis(I)],ZBasis(I)));
-        str cat:=Sprintf("%o,\n", Eltseq(mat));
-    end for;
-    str:=Prune(Prune(str)) cat "\n]\n";
-    fprintf file, "%o",str;
-// Copy the file "Ex6_2_candidates.txt" on a machine with julia+Oscar installed.
-// Open julia and run the following code
-    using Oscar;
-    coeffs = eval(Meta.parse(open(f->read(f, String), "Ex6_2_candidates.txt")));
-    n = Int(sqrt(length(coeffs[1])));
-    candidates = [ matrix(ZZ,n,n,coeffs[1]) ];
-    for i in 2:length(coeffs)
-        push!(candidates,matrix(ZZ,n,n,coeffs[i]));
-    end
-    classes = [candidates[1]];
-    perc_old=0;
-    for i in 2:length(candidates)
-        perc = Int(trunc(100*i/length(candidates)));
-        if perc > perc_old
-            perc_old = perc;
-            print(perc,"% ")
-        end
-        I = candidates[i];
-        test = true;
-        for j in 1:length(classes)
-            J = classes[j];
-            fl , T = is_GLZ_conjugate(I,J);
-            if fl
-                test = false;
-                break; # break J
-            end;
-        end;
-        if test
-            push!(classes,I);
-        end;
-    end;
-    classes
-
 

@@ -56,58 +56,6 @@ intrinsic MinimalIntermediateIdeals(I::AlgEtIdl,J::AlgEtIdl)->SetIndx[AlgEtIdl]
     end if;
 end intrinsic;
 
-intrinsic MaximalIntermediateIdeals(I::AlgEtIdl,J::AlgEtIdl)->SetIndx[AlgEtIdl]
-{ Given fractional S-ideals J subset I, returns the maximal (with respect to inclusion) fractional S-ideals K such that J subset K subset I. }
-    assert2 J subset I; // "the ideal J needs to be inside I";
-    S:=Order(I);
-    assert2 S eq Order(J); // "The ideals must be over the same order";
-    if J eq I then 
-        return {@ @};
-    else
-        // If I c K c I is maximal then I/K is a simple module, that is, isomorphic to S/P for some prime P of S.
-        // In particular, if p is the characteristic of S/P, then p*I c K c I.
-        // Note that I/pI is an Fp-vector space.
-        gens_J_over_S:=Generators(J);
-        Q,q:=Quotient(I,J);
-        max_ideals:={@ @};
-        for p in PrimeDivisors(#Q) do
-            mp:=[ p*(Q.j) : j in [1..Ngens(Q)] ];
-            Qp,qp:=quo<Q|mp>;
-            rk:=Ngens(Qp);
-            assert #Qp eq p^rk;
-            Fp:=FiniteField(p);
-            // Note: Qp = Fp^rk as a vector space
-            // So its S-module structure can be realized over Fp.
-            // More precisely, given generators ai of S over Z, 
-            // to find the (minimal) sub-S-modules, it is enough to look at Qp as module over Fp[ai]
-            // In matrices we store the matrix representations of the action of the ZBasis of S on Qp
-            matrices:=[Matrix(Fp,[ Eltseq(qp(q(zS*(Qp.j@@qp@@q)))) : j in [1..Ngens(Qp)]]) : zS in ZBasis(S) ];
-            matrices:=Setseq(Seqset(matrices)); //possibly there are repetiions.
-            Qp_Rmod:=RModule(matrices);
-            max_Rmod:=MaximalSubmodules(Qp_Rmod);
-            max_ideals join:={@ Ideal(S, gens_J_over_S cat 
-                                    [(Qp!Eltseq(Qp_Rmod!b))@@qp@@q : b in Basis(max)]) : max in max_Rmod @};
-        end for;
-        return max_ideals;
-    end if;
-end intrinsic;
-
-// // Using TraceDualIdeal. Slightly slower 
-// intrinsic MaximalIntermediateIdeals(I::AlgEtIdl,J::AlgEtIdl)->SetIndx[AlgEtIdl]
-// { Given fractional S-ideals J subset I, returns the maximal (with respect to inclusion) fractional S-ideals K such that J subset K subset I. }
-//     assert2 J subset I; // "the ideal J needs to be inside I";
-//     S:=Order(I);
-//     assert2 S eq Order(J); // "The ideals must be over the same order";
-//     if J eq I then 
-//         return {@ @};
-//     else
-//         // I c K c J is a maximal intermediate module iff K^t is a minimal intermediate module J^t c K^t c I^t.
-//         min_duals:=MinimalIntermediateIdeals(TraceDualIdeal(J), TraceDualIdeal(I));
-//         max:={@ TraceDualIdeal(K) : K in min_duals @};
-//         return max;
-//     end if;
-// end intrinsic;
-
 intrinsic IntermediateIdeals(I::AlgEtIdl,J::AlgEtIdl)->SetIndx[AlgEtIdl]
 { Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that J subset K subset I. They are produced recursively using from the minimal ones }
     require J subset I : "The ideal J needs to be inside I";
@@ -141,6 +89,59 @@ intrinsic IntermediateIdealsWithPrescribedMultiplicatorRing(I::AlgEtIdl,J::AlgEt
     end while;
     return output;
 end intrinsic;
+
+intrinsic MaximalIntermediateIdeals(I::AlgEtIdl,J::AlgEtIdl)->SetIndx[AlgEtIdl]
+{ Given fractional S-ideals J subset I, returns the maximal (with respect to inclusion) fractional S-ideals K such that J subset K subset I. }
+    assert2 J subset I; // "the ideal J needs to be inside I";
+    S:=Order(I);
+    assert2 S eq Order(J); // "The ideals must be over the same order";
+    if J eq I then 
+        return {@ @};
+    else
+        // If I c K c I is maximal then I/K is a simple module, that is, isomorphic to S/P for some prime P of S.
+        // In particular, if p is the characteristic of S/P, then p*I c K c I.
+        // Note that I/pI is an Fp-vector space.
+        Q,q:=Quotient(I,J);
+        gens_J_over_S:=Generators(J);
+        max_ideals:={@ @};
+        for p in PrimeDivisors(#Q) do
+            mp:=[ p*(Q.j) : j in [1..Ngens(Q)] ];
+            mp_in_I:=[ x@@q : x in mp  ] cat gens_J_over_S;
+            Qp,qp:=quo<Q|mp>;
+            rk:=Ngens(Qp);
+            assert #Qp eq p^rk;
+            Fp:=FiniteField(p);
+            // Note: Qp = Fp^rk as a vector space
+            // So its S-module structure can be realized over Fp.
+            // More precisely, given generators ai of S over Z, 
+            // to find the (minimal) sub-S-modules, it is enough to look at Qp as module over Fp[ai]
+            // In matrices we store the matrix representations of the action of the ZBasis of S on Qp
+            matrices:=[Matrix(Fp,[ Eltseq(qp(q(zS*(Qp.j@@qp@@q)))) : j in [1..Ngens(Qp)]]) : zS in ZBasis(S) ];
+            matrices:=Setseq(Seqset(matrices)); //possibly there are repetiions.
+            Qp_Rmod:=RModule(matrices);
+            max_Rmod:=MaximalSubmodules(Qp_Rmod);
+            max_ideals join:={@ Ideal(S, mp_in_I cat 
+                                    [(Qp!Eltseq(Qp_Rmod!b))@@qp@@q : b in Basis(max)]) : max in max_Rmod @};
+        end for;
+        return max_ideals;
+    end if;
+end intrinsic;
+
+// // Using TraceDualIdeal. Slightly slower 
+// intrinsic MaximalIntermediateIdeals(I::AlgEtIdl,J::AlgEtIdl)->SetIndx[AlgEtIdl]
+// { Given fractional S-ideals J subset I, returns the maximal (with respect to inclusion) fractional S-ideals K such that J subset K subset I. }
+//     assert2 J subset I; // "the ideal J needs to be inside I";
+//     S:=Order(I);
+//     assert2 S eq Order(J); // "The ideals must be over the same order";
+//     if J eq I then 
+//         return {@ @};
+//     else
+//         // I c K c J is a maximal intermediate module iff K^t is a minimal intermediate module J^t c K^t c I^t.
+//         min_duals:=MinimalIntermediateIdeals(TraceDualIdeal(J), TraceDualIdeal(I));
+//         max:={@ TraceDualIdeal(K) : K in min_duals @};
+//         return max;
+//     end if;
+// end intrinsic;
 
 intrinsic IntermediateIdealsWithTrivialExtension(I::AlgEtIdl,J::AlgEtIdl, O::AlgEtOrd)->SetIndx[AlgEtIdl]
 { Given fractional S-ideals J subset I, returns all the fractional S-ideals K J subset K subset I, and O!!K = I. 

@@ -15,14 +15,16 @@
     candidates = [ matrix(ZZ,n,n,coeffs[1]) ];
     for i in 2:length(coeffs)
         push!(candidates,matrix(ZZ,n,n,coeffs[i]));
-    end
+    end;
     # classes will contain the indices of the representatives
     classes = [1];
     for i in 2:length(candidates)
         I = candidates[i];
         test = true;
         for j in 1:length(classes)
-            J = candidates[j];
+            J = candidates[classes[j]];
+            :w
+            :q
             fl , T = is_GLZ_conjugate(I,J);
             if fl
                 test = false;

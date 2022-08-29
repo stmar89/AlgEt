@@ -15,7 +15,6 @@ declare verbose IsomModules, 2;
              power of Bass non trivial class group
     - when looping over the different k's, do the classes_k's all contain the same number of objects?
       see CONJECTURE BELOW
-    - Need pi in R ? To get integer matrices yes. But maybe both AreGLConjugate and is_GLZ_conjugate work with rational matrice...
 */
 
 //------------
@@ -23,7 +22,10 @@ declare verbose IsomModules, 2;
 //------------
 
 intrinsic IsIsomorphic(I::AlgEtMod,J::AlgEtMod : Method:="julia") -> BoolElt
-{Given two modules I and J returns wheater they are isomorphic.}
+{Given two modules I and J returns wheater they are isomorphic.
+The vararg Method allows to choose if the isomorphism testing is done with "Magma", very slow, or with the Hecke/Nemo package for julia, which is much faster.
+In the latter case, the Method should be of the form
+"julia path/to/AlgEt/", or if Hecke/Nemo has been built,"julia -J /tmp/Hecke.so ~/path/to/AlgEt/" (the ".so" might be different according to your SO. See the documentation of Hecke.Build()).}
     require Method eq "Magma" or Method[1..5] eq "julia" : "Method should be Magma or julia or a string of julia command";
     V,m:=UniverseAlgebra(I);
     VJ,mJ:=UniverseAlgebra(I);
@@ -32,29 +34,31 @@ intrinsic IsIsomorphic(I::AlgEtMod,J::AlgEtMod : Method:="julia") -> BoolElt
     require V eq VJ and forall{b : b in Basis(Algebra(S)) | m(b) eq mJ(b)} : "the modules are not compatible";
    
     require EquationOrder(Algebra(S)) subset S : "Implemented only for modules over orders containing the equation order";
-    pi:=m(PrimitiveElement(Algebra(S)));
+    pi:=PrimitiveElement(Algebra(S));
+    if not pi in S then
+        pi:=pi*Exponent(Quotient(pi*S + OneIdeal(S),OneIdeal(S)));
+    end if;
+    pi:=m(pi);
     // based on the following, two Z[pi] modules are isomorphic iff the matrices representing multiplcition by pi are Z-conjugte 
     matI:=ChangeRing(Matrix(AbsoluteCoordinates([pi*z : z in ZBasis(I)],ZBasis(I))),Integers());
     matJ:=ChangeRing(Matrix(AbsoluteCoordinates([pi*z : z in ZBasis(J)],ZBasis(J))),Integers());
-        if Method eq "Magma" then
-            test:=AreGLConjugate(matI,matJ);
-        else //Method eq "julia ...."
-            ID:=&cat[ Sprint(Random(0,9)) : i in [1..20] ];
-            file:="tmp_" cat ID cat ".txt";
-            str:="[\n";
-            str cat:=Sprintf("%o,\n%o\n", Eltseq(matI),Eltseq(matJ));
-            str:=Prune(Prune(str)) cat "\n]\n";
-            printf file, "%o",str;
-            indices:=eval(Pipe(Method cat "IsIsomorphic_julia_script.jl " cat file,"r"));
-            if #indices eq 2 then
-            // the matrices are not conjugate
-                test:=false;
-            else
-                assert #indices eq 1;
-                test:=true;
-            end if;
-            Pipe("rm " cat file cat " || true ",""); 
+    if Method eq "Magma" then
+        test:=AreGLConjugate(matI,matJ);
+    else //Method eq "julia ...."
+        ID:=&cat[ Sprint(Random(0,9)) : i in [1..20] ];
+        file:="tmp_" cat ID cat ".txt";
+        str:=Sprintf("[\n%o,\n%o\n]\n", Eltseq(matI),Eltseq(matJ));
+        fprintf file, "%o",str;
+        indices:=eval(Pipe(Method cat "IsIsomorphic_julia_script.jl " cat file,""));
+        if #indices eq 2 then
+        // the matrices are not conjugate
+            test:=false;
+        else
+            assert #indices eq 1;
+            test:=true;
         end if;
+        Pipe("rm " cat file cat " || true ",""); 
+    end if;
     return test;
 end intrinsic;
 
@@ -63,34 +67,39 @@ end intrinsic;
 //------------
 
 intrinsic IsomorphismClasses(R::AlgEtOrd,m::Map : Method:="julia") -> SeqEnum[AlgEtMod]
-{Given an order R in some AlgEt K, where K acts on some V, by m:K->V, returns representatives of hte isomorphism classes of the S-module lattices in V.}
+{Given an order R in some AlgEt K, where K acts on some V, by m:K->V, returns representatives of hte isomorphism classes of the S-module lattices in V.
+The vararg Method allows to choose if the isomorphism testing is done with "Magma", very slow, or with the Hecke/Nemo package for julia, which is much faster.
+In the latter case, the Method should be of the form "julia path/to/AlgEt/", or if Hecke/Nemo has been built,"julia -J /tmp/Hecke.so ~/path/to/AlgEt/" (the ".so" might be different according to your SO. See the documentation of Hecke.Build()).}
     require Method eq "Magma" or Method[1..5] eq "julia" : "Method should be Magma or julia or a string of julia command";
     V:=Codomain(m);
     K:=Domain(m);
     pi:=PrimitiveElement(K);
+    if not pi in R then
+        pi:=pi*Exponent(Quotient(pi*R + OneIdeal(R),OneIdeal(R)));
+    end if;
+    pi:=m(pi);
     O:=MaximalOrder(K);
     ff:=Conductor(R);
     Vnf:=NumberFields(V);
     Knfpoly:=[ DefiningPolynomial(L) : L in NumberFields(K) ];
     Vnfpoly:=[ DefiningPolynomial(L) : L in Vnf ];
     MO:=Module(R,m,<1*MaximalOrder(Vnf[i]) : i in [1..#Vnf]>);
-    MOO:=O!!MO;
     ff:=O!!Conductor(R);
     test,ff_prod:=IsProductOfIdeals(ff);
     assert test;
     ind:=[ #Vnfpoly+1 - Index(Reverse(Vnfpoly),fK)  : fK in Knfpoly ]; // last occurence of each number field from the dec of K 
                                                                        // in the decomposition of V
-        
     Mff:=Module(R,m,<ff_prod[Index(Knfpoly,Vnfpoly[i])] : i in [1..#Vnf]>);
-    gensMff:=Generators(Mff);
-    candidates:=IntermediateModulesWithTrivialExtension(MO,Mff,O);
+    vprint IsomModules,1 : "candidates:";
+    vtime IsomModules,1 : candidates:=IntermediateModulesWithTrivialExtension(MO,Mff,O);
+    vprint IsomModules,1 : #candidates;
     PO,pO:=PicardGroup(O);
     classes:=[];
     for g in PO do
         if g eq Zero(PO) then
             candidates_k:=candidates; 
         else
-            _,Ik:=CoprimeRepresentative(ff,pO(g)); // Ik+ff=O, Ik cap ff = Ik*ff
+            _,Ik:=CoprimeRepresentative(pO(g),ff); // Ik+ff=O, Ik cap ff = Ik*ff
             test,Ik_prod:=IsProductOfIdeals(Ik);
             assert test;
             MffIk:=Module(R,m,<i in ind select 
@@ -119,12 +128,13 @@ intrinsic IsomorphismClasses(R::AlgEtOrd,m::Map : Method:="julia") -> SeqEnum[Al
             file:="tmp_" cat ID cat ".txt";
             str:="[\n";
             for i->I in candidates do
-                mat:=Matrix(AbsoluteCoordinates([m(pi)*z : z in ZBasis(I)],ZBasis(I)));
+                mat:=Matrix(AbsoluteCoordinates([pi*z : z in ZBasis(I)],ZBasis(I)));
                 str cat:=Sprintf("%o,\n", Eltseq(mat));
             end for;
             str:=Prune(Prune(str)) cat "\n]\n";
             fprintf file, "%o",str;
-            indices_of_classes_k:=eval(Pipe(Method cat " IsIsomorphic_julia_script.jl " cat file,""));
+            indices_of_classes_k:=eval(Pipe(Method cat "IsIsomorphic_julia_script.jl " cat file,""));
+print indices_of_classes_k;
             classes_k:=[candidates_k[i] : i in indices_of_classes_k];
             Pipe("rm " cat file cat " || true ",""); 
         end if;
@@ -136,7 +146,47 @@ intrinsic IsomorphismClasses(R::AlgEtOrd,m::Map : Method:="julia") -> SeqEnum[Al
 end intrinsic;
 
 /* TEST
-   
+  
+
+    AttachSpec("~/packages_github/AlgEt/spec");
+    Attach("~/packages_github/AlgEt/Modules.m");
+    Attach("~/packages_github/AlgEt/IntermediateModules.m");
+    Attach("~/packages_github/AlgEt/IsomModules.m");
+    _<x>:=PolynomialRing(Integers()); 
+    g:=x^2+5;
+    K:=EtaleAlgebra(g);
+    nf:=NumberFields(K);
+    pi:=PrimitiveElement(K);
+    R:=Order([7*pi]);
+    m:=NaturalAction(K,K);
+    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/"); // this is the ICM
+    time icm:=ICM(R);
+    assert #classes eq #icm; // Since R is Bass, the ICM is Pic(R) cup Pic(O)
+
+    AttachSpec("~/packages_github/AlgEt/spec");
+    Attach("~/packages_github/AlgEt/Modules.m");
+    Attach("~/packages_github/AlgEt/IntermediateModules.m");
+    Attach("~/packages_github/AlgEt/IsomModules.m");
+    _<x>:=PolynomialRing(Integers());
+    SetVerbose("IsomModules",2);
+    m1:=x^2-x+3;
+    m2:=x^2+x+3;
+    s1:=2;
+    s2:=1;
+    h:=m1^s1*m2^s2; h;
+    K1:=NumberField(m1);
+    K2:=NumberField(m2);
+    K:=EtaleAlgebra([K1,K2]); // K = K1 x K2
+    pi:=PrimitiveElement(K); 
+    R:=Order([pi]);
+    O:=MaximalOrder(K);
+    V:=EtaleAlgebra([K1,K1,K2]); // V = K1^s1 x K2^s2
+    m:=NaturalAction(K,V); // m:K -> V component-wise diagonal action of K on V
+    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/"); // changes this line accordingly to wheter you have used Hecke.Build() or not,
+                                                                                                       // and to the appriopriate path to the the packages AlgEt
+    assert #classes eq 4;
+
+    SetVerbose("IsomModules",1);
     AttachSpec("~/packages_github/AlgEt/spec");
     Attach("~/packages_github/AlgEt/Modules.m");
     Attach("~/packages_github/AlgEt/IntermediateModules.m");
@@ -150,22 +200,15 @@ end intrinsic;
     R:=Order([pi,q/pi]);
     O:=MaximalOrder(K);
     assert IsBass(R);
-    assert #FindOverOrders(R) eq 2;
-    assert #PicardGroup(R) eq 3;
-    assert #PicardGroup(O) eq 1;
-
-    V:=EtaleAlgebra(&cat[nf : i in [1..3]]);
     m:=NaturalAction(K,K);
-    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so"); // this is the ICM
-    assert #classes eq 4; // Since R is Bass, the ICM is Pic(R) cup Pic(O)
+    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/"); // this is the ICM
+    time icm:=ICM(R);
+    assert #classes eq #icm; // Since R is Bass, the ICM is Pic(R) cup Pic(O)
+
+    // V = K^3 , this is quite slow
+    V:=EtaleAlgebra(&cat[nf : i in [1..3]]);
     m:=NaturalAction(K,V);
-    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so");
+    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/");
     assert #classes eq 6; // Example 6.1 in "Computing abelian varieties over finite fields isogenous to a power", by Marseglia
 
-
-
-
-
-
 */
-

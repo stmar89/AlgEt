@@ -14,14 +14,15 @@
     Please download the following repository on your machine:
         https://github.com/stmar89/AlgEt
 
-    WARNING: Some parts of the code requires significant optimizations. In other words, as of now, it is very slow...
-    In particular, the isomorphism testing (IsIsomorphic) is based on results from 
+    WARNING:.
+    The isomorphism testing (IsIsomorphic) with the Method Magma is based on results from 
         "The conjugacy problem in GL(n, Z)", T. Hofmann, B. Eick and E. A. O’Brien, J. Lond. Math. Soc. (2) 100 (2019), no. 3, 731–756.
     and the corresponding implementation of their code, which is in MAGMA.
-    In the paper, we suggest to use instead the results from
+    In the paper, we suggest to use instead to use the results from
         "Computation of lattice isomorphisms and the integral matrix similarity problem", T. Hofmann, W. Bley and H. Johnston,
         https://arxiv.org/abs/2202.03526
     Their code at the moment is not implemented in MAGMA, but only in julia package Hecke/Nemo. Requires julia 1.7.0 or higher and Hecke http://www.thofma.com/Hecke.jl/dev/ 
+    See below for instructions.
 */
 
 // ###################
@@ -90,7 +91,7 @@ time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/package
                                                                                                    // It should take ~200 secs
 #classes;
 // By Theorem 4.1, they correspond to the conjugacy classes of matrices with with minimal polynomial m1*m2 and characteristic polynomial h.
-// We now print the 6 matrices. These matrices might not be the same one as in the paper, but they are conjugate to them.
+// We now print the 4 matrices. These matrices might not be the same one as in the paper, but they are conjugate to them.
 for I in classes do
    mat:=Matrix(AbsoluteCoordinates([m(pi)*z : z in ZBasis(I)],ZBasis(I)));
    assert MinimalPolynomial(mat) eq m1*m2;

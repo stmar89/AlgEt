@@ -4,7 +4,7 @@
 #############################################################
 # Requires julia 1.7.0 or higher and Hecke
 # http://www.thofma.com/Hecke.jl/dev/ 
-# The keys tep is the use if is_GLZ_conjugate, see
+# The keys step is the use if is_GLZ_conjugate, see
 # http://www.thofma.com/Hecke.jl/dev/misc/conjugacy/
 # which is based on https://arxiv.org/pdf/2202.03526.pdf
 ############################################################# 

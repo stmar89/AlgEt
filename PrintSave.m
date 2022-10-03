@@ -101,8 +101,9 @@ intrinsic LoadWKICM(str::MonStgElt) -> AlgEtOrd
         S`IsGorenstein:=#dataS eq 1;
         Include(~ooR,S);
         wkS:=[];
-        for iI->zbI in dataS do
-            IS:=Ideal(S,[A!s : s in zbI]);
+        for iI->I in dataS do
+            zbI:=[A!s : s in I];
+            IS:=Ideal(S,zbI);
             IS`MultiplicatorRing:=S;
             IS`ZBasis:=zbI;
             IS`IsInvertible:=iI eq 1; //only the first is invertible

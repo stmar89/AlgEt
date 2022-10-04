@@ -86,6 +86,9 @@ In the latter case, the Method should be of the form "julia path/to/AlgEt/", or 
     Knfpoly:=[ DefiningPolynomial(L) : L in NumberFields(K) ];
     Vnfpoly:=[ DefiningPolynomial(L) : L in Vnf ];
     MO:=Module(R,m,<1*MaximalOrder(Vnf[i]) : i in [1..#Vnf]>);
+    mat:=Matrix(AbsoluteCoordinates([pi*z : z in ZBasis(MO)],ZBasis(MO)));
+    min_poly:=MinimalPolynomial(mat);
+    char_poly:=CharacteristicPolynomial(mat);
     ff:=O!!Conductor(R);
     test,ff_prod:=IsProductOfIdeals(ff);
     assert test;
@@ -107,7 +110,8 @@ In the latter case, the Method should be of the form "julia path/to/AlgEt/", or 
             MffIk:=Module(R,m,<i in ind select 
                                             ff_prod[Index(Knfpoly,Vnfpoly[i])] 
                                         else ff_prod[Index(Knfpoly,Vnfpoly[i])]*Ik_prod[Index(Knfpoly,Vnfpoly[i])] 
-                                                : i in [1..#Vnf]>);
+                                                : i in [1..#Vnf]>); // MffIk = f1^(s1-1)+f1I1 + ... + fn^(sn-1)+fnIn
+            zbMffIk:=ZBasis(MffIk);
             e:=ChineseRemainderTheorem(ff,Ik,One(K),Zero(K)); // e in Ik, e-1 in ff.
             assert not IsZeroDivisor(e);
             e:=Components(e);
@@ -116,7 +120,7 @@ In the latter case, the Method should be of the form "julia path/to/AlgEt/", or 
             // ik induces the isomorphism between (O1^s1 + ... + On^sn)/(f1^s1 + ... + fn^sn),
             // and (O1^(s1-1)+I1 + ... + On^(sn-1)+In)/(f1^(s1-1)+f1I1 + ... + fn^(sn-1)+fnIn),
             // where Ik = I1 + .... + In.
-            candidates_k:=[ Module(R,m, [ik(z) : z in ZBasis(M)]) : M in candidates];
+            candidates_k:=[ Module(R,m, [ik(z) : z in ZBasis(M)] cat zbMffIk ) : M in candidates];
         end if;
         if Method eq "Magma" then
             classes_k:=[];
@@ -131,6 +135,8 @@ In the latter case, the Method should be of the form "julia path/to/AlgEt/", or 
             str:="[\n";
             for i->I in candidates do
                 mat:=Matrix(AbsoluteCoordinates([pi*z : z in ZBasis(I)],ZBasis(I)));
+                assert MinimalPolynomial(mat) eq min_poly;
+                assert CharacteristicPolynomial(mat) eq char_poly;
                 str cat:=Sprintf("%o,\n", Eltseq(mat));
             end for;
             str:=Prune(Prune(str)) cat "\n]\n";

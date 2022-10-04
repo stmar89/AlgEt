@@ -16,15 +16,15 @@
     for i in 2:length(coeffs)
         push!(candidates,matrix(ZZ,n,n,coeffs[i]));
     end;
-    # classes will contain the indices of the representatives
+    # classes will contain the indices of the representatives, classes_mat the actual matrices
     classes = [1];
-    for i in 2:length(candidates)
-        I = candidates[i];
+    classes_mat = [ matrix(ZZ,n,n,coeffs[1]) ];
+    for i in 2:length(coeffs)
+        I = matrix(ZZ,n,n,coeffs[i]);
         test = true;
-        for j in 1:length(classes)
-            J = candidates[classes[j]];
-            :w
-            :q
+        for j in 1:length(classes_mat)
+            J = classes_mat[j];
+
             fl , T = is_GLZ_conjugate(I,J);
             if fl
                 test = false;
@@ -33,6 +33,7 @@
         end;
         if test
             push!(classes,i);
+            push!(classes_mat,I);
         end;
     end;
     println(classes)

@@ -33,12 +33,14 @@ In the latter case, the Method should be of the form
     require S eq Order(J) : "The ideals must be over the same order";
     require V eq VJ and forall{b : b in Basis(Algebra(S)) | m(b) eq mJ(b)} : "the modules are not compatible";
    
-    require EquationOrder(Algebra(S)) subset S : "Implemented only for modules over orders containing the equation order";
+    //require EquationOrder(Algebra(S)) subset S : "Implemented only for modules over orders containing the equation order";
     pi:=PrimitiveElement(Algebra(S));
     if not pi in S then
         pi:=pi*Exponent(Quotient(pi*S + OneIdeal(S),OneIdeal(S)));
     end if;
     pi:=m(pi);
+    // pi is now a primitive element of K such that Z[pi] c S.
+    
     // based on the following, two Z[pi] modules are isomorphic iff the matrices representing multiplcition by pi are Z-conjugte 
     matI:=ChangeRing(Matrix(AbsoluteCoordinates([pi*z : z in ZBasis(I)],ZBasis(I))),Integers());
     matJ:=ChangeRing(Matrix(AbsoluteCoordinates([pi*z : z in ZBasis(J)],ZBasis(J))),Integers());
@@ -106,10 +108,10 @@ In the latter case, the Method should be of the form "julia path/to/AlgEt/", or 
                                             ff_prod[Index(Knfpoly,Vnfpoly[i])] 
                                         else ff_prod[Index(Knfpoly,Vnfpoly[i])]*Ik_prod[Index(Knfpoly,Vnfpoly[i])] 
                                                 : i in [1..#Vnf]>);
-            e:=ChineseRemainderTheorem(Ik,ff,One(K),Zero(K)); // e-1 in Ik, e in ff.
+            e:=ChineseRemainderTheorem(ff,Ik,One(K),Zero(K)); // e in Ik, e-1 in ff.
             assert not IsZeroDivisor(e);
             e:=Components(e);
-            e:=V!< i in ind select e[i] else Vnf[i] ! 1 : i in [1..#Vnf] >;
+            e:=V!< i in ind select e[Index(Knfpoly,Vnfpoly[i])] else Vnf[i] ! 1 : i in [1..#Vnf] >;
             ik:=map<V->V | x:->x*e >;
             // ik induces the isomorphism between (O1^s1 + ... + On^sn)/(f1^s1 + ... + fn^sn),
             // and (O1^(s1-1)+I1 + ... + On^(sn-1)+In)/(f1^(s1-1)+f1I1 + ... + fn^(sn-1)+fnIn),
@@ -147,11 +149,11 @@ end intrinsic;
 
 /* TEST
   
-
     AttachSpec("~/packages_github/AlgEt/spec");
     Attach("~/packages_github/AlgEt/Modules.m");
     Attach("~/packages_github/AlgEt/IntermediateModules.m");
     Attach("~/packages_github/AlgEt/IsomModules.m");
+    SetVerbose("IsomModules",1);
     _<x>:=PolynomialRing(Integers()); 
     g:=x^2+5;
     K:=EtaleAlgebra(g);
@@ -163,10 +165,38 @@ end intrinsic;
     time icm:=ICM(R);
     assert #classes eq #icm; // Since R is Bass, the ICM is Pic(R) cup Pic(O)
 
+    // Pic(O) is non trivial
     AttachSpec("~/packages_github/AlgEt/spec");
     Attach("~/packages_github/AlgEt/Modules.m");
     Attach("~/packages_github/AlgEt/IntermediateModules.m");
     Attach("~/packages_github/AlgEt/IsomModules.m");
+    SetVerbose("IsomModules",1);
+    _<x>:=PolynomialRing(Integers()); 
+    g:=x^2+15;
+    K:=EtaleAlgebra(g);
+    nf:=NumberFields(K);
+    pi:=PrimitiveElement(K);
+    R:=Order([pi]);
+    m:=NaturalAction(K,K);
+    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/"); // this is the ICM
+    time icm:=ICM(R);
+    assert #classes eq #icm; // Since R is Bass, the ICM is Pic(R) cup Pic(O)
+    // V = K^2
+    V:=EtaleAlgebra(&cat[nf : i in [1..2]]);
+    m:=NaturalAction(K,V);
+    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/");
+    assert #classes eq 6; // because R is Bass 
+    // THERE IS A BUG in the julia code :  V = K^3
+    V:=EtaleAlgebra(&cat[nf : i in [1..3]]);
+    m:=NaturalAction(K,V);
+    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/");
+    assert #classes eq 8; // because R is Bass 
+
+    AttachSpec("~/packages_github/AlgEt/spec");
+    Attach("~/packages_github/AlgEt/Modules.m");
+    Attach("~/packages_github/AlgEt/IntermediateModules.m");
+    Attach("~/packages_github/AlgEt/IsomModules.m");
+    SetVerbose("IsomModules",1);
     _<x>:=PolynomialRing(Integers());
     SetVerbose("IsomModules",2);
     m1:=x^2-x+3;
@@ -186,11 +216,11 @@ end intrinsic;
                                                                                                        // and to the appriopriate path to the the packages AlgEt
     assert #classes eq 4;
 
-    SetVerbose("IsomModules",1);
     AttachSpec("~/packages_github/AlgEt/spec");
     Attach("~/packages_github/AlgEt/Modules.m");
     Attach("~/packages_github/AlgEt/IntermediateModules.m");
     Attach("~/packages_github/AlgEt/IsomModules.m");
+    SetVerbose("IsomModules",1);
     _<x>:=PolynomialRing(Integers()); 
     g:=x^6-x^5+2*x^4-2*x^3+4*x^2-4*x+8;
     K:=EtaleAlgebra(g);
@@ -205,7 +235,8 @@ end intrinsic;
     time icm:=ICM(R);
     assert #classes eq #icm; // Since R is Bass, the ICM is Pic(R) cup Pic(O)
 
-    // V = K^3 , this is quite slow
+    // THIS LAST TEST IS VERY SLOW. Computing the candidates (1774) takes 470 secs. The julia routine to sieve out the representatives does not finish in one night.
+    // V = K^3
     V:=EtaleAlgebra(&cat[nf : i in [1..3]]);
     m:=NaturalAction(K,V);
     time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/");

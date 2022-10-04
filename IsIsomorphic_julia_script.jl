@@ -10,7 +10,10 @@
 ############################################################# 
 
     using Hecke;
-    coeffs = eval(Meta.parse(open(f->read(f, String), ARGS[1])));
+    file=ARGS[1];
+    coeffs = eval(Meta.parse(open(f->read(f, String), file)));
+    # we erase immediately the temporary file
+    run(`rm $file`);
     n = Int(sqrt(length(coeffs[1])));
     candidates = [ matrix(ZZ,n,n,coeffs[1]) ];
     for i in 2:length(coeffs)

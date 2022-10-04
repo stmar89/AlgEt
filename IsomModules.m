@@ -52,6 +52,7 @@ In the latter case, the Method should be of the form
         str:=Sprintf("[\n%o,\n%o\n]\n", Eltseq(matI),Eltseq(matJ));
         fprintf file, "%o",str;
         indices:=eval(Pipe(Method cat "IsIsomorphic_julia_script.jl " cat file,""));
+        // file is erase inside the julia script immediately after loading
         if #indices eq 2 then
         // the matrices are not conjugate
             test:=false;
@@ -59,7 +60,6 @@ In the latter case, the Method should be of the form
             assert #indices eq 1;
             test:=true;
         end if;
-        Pipe("rm " cat file cat " || true ",""); 
     end if;
     return test;
 end intrinsic;
@@ -138,7 +138,6 @@ In the latter case, the Method should be of the form "julia path/to/AlgEt/", or 
             indices_of_classes_k:=eval(Pipe(Method cat "IsIsomorphic_julia_script.jl " cat file,""));
             vprintf IsomModules,1 : "indices_of_classes_k = %o\n",indices_of_classes_k;
             classes_k:=[candidates_k[i] : i in indices_of_classes_k];
-            Pipe("rm " cat file cat " || true ",""); 
         end if;
         Append(~classes,classes_k);
     end for;

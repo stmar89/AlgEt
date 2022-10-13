@@ -30,6 +30,7 @@
 
             fl , T = is_GLZ_conjugate(I,J);
             if fl
+                @assert isone(abs(det(T))) && T * I == J * T;
                 test = false;
                 break; # break J
             end;

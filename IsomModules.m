@@ -21,7 +21,7 @@ declare verbose IsomModules, 2;
 // Isomorphism Testing for modules
 //------------
 
-intrinsic IsIsomorphic(I::AlgEtMod,J::AlgEtMod : Method:="julia") -> BoolElt
+intrinsic IsIsomorphic(I::AlgEtMod,J::AlgEtMod : Method:="Magma") -> BoolElt
 {Given two modules I and J returns wheater they are isomorphic.
 The vararg Method allows to choose if the isomorphism testing is done with "Magma", very slow, or with the Hecke/Nemo package for julia, which is much faster.
 In the latter case, the Method should be of the form
@@ -68,7 +68,7 @@ end intrinsic;
 // Isomorphism Classes for modules
 //------------
 
-intrinsic IsomorphismClasses(R::AlgEtOrd,m::Map : Method:="julia") -> SeqEnum[AlgEtMod]
+intrinsic IsomorphismClasses(R::AlgEtOrd,m::Map : Method:="Magma") -> SeqEnum[AlgEtMod]
 {Given an order R in some AlgEt K, where K acts on some V, by m:K->V, returns representatives of hte isomorphism classes of the S-module lattices in V.
 The vararg Method allows to choose if the isomorphism testing is done with "Magma", very slow, or with the Hecke/Nemo package for julia, which is much faster.
 In the latter case, the Method should be of the form "julia path/to/AlgEt/", or if Hecke/Nemo has been built,"julia -J /tmp/Hecke.so ~/path/to/AlgEt/" (the ".so" might be different according to your SO. See the documentation of Hecke.Build()).}
@@ -166,6 +166,7 @@ end intrinsic;
     pi:=PrimitiveElement(K);
     R:=Order([7*pi]);
     m:=NaturalAction(K,K);
+    time classes:=IsomorphismClasses(R,m : Method:="Magma");
     time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/"); // this is the ICM
     time icm:=ICM(R);
     assert #classes eq #icm; // Since R is Bass, the ICM is Pic(R) cup Pic(O)
@@ -183,17 +184,20 @@ end intrinsic;
     pi:=PrimitiveElement(K);
     R:=Order([pi]);
     m:=NaturalAction(K,K);
+    time classes:=IsomorphismClasses(R,m : Method:="Magma");
     time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/"); // this is the ICM
     time icm:=ICM(R);
     assert #classes eq #icm; // Since R is Bass, the ICM is Pic(R) cup Pic(O)
     // V = K^2
     V:=EtaleAlgebra(&cat[nf : i in [1..2]]);
     m:=NaturalAction(K,V);
+    time classes:=IsomorphismClasses(R,m : Method:="Magma");
     time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/");
     assert #classes eq 6; // because R is Bass 
     // THERE IS A BUG in the julia code :  V = K^3
     V:=EtaleAlgebra(&cat[nf : i in [1..3]]);
     m:=NaturalAction(K,V);
+    time classes:=IsomorphismClasses(R,m : Method:="Magma");
     time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/");
     assert #classes eq 8; // because R is Bass 
 

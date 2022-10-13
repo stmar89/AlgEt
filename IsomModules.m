@@ -336,7 +336,7 @@ end intrinsic;
     // Slow Tests
     // #########
 
-    // Pic(O) is non trivial
+    // Pic(O) is non triviali. Class construction is rther fast, isomorphism sieveng requires ~10000 secs using julia.
     AttachSpec("~/packages_github/AlgEt/spec");
     Attach("~/packages_github/AlgEt/Modules.m");
     Attach("~/packages_github/AlgEt/IntermediateModules.m");
@@ -349,7 +349,6 @@ end intrinsic;
     pi:=PrimitiveElement(K);
     R:=Order([pi]);
     // V = K^3 this is expected to be considerably slower. Because of the bugs described below, I never got to the end.
-    // Currently there is a bug in the julia function which triggers some error. Tommy has it fixed. Need to check after update
     // There is a bug also in the Isomorphism testing routing the Magma. It returns false, when it should be true. It has been reported, but I don't expect any quick action.
     V:=EtaleAlgebra(&cat[nf : i in [1..3]]);
     m:=NaturalAction(K,V);

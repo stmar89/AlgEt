@@ -89,15 +89,32 @@ intrinsic LoadWKICM(str::MonStgElt) -> AlgEtOrd
     ff:=[ PP!f : f in data[1]];
     A:=EtaleAlgebra([NumberField(f) : f in ff ]);
     wk:=data[2];
-    R:=Order([ A! s : s in wk[1][1]]);
-    O:=Order([ A ! s : s in wk[#wk][1]]);
+    O:=Order([ A ! s : s in wk[#wk][1]]); // the first one is maximal
     O`IsMaximal:=true;
+    test,OasProd:=IsProductOfOrders(O);
+    assert test;
+    for i in [1..#OasProd] do
+        OL:=OasProd[i];
+        OL`Maximal:=true;
+        OL`MaximalOrder:=OL;
+    end for;
     O`IsGorenstein:=true;
     A`MaximalOrder:=O;
+    if #wk gt 1 then
+        R:=Order([ A! s : s in wk[1][1]]); // the first one is R
+    else 
+        R:=O; //to save attributes
+    end if;
     ooR:={@ @};
     wkR:=[];
-    for dataS in wk do
-        S:=Order([ A ! s : s in dataS[1]]);
+    for iS->dataS in wk do
+        if iS eq 1 then
+            S:=R;
+        elif iS eq #wk then
+            S:=O;
+        else
+            S:=Order([ A ! s : s in dataS[1]]);
+        end if;
         S`IsGorenstein:=#dataS eq 1;
         Include(~ooR,S);
         wkS:=[];

@@ -3,7 +3,7 @@
 
     - IdealsOfIndex.m
     - TotRealTotPos.m
-    - CMAlgAss.m
+    - CMAlgAss.m //already moved ComplexConjugate in ComplexConj.m, but not the CMType stuff
     - Completion.m
     - IntegralMatrices.m
     - RepsZConjugacy.m

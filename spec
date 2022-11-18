@@ -6,6 +6,7 @@ Ord.m
 Quotients.m
 OverOrders.m
 Idl.m
+ComplexConj.m
 IntermediateIdeals.m
 MinimalGenerators.m
 CRT.m

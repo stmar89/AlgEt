@@ -22,91 +22,154 @@ import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQ
 // Chinese RemainderTheorem
 //------------
 
+// // OLD VERSION to be cleaned
+// CRT_data_order:=function(S)
+//     if not assigned S`CRT_data then
+//         K:=Algebra(S);
+//         zb:=ZBasis(S); 
+//         //I need to modify the ZBasis(S) in a way that One(K) is the first element
+//         pos:=Position(zb,One(K));
+//         if pos ne 1 then
+//             vprintf CRT,2 : "1 is not in the first position of ZBasis(S)\n";
+//             if pos eq 0 then //One(K) not in Zbasis_S
+//                 vprintf CRT,2 : "1 is not in ZBasis(S)\n";
+//                 coord:=AbsoluteCoordinates([One(K)],zb)[1];
+//                 // since One(K) is in S, and there exists a Z-Basis of S containing One(K), then there must be a coefficient of coord that is a unit in Z, i.e. 1 or -1.
+//                 // the element for which this occurs can be replaced by One(K)
+//                 pos:=Position(coord,1);
+//                 if pos eq 0 then
+//                     pos:=Position(coord,-1);
+//                 end if;
+//                 assert pos ne 0;
+//             end if; 
+//             //replacing zb[pos] with One(K) since they generate the same Z-Span
+//             temp:=zb[1];
+//             zb[1]:=One(K);
+//             if pos ne 1 then
+//                 zb[pos]:=temp;
+//             end if;
+//         end if;
+//         assert2 Order(zb) eq S;
+//         M:=MatrixAtoQ(zb);
+//         Minv:=M^-1;
+//         S`CRT_data:=<zb,Minv>;
+//     end if;
+//     return Explode(S`CRT_data);
+// end function;
+// 
+// CRT_data_ideal:=function(I)
+//     if not assigned I`CRT_data then
+//         _,Minv:=CRT_data_order(Order(I)); 
+//         vprintf CRT,2 : "CRT_data_ideal output = %o\n",(MatrixAtoQ(ZBasis(I))*Minv);
+//         I`CRT_data:=crQZ(MatrixAtoQ(ZBasis(I))*Minv);
+//     end if;
+//     return I`CRT_data;
+// end function;
+// 
+// intrinsic ChineseRemainderTheorem(I::AlgEtIdl,J::AlgEtIdl,a::AlgEtElt,b::AlgEtElt)-> AlgEtElt
+// {Given two coprime ideals I and J of S, two elements a,b in S, finds e such that (e-a) in I and (e-b) in J.}
+//     S:=Order(I);
+//     vprintf CRT,2 : "S :=%o;\nI := %o;\nJ := %o;\n\/\/[a,b] =\nelts := %o;\n",PrintSeqAlgEtElt(ZBasis(S)),PrintSeqAlgEtElt(ZBasis(I)),PrintSeqAlgEtElt(ZBasis(J)),PrintSeqAlgEtElt([a,b]); 
+//     require a in S and b in S:"the elements must lie in order of definition of the ideals";
+//     require S eq Order(J): "the ideals must be of the same order";
+//     require IsCoprime(I,J) : "the ideals must be coprime";
+//     I_min:=MinimalInteger(I);
+//     J_min:=MinimalInteger(J);
+//     g,c1,d1:=XGCD(I_min,J_min);
+//     if g ne 1 then
+//         K:=Algebra(S);
+//         n:=AbsoluteDimension(K);
+//         Zbasis_S,Minv:=CRT_data_order(S);
+//         vprintf CRT,2 : "ZBasis_S := %o;\n",PrintSeqAlgEtElt(Zbasis_S);
+//         A:=CRT_data_ideal(I);
+//         B:=CRT_data_ideal(J);
+//         C:=VerticalJoin(A,B);
+//         H,U:=HermiteForm(C); //U*C = H;
+//         z:=ZeroMatrix(Integers(),n,n);
+//         s:=ScalarMatrix(n,1);
+//         assert2 H eq VerticalJoin(s,z);
+//         P:=VerticalJoin(HorizontalJoin(z,s),HorizontalJoin(s,z));
+//         U1:=Transpose(U)*P; //I need the (n+1)st column of U1
+//         Z:=Transpose(U1)[n+1];
+//         X:=Matrix(Integers(),1,n,[Z[i] : i in [1..n]]);
+//         Y:=X*A;
+//         c:=&+[Y[1,i]*Zbasis_S[i] : i in [1..n]];
+//         assert2 c in I;
+//         d:=One(K)-c;
+//         assert2 d in J;
+//         // c in I, d in J st 1 = c + d
+//     else
+//         //g:=c1*I_min+d1*J_min
+//         c:=c1*I_min;
+//         d:=d1*J_min;
+//     end if;
+//     e:=a*d+b*c;
+//     vprintf CRT,2 : "e := %o;\n",PrintSeqAlgEtElt([e])[1];
+//     assert e-a in I;
+//     assert e-b in J;
+//     return e;
+// end intrinsic;
+
 CRT_data_order:=function(S)
     if not assigned S`CRT_data then
-        K:=Algebra(S);
-        zb:=ZBasis(S); 
-        //I need to modify the ZBasis(S) in a way that One(K) is the first element
-        pos:=Position(zb,One(K));
-        if pos ne 1 then
-            vprintf CRT,2 : "1 is not in the first position of ZBasis(S)\n";
-            if pos eq 0 then //One(K) not in Zbasis_S
-                vprintf CRT,2 : "1 is not in ZBasis(S)\n";
-                coord:=AbsoluteCoordinates([One(K)],zb)[1];
-                // since One(K) is in S, and there exists a Z-Basis of S containing One(K), then there must be a coefficient of coord that is a unit in Z, i.e. 1 or -1.
-                // the element for which this occurs can be replaced by One(K)
-                pos:=Position(coord,1);
-                if pos eq 0 then
-                    pos:=Position(coord,-1);
-                end if;
-                assert pos ne 0;
-            end if; 
-            //replacing zb[pos] with One(K) since they generate the same Z-Span
-            temp:=zb[1];
-            zb[1]:=One(K);
-            if pos ne 1 then
-                zb[pos]:=temp;
-            end if;
-        end if;
-        assert2 Order(zb) eq S;
-        M:=MatrixAtoQ(zb);
-        Minv:=M^-1;
-        S`CRT_data:=<zb,Minv>;
+        M:=MatrixAtoQ(ZBasis(S));
+        d:=Denominator(M);
+        _,V:=HermiteForm(crQZ(d*M)); // V*d*M eq H
+        cc:=Matrix([AbsoluteCoordinates([One(Algebra(S))],S)[1]])*crZQ(V^-1);
+        S`CRT_data:=<cc,d>;
     end if;
     return Explode(S`CRT_data);
 end function;
 
 CRT_data_ideal:=function(I)
-    if not assigned I`CRT_data then
-        _,Minv:=CRT_data_order(Order(I)); 
-        vprintf CRT,2 : "CRT_data_ideal output = %o\n",(MatrixAtoQ(ZBasis(I))*Minv);
-        I`CRT_data:=crQZ(MatrixAtoQ(ZBasis(I))*Minv);
-    end if;
-    return I`CRT_data;
+     if not assigned I`CRT_data then
+         _,d:=CRT_data_order(Order(I));
+         I`CRT_data:=crQZ(d*MatrixAtoQ(ZBasis(I)));
+     end if;
+     return I`CRT_data;
 end function;
+
+intrinsic ChineseRemainderTheorem(Is::SeqEnum[AlgEtIdl],as::SeqEnum[AlgEtElt])-> AlgEtElt
+{Given a sequence Is of coprime ideals of S, and a sequence as of elements of S, it returns an element e such that e-as[i] in Is[i] for every i.}
+    N:=#as;
+    S:=Order(Is[1]);
+    require #Is eq N: "The number of ideals is not the same as the number of elements";
+    require forall{i : i in [1..N] | as[i] in S}:"the elements must lie in order of definition of the ideals";
+    require forall{i : i in [2..N] | Order(Is[i]) eq S}:"the ideals must be of the same order";
+    Is_min:=[ MinimalInteger(I) : I in Is ];
+    g,c1s:=XGCD(Is_min);
+    if g ne 1 then
+        // cc=coord of 1 in S * V^-1, where V*(zb(S)) = H. H is the same as below.
+        // let U*VerticalJoin(zb(I1),...,zb(IN)) = H 
+        // extend cc with zeros.
+        // hence cc*U gives the coordinates of 1 in I1+I2+...+IN. 
+        // Note that we use only the first n rows of U.
+        // So instead of extending cc, we can replace U wit only its first n rows.
+        K:=Algebra(S);
+        n:=AbsoluteDimension(K);
+        cc,d:=CRT_data_order(S);
+        C:=VerticalJoin([ CRT_data_ideal(I) : I in Is ]);
+        H,U:=HermiteForm(C); //U*C = H;
+        cc:=cc*crZQ(Matrix(Rows(U)[1..n]));
+        cc:=Partition(Eltseq(cc),n);
+        cs:=[ &+[cc[i][j]*ZBasis(Is[i])[j] : j in [1..n]] : i in [1..N] ]; 
+        // cs[i] in Is[i] and \sum_i cs[i] = 1
+    else
+        //1 = g = \sum_i c1s[i]*Is_min[i]
+        cs:=[c1s[i]*Is_min[i] : i in [1..N]];
+    end if;
+    assert2 &+cs eq One(Algebra(S));
+    assert2 forall{ cs : i in [1..N] | cs[i] in Is[i] };
+    ashat:=[ &*[as[j] : j in [1..N] | i ne j ]  : i in [1..N] ];
+    e:=&+[cs[i]*ashat[i] : i in [1..N]];
+    vprintf CRT,2 : "e := %o;\n",PrintSeqAlgEtElt([e])[1];
+    assert forall{ i : i in [1..N] | e-as[i] in Is[i]};
+    return e;
+end intrinsic;
 
 intrinsic ChineseRemainderTheorem(I::AlgEtIdl,J::AlgEtIdl,a::AlgEtElt,b::AlgEtElt)-> AlgEtElt
 {Given two coprime ideals I and J of S, two elements a,b in S, finds e such that (e-a) in I and (e-b) in J.}
-    S:=Order(I);
-    vprintf CRT,2 : "S :=%o;\nI := %o;\nJ := %o;\n\/\/[a,b] =\nelts := %o;\n",PrintSeqAlgEtElt(ZBasis(S)),PrintSeqAlgEtElt(ZBasis(I)),PrintSeqAlgEtElt(ZBasis(J)),PrintSeqAlgEtElt([a,b]); 
-    require a in S and b in S:"the elements must lie in order of definition of the ideals";
-    require S eq Order(J): "the ideals must be of the same order";
-    require IsCoprime(I,J) : "the ideals must be coprime";
-    I_min:=MinimalInteger(I);
-    J_min:=MinimalInteger(J);
-    g,c1,d1:=XGCD(I_min,J_min);
-    if g ne 1 then
-        K:=Algebra(S);
-        n:=AbsoluteDimension(K);
-        Zbasis_S,Minv:=CRT_data_order(S);
-        vprintf CRT,2 : "ZBasis_S := %o;\n",PrintSeqAlgEtElt(Zbasis_S);
-        A:=CRT_data_ideal(I);
-        B:=CRT_data_ideal(J);
-        C:=VerticalJoin(A,B);
-        H,U:=HermiteForm(C); //U*C = H;
-        z:=ZeroMatrix(Integers(),n,n);
-        s:=ScalarMatrix(n,1);
-        assert2 H eq VerticalJoin(s,z);
-        P:=VerticalJoin(HorizontalJoin(z,s),HorizontalJoin(s,z));
-        U1:=Transpose(U)*P; //I need the (n+1)st column of U1
-        Z:=Transpose(U1)[n+1];
-        X:=Matrix(Integers(),1,n,[Z[i] : i in [1..n]]);
-        Y:=X*A;
-        c:=&+[Y[1,i]*Zbasis_S[i] : i in [1..n]];
-        assert2 c in I;
-        d:=One(K)-c;
-        assert2 d in J;
-        // c in I, d in J st 1 = c + d
-    else
-        //g:=c1*I_min+d1*J_min
-        c:=c1*I_min;
-        d:=d1*J_min;
-    end if;
-    e:=a*d+b*c;
-    vprintf CRT,2 : "e := %o;\n",PrintSeqAlgEtElt([e])[1];
-    assert e-a in I;
-    assert e-b in J;
-    return e;
+    return ChineseRemainderTheorem([I,J],[a,b]);
 end intrinsic;
 
 /* TEST
@@ -159,7 +222,8 @@ end intrinsic;
         Append(~out2,e);
     end for;
     Cputime(t0);
-    assert forall{i : i in [1..#out1] | out1[i] eq out2[i]};
+    pp:=pp13[1]*pp13[2];
+    assert forall{i : i in [1..#out1] | (out1[i] - out2[i]) in pp};
     
     //////////////////
     //Relative setting

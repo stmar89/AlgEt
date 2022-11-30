@@ -967,21 +967,3 @@ end intrinsic;
 
 */
 
-
-/*OLD TEST
-
-//problem with CRT
-
-AttachSpec("packages.spec");
-  _<x>:=PolynomialRing(Integers());
-f:=x^4+11*x^3+73*x^2+319*x+841;
-A:=EtaleAlgebra(f);
-q:=Integers() ! (Coefficients(f)[1]^(2/Degree(f)));
-F:=PrimitiveElement(A);
-V:=q*F^-1;
-E:=Order([V,F]);
-seqOO:=FindOverOrders(E);
-[#PicardGroup(S) : S in seqOO];
-
-
-*/

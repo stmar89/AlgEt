@@ -60,6 +60,30 @@ intrinsic ChineseRemainderTheorem2(I::AlgEtIdl,J::AlgEtIdl)-> Map,Map,Map
     return qIJ,iso,qD;
 end intrinsic;
 
+////////
+// CRT
+///////
+
+    AttachSpec("~/packages_github/AlgEt/spec");
+    import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQtoA , meet_zbasis , inclusion_matrix;
+    _<x>:=PolynomialRing(Integers());
+    f:=x^4 + 6*x^2 + 25;
+    K:=EtaleAlgebra(f);
+    O:=MaximalOrder(K);
+    pp:=PrimesAbove(2*O);
+    P:=pp[1]; 
+    Q:=pp[2];
+    mP:=MatrixAtoQ(ZBasis(P));
+    mQ:=MatrixAtoQ(ZBasis(Q));
+    C:=VerticalJoin(mP,mQ);
+    d:=Denominator(C);
+    mO:=d*VerticalJoin(MatrixAtoQ(ZBasis(O)),ZeroMatrix(Rationals(),Dimension(K)));
+    HH,V:=HermiteForm(crQZ(mO));
+    H,U:=HermiteForm(crQZ(d*C)); // U*d*C = H = V*mO
+    dK:=d*One(K);
+
+    cc:=Matrix([AbsoluteCoordinates([One(K)],O)[1] cat [0 : i in [1..Dimension(K)]]])*crZQ(V^-1*U); cc;
+    assert &+[Eltseq(cc)[i]*(ZBasis(P) cat ZBasis(Q))[i] : i in [1..#Eltseq(cc)]] eq One(K);
 
 
 /* TEST

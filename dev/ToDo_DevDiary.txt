@@ -14,12 +14,8 @@
 
     TODO:
     ### Priority ###
-    - I have recently added the Type AlgEtMod. A lot more refinement is needed.
+    - I have recently added the Type AlgEtMod. Many thinks that are valid for Idl should also be implemented for Modules. Eg, sum of modules, ideal*module, ...
     - Then I should convert PowerOfBass.m
-    
-    ### Reorganize Quotients.m ###
-    - Make Quotient(ZBasis(I),ZBAsis(J)), which returns Q,q. Note that q has domain AlgEt, so even if I is not created, we are fine.
-    - Then Quotient for AlgEtIdl, AlgEtOrd and AlgEtMod should call this intrinsic.
 
     ### Various ###
     - an AlgEtToAlgAss intrinsic which returns an AlgAss and an isomorphism.
@@ -69,7 +65,13 @@
       Doing the computation prime per prime should help.
       But there are many cases where this is still too slow with only one non-Gorestein prime.
 
+    ### Other ###
+    - Check if I can use Self() to improve construction of sequences. This is based on the following observation:
+    [ 2^i : i in [1..10^1000]] computes each power of 2 separately.
+    [ i gt 1 select Self(i-1)*2 else 2 ] constructs the same sequence recursively: at each step, it multiplies by 2.
+
     ### FIXED/DONE: kept for the record. ###
+    - Quotient(ZBasis(I),ZBasis(J)) will not be implemented. In the map we use that I has an inclusion_matrix. This makes it faster. So it is worth to generate at least the ideal I.
     - For WKIC_bar: I changed the recursion in Intermediate...WithTrivial...AndPrescr... so that in output one would store only the wkclasses. I thought this would speed up a bit the computation, since less equalities would have to be checked. But it seems that it slowed it down a bit, instead. So reverted to the previous version, were we generate all the intermediate modules (with mult ring and trivial ext) and then mod out by weak equivalence.
     - Introduced IntermediateModulesWithTrivialExtension, which uses MaximalIntermediateModules. 
       Faster since we can skip some part of the recursion.

@@ -22,30 +22,67 @@ declare attributes AlgEtIdl : ResidueField;
 // Quotients
 //------------
 
+intrinsic Quotient(I::AlgEtIdl, zbJ::SeqEnum[AlgEtElt]) -> GrpAb, Map
+{ Given an ideal I and the ZBasis of an ideal J such that  J subset I, returns the abelian group Q=I/J together with the quotient map q:I->J. J can also be an order. } 
+    // if J is not inside I, an error occurs while forming Q. so no need to check in advance
+    A:=Algebra(I);
+    zbI:=ZBasis(I);
+	N := #zbI;
+	F := FreeAbelianGroup(N);
+	rel := [F ! cc : cc in AbsoluteCoordinates(zbJ,I)];
+	mFI := map<F->A| x:->&+[Eltseq(x)[i]*zbI[i] : i in [1..N]]>;
+	mIF := map<A->F| x:-> F ! AbsoluteCoordinates([x],I)[1]>;
+	Q,qFQ := quo<F|rel>; //q:F->Q. Q is an "abstract" abelian group isomorphic to I/J.
+    q:=map< A->Q | x:->qFQ(mIF(x)) , y:-> mFI(y@@qFQ) >; 
+    return Q,q;
+end intrinsic;
+
+intrinsic Quotient(I::AlgEtIdl, J::AlgEtIdl) -> GrpAb, Map
+{ given fractional ideals J subset I, returns the abelian group Q=I/J together with the quotient map q:I->J } 
+    return Quotient(I,ZBasis(J));
+end intrinsic;
+
+intrinsic Quotient(S::AlgEtOrd, zbJ::SeqEnum[AlgEtElt]) -> GrpAb, Map
+{ Given an order S and the ZBasis of an ideal J such that  J subset S, returns the abelian group Q=S/J together with the quotient map q:S->J. J can also be an order. } 
+    // if J is not inside S, an error occurs while forming Q. so no need to check in advance
+    A:=Algebra(S);
+    zbS:=ZBasis(S);
+	N := #zbS;
+	F := FreeAbelianGroup(N);
+	rel := [F ! cc : cc in AbsoluteCoordinates(zbJ,S)]; // this absolute coordinates uses inclusion_matrix. fast!
+	mFS := map<F->A| x:->&+[Eltseq(x)[i]*zbS[i] : i in [1..N]]>;
+	mSF := map<A->F| x:-> F ! AbsoluteCoordinates([x],S)[1]>;
+	Q,qFQ := quo<F|rel>; //q:F->Q. Q is an "abstract" abelian group isomorphic to S/J.
+    q:=map< A->Q | x:->qFQ(mSF(x)) , y:-> mFS(y@@qFQ) >; 
+    return Q,q;
+end intrinsic;
+
 intrinsic ResidueRing(S::AlgEtOrd,I::AlgEtIdl) -> GrpAb , Map
 {given an integral ideal I of S, returns the abelian group S/I and the epimorphism pi:S -> S/I (with inverse map). Important: the domain of pi is the Algebra of S, since the elements of S are usually expressed al elements of A. For eg Parent(Random(S)) = Algebra(S)}
     require Order(I) eq S : "wrong order";
-    require IsIntegral(I): "I must be an integral ideal of S";
-    A:=Algebra(S);
-    N:=AbsoluteDimension(A);
-    F:=FreeAbelianGroup(N);
-    S_to_F:=function(x0)
-        assert Parent(x0) eq A;
-        x_inS:=AbsoluteCoordinates([x0],S)[1];
-        return (F ! Eltseq(x_inS)) ;
-    end function;
-    F_to_S:=function(y)
-        y_inA:=&+[ZBasis(S)[i]*Eltseq(y)[i] : i in [1..N]];
-        return y_inA;
-    end function;
-    StoF:=map< A -> F | x :-> S_to_F(x), y :-> F_to_S(y)>;
-    rel:=[F ! x : x in AbsoluteCoordinates(ZBasis(I),S)];
-    Q,q:=quo<F|rel>; //Q=S/I
-    m:=StoF*q; //m is a map from S to Q
-    assert #Q eq Index(S,I);
-    assert2 forall{x : x in ZBasis(I) | m(x) eq Zero(Q)};
-    assert2 forall{x : x in ZBasis(S) | ((m(x))@@m - x) in I};
-    return Q,m;
+    return Quotient(S,ZBasis(I));
+//  OLD
+//     require IsIntegral(I): "I must be an integral ideal of S";
+//     A:=Algebra(S);
+//     N:=AbsoluteDimension(A);
+//     F:=FreeAbelianGroup(N);
+//     S_to_F:=function(x0)
+//         assert Parent(x0) eq A;
+//         x_inS:=AbsoluteCoordinates([x0],S)[1];
+//         return (F ! Eltseq(x_inS)) ;
+//     end function;
+//     F_to_S:=function(y)
+//         y_inA:=&+[ZBasis(S)[i]*Eltseq(y)[i] : i in [1..N]];
+//         return y_inA;
+//     end function;
+//     StoF:=map< A -> F | x :-> S_to_F(x), y :-> F_to_S(y)>;
+//     rel:=[F ! x : x in AbsoluteCoordinates(ZBasis(I),S)];
+//     Q,q:=quo<F|rel>; //Q=S/I
+//     m:=StoF*q; //m is a map from S to Q
+//     assert #Q eq Index(S,I);
+//     assert2 forall{x : x in ZBasis(I) | m(x) eq Zero(Q)};
+//     assert2 forall{x : x in ZBasis(S) | ((m(x))@@m - x) in I};
+//     return Q,m;
 end intrinsic;
 
 intrinsic ResidueField(P::AlgEtIdl) -> FldFin, Map
@@ -74,6 +111,7 @@ intrinsic ResidueField(P::AlgEtIdl) -> FldFin, Map
     end if;
     return Explode(P`ResidueField);
 end intrinsic;
+
 /* The following version is promising, but still bugged. One assertions fails.
 intrinsic QuotientVS(I::AlgEtIdl, J::AlgEtIdl, P::AlgEtIdl) -> ModRng, Map
 {Let I, J, P be fractional R-ideals such that:
@@ -139,7 +177,6 @@ intrinsic QuotientVS(I::AlgEtIdl, J::AlgEtOrd, P::AlgEtIdl) -> ModRng, Map
     return QuotientVS(S!!I,S!!OneIdeal(J),P);
 end intrinsic;
 
-// OLD version. Much more complicated 
 intrinsic QuotientVS(I::AlgEtIdl, J::AlgEtIdl, P::AlgEtIdl) -> ModRng, Map
 {
  let I, J, P be fractional R-ideals such that:
@@ -205,21 +242,6 @@ intrinsic QuotientVS(I::AlgEtIdl, J::AlgEtIdl, P::AlgEtIdl) -> ModRng, Map
 		return &+[ bas[j]*(Eltseq(y)[j]@@k) : j in [1..d] ];
     end function;
     return V, map<A->V | x:->mIV(x), y:->mVI(y) >;
-end intrinsic;
-
-intrinsic Quotient(I::AlgEtIdl, J::AlgEtIdl) -> GrpAb, Map
-{ given fractional ideals J subset I, returns the abelian group Q=I/J together with the quotient map q:I->J } 
-    // if J is not inside I, an error occurs while forming Q. so no need to check in advance
-    A:=Algebra(I);
-	zbI := ZBasis(I);
-	N := #zbI;
-	F := FreeAbelianGroup(N);
-	rel := [F ! cc : cc in AbsoluteCoordinates(ZBasis(J),I)];
-	mFI := map<F->A| x:->&+[Eltseq(x)[i]*zbI[i] : i in [1..N]]>;
-	mIF := map<A->F| x:-> F ! AbsoluteCoordinates([x],I)[1]>;
-	Q,qFQ := quo<F|rel>; //q:F->Q. Q is an "abstract" abelian group isomorphic to I/J.
-    q:=map< A->Q | x:->qFQ(mIF(x)) , y:-> mFI(y@@qFQ) >; 
-    return Q,q;
 end intrinsic;
 
 /* TEST

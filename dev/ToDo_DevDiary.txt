@@ -37,14 +37,6 @@
     - CHECK improve power of Ideals: if I is invertible, and I=aS+bS, then I^N=a^NS+b^NS. See Lemma in MinimalGenerators.m
 
     #### CRT ####
-    - residue_class_field_primitive_element can probably be upgraded using ResidueField(P);
-      the primitive elemnt should be cached.
-    - residue_class_ring_unit_subgroup_generators can be improved. calling CRT makes a lot of unecessary computations
-      see test2 in CRT.m: currently CRT given (a,b)->e such that e-a in I and e-b in J. 
-      If one needs to run it several times for the same I and J, 
-      then it is better to first run it with input (1,0)->e1 and (0,1)->e2.
-      Then for any (a,b) the corresponding e would just be e=a*e1+b*e2.
-    - is ResidueField cached?
     - Make a CRT for modules : I/P1*...*Ps*I -> \prod_i (I/Pi*I)
       This is needed for finding a minimal set of generators of non-necessarly invertible ideals.
 
@@ -70,6 +62,13 @@
     [ i gt 1 select Self(i-1)*2 else 2 ] constructs the same sequence recursively: at each step, it multiplies by 2.
 
     ### FIXED/DONE: kept for the record. ###
+    - residue_class_field_primitive_element is replaced by PrimitiveElementResidueField which is cached
+    - Done: residue_class_ring_unit_subgroup_generators can be improved. 
+      calling CRT makes a lot of unecessary computations see test2 in CRT.m: 
+      currently CRT given (a,b)->e such that e-a in I and e-b in J. 
+      If one needs to run it several times for the same I and J, 
+      then it is better to first run it with input (1,0)->e1 and (0,1)->e2.
+      Then for any (a,b) the corresponding e would just be e=a*e1+b*e2.
     - CRT should be done also for a list of ideals, not just pairs I,J.
     - Quotient(ZBasis(I),ZBasis(J)) will not be implemented. In the map we use that I has an inclusion_matrix. This makes it faster. So it is worth to generate at least the ideal I.
     - For WKIC_bar: I changed the recursion in Intermediate...WithTrivial...AndPrescr... so that in output one would store only the wkclasses. I thought this would speed up a bit the computation, since less equalities would have to be checked. But it seems that it slowed it down a bit, instead. So reverted to the previous version, were we generate all the intermediate modules (with mult ring and trivial ext) and then mod out by weak equivalence.

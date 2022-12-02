@@ -11,7 +11,7 @@ import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQ
 
 declare verbose Quotients, 1;
 
-declare attributes AlgEtIdl : ResidueField;
+declare attributes AlgEtIdl : ResidueField,PrimitiveElementResidueField;
 
 /*TODO:
 
@@ -112,6 +112,15 @@ intrinsic ResidueField(P::AlgEtIdl) -> FldFin, Map
 	    P`ResidueField:=<F, map>;
     end if;
     return Explode(P`ResidueField);
+end intrinsic;
+
+intrinsic PrimitiveElementResidueField(P::AlgEtIdl)->AlgEtElt
+{Returns an element of P that maps to the primitive element of the residue field S/P, that is a multiplicative generator of (S/P)^*.}
+    if not assigned P`PrimitiveElementResidueField then
+        F,f:=ResidueField(P);
+        P`PrimitiveElementResidueField:=PrimitiveElement(F)@@f;
+    end if;
+    return P`PrimitiveElementResidueField;
 end intrinsic;
 
 /* The following version is promising, but still bugged. One assertions fails.

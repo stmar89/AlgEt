@@ -174,6 +174,7 @@ end intrinsic;
 // Equality and Operations
 //------------
 
+// eq 
 intrinsic 'eq'(x1::AlgEtElt,x2::AlgEtElt) -> BoolElt
 {Is x1=x2 ?}
     A:=Parent(x1);
@@ -202,6 +203,7 @@ intrinsic 'eq'(x1::AlgEtElt,x2::FldRatElt) -> BoolElt
     return x1 eq (Algebra(x1)!x2);
 end intrinsic;
 
+// +
 intrinsic '+'(x1::AlgEtElt,x2::AlgEtElt) -> AlgEtElt
 {x1+x2}
     A:=Parent(x1);
@@ -224,6 +226,27 @@ intrinsic '+'(x1::AlgEtElt,x2::.) -> AlgEtElt
     return x1 + x2;
 end intrinsic;
 
+intrinsic '+'(x1::RngIntElt,x2::AlgEtElt) -> AlgEtElt
+{x1+x2}
+    return CreateAlgEtElt(Algebra(x2),<x1+c : c in Components(x2)>);
+end intrinsic;
+
+intrinsic '+'(x1::FldRatElt,x2::AlgEtElt) -> AlgEtElt
+{x1+x2}
+    return CreateAlgEtElt(Algebra(x2),<x1+c : c in Components(x2)>);
+end intrinsic;
+
+intrinsic '+'(x1::AlgEtElt,x2::RngIntElt) -> AlgEtElt
+{x1+x2}
+    return CreateAlgEtElt(Algebra(x1),<c+x2 : c in Components(x1)>);
+end intrinsic;
+
+intrinsic '+'(x1::AlgEtElt,x2::FldRatElt) -> AlgEtElt
+{x1+x2}
+    return CreateAlgEtElt(Algebra(x1),<c+x2 : c in Components(x1)>);
+end intrinsic;
+
+// -
 intrinsic '-'(x::AlgEtElt) -> AlgEtElt
 {-x}
     A:=Parent(x);
@@ -255,6 +278,27 @@ intrinsic '-'(x1::AlgEtElt,x2::.) -> AlgEtElt
     return x1 - x2;
 end intrinsic;
 
+intrinsic '-'(x1::RngIntElt,x2::AlgEtElt) -> AlgEtElt
+{x1+x2}
+    return Algebra(x2)! <x1-c : c in Components(x2)>;
+end intrinsic;
+
+intrinsic '-'(x1::FldRatElt,x2::AlgEtElt) -> AlgEtElt
+{x1+x2}
+    return Algebra(x2)! <x1-c : c in Components(x2)>;
+end intrinsic;
+
+intrinsic '-'(x1::AlgEtElt,x2::RngIntElt) -> AlgEtElt
+{x1+x2}
+    return Algebra(x1)! <c-x2 : c in Components(x1)>;
+end intrinsic;
+
+intrinsic '-'(x1::AlgEtElt,x2::FldRatElt) -> AlgEtElt
+{x1+x2}
+    return Algebra(x1)! <c-x2 : c in Components(x1)>;
+end intrinsic;
+
+// *
 intrinsic '*'(x1::AlgEtElt,x2::AlgEtElt) -> AlgEtElt
 {x1*x2}
     A:=Parent(x1);
@@ -278,6 +322,27 @@ intrinsic '*'(x1::AlgEtElt,x2::.) -> AlgEtElt
     return x1 * x2;
 end intrinsic;
 
+intrinsic '*'(x1::RngIntElt,x2::AlgEtElt) -> AlgEtElt
+{x1+x2}
+    return CreateAlgEtElt(Algebra(x2),<x1*c : c in Components(x2)>);
+end intrinsic;
+
+intrinsic '*'(x1::FldRatElt,x2::AlgEtElt) -> AlgEtElt
+{x1+x2}
+    return CreateAlgEtElt(Algebra(x2),<x1*c : c in Components(x2)>);
+end intrinsic;
+
+intrinsic '*'(x1::AlgEtElt,x2::RngIntElt) -> AlgEtElt
+{x1+x2}
+    return CreateAlgEtElt(Algebra(x1),<c*x2 : c in Components(x1)>);
+end intrinsic;
+
+intrinsic '*'(x1::AlgEtElt,x2::FldRatElt) -> AlgEtElt
+{x1+x2}
+    return CreateAlgEtElt(Algebra(x1),<c*x2 : c in Components(x1)>);
+end intrinsic;
+
+// inverse and power
 intrinsic Inverse(x::AlgEtElt) -> AlgEtElt
 {1/x}
     require IsUnit(x) : "The element is not invertible.";
@@ -304,6 +369,7 @@ intrinsic '^'(x::AlgEtElt,n::RngIntElt) -> AlgEtElt
     end if;
 end intrinsic;
 
+// /
 intrinsic '/'(x1::AlgEtElt,x2::AlgEtElt) -> AlgEtElt
 {x1/x2}
     A:=Parent(x1);
@@ -328,6 +394,110 @@ intrinsic '/'(x1::AlgEtElt,x2::.) -> AlgEtElt
     return x1 / x2;
 end intrinsic;
 
+intrinsic '/'(x1::RngIntElt,x2::AlgEtElt) -> AlgEtElt
+{x1+x2}
+    return CreateAlgEtElt(Algebra(x2),<x1/c : c in Components(x2)>);
+end intrinsic;
+
+intrinsic '/'(x1::FldRatElt,x2::AlgEtElt) -> AlgEtElt
+{x1+x2}
+    return CreateAlgEtElt(Algebra(x2),<x1/c : c in Components(x2)>);
+end intrinsic;
+
+intrinsic '/'(x1::AlgEtElt,x2::RngIntElt) -> AlgEtElt
+{x1+x2}
+    return CreateAlgEtElt(Algebra(x1),<c/x2 : c in Components(x1)>);
+end intrinsic;
+
+intrinsic '/'(x1::AlgEtElt,x2::FldRatElt) -> AlgEtElt
+{x1+x2}
+    return CreateAlgEtElt(Algebra(x1),<c/x2 : c in Components(x1)>);
+end intrinsic;
+
+//------------
+// Sums and Products of sequences
+//------------
+
+intrinsic '&+'(seq::SeqEnum[AlgEtElt]) -> AlgEtElt
+{Given a sequence of AlgEtElt returns the sum of the entries.}
+    if #seq eq 0 then
+        out:=Zero(Universe(seq));
+    elif #seq eq 1 then
+        out:=seq[1];
+    else
+        comps:=<>;
+        N:=#Components(seq[1]);
+        comps:=< &+[ Components(s)[i] : s in seq ] : i in [1..N] >;
+        out:=Algebra(seq[1])!comps;
+    end if;
+    return out;
+end intrinsic;
+
+intrinsic '&*'(seq::SeqEnum[AlgEtElt]) -> AlgEtElt
+{Given a sequence of AlgEtElt returns the product of the entries.}
+    if #seq eq 0 then
+        out:=One(Universe(seq));
+    elif #seq eq 1 then
+        out:=seq[1];
+    else
+        comps:=<>;
+        N:=#Components(seq[1]);
+        comps:=< &*[ Components(s)[i] : s in seq ] : i in [1..N] >;
+        out:=Algebra(seq[1])!comps;
+    end if;
+    return out;
+end intrinsic;
+
+intrinsic SumOfProducts(as::SeqEnum[AlgEtElt],bs::SeqEnum[AlgEtElt]) -> AlgEtElt
+{Given sequences as and bs, such that #as eq #bs, returns &+[as[i]*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.}
+    A:=Universe(bs);
+    N:=#as;
+    require N eq #bs : "The sequences don't have the same size";
+    as:=[ Components(ai) : ai in as ];
+    bs:=[ Components(bi) : bi in bs ];
+    N_comp:=#bs[1];
+    return A ! < &+[ as[i][c]*bs[i][c] : i in [1..N] ] : c in [1..N_comp]>;
+end intrinsic;
+
+intrinsic SumOfProducts(as::SeqEnum[RngIntElt],bs::SeqEnum[AlgEtElt]) -> AlgEtElt
+{Given sequences as and bs, such that #as eq #bs, returns &+[as[i]*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.}
+    A:=Universe(bs);
+    N:=#as;
+    require N eq #bs : "The sequences don't have the same size";
+    bs:=[ Components(bi) : bi in bs ];
+    N_comp:=#bs[1];
+    return CreateAlgEtElt(A,< &+[ as[i]*bs[i][c] : i in [1..N] ] : c in [1..N_comp]>);
+end intrinsic;
+
+intrinsic SumOfProducts(as::SeqEnum[FldRatElt],bs::SeqEnum[AlgEtElt]) -> AlgEtElt
+{Given sequences as and bs, such that #as eq #bs, returns &+[as[i]*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.}
+    A:=Universe(bs);
+    N:=#as;
+    require N eq #bs : "The sequences don't have the same size";
+    bs:=[ Components(bi) : bi in bs ];
+    N_comp:=#bs[1];
+    return CreateAlgEtElt(A,< &+[ as[i]*bs[i][c] : i in [1..N] ] : c in [1..N_comp]>);
+end intrinsic;
+
+intrinsic SumOfProducts(as::SeqEnum[AlgEtElt],bs::SeqEnum[RngIntElt]) -> AlgEtElt
+{Given sequences as and bs, such that #as eq #bs, returns &+[as[i]*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.}
+    A:=Universe(as);
+    N:=#as;
+    require N eq #bs : "The sequences don't have the same size";
+    as:=[ Components(ai) : ai in as ];
+    N_comp:=#as[1];
+    return CreateAlgEtElt(A,< &+[ as[i][c]*bs[i] : i in [1..N] ] : c in [1..N_comp]>);
+end intrinsic;
+
+intrinsic SumOfProducts(as::SeqEnum[AlgEtElt],bs::SeqEnum[FldRatElt]) -> AlgEtElt
+{Given sequences as and bs, such that #as eq #bs, returns &+[as[i]*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.}
+    A:=Universe(as);
+    N:=#as;
+    require N eq #bs : "The sequences don't have the same size";
+    as:=[ Components(ai) : ai in as ];
+    N_comp:=#as[1];
+    return CreateAlgEtElt(A,< &+[ as[i][c]*bs[i] : i in [1..N] ] : c in [1..N_comp]>);
+end intrinsic;
 
 //------------
 // Minimal polynomials and integrability
@@ -563,5 +733,44 @@ end intrinsic;
     assert #AbsoluteBasis(A) eq AbsoluteDimension(A);
     OrthogonalIdempotents(A);
     Idempotents(A);
+
+    // testing sequences
+    AttachSpec("~/packages_github/AlgEt/spec");
+    _<x>:=PolynomialRing(Integers());
+    f:=(x^8+16)*(x^8+81);
+    A:=EtaleAlgebra(f);
+    seq:=[Random(A) : i in [1..10^4]];
+    time c0:=&+seq;
+    t0:=Cputime();
+        c:=seq[1];
+        for i in [2..#seq] do
+            c+:=seq[i];
+        end for;
+    Cputime(t0);
+    assert c eq c0;
+    time c0:=&*seq;
+    t0:=Cputime();
+        c:=seq[1];
+        for i in [2..#seq] do
+            c*:=seq[i];
+        end for;
+    Cputime(t0);
+    assert c eq c0;
+
+    time s1:=&+[seq[i]*seq[i] : i in [1..#seq]];
+    time s2:=SumOfProducts(seq,seq);
+    assert s1 eq s2;
+    seq0:=[Random(-10,10) : i in [1..#seq]];
+    time s1:=&+[seq0[i]*seq[i] : i in [1..#seq]];
+    time s2:=SumOfProducts(seq0,seq);
+    time s3:=&+[seq[i]*seq0[i] : i in [1..#seq]];
+    time s4:=SumOfProducts(seq,seq0);
+    assert s1 eq s2 and s1 eq s3 and s1 eq s4;
+    seq1:=[Random(-10,10)/Random(1,20) : i in [1..#seq]];
+    time s1:=&+[seq1[i]*seq[i] : i in [1..#seq]];
+    time s2:=SumOfProducts(seq1,seq);
+    time s3:=&+[seq[i]*seq1[i] : i in [1..#seq]];
+    time s4:=SumOfProducts(seq,seq1);
+    assert s1 eq s2 and s1 eq s3 and s1 eq s4;
 
 */

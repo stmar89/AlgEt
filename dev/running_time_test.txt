@@ -176,7 +176,7 @@
     t0:=Cputime();
         ooet:=FindOverOrders(Eet);
     t1:=Cputime(t0); t1;
-    tprevbest:=19;
+    tprevbest:=13.7; //on diophantus
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "FindOverOrders for %o got faster. Update the previous best known time\n",f;
@@ -268,7 +268,7 @@
     t0:=Cputime();
         #WKICM(R);
     t1:=Cputime(t0); t1;
-    tprevbest:=4.5;
+    tprevbest:=4.5; // diophantus
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "WKICM for %o got faster. Update the previous best known time\n",f;

@@ -307,7 +307,8 @@ intrinsic Quotient(I::AlgEtMod, J::AlgEtMod) -> GrpAb, Map
     N := #zbI;
     F := FreeAbelianGroup(N);
     rel := [F ! cc : cc in AbsoluteCoordinates(ZBasis(J),I)]; //using inclusion_matrix. Fast!
-    mFI := map<F->A| x:->&+[Eltseq(x)[i]*zbI[i] : i in [1..N]]>;
+    //mFI := map<F->A| x:->&+[Eltseq(x)[i]*zbI[i] : i in [1..N]]>;
+    mFI := map<F->A| x:->SumOfProducts(Eltseq(x),zbI)>;
     mIF := map<A->F| x:-> F ! AbsoluteCoordinates([x],I)[1]>;
     Q,qFQ := quo<F|rel>; //q:F->Q. Q is an "abstract" abelian group isomorphic to I/J.
    q:=map< A->Q | x:->qFQ(mIF(x)) , y:-> mFI(y@@qFQ) >; 

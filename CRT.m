@@ -136,6 +136,7 @@ intrinsic ChineseRemainderTheorem(Is::SeqEnum[AlgEtIdl],as::SeqEnum[AlgEtElt])->
     require #Is eq N: "The number of ideals is not the same as the number of elements";
     require forall{i : i in [1..N] | as[i] in S}:"the elements must lie in order of definition of the ideals";
     require forall{i : i in [2..N] | Order(Is[i]) eq S}:"the ideals must be of the same order";
+    ashat:=[ &*[as[j] : j in [1..N] | i ne j ]  : i in [1..N] ];
     Is_min:=[ MinimalInteger(I) : I in Is ];
     g,c1s:=XGCD(Is_min);
     if g ne 1 then
@@ -152,16 +153,19 @@ intrinsic ChineseRemainderTheorem(Is::SeqEnum[AlgEtIdl],as::SeqEnum[AlgEtElt])->
         H,U:=HermiteForm(C); //U*C = H;
         cc:=cc*crZQ(Matrix(Rows(U)[1..n]));
         cc:=Partition(Eltseq(cc),n);
-        cs:=[ &+[cc[i][j]*ZBasis(Is[i])[j] : j in [1..n]] : i in [1..N] ]; 
+        // the following 2 lines are the slowest, many coercions in A
+        //cs:=[ &+[cc[i][j]*ZBasis(Is[i])[j] : j in [1..n]] : i in [1..N] ]; 
+        cs:=[ SumOfProducts(cc[i],ZBasis(Is[i])) : i in [1..N] ]; 
         // cs[i] in Is[i] and \sum_i cs[i] = 1
     else
         //1 = g = \sum_i c1s[i]*Is_min[i]
-        cs:=[c1s[i]*Is_min[i] : i in [1..N]];
+        cs:=[c1s[i]*Is_min[i] : i in [1..N]];// only integers here. very fast
+        // the following lines is the slowest, many coercions in A
     end if;
+    //e:=&+[cs[i]*ashat[i] : i in [1..N]];
+    e:=SumOfProducts(cs,ashat);
     assert2 &+cs eq One(Algebra(S));
     assert2 forall{ cs : i in [1..N] | cs[i] in Is[i] };
-    ashat:=[ &*[as[j] : j in [1..N] | i ne j ]  : i in [1..N] ];
-    e:=&+[cs[i]*ashat[i] : i in [1..N]];
     vprintf CRT,2 : "e := %o;\n",PrintSeqAlgEtElt([e])[1];
     assert forall{ i : i in [1..N] | e-as[i] in Is[i]};
     return e;
@@ -201,6 +205,7 @@ end intrinsic;
         Append(~pairs,[a,b]);
     end for;
     // test 1
+    
     t0:=Cputime();
     out1:=[];
     for pair in pairs do
@@ -209,7 +214,8 @@ end intrinsic;
         e:=ChineseRemainderTheorem(pp13[1],pp13[2],a,b);
         Append(~out1,e);
     end for;
-    Cputime(t0);
+    Cputime(t0); // old code ~14 secs. new code ~7 secs. w/o profiler
+
     // test 2
     t0:=Cputime();
     out2:=[];

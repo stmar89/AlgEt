@@ -30,7 +30,8 @@ intrinsic Quotient(I::AlgEtIdl, zbJ::SeqEnum[AlgEtElt]) -> GrpAb, Map
 	N := #zbI;
 	F := FreeAbelianGroup(N);
 	rel := [F ! cc : cc in AbsoluteCoordinates(zbJ,I)];
-	mFI := map<F->A| x:->&+[Eltseq(x)[i]*zbI[i] : i in [1..N]]>;
+	//mFI := map<F->A| x:->&+[Eltseq(x)[i]*zbI[i] : i in [1..N]]>;
+	mFI := map<F->A| x:->SumOfProducts(Eltseq(x),zbI)>;
 	mIF := map<A->F| x:-> F ! AbsoluteCoordinates([x],I)[1]>;
 	Q,qFQ := quo<F|rel>; //q:F->Q. Q is an "abstract" abelian group isomorphic to I/J.
     q:=map< A->Q | x:->qFQ(mIF(x)) , y:-> mFI(y@@qFQ) >; 
@@ -50,7 +51,8 @@ intrinsic Quotient(S::AlgEtOrd, zbJ::SeqEnum[AlgEtElt]) -> GrpAb, Map
 	N := #zbS;
 	F := FreeAbelianGroup(N);
 	rel := [F ! cc : cc in AbsoluteCoordinates(zbJ,S)]; // this absolute coordinates uses inclusion_matrix. fast!
-	mFS := map<F->A| x:->&+[Eltseq(x)[i]*zbS[i] : i in [1..N]]>;
+	//mFS := map<F->A| x:->&+[Eltseq(x)[i]*zbS[i] : i in [1..N]]>;
+	mFS := map<F->A| x:->SumOfProducts(Eltseq(x),zbS)>;
 	mSF := map<A->F| x:-> F ! AbsoluteCoordinates([x],S)[1]>;
 	Q,qFQ := quo<F|rel>; //q:F->Q. Q is an "abstract" abelian group isomorphic to S/J.
     q:=map< A->Q | x:->qFQ(mSF(x)) , y:-> mFS(y@@qFQ) >; 
@@ -197,7 +199,8 @@ intrinsic QuotientVS(I::AlgEtIdl, J::AlgEtIdl, P::AlgEtIdl) -> ModRng, Map
 	F := FreeAbelianGroup(N);
 	relJ := [F ! cc : cc in AbsoluteCoordinates(ZBasis(J),I)];
     rel:=relJ;
-	mFI := map<F->A| x:->&+[Eltseq(x)[i]*zbI[i] : i in [1..N]]>;
+	//mFI := map<F->A| x:->&+[Eltseq(x)[i]*zbI[i] : i in [1..N]]>;
+	mFI := map<F->A| x:->SumOfProducts(Eltseq(x),zbI)>;
 	mIF := map<A->F| x:-> F ! AbsoluteCoordinates([x],I)[1]>;
 	Q,q := quo<F|rel>; //q:F->Q. Q is an "abstract" abelian group isomorphic to I/J.
 	bas := [];
@@ -227,19 +230,23 @@ intrinsic QuotientVS(I::AlgEtIdl, J::AlgEtIdl, P::AlgEtIdl) -> ModRng, Map
     for k in [1..#zbI] do
         zbIk:=[];
         for i in [0..d-1] do    
-            coord_i:=&+[C[k,i*N+j]*zbS[j] : j in [1..#zbS]];
+            //coord_i:=&+[C[k,i*N+j]*zbS[j] : j in [1..#zbS]];
+            coord_i:=SumOfProducts([C[k,i*N+j] : j in [1..#zbS]],zbS);
             Append(~zbIk,coord_i);
         end for;
         Append(~new_coords_zbI,zbIk);
     end for;
     mIV:=function(x)
         xinI:=AbsoluteCoordinates([x],I)[1];
-        coords_inS:=[ &+[xinI[i]*new_coords_zbI[i][k]: i in [1..#zbI]]  : k in [1..d]];
+        //coords_inS:=[ &+[xinI[i]*new_coords_zbI[i][k]: i in [1..#zbI]]  : k in [1..d]];
+        coords_inS:=[ SumOfProducts(xinI,[new_coords_zbI[i][k]: i in [1..#zbI]])  : k in [1..d]];
         coords_inK:=[k(c) : c in coords_inS];
         return &+[coords_inK[i]*V.i : i in [1..d]];
     end function;
 	mVI := function(y)
-		return &+[ bas[j]*(Eltseq(y)[j]@@k) : j in [1..d] ];
+        y:=[Eltseq(y)[j]@@k : j in [1..d]];
+		return SumOfProducts(bas,y);
+		//return &+[ bas[j]*(Eltseq(y)[j]@@k) : j in [1..d] ];
     end function;
     return V, map<A->V | x:->mIV(x), y:->mVI(y) >;
 end intrinsic;

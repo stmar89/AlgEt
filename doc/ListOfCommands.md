@@ -216,6 +216,30 @@
 *x1+x2*
 
 <pre>
+<b>'+'</b>(x1::RngIntElt,x2::AlgEtElt) -> AlgEtElt
+</pre>
+
+*x1+x2*
+
+<pre>
+<b>'+'</b>(x1::FldRatElt,x2::AlgEtElt) -> AlgEtElt
+</pre>
+
+*x1+x2*
+
+<pre>
+<b>'+'</b>(x1::AlgEtElt,x2::RngIntElt) -> AlgEtElt
+</pre>
+
+*x1+x2*
+
+<pre>
+<b>'+'</b>(x1::AlgEtElt,x2::FldRatElt) -> AlgEtElt
+</pre>
+
+*x1+x2*
+
+<pre>
 <b>'-'</b>(x::AlgEtElt) -> AlgEtElt
 </pre>
 
@@ -240,6 +264,30 @@
 *x1-x2*
 
 <pre>
+<b>'-'</b>(x1::RngIntElt,x2::AlgEtElt) -> AlgEtElt
+</pre>
+
+*x1+x2*
+
+<pre>
+<b>'-'</b>(x1::FldRatElt,x2::AlgEtElt) -> AlgEtElt
+</pre>
+
+*x1+x2*
+
+<pre>
+<b>'-'</b>(x1::AlgEtElt,x2::RngIntElt) -> AlgEtElt
+</pre>
+
+*x1+x2*
+
+<pre>
+<b>'-'</b>(x1::AlgEtElt,x2::FldRatElt) -> AlgEtElt
+</pre>
+
+*x1+x2*
+
+<pre>
 <b>'*'</b>(x1::AlgEtElt,x2::AlgEtElt) -> AlgEtElt
 </pre>
 
@@ -256,6 +304,30 @@
 </pre>
 
 *x1*x2*
+
+<pre>
+<b>'*'</b>(x1::RngIntElt,x2::AlgEtElt) -> AlgEtElt
+</pre>
+
+*x1+x2*
+
+<pre>
+<b>'*'</b>(x1::FldRatElt,x2::AlgEtElt) -> AlgEtElt
+</pre>
+
+*x1+x2*
+
+<pre>
+<b>'*'</b>(x1::AlgEtElt,x2::RngIntElt) -> AlgEtElt
+</pre>
+
+*x1+x2*
+
+<pre>
+<b>'*'</b>(x1::AlgEtElt,x2::FldRatElt) -> AlgEtElt
+</pre>
+
+*x1+x2*
 
 <pre>
 <b>Inverse</b>(x::AlgEtElt) -> AlgEtElt
@@ -286,6 +358,72 @@
 </pre>
 
 *x1/x2*
+
+<pre>
+<b>'/'</b>(x1::RngIntElt,x2::AlgEtElt) -> AlgEtElt
+</pre>
+
+*x1+x2*
+
+<pre>
+<b>'/'</b>(x1::FldRatElt,x2::AlgEtElt) -> AlgEtElt
+</pre>
+
+*x1+x2*
+
+<pre>
+<b>'/'</b>(x1::AlgEtElt,x2::RngIntElt) -> AlgEtElt
+</pre>
+
+*x1+x2*
+
+<pre>
+<b>'/'</b>(x1::AlgEtElt,x2::FldRatElt) -> AlgEtElt
+</pre>
+
+*x1+x2*
+
+<pre>
+<b>'&+'</b>(seq::SeqEnum[AlgEtElt]) -> AlgEtElt
+</pre>
+
+*Given a sequence of AlgEtElt returns the sum of the entries.*
+
+<pre>
+<b>'&*'</b>(seq::SeqEnum[AlgEtElt]) -> AlgEtElt
+</pre>
+
+*Given a sequence of AlgEtElt returns the product of the entries.*
+
+<pre>
+<b>SumOfProducts</b>(as::SeqEnum[AlgEtElt],bs::SeqEnum[AlgEtElt]) -> AlgEtElt
+</pre>
+
+*Given sequences as and bs, such that #as eq #bs, returns &+[as[i]*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.*
+
+<pre>
+<b>SumOfProducts</b>(as::SeqEnum[RngIntElt],bs::SeqEnum[AlgEtElt]) -> AlgEtElt
+</pre>
+
+*Given sequences as and bs, such that #as eq #bs, returns &+[as[i]*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.*
+
+<pre>
+<b>SumOfProducts</b>(as::SeqEnum[FldRatElt],bs::SeqEnum[AlgEtElt]) -> AlgEtElt
+</pre>
+
+*Given sequences as and bs, such that #as eq #bs, returns &+[as[i]*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.*
+
+<pre>
+<b>SumOfProducts</b>(as::SeqEnum[AlgEtElt],bs::SeqEnum[RngIntElt]) -> AlgEtElt
+</pre>
+
+*Given sequences as and bs, such that #as eq #bs, returns &+[as[i]*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.*
+
+<pre>
+<b>SumOfProducts</b>(as::SeqEnum[AlgEtElt],bs::SeqEnum[FldRatElt]) -> AlgEtElt
+</pre>
+
+*Given sequences as and bs, such that #as eq #bs, returns &+[as[i]*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.*
 
 <pre>
 <b>MinimalPolynomial</b>(x::AlgEtElt) -> RngUPolElt
@@ -604,6 +742,91 @@
 *returns the discriminant of the order*
 
 
+# List of instrinsics in Quotients.m:
+--
+
+<pre>
+<b>Quotient</b>(I::AlgEtIdl, zbJ::SeqEnum[AlgEtElt]) -> GrpAb, Map
+</pre>
+
+*Given an ideal I and the ZBasis of an ideal J such that  J subset I, returns the abelian group Q=I/J together with the quotient map q:I->J. J can also be an order.*
+
+<pre>
+<b>Quotient</b>(I::AlgEtIdl, J::AlgEtIdl) -> GrpAb, Map
+</pre>
+
+*given fractional ideals J subset I, returns the abelian group Q=I/J together with the quotient map q:I->J*
+
+<pre>
+<b>Quotient</b>(S::AlgEtOrd, zbJ::SeqEnum[AlgEtElt]) -> GrpAb, Map
+</pre>
+
+*Given an order S and the ZBasis of an ideal J such that  J subset S, returns the abelian group Q=S/J together with the quotient map q:S->J. J can also be an order.*
+
+<pre>
+<b>ResidueRing</b>(S::AlgEtOrd,I::AlgEtIdl) -> GrpAb , Map
+</pre>
+
+*given an integral ideal I of S, returns the abelian group S/I and the epimorphism pi:S -> S/I (with inverse map). Important: the domain of pi is the Algebra of S, since the elements of S are usually expressed al elements of A. For eg Parent(Random(S)) = Algebra(S)*
+
+<pre>
+<b>ResidueField</b>(P::AlgEtIdl) -> FldFin, Map
+</pre>
+
+*given P a prime of S, returns a finite field F isomorphic to S/P and a surjection (with inverse) S->F.*
+
+<pre>
+<b>PrimitiveElementResidueField</b>(P::AlgEtIdl)->AlgEtElt
+</pre>
+
+*Returns an element of P that maps to the primitive element of the residue field S/P, that is a multiplicative generator of (S/P)^*.*
+
+<pre>
+<b>QuotientVS</b>(I::AlgEtIdl, J::AlgEtIdl, P::AlgEtIdl) -> ModRng, Map
+</pre>
+
+*Let I, J, P be fractional R-ideals such that:
+ - P is prime of of some order R, with residue field K;
+ - J in I and I/J is a vector space V over K, say of dimension d.
+ The function returns the KModule K^d=V and the natural surjection I->V (with pre-image)*
+
+<pre>
+<b>QuotientVS</b>(I::AlgEtOrd, J::AlgEtOrd, P::AlgEtIdl) -> ModRng, Map
+</pre>
+
+*Let I, J be orders, P a fractional R-ideals such that:
+ - P is prime of of some order R, with residue field K;
+ - J in I and I/J is a vector space V over K, say of dimension d.
+ The function returns the KModule K^d=V and the natural surjection I->V (with pre-image)*
+
+<pre>
+<b>QuotientVS</b>(I::AlgEtOrd, J::AlgEtIdl, P::AlgEtIdl) -> ModRng, Map
+</pre>
+
+*Let I be an order, J and  P be fractional R-ideals such that:
+ - P is prime of of some order R, with residue field K;
+ - J in I and I/J is a vector space V over K, say of dimension d.
+ The function returns the KModule K^d=V and the natural surjection I->V (with pre-image)*
+
+<pre>
+<b>QuotientVS</b>(I::AlgEtIdl, J::AlgEtOrd, P::AlgEtIdl) -> ModRng, Map
+</pre>
+
+*Let J be an order, I and  P be fractional R-ideals such that:
+ - P is prime of of some order R, with residue field K;
+ - J in I and I/J is a vector space V over K, say of dimension d.
+ The function returns the KModule K^d=V and the natural surjection I->V (with pre-image)*
+
+<pre>
+<b>QuotientVS</b>(I::AlgEtIdl, J::AlgEtIdl, P::AlgEtIdl) -> ModRng, Map
+</pre>
+
+*let I, J, P be fractional R-ideals such that:
+ - P is prime of of some order R;
+ - J in I and I/J is a vector space over R/P, say of dimension d;
+ the function returns the KModule K^d=V and the natural surjection I->V (with pre-image)*
+
+
 # List of instrinsics in OverOrders.m:
 --
 
@@ -919,6 +1142,12 @@
 *given ideals I and J, return J cap I*
 
 <pre>
+<b>'&+'</b>(seq::SeqEnum[AlgEtIdl])->AlgEtIdl
+</pre>
+
+*Returns the sum of the fractional ideals in the sequence.*
+
+<pre>
 <b>ColonIdeal</b>(I::AlgEtIdl,J::AlgEtIdl)->AlgEtIdl
 </pre>
 
@@ -1005,6 +1234,125 @@
 *return an element x such that x*I is an integral ideal coprime with J, togheter with the product x*I.. The first ideal must be invertible and the second should be integral*
 
 
+# List of instrinsics in ComplexConj.m:
+--
+
+<pre>
+<b>HasComplexConjugate</b>(A::AlgEt) -> BoolElt
+</pre>
+
+*Returns if the algebra is the product of CM fields*
+
+<pre>
+<b>ComplexConjugate</b>(x::AlgEtElt) -> AlgEtElt
+</pre>
+
+*If A is a product of CM fields, it returns the complex conjugate of the argument*
+
+<pre>
+<b>IsConjugateStable</b>(O::AlgEtOrd) -> BoolElt,AlgEtOrd
+</pre>
+
+*Returns wheter O is conjugate stable and the complex conjugate.*
+
+<pre>
+<b>ComplexConjugate</b>(O::AlgEtOrd) -> AlgEtOrd
+</pre>
+
+*It returns the complex conjugate of the argument.*
+
+<pre>
+<b>IsConjugateStable</b>(I::AlgEtIdl) -> BoolElt,AlgEtIdl
+</pre>
+
+*Returns wheter O is conjugate stable and the complex conjugate.*
+
+<pre>
+<b>ComplexConjugate</b>(I::AlgEtIdl) -> AlgEtIdl
+</pre>
+
+*if A is a product of CM fields, it returns the complex conjugate of the argument*
+
+
+# List of instrinsics in IntermediateIdeals.m:
+--
+
+<pre>
+<b>MinimalIntermediateIdeals</b>(I::AlgEtIdl,J::AlgEtIdl)->SetIndx[AlgEtIdl]
+</pre>
+
+*Given fractional S-ideals J subset I, returns the minimal (with respect to inclusion) fractional S-ideals K such that J subset K subset I.*
+
+<pre>
+<b>IntermediateIdeals</b>(I::AlgEtIdl,J::AlgEtIdl)->SetIndx[AlgEtIdl]
+</pre>
+
+*Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that J subset K subset I. They are produced recursively using from the minimal ones*
+
+<pre>
+<b>IntermediateIdealsWithPrescribedMultiplicatorRing</b>(I::AlgEtIdl,J::AlgEtIdl)->SetIndx[AlgEtIdl]
+</pre>
+
+*Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that (K:K)=S and  J subset K subset I. 
+  They are produced recursively using from the minimal ones*
+
+<pre>
+<b>MaximalIntermediateIdeals</b>(I::AlgEtIdl,J::AlgEtIdl)->SetIndx[AlgEtIdl]
+</pre>
+
+*Given fractional S-ideals J subset I, returns the maximal (with respect to inclusion) fractional S-ideals K such that J subset K subset I.*
+
+<pre>
+<b>MaximalIntermediateIdeals</b>(I::AlgEtIdl,J::AlgEtIdl)->SetIndx[AlgEtIdl]
+</pre>
+
+*Given fractional S-ideals J subset I, returns the maximal (with respect to inclusion) fractional S-ideals K such that J subset K subset I.*
+
+<pre>
+<b>IntermediateIdealsWithTrivialExtension</b>(I::AlgEtIdl,J::AlgEtIdl, O::AlgEtOrd)->SetIndx[AlgEtIdl]
+</pre>
+
+*Given fractional S-ideals J subset I, returns all the fractional S-ideals K J subset K subset I, and O!!K = I. 
+  Note that we need O subset (J:J).
+  They are produced recursively using from the maximal ones*
+
+<pre>
+<b>IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing</b>(I::AlgEtIdl,J::AlgEtIdl, O::AlgEtOrd)->SetIndx[AlgEtIdl]
+</pre>
+
+*Given fractional S-ideals J subset I, returns all the fractional S-ideals K J subset K subset I, O!!K = I, and (K:K) eq S.
+  Note that we need O subset (J:J).
+  They are produced recursively using from the maximal ones.*
+
+<pre>
+<b>MinimalIntermediateIdealsVS</b>(I::AlgEtIdl,J::AlgEtIdl : primes:=[])->SetIndx[AlgEtIdl]
+</pre>
+
+*Given fractional S-ideals J subset I, returns the minimal with respect to inclusion fractional S-ideals K such that J subset K subset I.*
+
+<pre>
+<b>IntermediateIdealsVS</b>(I::AlgEtIdl,J::AlgEtIdl)->SetIndx[AlgEtIdl]
+</pre>
+
+*Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that J subset K subset I. They are produced recursively using from the minimal ones*
+
+
+# List of instrinsics in ShortEltSmallRep.m:
+--
+
+<pre>
+<b>ShortestElement</b>(I::AlgEtIdl) ->AlgEtElt
+</pre>
+
+*Given an ideal I returns a non-zerodivisor in I with small coefficients (in the LLL sense). Note that if I decomposes into a direct sums I=I1+I2, then the element returned is the sum of the shortest elements of I1 and I2.*
+
+<pre>
+<b>SmallRepresentative</b>(I::AlgEtIdl) ->AlgEtIdl,AlgEtElt
+</pre>
+
+*Given a fractional R-ideal I, it returns an isomorphic ideal a*I, and the element a, such that a*I is a subset of R, and the cardinality of R/aI is small. This is achieved by computing the ShortestElement a of (R:I). Note that if I is invertible R/aI is isomorphic to (R:I)/aR.*
+
+
 # List of instrinsics in MinimalGenerators.m:
 --
 
@@ -1015,39 +1363,20 @@
 *A procedure that given an invertible ideal I put in the attibute I`Generators two non-zerodivisors in I that generate I. If I is known to be principal, that is I`Generators consists of one single element, nothing is done.*
 
 
-# List of instrinsics in Quotients.m:
---
-
-<pre>
-<b>ResidueRing</b>(S::AlgEtOrd,I::AlgEtIdl) -> GrpAb , Map
-</pre>
-
-*given an integral ideal I of S, returns the abelian group S/I and the epimorphism pi:S -> S/I (with inverse map). Important: the domain of pi is the Algebra of S, since the elements of S are usually expressed al elements of A. For eg Parent(Random(S)) = Algebra(S)*
-
-<pre>
-<b>ResidueField</b>(P::AlgEtIdl) -> FldFin, Map
-</pre>
-
-*given P a prime of S, returns a finite field F isomorphic to S/P and a surjection (with inverse) S->F.*
-
-<pre>
-<b>QuotientVS</b>(I::Any, J::Any, P::AlgEtIdl) -> ModFld, Map
-</pre>
-
-*let I, J, P be fractional R-ideals such that:
- - P is prime of of some order R;
- - J in I and I/J is a vector space over R/P, say of dimension d;
- the function returns the KModule K^d=V and the natural surjection I->V (with pre-image)*
-
-<pre>
-<b>Quotient</b>(I::AlgEtIdl, J::AlgEtIdl) -> GrpAb, Map
-</pre>
-
-*given fractional ideals J subset I, returns the abelian group Q=I/J together with the quotient map q:I->J*
-
-
 # List of instrinsics in CRT.m:
 --
+
+<pre>
+<b>ChineseRemainderTheorem</b>(I::AlgEtIdl,J::AlgEtIdl,a::AlgEtElt,b::AlgEtElt)-> AlgEtElt
+</pre>
+
+*Given two coprime ideals I and J of S, two elements a,b in S, finds e such that (e-a) in I and (e-b) in J.*
+
+<pre>
+<b>ChineseRemainderTheorem</b>(Is::SeqEnum[AlgEtIdl],as::SeqEnum[AlgEtElt])-> AlgEtElt
+</pre>
+
+*Given a sequence Is of coprime ideals of S, and a sequence as of elements of S, it returns an element e such that e-as[i] in Is[i] for every i.*
 
 <pre>
 <b>ChineseRemainderTheorem</b>(I::AlgEtIdl,J::AlgEtIdl,a::AlgEtElt,b::AlgEtElt)-> AlgEtElt
@@ -1176,16 +1505,22 @@
 --
 
 <pre>
-<b>WKICM_bar</b>(S::AlgEtOrd) -> SeqEnum
+<b>WKICM_bar</b>(S::AlgEtOrd : Method:="Auto") -> SeqEnum
 </pre>
 
-*returns all the weak eq classes I, such that (I:I)=S*
+*Returns all the weak eq classes I, such that (I:I)=S. The VarArg Method (default "Auto") determines if we should use the "IntermediateIdeals" routine or the "LowIndexProcess", which is potentially much slower but more memory efficient.*
 
 <pre>
-<b>WKICM</b>(E::AlgEtOrd)->SeqEnum
+<b>WKICM</b>(E::AlgEtOrd : Method:="Auto")->SeqEnum
 </pre>
 
-*computes the Weak equivalence class monoid of E*
+*Computes the Weak equivalence class monoid of E. The VarArg Method (default "Auto") determines if we should use the "IntermediateIdeals" routine or the "LowIndexProcess", which is potentially much slower but more memory efficient.*
+
+<pre>
+<b>WKICM_bar_intermediate_idls</b>(S::AlgEtOrd) -> SeqEnum[AlgEtIdl]
+</pre>
+
+*???*
 
 
 # List of instrinsics in WkTesting.m:

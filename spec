@@ -8,6 +8,7 @@ OverOrders.m
 Idl.m
 ComplexConj.m
 IntermediateIdeals.m
+ShortEltSmallRep.m
 MinimalGenerators.m
 CRT.m
 PicardGroup.m

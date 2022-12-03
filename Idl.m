@@ -505,8 +505,19 @@ intrinsic '^'(I::AlgEtIdl, n::RngIntElt) -> AlgEtIdl
     S:=Order(I);
     power_invertible:=function(I,n)
     // given an invertible ideal I and positive integer n return I^n
+
+    // Lemma:
+    // Let I be an invertible fractional S-ideal generated globally by I=aS+bS.
+    // For every integer N, we have I^N=a^NS+b^NS.
+    // Proof: we will show it locally at every prime. Since I is invertible, then it is locally principal.
+    // Pick a prime P. Then by Nakayama's Lemma I_P=(a/1)S_P or I_P=(b/1)S_P. wlog assume the first. Then I_P^N=(a^N/1)S_P. QED.
+    //
+    // Remark: this trick does not work for product of invertible ideals I and J. 
+    // One can have I_P1=(a) J_P1=(c) but I_P2=(a), J_P2=(d) so one cannot avoid the mixed products.
+    
         TwoGeneratingSet(I);
         gg:=Generators(I);
+        assert #gg eq 2;
         out:=Ideal(Order(I),[g^n : g in gg]);
         out`IsInvertible:=true;
         if assigned I`MultiplicatorRing then 
@@ -542,11 +553,11 @@ intrinsic '^'(I::AlgEtIdl, n::RngIntElt) -> AlgEtIdl
     //    return I * I;
     else
         if n gt 0 then
-            if assigned I`IsInvertible and IsInvertible(I) then
-                return power_invertible(I,n);
-            else
+           if assigned I`IsInvertible and IsInvertible(I) then
+               return power_invertible(I,n);
+           else
                 return power_positive(I,n);
-            end if;
+           end if;
         end if;
         if n lt 0 then
             invI:=Inverse(I);
@@ -596,6 +607,16 @@ intrinsic 'meet'(I::AlgEtIdl, J::AlgEtIdl) -> AlgEtIdl
     zb:=meet_zbasis(ZBasis(I),ZBasis(J));
     id:=Ideal(Order(I),zb);
     id`ZBasis:=zb;
+    return id;
+end intrinsic;
+
+//----------
+// On Sequences
+//----------
+
+intrinsic '&+'(seq::SeqEnum[AlgEtIdl])->AlgEtIdl
+{Returns the sum of the fractional ideals in the sequence.}
+    id:=Ideal(Order(seq[1]),&cat[Generators(I):I in seq]);
     return id;
 end intrinsic;
 
@@ -964,6 +985,43 @@ end intrinsic;
     C:=ColonIdeal(I,J);
     CC:=&meet[(1/g)*I : g in Generators(J)];
     assert C eq CC;
+
+    // test if TwoGeneratingSet makes the power faster
+    // Conlcusion: yes. By quite a bit!
+	AttachSpec("~/packages_github/AlgEt/spec");
+	_<x>:=PolynomialRing(Integers());
+    f:=x^4-100*x^3-100*x^2-100*x-100;
+    //f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
+    A:=EtaleAlgebra(f);
+	E:=EquationOrder(A);
+    P,p:=PicardGroup(E : GRH:=true); //this might take a while. timings are very inconsistent
+    repeat
+        Ii:=Random(P);
+    until Ii ne Zero(P);
+    I:=p(Ii);
+    #Generators(I);
+    
+    delete I`IsInvertible;
+    exp:=[ Random(2,30) : i in [1..100]];
+    time l1:=[ I^i : i in exp ];
+    #Generators(I);
+
+    assert IsInvertible(I);
+    TwoGeneratingSet(I);
+    #Generators(I);
+    time l2:=[ I^i : i in exp ];
+    assert l1 eq l2;
+
+    I:=SmallRepresentative(I);
+    delete I`IsInvertible;
+    time l1:=[ I^i : i in exp ];
+    #Generators(I);
+
+    assert IsInvertible(I);
+    TwoGeneratingSet(I);
+    #Generators(I);
+    time l2:=[ I^i : i in exp ];
+    assert l1 eq l2;
 
 */
 

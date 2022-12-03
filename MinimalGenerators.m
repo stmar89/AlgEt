@@ -22,11 +22,12 @@ intrinsic TwoGeneratingSet(I::AlgEtIdl)
 {A procedure that given an invertible ideal I put in the attibute I`Generators two non-zerodivisors in I that generate I. If I is known to be principal, that is I`Generators consists of one single element, nothing is done.}
     require IsInvertible(I) : "the ideal must be invertible";
     if #Generators(I) gt 2 then
-        if assigned I`IsIntegral and IsIntegral(I) then
-            a:=Algebra(I)!MinimalInteger(I);
-        else
-            a:=Random(I : ZeroDivisorsAllowed:=false );
-        end if;
+        // if assigned I`IsIntegral and IsIntegral(I) then
+        //     a:=MinimalInteger(I);
+        // else
+        //     a:=Random(I : ZeroDivisorsAllowed:=false );
+        // end if;
+        a:=ShortestElement(I);
         S:=Order(I);
         Q,q:=Quotient(I,[a*z : z in ZBasis(S)]);
         if #Q eq 0 then
@@ -43,7 +44,6 @@ intrinsic TwoGeneratingSet(I::AlgEtIdl)
         I`Generators:=[a,b];
     end if;
 end intrinsic;
-
 
 /* TEST
 

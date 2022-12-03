@@ -60,30 +60,67 @@ intrinsic ChineseRemainderTheorem2(I::AlgEtIdl,J::AlgEtIdl)-> Map,Map,Map
     return qIJ,iso,qD;
 end intrinsic;
 
-////////
-// CRT
-///////
 
-    AttachSpec("~/packages_github/AlgEt/spec");
-    import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQtoA , meet_zbasis , inclusion_matrix;
-    _<x>:=PolynomialRing(Integers());
-    f:=x^4 + 6*x^2 + 25;
-    K:=EtaleAlgebra(f);
-    O:=MaximalOrder(K);
-    pp:=PrimesAbove(2*O);
-    P:=pp[1]; 
-    Q:=pp[2];
-    mP:=MatrixAtoQ(ZBasis(P));
-    mQ:=MatrixAtoQ(ZBasis(Q));
-    C:=VerticalJoin(mP,mQ);
-    d:=Denominator(C);
-    mO:=d*VerticalJoin(MatrixAtoQ(ZBasis(O)),ZeroMatrix(Rationals(),Dimension(K)));
-    HH,V:=HermiteForm(crQZ(mO));
-    H,U:=HermiteForm(crQZ(d*C)); // U*d*C = H = V*mO
-    dK:=d*One(K);
+    /////////////
+    // test &* if the generators are bad it is much better.
+    /////////////
+    //Conlcusion: classic is the winner
+    
+	AttachSpec("~/packages_github/AlgEt/spec");
+	_<x>:=PolynomialRing(Integers());
+    f:=x^4-100*x^3-100*x^2-100*x-100;
+    //f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
+    A:=EtaleAlgebra(f);
+	E:=EquationOrder(A);
+    time P,p:=PicardGroup(E);
+    l:=[];
+    for i in [1..10] do
+        Ii:=p(Random(P));
+        I:=Ii^Random(2,30);
+        Append(~l,I);
+    end for;
 
-    cc:=Matrix([AbsoluteCoordinates([One(K)],O)[1] cat [0 : i in [1..Dimension(K)]]])*crZQ(V^-1*U); cc;
-    assert &+[Eltseq(cc)[i]*(ZBasis(P) cat ZBasis(Q))[i] : i in [1..#Eltseq(cc)]] eq One(K);
+    seq:=l;
+
+    //classic + small rep
+    t0:=Cputime();
+    seq1:=[];
+    as:=[];
+    for I in seq do
+        aI,a:=SmallRepresentative(I);
+        Append(~seq1,aI);
+        Append(~as,a);
+    end for;
+    I3_small:=&*seq1;
+    I3:=I3_small*(1/&*as);
+    Cputime(t0);
+
+    //classic
+    time I4:=&*seq;
+
+    // one creation + small rep
+    t0:=Cputime();
+    seq1:=[];
+    as:=[];
+    for I in seq do
+        aI,a:=SmallRepresentative(I);
+        Append(~seq1,aI);
+        Append(~as,a);
+    end for;
+    gens:=[ Generators(I) : I in seq1 ];
+    cc:=CartesianProduct(gens);
+    I2_small:=Ideal(E,[&*[d :d in c] : c in cc ]);
+    I2:=I2_small*(1/&*as);
+    Cputime(t0);
+
+    // one creation : it seems super slow
+    t0:=Cputime();
+    gens:=[ Generators(I) : I in seq ];
+    cc:=CartesianProduct(gens);
+    I1:=Ideal(E,[&*[d :d in c] : c in cc ]);
+    Cputime(t0);
+
+    assert 1 eq #{I1,I2,I3,I4};
 
 
 /* TEST

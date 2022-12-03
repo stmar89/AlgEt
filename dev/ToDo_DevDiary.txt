@@ -30,11 +30,6 @@
     ### PICARD GROUP ###
     - Update: in th test suit I have made a for loop that shows that the timings for AlgEt is very inconsistent.
         Sometimes it is faster than RngOld, sometimes it is much slower. I don't understand!
-    - PicardGroup is again slower for AlgEt than for AlgAss and FldNum. 
-      I think that the changes made to how powers of invertible ideals are computed are slowing things down, 
-      instead of speeding them up. 
-      Need to investigate.
-    - CHECK improve power of Ideals: if I is invertible, and I=aS+bS, then I^N=a^NS+b^NS. See Lemma in MinimalGenerators.m
 
     #### CRT ####
     - Make a CRT for modules : I/P1*...*Ps*I -> \prod_i (I/Pi*I)
@@ -62,6 +57,7 @@
     [ i gt 1 select Self(i-1)*2 else 2 ] constructs the same sequence recursively: at each step, it multiplies by 2.
 
     ### FIXED/DONE: kept for the record. ###
+    - Done: &+ for sequence of ideals. &* doesn't seem to be more efficient than taking products.
     - residue_class_field_primitive_element is replaced by PrimitiveElementResidueField which is cached
     - Done: residue_class_ring_unit_subgroup_generators can be improved. 
       calling CRT makes a lot of unecessary computations see test2 in CRT.m: 

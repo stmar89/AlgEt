@@ -48,21 +48,22 @@ intrinsic ResidueRingUnits(S::AlgEtOrd,I::AlgEtIdl) -> GrpAb,Map
     return D,map;
 end intrinsic;
 
-residue_class_field_primitive_element := function(P)
-//given a maximal ideal P in S, returns a generator of (S/P)* as an element of S;
-    S:=Order(P);
-    Q,m:=ResidueRing(S,P);
-    ord:=#Q-1; //ord = #(S/P)-1;
-    assert IsPrimePower(#Q); // #(S/P) must be a prime power
-    proper_divisors_ord:=Exclude(Divisors(ord),ord);
-    repeat
-        repeat 
-            a:=Random(Q);
-        until a ne Zero(Q);
-    until forall{f : f in proper_divisors_ord | m((a@@m)^f) ne m(One(Algebra(S)))};
-    assert2 (m((a@@m)^ord) eq m(One(Algebra(S)))); 
-    return a@@m;
-end function;
+// USE INSTEAD PrimitiveElementResidueField from Quotients.m
+// residue_class_field_primitive_element := function(P)
+// //given a maximal ideal P in S, returns a generator of (S/P)* as an element of S;
+//     S:=Order(P);
+//     Q,m:=ResidueRing(S,P);
+//     ord:=#Q-1; //ord = #(S/P)-1;
+//     assert IsPrimePower(#Q); // #(S/P) must be a prime power
+//     proper_divisors_ord:=Exclude(Divisors(ord),ord);
+//     repeat
+//         repeat 
+//             a:=Random(Q);
+//         until a ne Zero(Q);
+//     until forall{f : f in proper_divisors_ord | m((a@@m)^f) ne m(One(Algebra(S)))};
+//     assert2 (m((a@@m)^ord) eq m(One(Algebra(S)))); 
+//     return a@@m;
+// end function;
 
 residue_class_ring_unit_subgroup_generators:=function(F)
 // determine generators of the subgroup of (S/F)^* as elements of A=Algebra(S)
@@ -86,15 +87,22 @@ residue_class_ring_unit_subgroup_generators:=function(F)
                 rest:=OneIdeal(S);
             end if;
             //Compute primitive elt for residue field
-            c:=residue_class_field_primitive_element(idp);
-            c:=ChineseRemainderTheorem(a1a2,rest,c,One(A));
+            //c:=residue_class_field_primitive_element(idp);
+            c:=PrimitiveElementResidueField(idp);
+            e1:=ChineseRemainderTheorem(a1a2,rest,One(A),Zero(A));
+            e2:=ChineseRemainderTheorem(a1a2,rest,Zero(A),One(A));
+            c:=c*e1+e2;
+            //c:=ChineseRemainderTheorem(a1a2,rest,c,One(A));
+            assert2 c - ChineseRemainderTheorem(a1a2,rest,c,One(A)) in a1a2*rest;
             Include(~elts,c);
             b:=1;
             while b lt a[2] do
                 M:=ZBasis(idp);
                 M:=[1+x:x in M];
                 for elt in M do
-                    c:=ChineseRemainderTheorem((a1a2),rest,elt,One(A));
+                    c:=elt*e1+e2;
+                    //c:=ChineseRemainderTheorem((a1a2),rest,elt,One(A));
+                    assert2 c - ChineseRemainderTheorem(a1a2,rest,elt,One(A)) in a1a2*rest;
                     Include(~elts,c);
                 end for;
                 b:=b*2;
@@ -107,7 +115,7 @@ residue_class_ring_unit_subgroup_generators:=function(F)
 	return F`residue_class_ring_unit_subgroup_generator ;
 end function;
 
-IsPrincipal_prod_internal:=function( I , GRH )
+IsPrincipal_prod_internal_old:=function( I , GRH )
 //returns if the argument is a principal ideal; if so the function returns also the generator. It works only for products of ideals
     assert IsMaximal(Order(I)); //this function should be called only for ideals of the maximal order
     if #Generators(I) eq 1 then return true,Generators(I)[1]; end if;
@@ -124,18 +132,9 @@ IsPrincipal_prod_internal:=function( I , GRH )
         IL:=I_asProd[i];
         OrdIL:=Order(IL);
         assert IsMaximal(OrdIL);
-         //The next call is to prevent a bug of the in-built function IsPrincipal (which might have been corrected by now...).
-         //Also if one wants to use the GRH bound rather than one needs to precompute the class groups, since IsPrincipal does not accepts varargs )       
+        //The next call is to prevent a bug of the in-built function IsPrincipal (which might have been corrected by now...).
+        //Also if one wants to use the GRH bound rather than one needs to precompute the class groups, since IsPrincipal does not accepts varargs )       
         OL,oL:=ClassGroup(OrdIL);
-/*
-        // TEST we try to make the generators of IL smaller.
-min_IL:=MinimalInteger(IL);
-repeat
-    gen_IL:=Random(IL,3);
-    IL_new:=ideal<Order(IL)|[min_IL,gen_IL]>;
-until IL_new eq IL;
-IL:=IL_new;
-*/
         // the next line seems to be the most time consuming part of the package. 
         // It is 10/20 times slower than the RngOrdIdl version. Need to investigate
         testL,genL:=IsPrincipal(IL);
@@ -150,6 +149,43 @@ IL:=IL_new;
     return true,gen;
 end function;
 
+IsPrincipal_prod_internal:=function( II , GRH )
+//returns if the argument is a principal ideal; if so the function returns also the generator. It works only for products of ideals
+    assert IsMaximal(Order(II)); //this function should be called only for ideals of the maximal order
+    if #Generators(II) eq 1 then return true,Generators(II)[1]; end if;
+
+    I,a:=SmallRepresentative(II); //a*II=I
+    test,I_asProd:=IsProductOfIdeals(I);
+    assert test; //this function should be called only for ideals of the maximal order, hence I is a product
+    S:=Order(I);
+    A:=Algebra(S);
+    nf,embs:=NumberFields(A);
+    gen:=Zero(A);
+    if GRH then
+        SetClassGroupBounds("GRH");
+    end if;
+    for i in [1..#I_asProd] do
+        IL:=I_asProd[i];
+        OrdIL:=Order(IL);
+        assert IsMaximal(OrdIL);
+        //The next call is to prevent a bug of the in-built function IsPrincipal (which might have been corrected by now...).
+        //Also if one wants to use the GRH bound rather than one needs to precompute the class groups, since IsPrincipal does not accepts varargs )       
+        OL,oL:=ClassGroup(OrdIL);
+        // the next line seems to be the most time consuming part of the package. 
+        // It is 10/20 times slower than the RngOrdIdl version. Need to investigate
+        testL,genL:=IsPrincipal(IL);
+        assert2 (Zero(OL) eq (IL@@oL)) eq testL;
+        if not testL then
+            return false,_;
+        end if;
+        gen:=gen+embs[i](nf[i] ! genL);
+    end for;
+    assert2 gen*S eq I;
+    
+    gen:=gen/a; 
+    II`Generators:=[gen];
+    return true,gen;
+end function;
 
 intrinsic IsPrincipal(I1::AlgEtIdl : GRH:=false )->BoolElt, AlgAssElt
 {   
@@ -252,11 +288,14 @@ PicardGroup_prod_internal:=function( O , GRH )
                 idLi:=gLi(Gproj[i](gen));
                 gens_inA:=gens_inA cat[T[4](g) : g in Basis(idLi,T[3])];
             end for;
-            // TODO this ideal is invertible, so 2-generated. taking that set instead of gens_inA should be much better
             gen_O:=Ideal(O,gens_inA);
+            // make the rep small
+            gen_O:=SmallRepresentative(gen_O);
             assert2 IsInvertible(gen_O); //test using colon ideal
             gen_O`IsInvertible:=true;
             gen_O`MultiplicatorRing:=O;
+            // invertible, so 2-generated.
+            TwoGeneratingSet(gen_O);
             Append(~geninO,gen_O);
         end for;
         assert #geninO eq #Generators(G);      
@@ -302,14 +341,15 @@ intrinsic PicardGroup( S::AlgEtOrd : GRH:=false ) -> GrpAb, Map
     gens_GO_in_O:=[]; //coprime with FO, in O, Cgen
     if #GO gt 1 then
         for i in [1..#Generators(GO)] do
-            I:=gO(GO.i);
-            //c:=CoprimeRepresentative(I,FO);
-            c,cI:=CoprimeRepresentative(I,MinimalInteger(FO)*O);
-            //TODO these are invertible, hence 2-generated
+            I:=gO(GO.i); //already made small in the internal function
+            c,cI:=CoprimeRepresentative(I,FO);
+            //c,cI:=CoprimeRepresentative(I,MinimalInteger(FO)*O);
             cISmeetS:=(S!!cI) meet S;
             assert2 IsInvertible(cISmeetS); //test using colon ideal
             cISmeetS`IsInvertible:=true;
             cISmeetS`MultiplicatorRing:=S;
+            // invertible, so 2-generated.
+            TwoGeneratingSet(cISmeetS);
             Append(~gens_GO_in_S,cISmeetS);
             Append(~gens_GO_in_O,cI);//used in building relDglue
         end for;
@@ -361,10 +401,13 @@ intrinsic PicardGroup( S::AlgEtOrd : GRH:=false ) -> GrpAb, Map
             id1:=(S!!( O*(r(mDR(gen))) )) meet S;
             id2:=mGO_to_S(mDH(gen));
             gen_inS:=id1*id2;
+            // make the rep small
+            gen_inS:=SmallRepresentative(gen_inS);
             assert2 IsInvertible(gen_inS); //test using colon ideal
             gen_inS`IsInvertible:=true;
             gen_inS`MultiplicatorRing:=S;
-            //TODO this ideal is invertible, hence 2-generated
+            // invertible, so 2-generated.
+            TwoGeneratingSet(gen_inS);
             Append(~generators_ideals,gen_inS);
         end for;
     else
@@ -507,13 +550,6 @@ intrinsic IsIsomorphic(I::AlgEtIdl, J::AlgEtIdl : GRH:=false ) -> BoolElt, AlgAs
     end if;
 end intrinsic;
 
-
-
-
-
-
-
-
 /*TEST
 	
 	AttachSpec("~/packages_github/AlgEt/spec");
@@ -532,7 +568,10 @@ end intrinsic;
     end for;
     Cputime(t0);
 
-    // the next one is slower ~190 sec with GRH:=true
+    // with Profiler ~16 sec with GRH:=true
+	AttachSpec("~/packages_github/AlgEt/spec");
+	SetAssertions(1);
+	_<x>:=PolynomialRing(Integers());
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
     A:=EtaleAlgebra(f);
 	E:=EquationOrder(A);
@@ -544,7 +583,20 @@ end intrinsic;
 	SetProfile(false);
     ProfilePrintByTotalTime(ProfileGraph());
 
-    // 
+	AttachSpec("~/packages_github/AlgEt/spec");
+	_<x>:=PolynomialRing(Integers());
+    f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
+    SetClassGroupBounds("GRH");
+    for i in [1..10^1] do
+        //"NF";
+        //time P,p:=PicardGroup(EquationOrder(NumberField(f)));
+        //assert #P eq 3548000;
+        "Et";
+        time P,p:=PicardGroup(EquationOrder(EtaleAlgebra(f)) : GRH:=true);
+        assert #P eq 3548000;
+        "\n";
+    end for;
+
     AttachSpec("~/packages_github/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());
     f:=x^6 - 3*x^5 - 3*x^4 + 65*x^3 - 48*x^2 - 768*x + 4096;

@@ -517,7 +517,7 @@ intrinsic '^'(I::AlgEtIdl, n::RngIntElt) -> AlgEtIdl
     
         TwoGeneratingSet(I);
         gg:=Generators(I);
-        assert #gg eq 2;
+        assert #gg le 2;
         out:=Ideal(Order(I),[g^n : g in gg]);
         out`IsInvertible:=true;
         if assigned I`MultiplicatorRing then 

@@ -2,7 +2,6 @@
     .m files from AbVarFq to 'translate':
 
     - IdealsOfIndex.m
-    - TotRealTotPos.m
     - IntegralMatrices.m
     - RepsZConjugacy.m
     - PowerBass.m

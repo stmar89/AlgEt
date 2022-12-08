@@ -17,6 +17,7 @@ MinimalGenerators.m
 CRT.m
 PicardGroup.m
 FactPrimes.m
+TotRealTotPos.m
 PrintSave.m
 LowCohenMacaulayType.m
 WkClasses.m

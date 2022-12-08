@@ -19,7 +19,7 @@ declare attributes AlgEt : DefiningPolynomial,
                            // ass_algebra, 
                            Dimension,
                            AbsoluteDimension,
-                           BaseField, //a tup : <F,m> where F is the Base fiedl and m is the diagonal embedding into A
+                           BaseField, //a tup : <F,m> where F is the Base field and m is the diagonal embedding into A
                            HasBaseField, //a boolean
                            PrimeField,
                            NumberFields; //a tup of 3 sequences: the first are the NF, 

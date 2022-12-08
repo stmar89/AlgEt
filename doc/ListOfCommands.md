@@ -2,22 +2,44 @@
 --
 
 <pre>
-<b>Print</b>(A::AlgEt)
-</pre>
-
-*Prints the defining polynomial or the number fields defining A.*
-
-<pre>
 <b>EtaleAlgebra</b>(seq::SeqEnum[FldNum]) -> AlgEt
 </pre>
 
 *Given a sequence of number fields returns the étale algebra corresponding to the direct product.*
 
 <pre>
-<b>EtaleAlgebra</b>(f::RngUPolElt) -> AlgEt
+<b>EtaleAlgebra</b>(f::RngUPolElt[RngInt]) -> AlgEt
 </pre>
 
-*Given a squarefree polynomial returns the product of the number fields defined by the irreducible factors.*
+*Given a squarefree polynomial over the integers returns the product of the number fields defined by the irreducible factors.*
+
+<pre>
+<b>EtaleAlgebra</b>(f::RngUPolElt[FldRat]) -> AlgEt
+</pre>
+
+*Given a squarefree polynomial over the rationals returns the product of the number fields defined by the irreducible factors.*
+
+<pre>
+<b>EtaleAlgebra</b>(f::RngUPolElt[FldNum]) -> AlgEt
+</pre>
+
+*Given a squarefree polynomial over the rationals returns the product of the number fields defined by the irreducible factors.*
+
+<pre>
+<b>HomsToC</b>(A::AlgEt : Precision:=30)->SeqEnum[Map]
+</pre>
+
+*returns Hom(A,\C) as a sequence of maps. The precision of \C is given by the optional parameter "Precision". Default value is 30*
+
+
+# List of instrinsics in AlgEtAttributes.m:
+--
+
+<pre>
+<b>Print</b>(A::AlgEt)
+</pre>
+
+*Prints the defining polynomial or the components defining A.*
 
 <pre>
 <b>DefiningPolynomial</b>(A::AlgEt) -> RngUPolElt
@@ -26,7 +48,7 @@
 *Returns the defining polynomial of A, if the corresponding number fields are distinct.*
 
 <pre>
-<b>NumberFields</b>(A::AlgEt) -> SeqEnum
+<b>Components</b>(A::AlgEt) -> SeqEnum
 </pre>
 
 *Returns the number fields of which A is a product of,together with embeddings and projections*
@@ -66,12 +88,6 @@
 </pre>
 
 *A1 eq A2*
-
-<pre>
-<b>HomsToC</b>(A::AlgEt : Precision:=30)->SeqEnum[Map]
-</pre>
-
-*returns Hom(A,\C) as a sequence of maps. The precision of \C is given by the optional parameter "Precision". Default value is 30*
 
 
 # List of instrinsics in Elt.m:
@@ -1232,6 +1248,16 @@
 </pre>
 
 *return an element x such that x*I is an integral ideal coprime with J, togheter with the product x*I.. The first ideal must be invertible and the second should be integral*
+
+
+# List of instrinsics in Completion.m:
+--
+
+<pre>
+<b>Completion</b>(P::AlgEtIdl : MinPrecision:=20) -> FldPad,Map
+</pre>
+
+*Given a prime ideal of the maximal order of an etale algebra L it returns the p-adic field corresponding to the completion LP and a homormophism map:L->LP. The vararg MinPrecision is passed to Completion. map has preimage (it acts a bit weird).*
 
 
 # List of instrinsics in ComplexConj.m:

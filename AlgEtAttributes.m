@@ -104,43 +104,23 @@ end intrinsic;
 
 intrinsic 'eq'(A1::AlgEt,A2::AlgEt) -> BoolElt
 {A1 eq A2}
-   return A1 cmpeq A2;
+   c1,e1,p1:=Components(A1);
+   c2,e2,p2:=Components(A2);
+   return <c1,e1,p1> eq <c2,e2,p2>;
 end intrinsic;
-
-/*
 
 /* TEST
 
-    Attach("~/packages_github/AlgEt/AlgEt.m");
+    AttachSpec("~/packages_github/AlgEt/spec");
     SetAssertions(2);
     _<x>:=PolynomialRing(Integers());
     f:=(x^8+16)*(x^8+81);
     A:=EtaleAlgebra(f);
-    assert #Basis(A) eq Dimension(A);
-
-    seq:=[x^2-5,x^2-7];
-    seq:=[NumberField(f) : f in seq];
-    A:=EtaleAlgebra(seq);
-
-    K:=NumberField(x^2-5);
-    _<y>:=PolynomialRing(K);
-    p:=y^2-7;
-    A:=EtaleAlgebra(p);
-    A;
-    F,mFA:=BaseField(A);
-    [ mFA(b) : b in Basis(MaximalOrder(F)) ];
-
-    E:=NumberField(p);
-    seq:=[E,K];
-    A:=EtaleAlgebra(seq);
-    HasBaseField(A);
-    AbsoluteDimension(A);
-    PrimeField(A);
-
-    A:=EtaleAlgebra([E,E]);
-    Dimension(A);
-    AbsoluteDimension(A);
-    BaseField(A);
-    PrimeField(A);
+    B:=EtaleAlgebra(f);
+    assert not A eq B;
+    assert A ne B;
+    assert A eq A;
+    assert A cmpeq A;
+    assert not A cmpeq B;
 
 */

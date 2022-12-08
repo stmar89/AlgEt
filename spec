@@ -7,6 +7,7 @@ Ord.m
 Quotients.m
 OverOrders.m
 Idl.m
+Completion.m
 ComplexConj.m
 IntermediateIdeals.m
 ShortEltSmallRep.m

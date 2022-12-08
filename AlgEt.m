@@ -54,6 +54,14 @@ intrinsic EtaleAlgebra(f::RngUPolElt[FldRat]) -> AlgEt
     return A;
 end intrinsic;
 
+intrinsic EtaleAlgebra(f::RngUPolElt[FldNum]) -> AlgEt
+{Given a squarefree polynomial over the rationals returns the product of the number fields defined by the irreducible factors.}
+    require IsSquarefree(f) : "The polynomial must be squarefree.";
+    A:=EtaleAlgebra([NumberField(g[1]) : g in Factorization(f)]);
+    A`DefiningPolynomial:=f;
+    return A;
+end intrinsic;
+
 /*
 
 // MOVE OR REMOVE THE NEXT
@@ -73,7 +81,7 @@ end intrinsic;
 
 /* TEST
 
-    Attach("~/packages_github/AlgEt/AlgEt.m");
+    AttachSpec("~/packages_github/AlgEt/spec");
     SetAssertions(2);
     _<x>:=PolynomialRing(Integers());
     f:=(x^8+16)*(x^8+81);

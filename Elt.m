@@ -15,7 +15,6 @@ declare verbose AlgEtElt, 3;
 
 declare attributes AlgEtElt : Algebra, // AlgEt
                               AbsoluteCoordinates,
-                              Hash,
                               Components; // Tup
 
 declare attributes AlgEt : Basis,
@@ -70,11 +69,11 @@ function CreateAlgEtElt(A,comp)
     x1:=New(AlgEtElt);
     x1`Algebra:=A;
     x1`Components:=comp;
-    x1`Hash:=Hash(comp);
     return x1;
 end function;
 
 intrinsic IsCoercible(A::AlgEt, x::.) -> BoolElt, .
+
 {Return whether x is coercible into A and the result of the coercion if so.}
     if Parent(x) cmpeq A then
         return true,x;
@@ -179,7 +178,7 @@ intrinsic 'eq'(x1::AlgEtElt,x2::AlgEtElt) -> BoolElt
 {Is x1=x2 ?}
     A:=Parent(x1);
     require A cmpeq Parent(x2): "The elements must belong to the same algebra.";
-    return (x1`Hash eq x2`Hash) and (Components(x1) eq Components(x2)); // first part is faster for negatives 
+    return (Components(x1) eq Components(x2)); // first part is faster for negatives 
                                                                         // and second is safer for positive
 end intrinsic;
 

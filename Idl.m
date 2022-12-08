@@ -101,7 +101,7 @@ intrinsic Ideal(S::AlgEtOrd, idls::Tup) -> AlgEtIdl
     require #SasProd eq #idls : "The sequence does not contain enough ideals to generate a lattice in Algebra(S).";
     require forall{ i : i in [1..#idls] | Order(idls[i]) eq SasProd[i]} : "The ideals are not defined over the components of S.";
     A:=Algebra(S);
-    _,embs:=NumberFields(A);
+    _,embs:=Components(A);
     gens:=&cat[ [embs[i](g) : g in Generators(idls[i])] : i in [1..#idls] ];
     I:=Ideal(S,gens);
     I`IsProductOfIdeals:=<true,idls>;
@@ -739,7 +739,7 @@ intrinsic IsProductOfIdeals(I::AlgEtIdl) -> BoolElt, Tup
         A:=Algebra(O);
         test,orders:=IsProductOfOrders(O);
         if test then
-            nf,_,projs:=NumberFields(A); 
+            nf,_,projs:=Components(A); 
             zb:=ZBasis(I);
             ideals:=< ideal< orders[i] | [ projs[i](z) : z in zb ] > : i in [1..#orders] >;
             I`IsProductOfIdeals:=<true, ideals>;

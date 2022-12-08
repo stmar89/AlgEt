@@ -17,7 +17,7 @@ declare attributes AlgEtIdl : IsConjugateStable;
 intrinsic HasComplexConjugate(A::AlgEt) -> BoolElt
 {Returns if the algebra is the product of CM fields}
     if not assigned A`HasComplexConjugate then
-        A`HasComplexConjugate:=forall{L : L in A`NumberFields[1] | HasComplexConjugate(L)};
+        A`HasComplexConjugate:=forall{L : L in A`Components[1] | HasComplexConjugate(L)};
     end if;
 	return A`HasComplexConjugate;
 end intrinsic;

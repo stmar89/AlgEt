@@ -33,7 +33,7 @@ intrinsic PrintWKICM(R::AlgEtOrd) -> MonStgElt
 { Given an order R in an AlgEt, it returns a string that contains the weak equivalence classes of R, sorted by multiplicator ring. In particular, the overorders of R can be recovered fro this string. Such string can be easily printed to file. To load the string, after using Read() on the file, use the intrinsic LoadWKICM }
     str:="<\n";
     A:=Algebra(R);
-    nf:=NumberFields(A);
+    nf:=Components(A);
     nf_poly:=[ Coefficients((DefiningPolynomial(K))) : K in nf ];
     str cat:=RemoveBlanks(Sprint(nf_poly)) cat ",\n";
     oo:=FindOverOrders(R);

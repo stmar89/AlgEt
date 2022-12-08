@@ -20,7 +20,7 @@ intrinsic ResidueRingUnits(S::AlgEtOrd,I::AlgEtIdl) -> GrpAb,Map
     assert test;
     A:=Algebra(S);
     n:=#I_asProd;
-    _,embs:=NumberFields(A);
+    _,embs:=Components(A);
     ray_res_rings:=[];
     ray_res_rings_maps:=[**];
     for i in [1..n] do
@@ -123,7 +123,7 @@ IsPrincipal_prod_internal_old:=function( I , GRH )
     assert test; //this function should be called only for ideals of the maximal order, hence I is a product
     S:=Order(I);
     A:=Algebra(S);
-    nf,embs:=NumberFields(A);
+    nf,embs:=Components(A);
     gen:=Zero(A);
     if GRH then
         SetClassGroupBounds("GRH");
@@ -159,7 +159,7 @@ IsPrincipal_prod_internal:=function( II , GRH )
     assert test; //this function should be called only for ideals of the maximal order, hence I is a product
     S:=Order(I);
     A:=Algebra(S);
-    nf,embs:=NumberFields(A);
+    nf,embs:=Components(A);
     gen:=Zero(A);
     if GRH then
         SetClassGroupBounds("GRH");
@@ -248,7 +248,7 @@ PicardGroup_prod_internal:=function( O , GRH )
     assert IsMaximal(O); // this function should be used only for maximal orders
     test,O_asProd:=IsProductOfOrders(O);
     assert test; //O must be a product of orders
-    nf,embs:=NumberFields(A);
+    nf,embs:=Components(A);
     assert #nf eq #O_asProd;
     groups_maps_fields_maps:=[**];
     if GRH then
@@ -452,7 +452,7 @@ UnitGroup_prod_internal:=function(O, GRH)
 	test,O_asProd:=IsProductOfOrders(O);
 	assert test; //the order must be a product
 	A:=Algebra(O);
-    nf,embs:=NumberFields(A);
+    nf,embs:=Components(A);
 	idemA:=OrthogonalIdempotents(A);
 	U_asProd:=[];
 	u_asProd:=[**];
@@ -490,7 +490,7 @@ intrinsic UnitGroup(S::AlgEtOrd : GRH:=false ) -> GrpAb, Map
     end if;
     if IsMaximal(S) then return UnitGroup_prod_internal(S,GRH); end if;
     A:=Algebra(S);
-    require assigned A`NumberFields: "the order must lie in a product of number fields";
+    require assigned A`Components: "the order must lie in a product of number fields";
     O:=MaximalOrder(Algebra(S));
     UO,uO:=UnitGroup_prod_internal(O, GRH);
     F:=Conductor(S);

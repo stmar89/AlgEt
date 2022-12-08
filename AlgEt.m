@@ -22,7 +22,7 @@ declare attributes AlgEt : DefiningPolynomial,
                            BaseField, //a tup : <F,m> where F is the Base field and m is the diagonal embedding into A
                            HasBaseField, //a boolean
                            PrimeField,
-                           NumberFields; //a tup of 3 sequences: the first are the NF, 
+                           Components; //a tup of 3 sequences: the first are the NF, 
                                          //the second are embeddings and the third are projections
 
 //------------
@@ -35,7 +35,7 @@ intrinsic Print(A::AlgEt)
         f:=DefiningPolynomial(A);
         printf "Etale Algebra over (%o) defined by %o", FieldOfFractions(CoefficientRing(f)),f;    
     else
-        printf "Etale Algebra product of %o", NumberFields(A);
+        printf "Etale Algebra product of %o", Components(A);
     end if;
 end intrinsic;
 
@@ -44,7 +44,7 @@ intrinsic EtaleAlgebra(seq::SeqEnum[FldNum]) -> AlgEt
     A:=New(AlgEt);
     embs:=[ map< seq[i]->A | x:-> A! (<seq[j]!0 : j in [1..i-1]> cat <x> cat <seq[j]!0 : j in [i+1..#seq]>)  > : i in [1..#seq] ];
     projs:=[ map< A->seq[i] | y:-> Components(y)[i] > : i in [1..#seq] ];
-    A`NumberFields:=<seq,embs,projs>;
+    A`Components:=<seq,embs,projs>;
     return A;
 end intrinsic;
 
@@ -63,22 +63,22 @@ end intrinsic;
 intrinsic DefiningPolynomial(A::AlgEt) -> RngUPolElt
 {Returns the defining polynomial of A, if the corresponding number fields are distinct.}
     if not assigned A`DefiningPolynomial then
-        polys:=[DefiningPolynomial(L) : L in NumberFields(A)];
+        polys:=[DefiningPolynomial(L) : L in Components(A)];
         require #polys eq #Seqset(polys) : "The number fields defining A are not distinct.";
         A`DefiningPolynomial:=&*(polys);
     end if;
     return A`DefiningPolynomial;
 end intrinsic;
 
-intrinsic NumberFields(A::AlgEt) -> SeqEnum
+intrinsic Components(A::AlgEt) -> SeqEnum
 {Returns the number fields of which A is a product of,together with embeddings and projections}
-    return Explode(A`NumberFields);
+    return Explode(A`Components);
 end intrinsic;
 
 intrinsic Dimension(A::AlgEt)->RngInt
 {Dimension of A}    
     if not assigned A`Dimension then
-        nf:=NumberFields(A);
+        nf:=Components(A);
         require HasBaseField(A) : "The number fields of A shoud all be defined over the same base ring.";
         A`Dimension:=&+[Degree(E) : E in nf];
     end if;
@@ -88,7 +88,7 @@ end intrinsic;
 intrinsic AbsoluteDimension(A::AlgEt)->RngInt
 {Dimension of A over the prime field}    
     if not assigned A`AbsoluteDimension then
-        A`AbsoluteDimension:=&+[AbsoluteDegree(E) : E in NumberFields(A)];
+        A`AbsoluteDimension:=&+[AbsoluteDegree(E) : E in Components(A)];
     end if;
     return A`AbsoluteDimension;
 end intrinsic;
@@ -96,7 +96,7 @@ end intrinsic;
 intrinsic HasBaseField(A::AlgEt) -> BoolElt,FldNum
 {Returns whether A has common base field. If this is the case it returns it.}
     if not assigned A`HasBaseField then
-        nf,embs:=NumberFields(A);
+        nf,embs:=Components(A);
         F:=BaseRing(nf[1]);
         A`HasBaseField:=forall{ E : E in nf[2..#nf] | BaseRing(E) eq F };
         if A`HasBaseField then
@@ -119,7 +119,7 @@ end intrinsic;
 intrinsic PrimeField(A::AlgEt) -> FldNum
 {Returns the prime field of the Algebra}
     if not assigned A`PrimeField then
-        nf:=NumberFields(A);
+        nf:=Components(A);
         F:=PrimeField(nf[1]); //this should always be Rationals()
         A`PrimeField:=F;
     end if;
@@ -145,7 +145,7 @@ intrinsic HomsToC(A::AlgEt : Precision:=30)->SeqEnum[Map]
         return &cat[[CC ! z : z in Conjugates(y : Precision:=Precision)] :y in Components(x)];
     end function;
     maps:=< map< A -> CC | x:-> images(x)[k] > : k in [1..Dimension(A)] >;
-    f:=&*[DefiningPolynomial(L[1]) : L in A`NumberFields];
+    f:=&*[DefiningPolynomial(L[1]) : L in A`Components];
     assert &and [ Abs(Evaluate(f,g(PrimitiveElement(A)))) lt 10^-10 : g in maps]; //the precision here is quite arbitrary...
     return maps;
 end intrinsic;

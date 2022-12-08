@@ -28,7 +28,7 @@ function factorizationMaximalOrder(I)
     test,IasProd:=IsProductOfIdeals(I);
     assert test;
     fac:=[]; //this will be the factorization of I
-    nf,embs:=NumberFields(A);
+    nf,embs:=Components(A);
     tup_one_ideals:=< 1*O : O in OasProd >;
     for i in [1..#nf] do
         IL:=IasProd[i];

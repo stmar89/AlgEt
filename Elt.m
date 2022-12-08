@@ -81,7 +81,7 @@ intrinsic IsCoercible(A::AlgEt, x::.) -> BoolElt, .
     elif Type(x) in {List,Tup,SeqEnum} then
         comp:=<>;
         for i in [1..#x] do
-            t,xi:=IsCoercible(NumberFields(A)[i],x[i]); 
+            t,xi:=IsCoercible(Components(A)[i],x[i]); 
             if not t then
                 return false,""; // early exit if not coercible
             else
@@ -93,7 +93,7 @@ intrinsic IsCoercible(A::AlgEt, x::.) -> BoolElt, .
         return true,x1;
     elif Type(x) eq RngIntElt or Type(x) eq FldRatElt then
         coordinates:=<>;
-        nf:=NumberFields(A);
+        nf:=Components(A);
         comp:=<nf[i]!x : i in [1..#nf]>; //diagonal embedding
         x1:=CreateAlgEtElt(A,comp);
         return true,x1;
@@ -115,12 +115,12 @@ end intrinsic;
 
 intrinsic One(A::AlgEt) -> AlgEtElt
 {The multiplicative neutral element of A.}   
-    return A![1 : i in [1..#NumberFields(A)]];
+    return A![1 : i in [1..#Components(A)]];
 end intrinsic;
 
 intrinsic Zero(A::AlgEt) -> AlgEtElt
 {The additive neutral element of A.}   
-    return A![0 : i in [1..#NumberFields(A)]];
+    return A![0 : i in [1..#Components(A)]];
 end intrinsic;
 
 intrinsic IsUnit(x::AlgEtElt) -> BoolElt
@@ -161,7 +161,7 @@ end intrinsic;
 intrinsic RandomUnit(A::AlgEt , bd::RngIntElt) -> AlgEtElt
 {Random unit of A. The Coefficients are bounded by the positive integer bd.}   
     require bd gt 0 : "The bound needs to be a positive integer.";
-    nf:=NumberFields(A);
+    nf:=Components(A);
     require BaseField(A) eq Rationals() : "The function works only for product of absolute number fiedls'" ;
     repeat
         num:=A!< E!Random(EquationOrder(E),bd) : E in nf>;
@@ -208,7 +208,7 @@ intrinsic '+'(x1::AlgEtElt,x2::AlgEtElt) -> AlgEtElt
 {x1+x2}
     A:=Parent(x1);
     require A cmpeq Parent(x2): "The elements must belong to the same algebra.";
-    x3:=CreateAlgEtElt(A,< Components(x1)[i] + Components(x2)[i] : i in [1..#NumberFields(A)] >);
+    x3:=CreateAlgEtElt(A,< Components(x1)[i] + Components(x2)[i] : i in [1..#Components(A)] >);
     return x3;
 end intrinsic;
 
@@ -250,7 +250,7 @@ end intrinsic;
 intrinsic '-'(x::AlgEtElt) -> AlgEtElt
 {-x}
     A:=Parent(x);
-    comp:=< - Components(x)[i] : i in [1..#NumberFields(A)] >;
+    comp:=< - Components(x)[i] : i in [1..#Components(A)] >;
     y:=CreateAlgEtElt(A,comp);
     return y;
 end intrinsic;
@@ -259,7 +259,7 @@ intrinsic '-'(x1::AlgEtElt,x2::AlgEtElt) -> AlgEtElt
 {x1-x2}
     A:=Parent(x1);
     require A cmpeq Parent(x2): "The elements must belong to the same algebra.";
-    comp:=< Components(x1)[i] - Components(x2)[i] : i in [1..#NumberFields(A)] >;
+    comp:=< Components(x1)[i] - Components(x2)[i] : i in [1..#Components(A)] >;
     x3:=CreateAlgEtElt(A,comp);
     return x3;
 end intrinsic;
@@ -303,7 +303,7 @@ intrinsic '*'(x1::AlgEtElt,x2::AlgEtElt) -> AlgEtElt
 {x1*x2}
     A:=Parent(x1);
     require A cmpeq Parent(x2): "The elements must belong to the same algebra.";
-    comp:=< Components(x1)[i] * Components(x2)[i] : i in [1..#NumberFields(A)] >;
+    comp:=< Components(x1)[i] * Components(x2)[i] : i in [1..#Components(A)] >;
     x3:=CreateAlgEtElt(A,comp);
     return x3;
 end intrinsic;
@@ -347,7 +347,7 @@ intrinsic Inverse(x::AlgEtElt) -> AlgEtElt
 {1/x}
     require IsUnit(x) : "The element is not invertible.";
     A:=Parent(x);
-    comp:=< 1/(Components(x)[i]) : i in [1..#NumberFields(A)] >;
+    comp:=< 1/(Components(x)[i]) : i in [1..#Components(A)] >;
     y:=CreateAlgEtElt(A,comp);
     return y;
 end intrinsic;
@@ -358,12 +358,12 @@ intrinsic '^'(x::AlgEtElt,n::RngIntElt) -> AlgEtElt
     if n eq 0 then
         return One(A);
     elif n gt 0 then
-        comp:=< Components(x)[i]^n : i in [1..#NumberFields(A)] >;
+        comp:=< Components(x)[i]^n : i in [1..#Components(A)] >;
         y:=CreateAlgEtElt(A,comp);
         return y;
     elif n lt 0 then
         require IsUnit(x) : "The element is not invertible.";
-        comp:=< Components(x)[i]^n : i in [1..#NumberFields(A)] >;
+        comp:=< Components(x)[i]^n : i in [1..#Components(A)] >;
         y:=CreateAlgEtElt(A,comp);
         return y;
     end if;
@@ -375,7 +375,7 @@ intrinsic '/'(x1::AlgEtElt,x2::AlgEtElt) -> AlgEtElt
     A:=Parent(x1);
     require A cmpeq Parent(x2): "The elements must belong to the same algebra.";
     require IsUnit(x2) : "The denominator is not invertible.";
-    comp:=< Components(x1)[i]/Components(x2)[i] : i in [1..#NumberFields(A)] >;
+    comp:=< Components(x1)[i]/Components(x2)[i] : i in [1..#Components(A)] >;
     y:=CreateAlgEtElt(A,comp);
     return y;
 end intrinsic;
@@ -546,7 +546,7 @@ end intrinsic;
 intrinsic PrimitiveElement(A::AlgEt) -> AlgEtElt
 {Returns the primitive element of the étale algebra A. Note that A has a primitive element only if it is the product of distinct number fields.}
     if not assigned A`PrimitiveElement then
-        nf,embs:=NumberFields(A);
+        nf,embs:=Components(A);
         require #Seqset(nf) eq #nf : "The number fields defining the algebra are not distinct. Hence the algebra does not have a primitive element";
         A`PrimitiveElement:= CreateAlgEtElt(A,<PrimitiveElement(F) : F in nf>);
     end if;
@@ -571,7 +571,7 @@ end intrinsic;
 intrinsic Basis(A::AlgEt) -> SeqEnum
 {Returns a basis of the algebra over the common base field.}
     if not assigned A`Basis then
-        nf,embs:=NumberFields(A);
+        nf,embs:=Components(A);
         require HasBaseField(A) : "The number fields do not have a common base field.";
         cc:= &cat[ [embs[i](b) : b in Basis(nf[i])] : i in [1..#nf]]; 
         A`Basis := [ A ! c : c in cc ];
@@ -582,7 +582,7 @@ end intrinsic;
 intrinsic AbsoluteBasis(A::AlgEt) -> SeqEnum
 {Returns a basis of the algebra over the prime field.}
     if not assigned A`AbsoluteBasis then
-        nf,embs:=NumberFields(A);
+        nf,embs:=Components(A);
         cc:= &cat[ [embs[i](b) : b in AbsoluteBasis(nf[i])] : i in [1..#nf]]; 
         A`AbsoluteBasis := [ A ! c : c in cc ];
     end if;
@@ -610,7 +610,7 @@ end intrinsic;
 intrinsic OrthogonalIdempotents(A::AlgEt) -> SeqEnum
 {Returns the orthogonal ideampotent element of the étale algebra A}
     if not assigned A`OrthogonalIdempotents then
-        nf,embs:=NumberFields(A);
+        nf,embs:=Components(A);
         A`OrthogonalIdempotents := [embs[i](One(nf[i])) : i in [1..#nf]];
     end if;
     return A`OrthogonalIdempotents;
@@ -711,7 +711,7 @@ end intrinsic;
     IsIntegral(e);
     e2:=A!<K.1^2,K.1^2>;
     assert MinimalPolynomial(e2) eq MinimalPolynomial(K.1^2);
-    _,embs,projs:=NumberFields(A);
+    _,embs,projs:=Components(A);
     assert embs[1](K.1)+embs[2](K.1^2) eq e;
     assert projs[1](e) eq K.1;
     assert projs[2](e) eq K.1^2;

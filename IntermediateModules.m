@@ -175,7 +175,7 @@ end intrinsic;
     F:=PrimitiveElement(K);
     [MinimalPolynomial(c) : c in Components(m(F))];
 
-    Vnf,Ve:=NumberFields(V);
+    Vnf,Ve:=Components(V);
     gens:=&cat[ [Ve[i](z) : z in Basis(MaximalOrder(Vnf[i])) ] : i in [1..#Vnf]];
     gens;
     O:=MaximalOrder(K);
@@ -227,14 +227,14 @@ end intrinsic;
     ss:={1,2,3,4};
     #[ c : c in car<ss,ss,ss,ss> | c[1] le c[2] and c[2] le c[3] and c[3] le c[4] ];
     // we get 35 classes.
-    // But ZFV is NOT Bass!
+    // But ZFV is NOT Bass!/
     assert #PicardGroup(ZFV) eq 1;
 
     R:=ZFV;
     O:=MaximalOrder(K);
-    nf:=NumberFields(K);
+    nf:=Components(K);
     V:=EtaleAlgebra(&cat[nf : i in [1..2]]);
-    Vnf:=NumberFields(V);
+    Vnf:=Components(V);
     m:=NaturalAction(K,V);
     MO:=Module(R,m,<1*MaximalOrder(Vnf[i]) : i in [1..#Vnf]>);
     MOO:=O!!MO;

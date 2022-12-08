@@ -53,7 +53,7 @@ intrinsic TraceDualIdeal(I::AlgEtIdl) -> AlgEtIdl
         require PrimeField(A) eq BaseField(A) : "implementend only for algebras over the prime field";
         S:=Order(I);
         B:=ZBasis(I);
-        Nnf:=#NumberFields(A);
+        Nnf:=#Components(A);
         n:=#B;
         Q:=MatrixRing(RationalField(), n)![AbsoluteTrace(B[i]*B[j]): i, j in [1..n] ];
         QQ:=Q^-1;

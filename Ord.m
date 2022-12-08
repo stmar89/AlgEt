@@ -95,7 +95,7 @@ MatrixQtoA:=function(A,P)
 //given a matrix with Integer or Rational entries, returns a sequence of elements of A, corresponding to the rows.
     abs:=AbsoluteBasis(A);
     abs_dim:=AbsoluteDimension(A);
-    N:=#NumberFields(A);
+    N:=#Components(A);
     rows:=[ Eltseq(r) : r in Rows(P)];
     Nrow:=#rows;
     assert #Columns(P) eq abs_dim;
@@ -167,7 +167,7 @@ end intrinsic;
 
 intrinsic Order(A::AlgEt , orders::Tup) -> AlgEtOrd
 {Given a sequence of order in the number fiedls defining the etale algebra A, generates the product order.}
-    nf,embs,projs:=NumberFields(A);
+    nf,embs,projs:=Components(A);
     require #nf eq #orders and forall{ i : i in [1..#orders] | NumberField(orders[i]) eq nf[i]} and 
 forall{ S : S in orders | Type(S) eq RngOrd } : "The second input should be a sequence of orders in the number fields defining A";
     gens:=&cat[ [ embs[i](z) : z in AbsoluteBasis(orders[i]) ] : i in [1..#nf] ];
@@ -364,7 +364,7 @@ end intrinsic;
 intrinsic ProductOfEquationOrders(A::AlgEt)->AlgEtOrd
 {Given a product of number field A, returns the order consisting of the product of the equation orders of the number fields.}
     if not assigned A`ProductOfEquationOrders then
-        A`ProductOfEquationOrders := Order( A , <EquationOrder(E) : E in NumberFields(A)> );
+        A`ProductOfEquationOrders := Order( A , <EquationOrder(E) : E in Components(A)> );
     end if;
     return A`ProductOfEquationOrders ;
 end intrinsic;
@@ -376,7 +376,7 @@ end intrinsic;
 intrinsic MaximalOrder(A::AlgEt)->AlgEtOrd
 {Returns the maximal order of the étale algebra A.}
     if not assigned A`MaximalOrder then    
-        O:=Order( A , <MaximalOrder(E) : E in NumberFields(A)> );
+        O:=Order( A , <MaximalOrder(E) : E in Components(A)> );
         O`IsMaximal:=true;
         A`MaximalOrder:=O;
     end if;
@@ -403,7 +403,7 @@ intrinsic IsProductOfOrders(O::AlgEtOrd)->BoolElt, Tup
         idem:=OrthogonalIdempotents(A);
         test:=forall{x : x in idem | x in O};
         if test then
-            nf,_,projs:=NumberFields(A); 
+            nf,_,projs:=Components(A); 
             if #nf eq 1 then
                 orders:=< Order([ projs[1](z) : z in ZBasis(O) ])  >;
             else

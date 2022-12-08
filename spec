@@ -10,6 +10,7 @@ OverOrders.m
 Idl.m
 Completion.m
 ComplexConj.m
+ComplexMult.m
 IntermediateIdeals.m
 ShortEltSmallRep.m
 MinimalGenerators.m

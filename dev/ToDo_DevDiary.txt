@@ -3,12 +3,12 @@
 
     - IdealsOfIndex.m
     - TotRealTotPos.m
-    - CMAlgAss.m //already moved ComplexConjugate in ComplexConj.m, but not the CMType stuff
     - IntegralMatrices.m
     - RepsZConjugacy.m
     - PowerBass.m
-    - padictocc.m ?
     - stuff about AVs 
+    - CMAlgAss.m // CMType missing stuff for IsogenyClassFq
+    - padictocc.m ?
 
     TODO:
     ### Priority ###

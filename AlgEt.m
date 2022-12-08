@@ -62,23 +62,6 @@ intrinsic EtaleAlgebra(f::RngUPolElt[FldNum]) -> AlgEt
     return A;
 end intrinsic;
 
-/*
-
-// MOVE OR REMOVE THE NEXT
-intrinsic HomsToC(A::AlgEt : Precision:=30)->SeqEnum[Map]
-{returns Hom(A,\C) as a sequence of maps. The precision of \C is given by the optional parameter "Precision". Default value is 30}
-    CC:=ComplexField(Precision);
-    images:=function(x)
-        return &cat[[CC ! z : z in Conjugates(y : Precision:=Precision)] :y in Components(x)];
-    end function;
-    maps:=< map< A -> CC | x:-> images(x)[k] > : k in [1..Dimension(A)] >;
-    f:=&*[DefiningPolynomial(L[1]) : L in A`Components];
-    assert &and [ Abs(Evaluate(f,g(PrimitiveElement(A)))) lt 10^-10 : g in maps]; //the precision here is quite arbitrary...
-    return maps;
-end intrinsic;
-
-*/
-
 /* TEST
 
     AttachSpec("~/packages_github/AlgEt/spec");

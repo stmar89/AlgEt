@@ -1,6 +1,7 @@
 {
 AlgEt.m
 AlgEtAttributes.m
+HomsToC.m
 Elt.m
 TraceNorm.m
 Ord.m

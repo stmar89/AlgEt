@@ -7,7 +7,6 @@
     - IntegralMatrices.m
     - RepsZConjugacy.m
     - PowerBass.m
-    
     - padictocc.m ?
     - stuff about AVs 
 

@@ -702,7 +702,7 @@ intrinsic Inverse(I::AlgEtIdl) ->AlgEtIdl
 end intrinsic;
 
 intrinsic MultiplicatorRing(I::AlgEtIdl) -> AlgEtOrd
-{return a Z-basis of the ideal}
+{Given a fractional R-ideal I computes its multiplicator ring (I:I). If the overorders of R are known the corresponding overorder is returned, in order to preserve the known attributes.}
     if not assigned I`MultiplicatorRing then
         R:=Order(I);
         if #Generators(I) eq 1 then

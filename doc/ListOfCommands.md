@@ -25,12 +25,6 @@
 
 *Given a squarefree polynomial over the rationals returns the product of the number fields defined by the irreducible factors.*
 
-<pre>
-<b>HomsToC</b>(A::AlgEt : Precision:=30)->SeqEnum[Map]
-</pre>
-
-*returns Hom(A,\C) as a sequence of maps. The precision of \C is given by the optional parameter "Precision". Default value is 30*
-
 
 # List of instrinsics in AlgEtAttributes.m:
 --
@@ -88,6 +82,16 @@
 </pre>
 
 *A1 eq A2*
+
+
+# List of instrinsics in Homs.m:
+--
+
+<pre>
+<b>HomsToC</b>(A::AlgEt : Precision:=30)->SeqEnum[Map]
+</pre>
+
+*returns Hom(A,\C) as a sequence of maps. The precision of \C is given by the optional parameter "Precision". Default value is 30*
 
 
 # List of instrinsics in Elt.m:
@@ -1197,7 +1201,7 @@
 <b>MultiplicatorRing</b>(I::AlgEtIdl) -> AlgEtOrd
 </pre>
 
-*return a Z-basis of the ideal*
+*Given a fractional R-ideal I computes its multiplicator ring (I:I). If the overorders of R are known the corresponding overorder is returned, in order to preserve the known attributes.*
 
 <pre>
 <b>IsProductOfIdeals</b>(I::AlgEtIdl) -> BoolElt, Tup
@@ -1298,6 +1302,88 @@
 </pre>
 
 *if A is a product of CM fields, it returns the complex conjugate of the argument*
+
+
+# List of instrinsics in ComplexMult.m:
+--
+
+<pre>
+<b>CMType</b>(seq::SeqEnum[Map]) -> AlgEtCMType
+</pre>
+
+*given a sequence seq of homomorphisms from a CM-algebra to CC, one per conjugate pair, it returns the corresponding CMType*
+
+<pre>
+<b>CreateCMType</b>(seq::SeqEnum[Map]) -> AlgEtCMType
+</pre>
+
+*given a sequence seq of homomorphisms from a CM-algebra to CC, one per conjugate pair, it returns the corresponding CMType*
+
+<pre>
+<b>CMType</b>( b::AlgEtElt  ) -> AlgEtCMType
+</pre>
+
+*given a totally imginary element b, it returns the CMType PHI for which b is PHI-positive*
+
+<pre>
+<b>CreateCMType</b>( b::AlgEtElt  ) -> AlgEtCMType
+</pre>
+
+*given a totally imginary element b, it returns the CMType PHI for which b is PHI-positive*
+
+<pre>
+<b>Print</b>( PHI :: AlgEtCMType)
+</pre>
+
+*print the AlgEtCMType*
+
+<pre>
+<b>CMPositiveElement</b>( PHI::AlgEtCMType )->AlgEtElt
+</pre>
+
+*given a CMType PHI returns a totally imaginary PHI-positive element (which uniquely determines PHI)*
+
+<pre>
+<b>CMPosElt</b>( PHI::AlgEtCMType )->AlgEtElt
+</pre>
+
+*given a CMType PHI returns a totally imaginary PHI-positive element (which uniquely determines PHI)*
+
+<pre>
+<b>Homs</b>( PHI::AlgEtCMType : prec:=30 )->SeqEnum[Map]
+</pre>
+
+*given a AlgEtCMType PHI returns the sequence of maps to CC defining it*
+
+<pre>
+<b>'eq'</b>(PHI1 :: AlgEtCMType, PHI2::AlgEtCMType : prec:=30)->BoolElt
+</pre>
+
+*returns whether two cm types are equal*
+
+<pre>
+<b>Precision</b>(PHI :: AlgEtCMType)->RngIntElt
+</pre>
+
+*the precision of the given CM-type, that is, the codomain of each homomorphism will be ComplexField(Precision)*
+
+<pre>
+<b>ChangePrecision</b>(PHI0 :: AlgEtCMType, prec::RngIntElt )->AlgEtCMType
+</pre>
+
+*changes the precision of the given CM-type, that is, the codomain of each homomorphism will be ComplexField(Precision)*
+
+<pre>
+<b>ChangePrecision</b>(~PHI :: AlgEtCMType, prec::RngIntElt )
+</pre>
+
+*changes the precision of the given CM-type, that is, the codomain of each homomorphism will be ComplexField(Precision)*
+
+<pre>
+<b>AllCMTypes</b>(A::AlgEt : Precision := 30 ) -> SeqEnum[AlgEtCMType]
+</pre>
+
+*Returns all the AlgEtCMTypes of A*
 
 
 # List of instrinsics in IntermediateIdeals.m:
@@ -1487,6 +1573,41 @@
 </pre>
 
 *Check if the order is Gorenstein at the prime ideal P.*
+
+
+# List of instrinsics in TotRealTotPos.m:
+--
+
+<pre>
+<b>IsTotallyReal</b>(a::AlgEtElt) -> BoolElt
+</pre>
+
+*returns whther a is totally real*
+
+<pre>
+<b>IsTotallyRealPositive</b>(a::AlgEtElt) -> BoolElt
+</pre>
+
+*returns whether a is totally positive, that is, totally real and with positive image in C*
+
+<pre>
+<b>TotallyRealSubAlgebra</b>(K::AlgEt) -> AlgEt,Map
+</pre>
+
+*Given a CM algebra K returns the unique totally real subalgebra, and an embedding*
+
+<pre>
+<b>TotallyRealUnitGroup</b>(S::AlgEtOrd) -> Grp
+</pre>
+
+*Given an order S in a CM étale algebra A returns the groups of totally real units of S, as a subgroup of S^**
+
+<pre>
+<b>TotallyRealPositiveUnitGroup</b>(S::AlgEtOrd) -> Grp
+</pre>
+
+*Given an order S in a CM étale algebra A
+      returns the groups of totally positive units of S, as a subgroup of S^**
 
 
 # List of instrinsics in PrintSave.m:

@@ -167,5 +167,25 @@ end intrinsic;
     assert forall{i : i in [1..#out1] | out1[i] eq out3[i]};
     */
 
+    // wkimc _better
+    // as a recursion with early exit if type le 2
+    wkicm_bar:=function(S)
+        ooS:=[ T : T in FindOverOrders(S) | T ne S and T eq MultiplicatorRing(T!!St)];
+        ind:=[ Index(T,S) : T in ooS];
+        min,pos:=Min(ind);
+        assert #[ i : i in ind | i eq min ] eq 1;
+        T:=ooS[pos];
+        wkT:=[ S!! I : I in WKICM_bar(T) ];
+        ff:=ColonIdeal(OneIdeal(S),S!!OneIdeal(T));
+        l:=&join{@ IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing(I,ff*I,T) : I in wkT @};
+        ww:={@ @};
+        for I in l do 
+            if not exists{J : J in ww | IsWeakEquivalent(I,J)} then
+                Include(~ww,I); 
+            end if; 
+        end for;
+        return ww;
+    end function;
 
+    for S in oo do time #wkicm_bar(S); end for;
 */

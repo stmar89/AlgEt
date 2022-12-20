@@ -187,5 +187,4 @@ end intrinsic;
         return ww;
     end function;
 
-    for S in oo do time #wkicm_bar(S); end for;
 */

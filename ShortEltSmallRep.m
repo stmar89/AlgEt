@@ -47,7 +47,6 @@ intrinsic ShortestElement(I::AlgEtIdl) ->AlgEtElt
     b:=Basis(LLL(L));
     b:=[ Norm(c) : c in b ];
     min:=Min(b);
-    max:=Max(b);
     repeat
         p:=ShortVectors(L,2^(-k)*min,min*2^k);
         for i in [1..#p] do
@@ -59,7 +58,6 @@ intrinsic ShortestElement(I::AlgEtIdl) ->AlgEtElt
         end for;
         k+:=1;
     until stop;
-    k,min,max,#p;
     return elt;
 end intrinsic;
 

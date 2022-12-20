@@ -572,14 +572,16 @@ end intrinsic;
 	AttachSpec("~/packages_github/AlgEt/spec");
 	SetAssertions(1);
 	_<x>:=PolynomialRing(Integers());
-    f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
-    A:=EtaleAlgebra(f);
-	E:=EquationOrder(A);
-	SetProfile(true);
-    t0:=Cputime();
-        P,p:=PicardGroup(E : GRH:=true);
-        U,u:=UnitGroup(E : GRH:=true);	
-    Cputime(t0);
+    	SetProfile(true);
+    for i in [1..10] do
+        f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
+        A:=EtaleAlgebra(f);
+        E:=EquationOrder(A);
+        t0:=Cputime();
+            P,p:=PicardGroup(E : GRH:=true);
+            //U,u:=UnitGroup(E : GRH:=true);	
+        Cputime(t0);
+    end for;
 	SetProfile(false);
     ProfilePrintByTotalTime(ProfileGraph());
 

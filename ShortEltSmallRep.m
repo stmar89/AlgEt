@@ -51,7 +51,7 @@ intrinsic ShortestElement(I::AlgEtIdl) ->AlgEtElt
     repeat
         p:=ShortVectors(L,2^(-k)*min,min*2^k);
         for i in [1..#p] do
-            elt:=MatrixQtoA(A,Matrix([Eltseq(p[i][1])]))[1];
+            elt:=MatrixQtoA(Algebra(I),Matrix([Eltseq(p[i][1])]))[1];
             if not IsZeroDivisor(elt) then
                 stop:=true;
                 break i;

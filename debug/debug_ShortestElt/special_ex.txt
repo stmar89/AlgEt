@@ -1,3 +1,5 @@
+quit; 
+magma;
 /* vim: set syntax=magma : */
 /*
     There is a bug in Shortest Element
@@ -8,9 +10,11 @@
     SetAssertions(3);
     ex:="/home/stmar/260_parallel_entire_recomputation_p2/output_twists_256/3.16.ab_ab_r_wkicm.txt";
     R:=LoadWKICM(Read(ex));
+    A:=Algebra(R);
     wk:=WKICM(R);
     iI:=705;
     I:=wk[iI];
+    SmallRepresentative(I); //this reproduces the bug
 
     ort:=OrthogonalIdempotents(A);
 
@@ -33,13 +37,12 @@
 
     // STATUS: the current intrinsic does not always proce a non-zero divisor. We need to find something more canonical.
     // acting with ort seems to be a good idea, but I c Ip, where Ip = I*ort
+    I:=Random(ColonIdeal(R,I))*I;
+    1 in I;
+    ort:=OrthogonalIdempotents(A);
     Ip:=Ideal(Order(I),[ z*o : z in ZBasis(I) , o in ort ]);
-    c:=ShortestElement(ColonIdeal(I,Ip));
-    // c is in I! Why?
-    a:=ShortestElement(c*Ip);
-    a in I;
-    // a eq c, for some reason.
-    // TOO TIRED. KEEP INVESTIGTING
+    J:=ColonIdeal(Order(I),Ip);
+    c:=ShortestElement(J);
     
 
 
@@ -66,4 +69,194 @@
         end if;
     until na eq 0;
     assert not IsZeroDivisor(a);
+
+    // ######## 20221220
+    quit; 
+    magma;
+    AttachSpec("~/packages_github/AlgEt/spec");
+    import "~/packages_github/AlgEt/Ord.m" : MatrixQtoA,MatrixAtoQ,MatrixAtoZ, meet_zbasis;
+    _<x>:=PolynomialRing(Integers());
+    SetAssertions(3);
+    ex:="/home/stmar/260_parallel_entire_recomputation_p2/output_twists_256/3.16.ab_ab_r_wkicm.txt";
+    R:=LoadWKICM(Read(ex));
+    A:=Algebra(R);
+    wk:=WKICM(R);
+    iI:=705;
+    I:=wk[iI];
+
+    // for a fractional R-ideal J, ShortestElement(J) returns an element a in J such that |J/aR|=Index(J,aR) is minimal.
+    R1:=OneIdeal(R);
+    for i in [1..100] do
+        x:=Random(I);
+        xR:=x*R;
+        assert Index(I,R1)*Index(R1,xR) eq Index(I,xR);
+    end for;
+
+    for i in [1..1000] do
+        x:=Random(R);
+        xR:=x*R;
+        cand:=MatrixQtoA(A,LLL(MatrixAtoQ([x*r : r in ZBasis(R)])));
+        if not exists{ c : c in cand | not IsZeroDivisor(c) and c*R eq xR } then
+            x; cand;
+        end if;
+    end for;
+    x;
+    cand;
+
+    I;
+    cRI:=ColonIdeal(R,I);
+    c:=Random(cRI);
+    Index(R,c*I);
+    n:=AbsoluteDimension(A);
+    zb_cRI_LLL:=MatrixQtoA(A,LLL(MatrixAtoQ(ZBasis(cRI))));
+    repeat
+        c:=SumOfProducts( [Random(-3,3) : i in [1..n]] , zb_cRI_LLL );
+    until not IsZeroDivisor(c);
+    Index(R,c*I);
+
+    //////////////////
+    // q:=function(x)
+    //    return Index(I,x*R)^(2/AbsoluteDimension(A));
+    // end function;
+    homs:=HomsToC(A);
+    // q:=function(x)
+    //     return &+[ Abs(h(x))^2 : h in homs ];
+    // end function;
+    q:=function(x)
+        if IsZeroDivisor(x) then
+            return 0;
+        end if;
+        return &+[ Abs(h(x))^2 : h in homs ];
+    end function;
+    b:=function(x,y)
+        return 1/2*(q(x+y) - q(x) - q(y) );
+    end function;
+
+    for i in [1..100] do
+        x:=Random(I);
+        c:=Random([-100,-1] cat [1,100]);
+        q(c*x) - c^2*q(x);
+    end for;
+
+    for i in [1..100] do
+        x:=Random(I);
+        x1:=Random(I);
+        y:=Random(I);
+        c:=Random([-100,-1] cat [1,100]);
+        b(x+x1,y) - b(x,y) - b(x1,y);
+        b(c*x,y)-c*b(x,y);
+    end for;
+
+    //////////////////
+    quit; 
+    magma;
+    AttachSpec("~/packages_github/AlgEt/spec");
+    import "~/packages_github/AlgEt/Ord.m" : MatrixQtoA,MatrixAtoQ,MatrixAtoZ, meet_zbasis, crZQ,crQZ;
+    _<x>:=PolynomialRing(Integers());
+    SetAssertions(3);
+    ex:="/home/stmar/260_parallel_entire_recomputation_p2/output_twists_256/3.16.ab_ab_r_wkicm.txt";
+    R:=LoadWKICM(Read(ex));
+    A:=Algebra(R);
+    wk:=WKICM(R);
+    iI:=705;
+    I:=wk[iI];
+    ort:=OrthogonalIdempotents(A);
+
+    shortest_element:=function(I)
+        zb1:=ZBasis(I);
+        A:=Algebra(zb1[1]);
+        N:=#zb1;
+        MI:=crZQ(MatrixAtoQ(zb1));
+        dI:=Integers() ! Denominator(MI);
+        orts:=OrthogonalIdempotents(A);
+        rows:=[];
+        for ort in orts do
+            zb2:=[ort * z : z in zb1];
+            MJ:=crZQ(MatrixAtoQ(zb2));
+            dJ:=Integers() ! Denominator(MJ);
+            d:=LCM(dI,dJ);
+            MI:=crQZ(d*MI);
+            MJ:=crQZ(d*MJ);
+            MZ:=ZeroMatrix(Integers(),N,N);
+            M:=Matrix(HorizontalJoin(VerticalJoin(MI,MJ),VerticalJoin(MI,MZ)));
+            M:=HermiteForm(M);
+            P:=Matrix(N,N,[M[i,j] : i,j in [N+1..2*N]]);
+            P:=LLL((1/d)*crZQ(P));
+            Append(~rows,Eltseq(Rows(P)[1]));
+        end for;
+        elt:=&+MatrixQtoA(A,Matrix(rows));
+        assert elt in I;
+        return elt;
+    end function;
+
+    for i in [1..100] do
+        x:=Random(R);
+        xR:=x*R;
+        y:=shortest_element(xR);
+        Index(xR,y*R);
+        // y*R eq xR;
+    end for;
+    // NOT WORKING!!!
+
+    //////////////////
+    quit; 
+    magma;
+    AttachSpec("~/packages_github/AlgEt/spec");
+    import "~/packages_github/AlgEt/Ord.m" : MatrixQtoA,MatrixAtoQ,MatrixAtoZ, meet_zbasis, crZQ,crQZ;
+    _<x>:=PolynomialRing(Integers());
+    SetAssertions(3);
+    ex:="/home/stmar/260_parallel_entire_recomputation_p2/output_twists_256/3.16.ab_ab_r_wkicm.txt";
+    R:=LoadWKICM(Read(ex));
+    A:=Algebra(R);
+    wk:=WKICM(R);
+    iI:=705;
+    I:=wk[iI];
+
+    shortest_element:=function(I)
+        L:=Lattice(MatrixAtoQ(ZBasis(I)));
+        k:=0;
+        stop:=false;
+        b:=Basis(LLL(L));
+        b:=[ Norm(c) : c in b ];
+        min:=Min(b);
+        max:=Max(b);
+        repeat
+            p:=ShortVectors(L,2^(-k)*min,min*2^k);
+            for i in [1..#p] do
+                elt:=MatrixQtoA(A,Matrix([Eltseq(p[i][1])]))[1];
+                if not IsZeroDivisor(elt) then
+                    stop:=true;
+                    break i;
+                end if;
+            end for;
+            k+:=1;
+        until stop;
+        k,min,max,#p;
+        return elt;
+    end function;
+
+    O:=MaximalOrder(A);
+    time _:=PicardGroup(O);
+    for i in [1..100] do
+        x:=Random(O);
+        xO:=x*O;
+        time y:=shortest_element(xO);
+        Index(xO,y*O);
+        //assert y*O eq xO;
+        delete xO`Generators;
+        time IsPrincipal(xO);
+        "\n";
+    end for;
+
+    for i in [1..100] do
+        x:=Random(R);
+        xR:=x*R;
+        time y:=shortest_element(xR);
+        Index(xR,y*R);
+        //assert y*R eq xR;
+        //delete xR`Generators;
+        //time IsPrincipal(xR);
+        "\n";
+    end for;
+
 

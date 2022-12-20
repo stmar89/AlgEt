@@ -11,49 +11,9 @@
 
     TODO:
     ### Priority ###
-    - There is a bug in ShortestElt
-        see the following output:
-        ###########
-            ~/260_parallel_entire_recomputation_p2/output_fast/3.25.ad_b_dh_wkicm.txt
-            ~/260_parallel_entire_recomputation_p2/output_fast/3.25.ad_bd_h_wkicm.txt
-            ~/260_parallel_entire_recomputation_p2/output_fast/3.25.ad_bb_ahp_wkicm.txt
-            ~/260_parallel_entire_recomputation_p2/output_fast/3.25.ad_bd_i_wkicm.txt
-            ~/260_parallel_entire_recomputation_p2/output_fast/3.25.ad_b_dj_wkicm.txt
-            ~/260_parallel_entire_recomputation_p2/output_fast/3.25.ad_bd_j_wkicm.txt
-            ~/260_parallel_entire_recomputation_p2/output_fast/3.25.ad_b_dk_wkicm.txt
-            ~/260_parallel_entire_recomputation_p2/output_fast/3.25.ad_bd_k_wkicm.txt
-            ~/260_parallel_entire_recomputation_p2/output_fast/3.25.ad_b_dl_wkicm.txt
-            ~/260_parallel_entire_recomputation_p2/output_fast/3.25.ad_bd_l_wkicm.txt
-            ~/260_parallel_entire_recomputation_p2/output_fast/3.25.ad_b_dm_wkicm.txt
-            ~/260_parallel_entire_recomputation_p2/output_fast/3.25.ad_bd_m_wkicm.txt
-            ~/260_parallel_entire_recomputation_p2/output_fast/3.25.ad_b_dn_wkicm.txt
-            ~/260_parallel_entire_recomputation_p2/output_fast/3.25.ad_bd_n_wkicm.txt
-            ~/260_parallel_entire_recomputation_p2/output_fast/3.25.ad_b_do_wkicm.txt
-            ~/260_parallel_entire_recomputation_p2/output_fast/3.25.ad_bd_o_wkicm.txt
-            ~/260_parallel_entire_recomputation_p2/output_fast/3.25.ad_b_dp_wkicm.txt
-            ~/260_parallel_entire_recomputation_p2/output_fast/3.25.ad_bd_p_wkicm.txt
-            ~/260_parallel_entire_recomputation_p2/output_fast/3.25.ad_b_dq_wkicm.txt
-            ~/260_parallel_entire_recomputation_p2/output_fast/3.25.ad_bd_q_wkicm.txt
-            ~/260_parallel_entire_recomputation_p2/output_fast/3.25.ad_b_dr_wkicm.txt
-            ~/260_parallel_entire_recomputation_p2/output_fast/3.25.ad_bd_r_wkicm.txt
-            ~/260_parallel_entire_recomputation_p2/output_fast/3.25.ad_b_ds_wkicm.txt
-            ~/260_parallel_entire_recomputation_p2/output_fast/3.25.ad_bd_s_wkicm.txt
-            
-            PicardGroup(
-                S: Order in Etale Algebra over (Rational Field) defined by x^6 ...
-            )
-            TwoGeneratingSet(
-                I: Ideal of Order in Etale Algebra over (Rational Field) define...
-            )
-            ShortestElement(
-                I: Ideal of Order in Etale Algebra over (Rational Field) define...
-            )
-            In file "/home/stmar/260_parallel_entire_recomputation_p2/isogeny_data/AlgEt/Sh\
-            ortEltSmallRep.m", line 30, column 38:
-            >>         b:=a+A!MatrixQtoA(A,Matrix(rL[i]))[1];
-                                                    ^
-            Runtime error in '[]': Sequence index 7 should be in the range 1 to 6
-        ###############
+    - add ZBasisLLL for a reduced ZBasis. This one should be used for generating random elements and in other occasions. Actually, almost always....
+    
+    - There is a bug in ShortestElt: see debug folder
     - SmallRepresentative does not give a unique ideal: when you repeat the code it goes into a 'loop' of short ideals. It should be a canonical representative.
     - I have recently added the Type AlgEtMod. Many thinks that are valid for Idl should also be implemented for Modules. Eg, sum of modules, ideal*module, ...
     - Then I should convert PowerOfBass.m

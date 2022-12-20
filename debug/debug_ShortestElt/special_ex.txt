@@ -1,0 +1,69 @@
+/* vim: set syntax=magma : */
+/*
+    There is a bug in Shortest Element
+*/
+
+    AttachSpec("~/packages_github/AlgEt/spec");
+    _<x>:=PolynomialRing(Integers());
+    SetAssertions(3);
+    ex:="/home/stmar/260_parallel_entire_recomputation_p2/output_twists_256/3.16.ab_ab_r_wkicm.txt";
+    R:=LoadWKICM(Read(ex));
+    wk:=WKICM(R);
+    iI:=705;
+    I:=wk[iI];
+
+    ort:=OrthogonalIdempotents(A);
+
+    Ip:=Ideal(Order(I),[ z*o : z in ZBasis(I) , o in ort ]);
+    Ip:=1/Random(Ip) * Ip;
+    cRIp:=ColonIdeal(Order(I),Ip);
+    a1:=ShortestElement(cRIp);
+    I:=a1*I;
+    Index(R,I);
+
+    //this version is better, but still not stable.
+    I:=1/Random(I) *I;
+    cpRI:=Ideal(Order(I),[ z*o : z in ZBasis(ColonIdeal(Order(I),I)) , o in ort ]);
+    a2:=ShortestElement(cpRI);
+    I:=a2*I;
+    Index(R,I);
+
+    // I*(R:I) depends only on the class of I.
+
+
+    // STATUS: the current intrinsic does not always proce a non-zero divisor. We need to find something more canonical.
+    // acting with ort seems to be a good idea, but I c Ip, where Ip = I*ort
+    Ip:=Ideal(Order(I),[ z*o : z in ZBasis(I) , o in ort ]);
+    c:=ShortestElement(ColonIdeal(I,Ip));
+    // c is in I! Why?
+    a:=ShortestElement(c*Ip);
+    a in I;
+    // a eq c, for some reason.
+    // TOO TIRED. KEEP INVESTIGTING
+    
+
+
+    I:=ColonIdeal(Order(I),I);
+    _:=SmallRepresentative(I);
+
+    import "~/packages_github/AlgEt/Ord.m" : MatrixQtoA,MatrixAtoQ,MatrixAtoZ;
+    num_zero_comp:=function(a)
+        return #[1: c in Components(a) | IsZero(c)];
+    end function;
+    A:=Algebra(I);
+    L:=LLL(MatrixAtoQ(ZBasis(I)));
+    rL:=Rows(L);
+    a:=Zero(A);
+    na:=num_zero_comp(a);
+    i:=0;
+    repeat
+        i+:=1;
+        b:=a+A!MatrixQtoA(A,Matrix(rL[i]))[1];
+        nb:=num_zero_comp(b);
+        if nb lt na then
+            a:=b;
+            na:=nb;
+        end if;
+    until na eq 0;
+    assert not IsZeroDivisor(a);
+

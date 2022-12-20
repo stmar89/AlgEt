@@ -1,0 +1,29 @@
+/* vim: set syntax=magma : */
+/*
+    There is a bug in Shortest Element
+*/
+
+    AttachSpec("~/packages_github/AlgEt/spec");
+    _<x>:=PolynomialRing(Integers());
+    SetAssertions(3);
+    flds:=Split(Pipe("find ~/260_parallel_entire_recomputation_p2 -maxdepth 1 -type d -name 'output_*'","")); 
+    for fld in flds do
+        list:=Split(Pipe("ls " cat fld cat "", ""));
+        for f in list do
+            printf ".";
+            R:=LoadWKICM(Read(fld cat "/" cat f));
+            wk:=WKICM(R);
+            for iI->I in wk do
+                try
+                    _:=ShortestElement(I);
+                    _:=SmallRepresentative(I);
+                catch e
+                    fld cat "/" cat f;
+                    iI;
+                    break fld;
+                end try;
+            end for;
+        end for;
+    end for;
+
+

@@ -461,7 +461,8 @@ intrinsic '*'(I::AlgEtIdl , x::AlgEtElt ) -> AlgEtIdl
         gens:=[i*x : i in Generators(I) ];
         id:=Ideal(S,gens);
         if assigned I`ZBasis then
-            id`ZBasis:=[x*z : z in ZBasis(I)];
+            // id`ZBasis:=[x*z : z in ZBasis(I)];
+            id`ZBasis:=MatrixQtoA(Algebra(I),LLL(MatrixAtoQ([x*z : z in ZBasis(I)])));
         end if;
         if assigned I`MultiplicatorRing then
             id`MultiplicatorRing:=MultiplicatorRing(I);

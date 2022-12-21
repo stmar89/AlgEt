@@ -58,8 +58,7 @@ CreateAlgEtIdl:=function(S,gens)
         d:=Denominator(P); //this d might be different from Denomintor(M)
         hash:=[d] cat [(d*P[i,j]) : j in [i..dim] , i in [1..dim]];
         // UNSAFE hash:=Hash(P);
-        //zb:=MatrixQtoA(A,P);
-        zb:=MatrixQtoA(A,LLL(P)); // with LLL
+        zb:=MatrixQtoA(A,P);
         assert #zb eq AbsoluteDimension(A);
         I`Hash:=hash;
         I`ZBasis:=zb;
@@ -203,8 +202,7 @@ intrinsic ZBasis(I::AlgEtIdl)->SeqEnum[AlgEtElt]
             d:=Denominator(P); //this d might be different from Denomintor(M)
             hash:=[d] cat [(d*P[i,j]) : j in [i..dim] , i in [1..dim]];
             // UNSAFE hash:=Hash(P);
-            //zb:=MatrixQtoA(A,P);
-            zb:=MatrixQtoA(A,LLL(P)); // with LLL
+            zb:=MatrixQtoA(A,P);
             assert #zb eq AbsoluteDimension(A);
             I`Hash:=hash;
         end if;
@@ -454,8 +452,7 @@ intrinsic '*'(I::AlgEtIdl , x::AlgEtElt ) -> AlgEtIdl
         gens:=[i*x : i in Generators(I) ];
         id:=Ideal(S,gens);
         if assigned I`ZBasis and not assigned id`ZBasis then
-            // id`ZBasis:=[x*z : z in ZBasis(I)];
-            id`ZBasis:=MatrixQtoA(Algebra(I),LLL(MatrixAtoQ([x*z : z in ZBasis(I)])));
+            id`ZBasis:=[x*z : z in ZBasis(I)];
         end if;
         if assigned I`MultiplicatorRing then
             id`MultiplicatorRing:=MultiplicatorRing(I);
@@ -645,8 +642,7 @@ intrinsic ColonIdeal(I::AlgEtIdl,J::AlgEtIdl)->AlgEtIdl
         d:=Denominator(M);
         P:=(1/d)*crZQ(hnf(crQZ(d*M)));
         P:=Transpose(P)^-1;
-        // zbIJ:=MatrixQtoA(A,P);
-        zbIJ:=MatrixQtoA(A,LLL(P)); //with LLL
+        zbIJ:=MatrixQtoA(A,P);
         IJ:=Ideal(O,zbIJ);
         IJ`ZBasis:=zbIJ; //we know that zbIJ is a ZBasisA
     //end if;

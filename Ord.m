@@ -148,8 +148,7 @@ intrinsic Order( gens::SeqEnum[AlgEtElt] : Check:=100 ) -> AlgEtOrd
         d:=Denominator(P); //this d might be different from Denomintor(M)
         R`Hash:=[d] cat [(Integers()!(d*P[i,j])) : j in [i..dim] , i in [1..dim]];
         // UNSAFE R`Hash:=Hash(P);
-        //zb:=MatrixQtoA(A,P);
-        zb:=MatrixQtoA(A,LLL(P)); // with LLL
+        zb:=MatrixQtoA(A,P);
     else
     //we assume that gens is a ZBasis of a multiplicativly closed lattice
         zb:=gens;
@@ -501,8 +500,7 @@ meet_zbasis:=function(zb1,zb2)
     //the hnf of zb1 meet zb2 is the lower-right quadrant of M
     P:=Matrix(N,N,[M[i,j] : i,j in [N+1..2*N]]);
     P:=(1/d)*crZQ(P);
-    //zb:=MatrixQtoA(A,P);
-    zb:=MatrixQtoA(A,LLL(P)); // with LLL
+    zb:=MatrixQtoA(A,P);
     return zb;
 end function;
 

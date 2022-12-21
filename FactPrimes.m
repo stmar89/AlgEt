@@ -111,9 +111,9 @@ intrinsic PrimesAbove(I::AlgEtIdl) -> SeqEnum[AlgAssEtOrdIdl]
             assert2 forall{P : P in primes | I subset P};
             assert2 forall{P : P in primes | IsPrimePower(Integers() ! Index(S,P))};
         end if;
-        for P in primes do
-            // ZBasisLLL(P);
-        end for;
+        // for P in primes do
+        //     ZBasisLLL(P);
+        // end for;
         I`PrimesAbove:=primes;
     end if;
     return I`PrimesAbove;

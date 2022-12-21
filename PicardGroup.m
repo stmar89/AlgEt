@@ -113,7 +113,7 @@ residue_class_ring_unit_subgroup_generators:=function(F)
         end for;
         assert2 forall{x : x in elts | x in S and not x in F};
         F`residue_class_ring_unit_subgroup_generator:=elts;
-        vprintf AlgEtPicardGroup, 2, "residue_class_ring_unit_subgroup_generator:\n
+        vprintf AlgEtPicardGroup, 2:"residue_class_ring_unit_subgroup_generator:\n
                                          elts = %o\n",PrintSeqAlgEtElt(elts);
     end if;
 	return F`residue_class_ring_unit_subgroup_generator ;
@@ -159,7 +159,7 @@ IsPrincipal_prod_internal:=function( II , GRH )
     if #Generators(II) eq 1 then return true,Generators(II)[1]; end if;
 
     I,a:=SmallRepresentative(II); //a*II=I
-    vprintf AlgEtPicardGroup, 2, "IsPrincipal_prod_internal:\n
+    vprintf AlgEtPicardGroup, 2:"IsPrincipal_prod_internal:\n
                                     ZBasis(II) = %o\n,ZBasis(I) = %o\n",
                                     PrintSeqAlgEtElt(ZBasis(II)),PrintSeqAlgEtElt(ZBasis(I));
     test,I_asProd:=IsProductOfIdeals(I);
@@ -190,7 +190,7 @@ IsPrincipal_prod_internal:=function( II , GRH )
     assert2 gen*S eq I;
     
     gen:=gen/a;
-    vprintf AlgEtPicardGroup, 2, "IsPrincipal_prod_internal:\n
+    vprintf AlgEtPicardGroup, 2:"IsPrincipal_prod_internal:\n
                             [gen,a] = %o\n,ZBasis(I) = %o\n",PrintSeqAlgEtElt([gen,a]); 
     II`Generators:=[gen];
     return true,gen;
@@ -328,7 +328,7 @@ PicardGroup_prod_internal:=function( O , GRH )
         mapGtoO:=map<G -> Codomain | rep:-> rep_idinA(rep) , y:->inverse_map(y) >; 
         assert2 forall{a : a in Generators(G)| (mapGtoO(a))@@mapGtoO eq a};
         O`PicardGroup:=<G,mapGtoO>;
-        vprintf AlgEtPicardGroup, 2, "PicardGroup_prod_internal:\n
+        vprintf AlgEtPicardGroup, 2:"PicardGroup_prod_internal:\n
                               geninO = %o\n",[PrintSeqAlgEtElt(ZBasis(I)) : I in geninO];
         return G,mapGtoO;
     end if;
@@ -391,7 +391,7 @@ intrinsic PicardGroup( S::AlgEtOrd : GRH:=false ) -> GrpAb, Map
             return idO;
         end function;
     end if;
-    vprintf AlgEtPicardGroup, 2, "PicardGroup:\n
+    vprintf AlgEtPicardGroup, 2:"PicardGroup:\n
                         gens_GO_in_S = %o\n
                         gens_GO_in_O = %o\n",
                         [PrintSeqAlgEtElt(ZBasis(I)) : I in gens_GO_in_S],
@@ -463,7 +463,7 @@ intrinsic PicardGroup( S::AlgEtOrd : GRH:=false ) -> GrpAb, Map
     p:=map<P -> cod | rep:->representative_picard_group(rep),
                        id:->disc_log_picard_group(id) >;
     S`PicardGroup:=<P,p>;
-    vprintf AlgEtPicardGroup, 2, "PicardGroup:\n
+    vprintf AlgEtPicardGroup, 2:"PicardGroup:\n
                         generators_ideals = %o\n",
                         [PrintSeqAlgEtElt(ZBasis(I)) : I in generators_ideals];
     return P,p;
@@ -505,7 +505,7 @@ UnitGroup_prod_internal:=function(O, GRH)
 
     maptoA:=map<Udp -> A | rep :-> rep_inA(rep) , y :-> disc_log(y) >;
     O`UnitGroup:=<Udp,maptoA>;
-    vprintf AlgEtPicardGroup, 2, "UnitGroup_prod_internal:\n
+    vprintf AlgEtPicardGroup, 2:"UnitGroup_prod_internal:\n
                                     gensinA = %o\n",PrintSeqAlgEtElt(gensinA);
     return Udp,maptoA;
 end function;
@@ -556,7 +556,7 @@ intrinsic UnitGroup(S::AlgEtOrd : GRH:=false ) -> GrpAb, Map
     end function;
     p:=map<P -> p_codomain | x:->map_P_to_S(x), y:->map_S_to_P(y)  >;
     S`UnitGroup:=<P,p>;
-    vprintf AlgEtPicardGroup, 2, "UnitGroup:\n
+    vprintf AlgEtPicardGroup, 2:"UnitGroup:\n
                                 gens_P_in_A = %o\n",PrintSeqAlgEtElt(gens_P_in_A);
     return P,p;
 end intrinsic;
@@ -623,6 +623,7 @@ end intrinsic;
 	_<x>:=PolynomialRing(Integers());
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
     SetClassGroupBounds("GRH");
+    SetVerbose(AlgEtPicardGroup,2);
     for i in [1..10^1] do
         //"NF";
         //time P,p:=PicardGroup(EquationOrder(NumberField(f)));

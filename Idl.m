@@ -34,13 +34,6 @@ declare attributes AlgEtIdl : Index, //stores the index
 
 import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQtoA , meet_zbasis , inclusion_matrix;
 
-/*TODO
-    - MinimalGenerators
-    - check which attributes should I pass when I create a new ideal (eg in *,+,colon,...)
-    - in '*' I pass Factorization. How does this affect the time?
-    - add LLL?
-*/
-
 //----------
 // Creation functions
 //----------

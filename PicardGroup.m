@@ -621,7 +621,7 @@ end intrinsic;
 	AttachSpec("~/packages_github/AlgEt/spec");
 	SetAssertions(1);
 	_<x>:=PolynomialRing(Integers());
-    	SetProfile(true);
+    SetProfile(true);
     for i in [1..10] do
         f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
         A:=EtaleAlgebra(f);

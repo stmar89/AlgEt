@@ -78,7 +78,6 @@ intrinsic TraceDualIdeal(O::AlgEtOrd) -> AlgEtIdl
 {Returns the trace dual ideal of an order in an etale algebra.}
     if not assigned O`TraceDualIdeal then
         Ot:=TraceDualIdeal(OneIdeal(O));
-        ZBasisLLL(Ot);
         O`TraceDualIdeal := Ot;
     end if;
     return O`TraceDualIdeal;

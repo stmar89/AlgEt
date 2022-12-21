@@ -391,7 +391,9 @@ intrinsic Conductor(O::AlgEtOrd) ->AlgEtOrdIdl
     if not assigned O`Conductor then
         A:=Algebra(O);
         OA:=MaximalOrder(A);
-        O`Conductor:=ColonIdeal(O,Ideal(O,ZBasis(OA)));
+        cc:=ColonIdeal(O,O!!OneIdeal(OA));
+        ZBasisLLL(cc);
+        O`Conductor:=cc;
     end if;
     return O`Conductor;
 end intrinsic;

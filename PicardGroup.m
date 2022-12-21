@@ -157,6 +157,13 @@ IsPrincipal_prod_internal:=function( II , GRH )
 //returns if the argument is a principal ideal; if so the function returns also the generator. It works only for products of ideals
     assert IsMaximal(Order(II)); //this function should be called only for ideals of the maximal order
     if #Generators(II) eq 1 then return true,Generators(II)[1]; end if;
+    // we try with LLL
+    elt:=ShortestElement(II);
+    if elt*Order(II) eq II then
+            II`Generators:=[elt];
+            return true,Generators(II)[1];
+    end if;
+
 
     I,a:=SmallRepresentative(II); //a*II=I
     vprintf AlgEtPicardGroup, 2:"IsPrincipal_prod_internal:\n
@@ -201,9 +208,14 @@ intrinsic IsPrincipal(I1::AlgEtIdl : GRH:=false )->BoolElt, AlgAssElt
     Return if the argument is a principal ideal; if so the function returns also the generator.
     The optional argument "GRH" decides wheter the bound for the IsPrincipal test should be conditional. The default value is "false".
 }
-//wouldn't an LLL test be faster?
     if not IsInvertible(I1) then return false,_; end if;
     if #Generators(I1) eq 1 then return true,Generators(I1)[1]; end if;
+    // we try with LLL
+    elt:=ShortestElement(I1);
+    if elt*Order(I1) eq I1 then
+            I1`Generators:=[elt];
+            return true,Generators(I1)[1];
+    end if;
 
     S:=Order(I1);
     if IsMaximal(S) then
@@ -602,6 +614,10 @@ end intrinsic;
     end for;
     Cputime(t0);
 
+    quit; 
+    git pull;
+    sleep 3; 
+    magma;
 	AttachSpec("~/packages_github/AlgEt/spec");
 	SetAssertions(1);
 	_<x>:=PolynomialRing(Integers());
@@ -616,7 +632,7 @@ end intrinsic;
         Cputime(t0);
     end for;
 	SetProfile(false);
-    ProfilePrintByTotalTime(ProfileGraph() : Max:=20);
+    ProfilePrintByTotalTime(ProfileGraph() : Max:=30);
 
     quit; 
     git pull;

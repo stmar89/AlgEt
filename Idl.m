@@ -460,7 +460,7 @@ intrinsic '*'(I::AlgEtIdl , x::AlgEtElt ) -> AlgEtIdl
         S:=Order(I);
         gens:=[i*x : i in Generators(I) ];
         id:=Ideal(S,gens);
-        if assigned I`ZBasis then
+        if assigned I`ZBasis and not assigned id`ZBasis then
             // id`ZBasis:=[x*z : z in ZBasis(I)];
             id`ZBasis:=MatrixQtoA(Algebra(I),LLL(MatrixAtoQ([x*z : z in ZBasis(I)])));
         end if;

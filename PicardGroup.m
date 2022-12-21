@@ -614,14 +614,10 @@ end intrinsic;
     end for;
     Cputime(t0);
 
-    quit; 
-    git pull;
-    sleep 3; 
-    magma;
 	AttachSpec("~/packages_github/AlgEt/spec");
 	SetAssertions(1);
 	_<x>:=PolynomialRing(Integers());
-    SetProfile(true);
+    //SetProfile(true);
     for i in [1..10] do
         f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
         A:=EtaleAlgebra(f);
@@ -631,16 +627,11 @@ end intrinsic;
             //U,u:=UnitGroup(E : GRH:=true);	
         Cputime(t0);
     end for;
-	SetProfile(false);
-    ProfilePrintByTotalTime(ProfileGraph() : Max:=30);
+	//SetProfile(false);
+    //ProfilePrintByTotalTime(ProfileGraph() : Max:=30);
 
-    quit; 
-    git pull;
-    sleep 3; 
-    magma;
 	AttachSpec("~/packages_github/AlgEt/spec");
-    SetOutputFile("verbose_output.txt");
-	_<x>:=PolynomialRing(Integers());
+    _<x>:=PolynomialRing(Integers());
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
     SetClassGroupBounds("GRH");
     SetVerbose("AlgEtPicardGroup",2);
@@ -655,11 +646,7 @@ end intrinsic;
         assert #P eq 3548000;
         "\n";
     end for;
-    UnsetOutputFile();
-    quit;
-    less verbose_output.txt
-    rm verbose_output.txt
-
+    
     AttachSpec("~/packages_github/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());
     f:=x^6 - 3*x^5 - 3*x^4 + 65*x^3 - 48*x^2 - 768*x + 4096;

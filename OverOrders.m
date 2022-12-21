@@ -92,9 +92,12 @@ if not assigned R`MinimalOverOrders then
     for S in min_oo do
       i := Index(orders, S);
       if i eq 0 then
+        ZBasisLLL(S);
         Include(~R`MinimalOverOrders, S);
       else
-        Include(~R`MinimalOverOrders, orders[i]);
+        T:=orders[i];
+        ZBasisLLL(T);
+        Include(~R`MinimalOverOrders, T);
       end if;
     end for;
   end if;
@@ -140,7 +143,7 @@ end intrinsic;
 
 
 intrinsic FindOverOrders(E::AlgEtOrd:  populateoo_in_oo := false) -> SetIndx[AlgEtOrd]
-{returns all the overorders of E, and populates }
+{Returns all the overorders of E. The boolean VarArg populateoo_in_oo determines whether to populate the attribute OverOrders of each overorder of E.}
   if not assigned E`OverOrders then
       E`OverOrders := FindOverOrders_Minimal(E);
   end if;

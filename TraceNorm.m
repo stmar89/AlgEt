@@ -68,6 +68,7 @@ intrinsic TraceDualIdeal(I::AlgEtIdl) -> AlgEtIdl
         // the multiplicator ring of I is the same of its trace dual.
             It`MultiplicatorRing:=I`MultiplicatorRing;
         end if;
+        ZBasisLLL(It);
         I`TraceDualIdeal:=It;
     end if;
     return I`TraceDualIdeal;
@@ -76,7 +77,9 @@ end intrinsic;
 intrinsic TraceDualIdeal(O::AlgEtOrd) -> AlgEtIdl
 {Returns the trace dual ideal of an order in an etale algebra.}
     if not assigned O`TraceDualIdeal then
-        O`TraceDualIdeal := TraceDualIdeal(OneIdeal(O));
+        Ot:=TraceDualIdeal(OneIdeal(O));
+        ZBasisLLL(Ot);
+        O`TraceDualIdeal := Ot;
     end if;
     return O`TraceDualIdeal;
 end intrinsic;

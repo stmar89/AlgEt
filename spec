@@ -8,6 +8,7 @@ Ord.m
 Quotients.m
 OverOrders.m
 Idl.m
+ZBasisLLL.m
 Completion.m
 ComplexConj.m
 ComplexMult.m

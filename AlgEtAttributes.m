@@ -9,11 +9,6 @@
 
 declare verbose AlgEt, 1;
 
-/*TODO:
-
-*/
-
-
 //------------
 // Creation and Printing for AlgEt
 //------------

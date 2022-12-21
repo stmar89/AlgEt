@@ -311,7 +311,7 @@ PicardGroup_prod_internal:=function( O , GRH )
             end for;
             gen_O:=Ideal(O,gens_inA);
             // make the rep small
-            gen_O:=SmallRepresentative(gen_O);
+            gen_O:=SmallRepresentative(gen_O); //the ZBasis is already LLL-ed
             assert2 IsInvertible(gen_O); //test using colon ideal
             gen_O`IsInvertible:=true;
             gen_O`MultiplicatorRing:=O;
@@ -435,7 +435,7 @@ intrinsic PicardGroup( S::AlgEtOrd : GRH:=false ) -> GrpAb, Map
             id2:=mGO_to_S(mDH(gen));
             gen_inS:=id1*id2;
             // make the rep small
-            gen_inS:=SmallRepresentative(gen_inS);
+            gen_inS:=SmallRepresentative(gen_inS); // the ZBasis is already LLL-ed
             assert2 IsInvertible(gen_inS); //test using colon ideal
             gen_inS`IsInvertible:=true;
             gen_inS`MultiplicatorRing:=S;

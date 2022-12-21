@@ -377,6 +377,7 @@ intrinsic MaximalOrder(A::AlgEt)->AlgEtOrd
 {Returns the maximal order of the étale algebra A.}
     if not assigned A`MaximalOrder then    
         O:=Order( A , <MaximalOrder(E) : E in Components(A)> );
+        ZBasisLLL(O);
         O`IsMaximal:=true;
         A`MaximalOrder:=O;
     end if;

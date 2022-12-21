@@ -19,11 +19,13 @@ declare attributes AlgEtIdl : ShortestElement, SmallRepresentative;
 intrinsic ShortestElement(I::AlgEtIdl) ->AlgEtElt
 {Given an ideal I returns a non-zerodivisor in I with small coefficients (in the LLL sense). This is achieved by enumerating short vectors in I, and pick the first one which is a non-zerodivisor.}
     if not assigned I`ShortestElement then
+        ZBasisLLL(I);
         L:=Lattice(MatrixAtoQ(ZBasis(I)));
+        // b:=Basis(LLL(L)); //we reduce above, so it is cached.
+        b:=Basis(L);
+        b:=[ Norm(c) : c in b ];
         k:=0;
         stop:=false;
-        b:=Basis(LLL(L));
-        b:=[ Norm(c) : c in b ];
         min:=Min(b);
         repeat
             p:=ShortVectors(L,2^(-k)*min,min*2^k);
@@ -53,7 +55,7 @@ intrinsic SmallRepresentative(I::AlgEtIdl) ->AlgEtIdl,AlgEtElt
         a:=ShortestElement(cRI);
         aI:=a*I;
         // the ZBasis of aI might be very big. We make it smaller.
-        aI`ZBasis:=MatrixQtoA(Algebra(I),LLL(MatrixAtoQ(ZBasis(aI))));
+        ZBasisLLL(aI);
         vprintf ShortEltSmallRep,2: "SmallRepresentative:\n
                                 I = %o\n,aI = %o\n",PrintSeqAlgEtElt(ZBasis(I)),PrintSeqAlgEtElt(ZBasis(aI));
         I`SmallRepresentative:=<aI,a>;

@@ -18,6 +18,9 @@ intrinsic ICM_bar(S::AlgEtOrd : GRH:=false ) -> SeqEnum
         GS,gS:=PicardGroup(S : GRH:=GRH );
         repS:=[gS(x) : x in GS];
         ICM_barS := &cat[[I*J : I in seqWKS_bar] : J in repS];
+        for I in ICM_barS do
+            ZBasisLLL(I);
+        end for;
         assert2 forall{J : J in ICM_barS | MultiplicatorRing(J) eq S};
         assert forall{J : J in ICM_barS | Order(J) eq S};
         S`ICM_bar:=ICM_barS;
@@ -35,6 +38,9 @@ intrinsic ICM(S::AlgEtOrd : GRH:=false ) -> SeqEnum
             seqICM:=seqICM cat ICM_barT;
         end for;
         assert forall{I: I in seqICM | Order(I) eq S};
+        for I in seqICM do
+            ZBasisLLL(I);
+        end for;
         S`ICM:=seqICM;
     end if;
     return S`ICM;

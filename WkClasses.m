@@ -27,7 +27,6 @@ intrinsic WKICM_bar(S::AlgEtOrd : Method:="Auto") -> SeqEnum
                 require Method in {"Auto","LowIndexProcess","IntermediateIdeals"} : "The VarArg parameter Method is assigned to a not avaialble value";
                 vprintf WkClasses,2:"Order of CohenMacaulayType = %o\n",CohenMacaulayType(S);
                 // general case
-                //TODO : prime per prime;
                 A:=Algebra(S);
                 degA:=Dimension(A);
                 seqWk_bar:=[];
@@ -72,6 +71,7 @@ intrinsic WKICM_bar(S::AlgEtOrd : Method:="Auto") -> SeqEnum
                     idls:=IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing(T1,ff,T);
                     for I in idls do
                         if not exists{ J : J in seqWk_bar | IsWeakEquivalent(I,J) } then
+                            ZBasisLLL(I);
                             Append(~seqWk_bar,I);
                         end if;
                     end for;
@@ -92,6 +92,7 @@ intrinsic WKICM_bar(S::AlgEtOrd : Method:="Auto") -> SeqEnum
                         if not I in seqWk_bar and 
                             MultiplicatorRing(I) eq S and 
                             not exists{J : J in seqWk_bar | IsWeakEquivalent(I,J)} then 
+                                ZBasisLLL(I);
                                 Append(~seqWk_bar,I);
                         end if;
                     end while;
@@ -108,23 +109,14 @@ intrinsic WKICM(E::AlgEtOrd : Method:="Auto")->SeqEnum
     if not assigned E`WKICM then
         require Method in {"Auto","LowIndexProcess","IntermediateIdeals"} : "The VarArg parameter Method is assigned to a not avaialble value";
         seqOO:=FindOverOrders(E : populateoo_in_oo:=true);
-        E`WKICM:=&cat[[(E!!I) : I in WKICM_bar(S : Method:=Method)] : S in seqOO ];
+        wk:=&cat[[(E!!I) : I in WKICM_bar(S : Method:=Method)] : S in seqOO ];
+        for I in wk do
+            ZBasisLLL(I);
+        end for;
+        E`WKICM:=wk;
     end if;
     return E`WKICM;
 end intrinsic;
-
-/* 
-intrinsic WKICM_bar_intermediate_idls(S::AlgEtOrd) -> SeqEnum[AlgEtIdl]
-{???}
-// add attributes ???
-//  to be used only for non Gorenstein orders
-    St:=TraceDualIdeal(S);
-    T:=&meet([ T : T in FindOverOrders(S) | IsInvertible(T !! St) ]);
-    //this construction of T is conjectural, hence the next assert. If the assert fails, please report it.
-    assert IsInvertible(T !! St);
-    return output;
-end intrinsic;
-*/
 
 /*TEST
 

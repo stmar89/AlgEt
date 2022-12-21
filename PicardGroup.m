@@ -629,8 +629,8 @@ end intrinsic;
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
     SetClassGroupBounds("GRH");
     SetVerbose("AlgEtPicardGroup",1);
-    SetVerbose("AlgEtIdl",2);
-    SetVerbose("ShortEltSmallRep",1);
+    SetVerbose("AlgEtIdl",0);
+    SetVerbose("ShortEltSmallRep",0);
     for i in [1..10^1] do
         //"NF";
         //time P,p:=PicardGroup(EquationOrder(NumberField(f)));

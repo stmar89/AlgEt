@@ -10,55 +10,35 @@ freeze;
 declare verbose ShortEltSmallRep, 2;
 import "Ord.m" : MatrixQtoA,MatrixAtoQ,MatrixAtoZ;
 
+declare attributes AlgEtIdl : ShortestElement, SmallRepresentative;
+
 //------------
 // ShortestElement
 //------------
 
-// OLD bugs
-// intrinsic ShortestElement(I::AlgEtIdl) ->AlgEtElt
-// {Given an ideal I returns a non-zerodivisor in I with small coefficients (in the LLL sense). Note that if I decomposes into a direct sums I=I1+I2, then the element returned is the sum of the shortest elements of I1 and I2.}
-//     num_zero_comp:=function(a)
-//         return #[1: c in Components(a) | IsZero(c)];
-//     end function;
-//     A:=Algebra(I);
-//     L:=LLL(MatrixAtoQ(ZBasis(I)));
-//     rL:=Rows(L);
-//     a:=Zero(A);
-//     na:=num_zero_comp(a);
-//     i:=0;
-//     repeat
-//         i+:=1;
-//         b:=a+A!MatrixQtoA(A,Matrix(rL[i]))[1];
-//         nb:=num_zero_comp(b);
-//         if nb lt na then
-//             a:=b;
-//             na:=nb;
-//         end if;
-//     until na eq 0;
-//     assert not IsZeroDivisor(a);
-//     return a;
-// end intrinsic;
-
 intrinsic ShortestElement(I::AlgEtIdl) ->AlgEtElt
 {Given an ideal I returns a non-zerodivisor in I with small coefficients (in the LLL sense). This is achieved by enumerating short vectors in I, and pick the first one which is a non-zerodivisor.}
-    L:=Lattice(MatrixAtoQ(ZBasis(I)));
-    k:=0;
-    stop:=false;
-    b:=Basis(LLL(L));
-    b:=[ Norm(c) : c in b ];
-    min:=Min(b);
-    repeat
-        p:=ShortVectors(L,2^(-k)*min,min*2^k);
-        for i in [1..#p] do
-            elt:=MatrixQtoA(Algebra(I),Matrix([Eltseq(p[i][1])]))[1];
-            if not IsZeroDivisor(elt) then
-                stop:=true;
-                break i;
-            end if;
-        end for;
-        k+:=1;
-    until stop;
-    return elt;
+    if not assigned I`ShortestElement then
+        L:=Lattice(MatrixAtoQ(ZBasis(I)));
+        k:=0;
+        stop:=false;
+        b:=Basis(LLL(L));
+        b:=[ Norm(c) : c in b ];
+        min:=Min(b);
+        repeat
+            p:=ShortVectors(L,2^(-k)*min,min*2^k);
+            for i in [1..#p] do
+                elt:=MatrixQtoA(Algebra(I),Matrix([Eltseq(p[i][1])]))[1];
+                if not IsZeroDivisor(elt) then
+                    stop:=true;
+                    break i;
+                end if;
+            end for;
+            k+:=1;
+        until stop;
+        I`ShortestElement:= elt;
+    end if;
+    return I`ShortestElement;
 end intrinsic;
 
 //------------
@@ -66,16 +46,19 @@ end intrinsic;
 //------------
 
 intrinsic SmallRepresentative(I::AlgEtIdl) ->AlgEtIdl,AlgEtElt
-{Given a fractional R-ideal I, it returns an isomorphic ideal a*I, and the element a, such that a*I is a subset of R, and the cardinality of R/aI is small. This is achieved by computing the ShortestElement a of (R:I). Note that if I is invertible R/aI is isomorphic to (R:I)/aR.}                                                                         
-    R:=Order(I);
-    cRI:=ColonIdeal(R,I);
-    a:=ShortestElement(cRI);
-    aI:=a*I;
-    // the ZBasis of aI might be very big. We make it smaller.
-    aI`ZBasis:=MatrixQtoA(Algebra(I),LLL(MatrixAtoQ(ZBasis(aI))));
-    vprintf ShortEltSmallRep,2: "SmallRepresentative:\n
-                            I = %o\n,aI = %o\n",PrintSeqAlgEtElt(ZBasis(I)),PrintSeqAlgEtElt(ZBasis(aI));
-    return aI,a;
+{Given a fractional R-ideal I, it returns an isomorphic ideal a*I, and the element a, such that a*I is a subset of R, and the cardinality of R/aI is small. This is achieved by computing the ShortestElement a of (R:I). Note that if I is invertible R/aI is isomorphic to (R:I)/aR.}
+    if not assigned I`SmallRepresentative then                                            
+        R:=Order(I);
+        cRI:=ColonIdeal(R,I);
+        a:=ShortestElement(cRI);
+        aI:=a*I;
+        // the ZBasis of aI might be very big. We make it smaller.
+        aI`ZBasis:=MatrixQtoA(Algebra(I),LLL(MatrixAtoQ(ZBasis(aI))));
+        vprintf ShortEltSmallRep,2: "SmallRepresentative:\n
+                                I = %o\n,aI = %o\n",PrintSeqAlgEtElt(ZBasis(I)),PrintSeqAlgEtElt(ZBasis(aI));
+        I`SmallRepresentative:=<aI,a>;
+    end if;
+    return Explode(I`SmallRepresentative);
 end intrinsic;
 
 

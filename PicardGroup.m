@@ -602,7 +602,6 @@ end intrinsic;
     end for;
     Cputime(t0);
 
-    // with Profiler ~16 sec with GRH:=true
 	AttachSpec("~/packages_github/AlgEt/spec");
 	SetAssertions(1);
 	_<x>:=PolynomialRing(Integers());
@@ -617,21 +616,21 @@ end intrinsic;
         Cputime(t0);
     end for;
 	SetProfile(false);
-    ProfilePrintByTotalTime(ProfileGraph());
+    ProfilePrintByTotalTime(ProfileGraph() : Max:=20);
 
     quit; 
     git pull;
     sleep 3; 
     magma;
 	AttachSpec("~/packages_github/AlgEt/spec");
-    //SetOutputFile("")
+    SetOutputFile("verbose_output.txt");
 	_<x>:=PolynomialRing(Integers());
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
     SetClassGroupBounds("GRH");
-    SetVerbose("AlgEtPicardGroup",1);
-    SetVerbose("AlgEtIdl",0);
-    SetVerbose("ShortEltSmallRep",0);
-    for i in [1..10^1] do
+    SetVerbose("AlgEtPicardGroup",2);
+    SetVerbose("AlgEtIdl",2);
+    SetVerbose("ShortEltSmallRep",2);
+    for i in [1..10^0] do
         //"NF";
         //time P,p:=PicardGroup(EquationOrder(NumberField(f)));
         //assert #P eq 3548000;
@@ -640,6 +639,10 @@ end intrinsic;
         assert #P eq 3548000;
         "\n";
     end for;
+    UnsetOutputFile();
+    quit;
+    less verbose_output.txt
+    rm verbose_output.txt
 
     AttachSpec("~/packages_github/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());

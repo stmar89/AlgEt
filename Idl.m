@@ -836,20 +836,37 @@ intrinsic MinimalInteger(I::AlgEtIdl) -> RngIntElt
     return I`MinimalInteger;
 end intrinsic;
 
+// IMPROVING BELOW
+// intrinsic CoprimeRepresentative(I::AlgEtIdl,J::AlgEtIdl) -> AlgEtElt,AlgEtIdl
+// {return an element x such that x*I is an integral ideal coprime with J, togheter with the product x*I.. The first ideal must be invertible and the second should be integral}
+//     require IsIntegral(J) : "the second ideal must be integral";
+//     S:=Order(I);
+//     require S eq Order(J): "the ideals must be defined over the same order";
+//     test:=IsInvertible(I);
+//     invI:=Inverse(I);
+//     require test: "The first ideal must be invertible";
+//     repeat
+//         x:=Random(invI);
+//         xI:=x*I;
+//     until IsCoprime(xI,J); //integrality of x*I is checked in IsCoprime
+//     vprintf AlgEtIdl,2: "CoprimeRepresentative:\n
+//                             I = %o\n,xI = %o\n",PrintSeqAlgEtElt(ZBasis(I)),PrintSeqAlgEtElt(ZBasis(xI));
+//     return x,xI;
+// end intrinsic;
+
 intrinsic CoprimeRepresentative(I::AlgEtIdl,J::AlgEtIdl) -> AlgEtElt,AlgEtIdl
 {return an element x such that x*I is an integral ideal coprime with J, togheter with the product x*I.. The first ideal must be invertible and the second should be integral}
     require IsIntegral(J) : "the second ideal must be integral";
     S:=Order(I);
     require S eq Order(J): "the ideals must be defined over the same order";
-    test:=IsInvertible(I);
-    invI:=Inverse(I);
-    require test: "The first ideal must be invertible";
-    repeat
-        x:=Random(invI);
+    x:=One(A);
+    xI:=I;
+    while not IsCoprime(xI,J) do
+        x:=Random(Inverse(I)); //Inverse is cached
         xI:=x*I;
-    until IsCoprime(xI,J); //integrality of x*I is checked in IsCoprime
+    end while;
     vprintf AlgEtIdl,2: "CoprimeRepresentative:\n
-                            I = %o\n,I = %o\n",PrintSeqAlgEtElt(ZBasis(I)),PrintSeqAlgEtElt(ZBasis(xI));
+                            I = %o\n,xI = %o\n",PrintSeqAlgEtElt(ZBasis(I)),PrintSeqAlgEtElt(ZBasis(xI));
     return x,xI;
 end intrinsic;
 

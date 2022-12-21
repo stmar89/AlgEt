@@ -7,7 +7,7 @@ freeze;
 // http://www.staff.science.uu.nl/~marse004/
 /////////////////////////////////////////////////////
 
-declare verbose ShortEltSmallRep, 1;
+declare verbose ShortEltSmallRep, 2;
 import "Ord.m" : MatrixQtoA,MatrixAtoQ,MatrixAtoZ;
 
 //------------
@@ -73,6 +73,8 @@ intrinsic SmallRepresentative(I::AlgEtIdl) ->AlgEtIdl,AlgEtElt
     aI:=a*I;
     // the ZBasis of aI might be very big. We make it smaller.
     aI`ZBasis:=MatrixQtoA(Algebra(I),LLL(MatrixAtoQ(ZBasis(aI))));
+    vprintf ShortEltSmallRep,2: "SmallRepresentative:\n
+                            I = %o\n,aI = %o\n",PrintSeqAlgEtElt(ZBasis(I)),PrintSeqAlgEtElt(ZBasis(aI));
     return aI,a;
 end intrinsic;
 

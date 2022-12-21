@@ -12,6 +12,8 @@ declare verbose ZBasisLLL, 2;
 declare attributes AlgEtIdl : IsZBasisLLLReduced;
 declare attributes AlgEtOrd : IsZBasisLLLReduced;
 
+import "Ord.m" : MatrixAtoQ , MatrixQtoA;
+
 //------------
 // LLL - Reduce ZBasis. This should be called whenever we are storing some orders or ideals.
 //------------

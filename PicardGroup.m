@@ -309,13 +309,13 @@ PicardGroup_prod_internal:=function( O , GRH )
         end for;
         assert #geninO eq #Generators(G);      
         rep_idinA:= function(x)
-            vprint AlgEtPicardGroup, 2, "PicardGroup_prod_internal: rep_idinA\n";
+            vprint AlgEtPicardGroup, 2: "PicardGroup_prod_internal: rep_idinA\n";
             coeff:=Eltseq(x);
             id:=&*[geninO[i]^coeff[i] : i in [1..#coeff]];
             return id;
         end function;
         inverse_map:=function(id)
-            vprint AlgEtPicardGroup, 2, "PicardGroup_prod_internal: inverse_map\n";
+            vprint AlgEtPicardGroup, 2: "PicardGroup_prod_internal: inverse_map\n";
             assert IsInvertible(id);
             if not IsIntegral(id) then
                 id:=MakeIntegral(id);
@@ -368,13 +368,13 @@ intrinsic PicardGroup( S::AlgEtOrd : GRH:=false ) -> GrpAb, Map
         end for;
 
         mGO_to_S:=function(rep)  
-            vprint AlgEtPicardGroup, 2, "PicardGroup: mGO_to_S\n";
+            vprint AlgEtPicardGroup, 2: "PicardGroup: mGO_to_S\n";
             coeff:=Eltseq(rep);
             idS:=&*[(gens_GO_in_S[i])^coeff[i] : i in [1..#coeff] ];
             return idS;
         end function;
         mGO_to_O:=function(rep) 
-            vprint AlgEtPicardGroup, 2, "PicardGroup: mGO_to_O\n"; 
+            vprint AlgEtPicardGroup, 2: "PicardGroup: mGO_to_O\n"; 
             coeff:=Eltseq(rep);
             assert #coeff eq #gens_GO_in_O;
             idO:=&*[(gens_GO_in_O[i])^coeff[i] : i in [1..#coeff] ];
@@ -437,7 +437,7 @@ intrinsic PicardGroup( S::AlgEtOrd : GRH:=false ) -> GrpAb, Map
     end if;
 
     representative_picard_group := function(rep)
-        vprint AlgEtPicardGroup, 2, "PicardGroup: representative_picard_group\n"; 
+        vprint AlgEtPicardGroup, 2: "PicardGroup: representative_picard_group\n"; 
         repseq := Eltseq(rep);
         return &*[generators_ideals[i]^repseq[i]:i in [1..#generators_ideals]];
     end function;
@@ -445,7 +445,7 @@ intrinsic PicardGroup( S::AlgEtOrd : GRH:=false ) -> GrpAb, Map
 
     disc_log_picard_group:=function(id)
     // (crep*id)^-1 is coprime with F
-        vprint AlgEtPicardGroup, 2, "PicardGroup: disc_log_picard_group\n"; 
+        vprint AlgEtPicardGroup, 2: "PicardGroup: disc_log_picard_group\n"; 
         crep:=1/(CoprimeRepresentative(id^-1,F));//here we check if id is invertible
         idO:=O!!(crep*id); //idO is coprime with FO
         GOrep:=idO@@gO;
@@ -491,13 +491,13 @@ UnitGroup_prod_internal:=function(O, GRH)
 	gensinA:=[&+[embs[j](u_asProd[j](proj_Udp[j](Udp.i))) : j in [1..#U_asProd]] : i in [1..#Generators(Udp)] ];
   
     rep_inA:=function(rep)
-        vprint AlgEtPicardGroup, 2, "UnitGroup_prod_internal: rep_inA\n"; 
+        vprint AlgEtPicardGroup, 2: "UnitGroup_prod_internal: rep_inA\n"; 
         coeff:=Eltseq(rep);
         return &*[gensinA[i]^coeff[i] : i in [1..#coeff]];
     end function;
 
     disc_log:=function(x)
-        vprint AlgEtPicardGroup, 2, "UnitGroup_prod_internal: disc_log\n"; 
+        vprint AlgEtPicardGroup, 2: "UnitGroup_prod_internal: disc_log\n"; 
         comp_x:=Components(A ! x);
         x_in_Udp:=&*[ udp[i](comp_x[i]@@u_asProd[i]) : i in [1..#comp_x] ];
         return x_in_Udp;
@@ -539,7 +539,7 @@ intrinsic UnitGroup(S::AlgEtOrd : GRH:=false ) -> GrpAb, Map
     p_codomain:=A;
 
     map_P_to_S:=function(rep)
-        vprint AlgEtPicardGroup, 2, "UnitGroup: map_P_to_S\n"; 
+        vprint AlgEtPicardGroup, 2: "UnitGroup: map_P_to_S\n"; 
         coeff:=Eltseq(rep);
         assert #coeff eq #gens_P_in_A;
         elt:=&*[gens_P_in_A[i]^coeff[i] : i in [1..#coeff]];
@@ -548,7 +548,7 @@ intrinsic UnitGroup(S::AlgEtOrd : GRH:=false ) -> GrpAb, Map
     end function;
 
     map_S_to_P:=function(y)
-        vprint AlgEtPicardGroup, 2, "UnitGroup: map_S_to_P\n"; 
+        vprint AlgEtPicardGroup, 2: "UnitGroup: map_S_to_P\n"; 
         assert2 y in S and y^-1 in S;
         assert2 m(y@@uO) eq Zero(B);
         elt := P ! (y@@uO);

@@ -706,7 +706,7 @@ intrinsic MultiplicatorRing(I::AlgEtIdl) -> AlgEtOrd
             I`MultiplicatorRing:=R;
         elif assigned R`IsMaximal and R`IsMaximal then
             I`MultiplicatorRing:=R;
-        elif assigned I`IsInvertible then
+        elif assigned I`IsInvertible and I`IsInvertible then
             I`MultiplicatorRing:=R;
         else 
             A:=Algebra(I);

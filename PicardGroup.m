@@ -113,7 +113,7 @@ residue_class_ring_unit_subgroup_generators:=function(F)
         end for;
         assert2 forall{x : x in elts | x in S and not x in F};
         F`residue_class_ring_unit_subgroup_generator:=elts;
-        vprintf AlgEtPicardGroup, 2:"residue_class_ring_unit_subgroup_generator:\n
+        vprintf AlgEtPicardGroup, 1:"residue_class_ring_unit_subgroup_generator:\n
                                          elts = %o\n",PrintSeqAlgEtElt(Setseq(elts));
     end if;
 	return F`residue_class_ring_unit_subgroup_generator ;
@@ -619,12 +619,18 @@ end intrinsic;
 	SetProfile(false);
     ProfilePrintByTotalTime(ProfileGraph());
 
+    quit; 
+    git pull;
+    sleep 3; 
+    magma;
 	AttachSpec("~/packages_github/AlgEt/spec");
+    //SetOutputFile("")
 	_<x>:=PolynomialRing(Integers());
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
     SetClassGroupBounds("GRH");
     SetVerbose("AlgEtPicardGroup",1);
     SetVerbose("AlgEtIdl",2);
+    SetVerbose("ShortEltSmallRep",1);
     for i in [1..10^1] do
         //"NF";
         //time P,p:=PicardGroup(EquationOrder(NumberField(f)));

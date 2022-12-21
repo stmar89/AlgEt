@@ -98,7 +98,6 @@ if not assigned R`MinimalOverOrders then
         T:=orders[i];
         ZBasisLLL(T);
         Include(~R`MinimalOverOrders, T);
-        // Include(~R`MinimalOverOrders, orders[i]);
       end if;
     end for;
   end if;

@@ -23,6 +23,7 @@ intrinsic ZBasisLLL(S::AlgEtOrd)
   if (not assigned S`IsZBasisLLLReduced) or (not S`IsZBasisLLLReduced) then
     S`ZBasis:=MatrixQtoA(Algebra(S),LLL(MatrixAtoQ(ZBasis(S))));
     S`IsZBasisLLLReduced:=true;
+    delete S`inclusion_matrix; // this is computed with respect to the old ZBasis!
   end if;
 end intrinsic;
 
@@ -31,6 +32,7 @@ intrinsic ZBasisLLL(S::AlgEtIdl)
   if (not assigned S`IsZBasisLLLReduced) or (not S`IsZBasisLLLReduced) then
     S`ZBasis:=MatrixQtoA(Algebra(S),LLL(MatrixAtoQ(ZBasis(S))));
     S`IsZBasisLLLReduced:=true;
+    delete S`inclusion_matrix; // this is computed with respect to the old ZBasis!
   end if;
 end intrinsic;
 

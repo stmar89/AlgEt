@@ -40,7 +40,7 @@ function factorizationMaximalOrder(I)
                 tup_p[i]:=p[1]; // we replace the i-th ideal with P
                 assert2 tup_p ne tup_one_ideals;
                 P:=Ideal(O,tup_p);
-                ZBasisLLL(P);
+                // ZBasisLLL(P);
                 assert2 P ne OneIdeal(O);
                 P`IsPrime:=true; //we know P is prime
                 assert2 IsPrimePower(Integers() ! Index(O,P));
@@ -70,7 +70,7 @@ intrinsic Factorization(I::AlgEtIdl) -> Tup
             facS:=<>;
             for i in [1..#primesS] do
                 P:=primesS[i];
-                ZBasisLLL(P);
+                // ZBasisLLL(P);
                 P`IsPrime:=true;
                 expP:=&+([ pO[2] : pO in facO | (S meet (S!!pO[1])) eq P ]);
                 Append(~facS, <P,expP>);
@@ -112,7 +112,7 @@ intrinsic PrimesAbove(I::AlgEtIdl) -> SeqEnum[AlgAssEtOrdIdl]
             assert2 forall{P : P in primes | IsPrimePower(Integers() ! Index(S,P))};
         end if;
         for P in primes do
-            ZBasisLLL(P);
+            // ZBasisLLL(P);
         end for;
         I`PrimesAbove:=primes;
     end if;

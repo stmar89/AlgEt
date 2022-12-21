@@ -114,7 +114,7 @@ residue_class_ring_unit_subgroup_generators:=function(F)
         assert2 forall{x : x in elts | x in S and not x in F};
         F`residue_class_ring_unit_subgroup_generator:=elts;
         vprintf AlgEtPicardGroup, 2:"residue_class_ring_unit_subgroup_generator:\n
-                                         elts = %o\n",PrintSeqAlgEtElt(elts);
+                                         elts = %o\n",PrintSeqAlgEtElt(Setseq(elts));
     end if;
 	return F`residue_class_ring_unit_subgroup_generator ;
 end function;
@@ -623,7 +623,7 @@ end intrinsic;
 	_<x>:=PolynomialRing(Integers());
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
     SetClassGroupBounds("GRH");
-    SetVerbose(AlgEtPicardGroup,2);
+    SetVerbose("AlgEtPicardGroup",2);
     for i in [1..10^1] do
         //"NF";
         //time P,p:=PicardGroup(EquationOrder(NumberField(f)));

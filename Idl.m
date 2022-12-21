@@ -859,7 +859,7 @@ intrinsic CoprimeRepresentative(I::AlgEtIdl,J::AlgEtIdl) -> AlgEtElt,AlgEtIdl
     require IsIntegral(J) : "the second ideal must be integral";
     S:=Order(I);
     require S eq Order(J): "the ideals must be defined over the same order";
-    x:=One(A);
+    x:=One(Algebra(I));
     xI:=I;
     while not IsCoprime(xI,J) do
         x:=Random(Inverse(I)); //Inverse is cached

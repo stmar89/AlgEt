@@ -55,7 +55,7 @@ CreateAlgEtIdl:=function(S,gens)
     gens:=Setseq(Seqset(gens));
     if #gens gt AbsoluteDimension(A) then
         ZZ:=Integers();
-        vprintf AlgEtIdl,3: "too many gens";
+        vprint AlgEtIdl,3: "CreateAlgEtIdl: too many gens";
         gens:=[g*s : g in gens, s in ZBasis(S) ];
         dim:=AbsoluteDimension(A);
         M:=MatrixAtoQ(gens);
@@ -848,6 +848,8 @@ intrinsic CoprimeRepresentative(I::AlgEtIdl,J::AlgEtIdl) -> AlgEtElt,AlgEtIdl
         x:=Random(invI);
         xI:=x*I;
     until IsCoprime(xI,J); //integrality of x*I is checked in IsCoprime
+    vprintf AlgEtIdl,2: "CoprimeRepresentative:\n
+                            I = %o\n,I = %o\n",PrintSeqAlgEtElt(ZBasis(I)),PrintSeqAlgEtElt(ZBasis(xI));
     return x,xI;
 end intrinsic;
 

@@ -191,7 +191,7 @@ IsPrincipal_prod_internal:=function( II , GRH )
     
     gen:=gen/a;
     vprintf AlgEtPicardGroup, 2:"IsPrincipal_prod_internal:\n
-                            [gen,a] = %o\n,ZBasis(I) = %o\n",PrintSeqAlgEtElt([gen,a]); 
+                            [gen,a] = %o\n",PrintSeqAlgEtElt([gen,a]); 
     II`Generators:=[gen];
     return true,gen;
 end function;
@@ -624,6 +624,7 @@ end intrinsic;
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
     SetClassGroupBounds("GRH");
     SetVerbose("AlgEtPicardGroup",2);
+    SetVerbose("AlgEtIdl",2);
     for i in [1..10^1] do
         //"NF";
         //time P,p:=PicardGroup(EquationOrder(NumberField(f)));

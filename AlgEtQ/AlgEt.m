@@ -31,6 +31,8 @@ declare attributes AlgEtQ : DefiningPolynomial,
 
 intrinsic EtaleAlgebra(seq::SeqEnum[FldNum[FldRat]]) -> AlgEtQ
 {Given a sequence of number fields returns the étale algebra corresponding to the direct product.}
+// funny stuff: ExtendedType([NumberField(g[1]) : g in Factorization(f)]); for f:=(x^8+16)*(x^8+81); returns SeqEnum[FldNum] and not SeqEnum[FldNum[FldRat]]
+    require forall{ K : K in seq | ISA(ExtendedType(K),FldNum[FldRat])} : "The given number fields are not absolute extensions of Q.";
     A:=New(AlgEtQ);
     embs:=[ map< seq[i]->A | x:-> A! (<seq[j]!0 : j in [1..i-1]> cat <x> cat <seq[j]!0 : j in [i+1..#seq]>)  > : i in [1..#seq] ];
     projs:=[ map< A->seq[i] | y:-> Components(y)[i] > : i in [1..#seq] ];

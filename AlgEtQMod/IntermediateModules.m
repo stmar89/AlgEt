@@ -9,12 +9,9 @@ freeze;
 
 declare verbose IntermediateModules, 2;
 
-/*TODO:
-
-*/
 
 intrinsic MinimalIntermediateModules(I::AlgEtQMod,J::AlgEtQMod)->SetIndx[AlgEtQMod]
-{ Given S-modules J subset I, returns the minimal (with respect to inclusion) S-modules M such that J subset M subset I. }
+{Given S-modules J subset I, returns the minimal (with respect to inclusion) S-modules M such that J subset M subset I.}
     assert2 J subset I; // "the ideal J needs to be inside I";
     S:=Order(I);
     assert2 S eq Order(J); // "The ideals must be over the same order";
@@ -75,7 +72,7 @@ intrinsic IntermediateModules(I::AlgEtQMod,J::AlgEtQMod)->SetIndx[AlgEtQMod]
 end intrinsic;
 
 intrinsic MaximalIntermediateModules(I::AlgEtQMod,J::AlgEtQMod)->SetIndx[AlgEtQMod]
-{ Given S-modules J subset I, returns the maximal (with respect to inclusion) S-modules K such that J subset K subset I. }
+{Given S-modules J subset I, returns the maximal (with respect to inclusion) S-modules K such that J subset K subset I.}
     assert2 J subset I; // "the ideal J needs to be inside I";
     S:=Order(I);
     assert2 S eq Order(J); // "The ideals must be over the same order";
@@ -113,8 +110,8 @@ intrinsic MaximalIntermediateModules(I::AlgEtQMod,J::AlgEtQMod)->SetIndx[AlgEtQM
 end intrinsic;
 
 intrinsic IntermediateModulesWithTrivialExtension(I::AlgEtQMod,J::AlgEtQMod,O::AlgEtQOrd)->SetIndx[AlgEtQMod]
-{ Given S-modules J subset I, and overorder O of S, it returns all the S-modules N such that J subset N subset I and NO=I. Note: we need O!!I eq I.
-  They are produced recursively using from the maximal ones }
+{Given S-modules J subset I, and overorder O of S, it returns all the S-modules N such that J subset N subset I and NO=I. Note: we need O!!I eq I.
+  They are produced recursively using from the maximal ones}
     V,m:=UniverseAlgebra(I);
     VJ,mJ:=UniverseAlgebra(J);
     S:=Order(I);
@@ -137,27 +134,6 @@ intrinsic IntermediateModulesWithTrivialExtension(I::AlgEtQMod,J::AlgEtQMod,O::A
     end while;
     return output;
 end intrinsic;
-
-/* CONTINUE FROM HERE
-intrinsic IntermediateIdealsWithPrescribedMultiplicatorRing(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]
-{ Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that (K:K)=S and  J subset K subset I. 
-  They are produced recursively using from the minimal ones }
-    require J subset I : "The ideal J needs to be inside I";
-    S:=Order(I);
-    require S eq Order(J) : "The ideals must be over the same order";
-    queue:={@ J @};
-    output:={@  @};
-    done:={@ @};
-    while #queue gt 0 do
-        pot_new:=&join[MinimalIntermediateIdeals(I,elt) : elt in queue ];
-        output join:={@ K : K in pot_new | not K in done and MultiplicatorRing(K) eq S @};
-        done join:=queue;
-        queue := pot_new diff done;
-    end while;
-    return output;
-end intrinsic;
-*/
-
 
 /* TEST
 

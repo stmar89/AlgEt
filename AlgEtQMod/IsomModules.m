@@ -10,11 +10,7 @@ freeze;
 declare verbose IsomModules, 2;
 
 /* TODO
-    - add how to use julia to the description
-    - TESTS: squarefree with non trivial class group
-             power of Bass non trivial class group
-    - when looping over the different k's, do the classes_k's all contain the same number of objects?
-      see CONJECTURE BELOW
+
 */
 
 //------------
@@ -24,8 +20,7 @@ declare verbose IsomModules, 2;
 intrinsic IsIsomorphic(I::AlgEtQMod,J::AlgEtQMod : Method:="Magma") -> BoolElt
 {Given two modules I and J returns wheater they are isomorphic.
 The vararg Method allows to choose if the isomorphism testing is done with "Magma", very slow, or with the Hecke/Nemo package for julia, which is much faster.
-In the latter case, the Method should be of the form
-"julia path/to/AlgEtQ/", or if Hecke/Nemo has been built,"julia -J /tmp/Hecke.so ~/path/to/AlgEtQ/" (the ".so" might be different according to your SO. See the documentation of Hecke.Build()).}
+In the latter case, the Method should be of the form "julia path/to/AlgEtQ/", or if Hecke/Nemo has been built,"julia -J /tmp/Hecke.so ~/path/to/AlgEtQ/" (the ".so" might be different according to your SO. See the documentation of Hecke.Build()).}
     require Method eq "Magma" or Method[1..5] eq "julia" : "Method should be Magma or julia or a string of julia command";
     V,m:=UniverseAlgebra(I);
     VJ,mJ:=UniverseAlgebra(I);
@@ -155,91 +150,6 @@ In the latter case, the Method should be of the form "julia path/to/AlgEtQ/", or
     classes:=&cat(classes);
     return classes;
 end intrinsic;
-
-// OLD VERSION, where we produce the candidates for each Steinitz decomposition.
-// intrinsic IsomorphismClasses(R::AlgEtQOrd,m::Map : Method:="Magma") -> SeqEnum[AlgEtQMod]
-// {Given an order R in some AlgEtQ K, where K acts on some V, by m:K->V, returns representatives of hte isomorphism classes of the S-module lattices in V.
-// The vararg Method allows to choose if the isomorphism testing is done with "Magma", very slow, or with the Hecke/Nemo package for julia, which is much faster.
-// In the latter case, the Method should be of the form "julia path/to/AlgEtQ/", or if Hecke/Nemo has been built,"julia -J /tmp/Hecke.so ~/path/to/AlgEtQ/" (the ".so" might be different according to your SO. See the documentation of Hecke.Build()).}
-//     require Method eq "Magma" or Method[1..5] eq "julia" : "Method should be Magma or julia or a string of julia command";
-//     V:=Codomain(m);
-//     K:=Domain(m);
-//     pi:=PrimitiveElement(K);
-//     if not pi in R then
-//         pi:=pi*Exponent(Quotient(pi*R + OneIdeal(R),OneIdeal(R)));
-//     end if;
-//     pi:=m(pi);
-//     O:=MaximalOrder(K);
-//     ff:=Conductor(R);
-//     Vnf:=Components(V);
-//     Knfpoly:=[ DefiningPolynomial(L) : L in Components(K) ];
-//     Vnfpoly:=[ DefiningPolynomial(L) : L in Vnf ];
-//     MO:=Module(R,m,<1*MaximalOrder(Vnf[i]) : i in [1..#Vnf]>);
-//     mat:=Matrix(AbsoluteCoordinates([pi*z : z in ZBasis(MO)],ZBasis(MO)));
-//     min_poly:=MinimalPolynomial(mat);
-//     char_poly:=CharacteristicPolynomial(mat);
-//     ff:=O!!Conductor(R);
-//     test,ff_prod:=IsProductOfIdeals(ff);
-//     assert test;
-//     ind:=[ #Vnfpoly+1 - Index(Reverse(Vnfpoly),fK)  : fK in Knfpoly ]; // last occurence of each number field from the dec of K 
-//                                                                        // in the decomposition of V
-//     Mff:=Module(R,m,<ff_prod[Index(Knfpoly,Vnfpoly[i])] : i in [1..#Vnf]>);
-//     vprint IsomModules,1 : "candidates:";
-//     vtime IsomModules,1 : candidates:=IntermediateModulesWithTrivialExtension(MO,Mff,O);
-//     vprint IsomModules,1 : #candidates;
-//     PO,pO:=PicardGroup(O);
-//     classes:=[];
-//     for g in PO do
-//         if g eq Zero(PO) then
-//             candidates_k:=candidates; 
-//         else
-//             _,Ik:=CoprimeRepresentative(pO(g),ff); // Ik+ff=O, Ik cap ff = Ik*ff
-//             test,Ik_prod:=IsProductOfIdeals(Ik);
-//             assert test;
-//             MffIk:=Module(R,m,<i in ind select 
-//                                             ff_prod[Index(Knfpoly,Vnfpoly[i])] 
-//                                         else ff_prod[Index(Knfpoly,Vnfpoly[i])]*Ik_prod[Index(Knfpoly,Vnfpoly[i])] 
-//                                                 : i in [1..#Vnf]>); // MffIk = f1^(s1-1)+f1I1 + ... + fn^(sn-1)+fnIn
-//             zbMffIk:=ZBasis(MffIk);
-//             e:=ChineseRemainderTheorem(ff,Ik,One(K),Zero(K)); // e in Ik, e-1 in ff.
-//             assert not IsZeroDivisor(e);
-//             e:=Components(e);
-//             e:=V!< i in ind select e[Index(Knfpoly,Vnfpoly[i])] else Vnf[i] ! 1 : i in [1..#Vnf] >;
-//             ik:=map<V->V | x:->x*e >;
-//             // ik induces the isomorphism between (O1^s1 + ... + On^sn)/(f1^s1 + ... + fn^sn),
-//             // and (O1^(s1-1)+I1 + ... + On^(sn-1)+In)/(f1^(s1-1)+f1I1 + ... + fn^(sn-1)+fnIn),
-//             // where Ik = I1 + .... + In.
-//             candidates_k:=[ Module(R,m, [ik(z) : z in ZBasis(M)] cat zbMffIk ) : M in candidates];
-//         end if;
-//         if Method eq "Magma" then
-//             classes_k:=[];
-//             for M in candidates_k do
-//                 if not exists{ N : N in classes_k | IsIsomorphic(M,N : Method:=Method) } then
-//                     Append(~classes_k,M);
-//                 end if;
-//             end for;
-//         else //Method eq "julia ...."
-//             ID:=&cat[ Sprint(Random(0,9)) : i in [1..20] ];
-//             file:="tmp_" cat ID cat ".txt";
-//             str:="[\n";
-//             for i->I in candidates_k do
-//                 mat:=Matrix(AbsoluteCoordinates([pi*z : z in ZBasis(I)],ZBasis(I)));
-//                 assert MinimalPolynomial(mat) eq min_poly;
-//                 assert CharacteristicPolynomial(mat) eq char_poly;
-//                 str cat:=Sprintf("%o,\n", Eltseq(mat));
-//             end for;
-//             str:=Prune(Prune(str)) cat "\n]\n";
-//             fprintf file, "%o",str;
-//             indices_of_classes_k:=eval(Pipe(Method cat "IsIsomorphic_julia_script.jl " cat file,""));
-//             vprintf IsomModules,1 : "indices_of_classes_k = %o\n",indices_of_classes_k;
-//             classes_k:=[candidates_k[i] : i in indices_of_classes_k];
-//         end if;
-//         Append(~classes,classes_k);
-//     end for;
-//     assert forall{ c : c in classes | #c eq #classes[1] }; // CONJECTURE THEY ALL CONTAIN THE SAME NUMBER OF CLASSES
-//     classes:=&cat(classes);
-//     return classes;
-// end intrinsic;
 
 /* TEST
     // ##########

@@ -164,7 +164,7 @@ intrinsic ZBasis(I::AlgEtQMod)->SeqEnum[AlgEtQElt]
 end intrinsic;
 
 intrinsic myHash(I::AlgEtQMod)->RngInt
-{Hash function}
+{Hash function.}
     if not assigned I`Hash then
         dim:=AbsoluteDimension(UniverseAlgebra(I));
         P:=MatrixAtoQ(ZBasis(I));
@@ -204,12 +204,12 @@ intrinsic 'eq'(I::AlgEtQMod,J::AlgEtQMod) -> BoolElt
 end intrinsic;
 
 intrinsic 'ne'(I::AlgEtQMod , J::AlgEtQMod ) -> BoolElt
-{Equality testing}
+{Disequality testing.}
     return not I eq J;
 end intrinsic;
 
 intrinsic AbsoluteCoordinates(seq::SeqEnum[AlgEtQElt],I::AlgEtQMod) -> SeqEnum
-{AbsoluteCoordiantes with respect to the ZBasis} 
+{AbsoluteCoordiantes with respect to the ZBasis.} 
     require forall{x : x in seq | Algebra(x) cmpeq UniverseAlgebra(I)} : "the algebra is not the same";
     Minv:=inclusion_matrix(I);
     M:=MatrixAtoQ(seq)*Minv;
@@ -265,7 +265,7 @@ intrinsic Index(T::AlgEtQMod) -> FldRatElt
 end intrinsic;
 
 intrinsic Index(J::AlgEtQMod, I::AlgEtQMod) -> Any
-{Given modules J and I defined over the same order returns [J:I] = [J:J cap I]/[I : J cap I]}
+{Given modules J and I defined over the same order returns [J:I] = [J:J cap I]/[I : J cap I].}
   out:=Index(I)/Index(J);
   if IsCoercible(Integers(),out) then
     out:=Integers()!out;
@@ -279,7 +279,7 @@ end intrinsic;
 //----------
 
 intrinsic '!!'(T::AlgEtQOrd,I::AlgEtQMod) -> AlgEtQMod
-{Given an S-module I and an order T, returns the extension IT as a T-module. Note that if T is in S, then IT=I}
+{Given an S-module I and an order T, returns the extension IT as a T-module. Note that if T is in S, then IT=I.}
     if Order(I) eq T then
         return I;
     elif T subset Order(I) then
@@ -300,7 +300,7 @@ end intrinsic;
 //----------
 
 intrinsic Quotient(I::AlgEtQMod, J::AlgEtQMod) -> GrpAb, Map
-{ given S-modules J subset I, returns the abelian group Q=I/J together with the quotient map q:I->J } 
+{Given S-modules J subset I, returns the abelian group Q=I/J together with the quotient map q:I->J.} 
     // if J is not inside I, an error occurs while forming Q. so no need to check in advance
     A:=UniverseAlgebra(I);
     zbI := ZBasis(I);

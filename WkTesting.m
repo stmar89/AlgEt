@@ -18,7 +18,7 @@ declare verbose AlgEtIdlWkClasses,3;
 //----------
 
 intrinsic IsWeakEquivalent(I::AlgEtIdl,J::AlgEtIdl)->BoolElt
-{ checks if 1 \in (I:J)*(J:I). This function does not require that the ideals are defined over the same order. }
+{Checks if I and J are weakly equivalent 1 \in (I:J)*(J:I). This function does not require that the ideals are defined over the same order.}
     S := MultiplicatorRing(I);
     if MultiplicatorRing(J) ne S then
         return false;
@@ -35,22 +35,22 @@ intrinsic IsWeakEquivalent(I::AlgEtIdl,J::AlgEtIdl)->BoolElt
 end intrinsic;
 
 intrinsic IsWeakEquivalent(O1::AlgEtOrd,O2::AlgEtOrd)->BoolElt
-{ check if the two orders are weakly equivalent, that is equal }
+{Check if the two orders are weakly equivalent, that is equal.}
     return O1 eq O2;
 end intrinsic;
 
 intrinsic IsWeakEquivalent(O::AlgEtOrd,J::AlgEtIdl)->BoolElt
-{ checks if the second argument is weakly equivalent to the first argument }
+{Checks if the second argument is weakly equivalent to the first argument.}
     return IsWeakEquivalent(OneIdeal(O), J);
 end intrinsic;
 
 intrinsic IsWeakEquivalent(J::AlgEtIdl,O::AlgEtOrd)->BoolElt
-{ checks if the second argument is weakly equivalent to the first argument }
+{Checks if the second argument is weakly equivalent to the first argument.}
     return IsWeakEquivalent(OneIdeal(O), J);
 end intrinsic;
 
 intrinsic IsGorenstein(O::AlgEtOrd)->BoolElt
-{ checks if the order O is Gorenstein }
+{Checks if the order O is Gorenstein.}
     if not assigned O`IsGorenstein then
         if assigned O`IsMaximal and O`IsMaximal then
             O`IsGorenstein:=true;
@@ -65,5 +65,20 @@ end intrinsic
 
 
 /* TEST
+
+    printf "### Testing WKICM:";
+	AttachSpec("~/packages_github/AlgEt/spec");
+	SetAssertions(2);
+	_<x>:=PolynomialRing(Integers());
+    f:=x^4-100*x^3-100*x^2-100*x-100;
+    K:=EtaleAlgebra(f);
+    E:=EquationOrder(K);
+    assert not IsWeakEquivalent(E,Conductor(E));
+    assert not IsWeakEquivalent(OneIdeal(E),Conductor(E));
+    assert not IsWeakEquivalent(E,MaximalOrder(K));
+    assert IsWeakEquivalent(OneIdeal(MaximalOrder(K)),Conductor(E));
+    SetAssertions(1);
+    printf " all good!\n"; 
+    
 
 */

@@ -1,6 +1,6 @@
 /* vim: set syntax=magma :*/
 
-//freeze;
+freeze;
 
 /////////////////////////////////////////////////////
 // Stefano Marseglia, Utrecht University, s.marseglia@uu.nl
@@ -10,10 +10,6 @@
 // Reference: S. Marseglia, "Cohen-Macaulay type of orders, generators and ideal classes".
 // https://arxiv.org/abs/2206.03758
 
-/*TODO:
-
-*/
-
 declare attributes AlgEtOrd:NonGorensteinPrimes, CohenMacaulayType;
 
 //------------
@@ -21,7 +17,7 @@ declare attributes AlgEtOrd:NonGorensteinPrimes, CohenMacaulayType;
 //------------
 
 intrinsic NonGorensteinPrimes(S::AlgEtOrd)->SeqEnum,SeqEnum
-{ Given an order S it returns two sequences the first containing the primes at which S is locally not Gorenstein and the second containing the CohenMacaulay types of S at this primes, that is, the dimension of S^t/PS^t over S/P, where S^t is the TraceDualIdeal of S}
+{Given an order S it returns two sequences the first containing the primes at which S is locally not Gorenstein and the second containing the CohenMacaulay types of S at this primes, that is, the dimension of S^t/PS^t over S/P, where S^t is the TraceDualIdeal of S.}
     if not assigned S`NonGorensteinPrimes then
         if IsGorenstein(S) then
             S`NonGorensteinPrimes:=<[],[]>;
@@ -49,8 +45,30 @@ end intrinsic;
 // CohenMacaulayType
 //------------
 
+intrinsic CohenMacaulayTypeAtPrime(S::AlgEtOrd,P::AlgEtIdl)->RngIntElt
+{Given an order S and a prime ideal P, it returns its Cohen-Macaulay Type at P. This integer equals the dimension of S^t/P*S^t where S^t is the trace dual of S.}
+    if IsGorenstein(S) then
+        return 1;
+    end if;
+    if assigned S`NonGorensteinPrimes then
+        pp,dPs:=NonGorensteinPrimes(S);
+        i:=Index(pp,P);
+        if i eq 0 then // S is Gorenstein at P
+            return 1;
+        else
+            return dPs[i];
+        end if;
+    end if;
+    // No early exit ocured. We compute it.
+    St:=TraceDualIdeal(S);
+    k:=Integers() ! Index(S,P);
+    v:=Integers() ! Index(St,P*St);
+    dP:=Ilog(k,v);
+    return dP;
+end intrinsic;
+
 intrinsic CohenMacaulayType(S::AlgEtOrd)->RngIntElt
-{ Given an order S returns its Cohen-Macaulay Type. This integer equals the max dimension of S^t/P*S^t where S^t is the trace dual of S and P runs over all (non-Gorenstein) primes of S. }
+{Given an order S returns its Cohen-Macaulay Type. This integer equals the max dimension of S^t/P*S^t where S^t is the trace dual of S and P runs over all (non-Gorenstein) primes of S.}
     if not assigned S`CohenMacaulayType then
         pp,dps:=NonGorensteinPrimes(S);
         if #pp eq 0 then
@@ -65,8 +83,8 @@ end intrinsic;
 /////////////////////////////////////////////////////
 // functions for orders that locally have CM-type \leq 2
 /////////////////////////////////////////////////////
-// if S^t/P*S^t has dimension 2 over S/P then
-// locally at P the only fractional ideals with 
+// if S^t/P*S^t has dimension 2 over S/P then,
+// locally at P, the only fractional ideals with 
 // multiplicator ring S are S and S^t.
 
 wkicm_bar_CM_type2:=function(S,pp)
@@ -101,8 +119,28 @@ wkicm_bar_CM_type2:=function(S,pp)
      end if;
 end function;
 
-
-
 /* TEST
+
+    printf "### Testing LowCohenMacaulayType:";
+    SetAssertions(2);
+    _<x>:=PolynomialRing(Integers());
+    f:=x^4-10000*x^3-10000*x^2-10000*x-10000; 
+    AttachSpec("~/packages_github/AlgEt/spec");
+    A:=EtaleAlgebra(f);
+    E:=EquationOrder(A);
+    oo:=FindOverOrders(E); // ~13 secs
+    assert #oo eq 297;
+    for S in oo do
+        pp:=PrimesAbove(Conductor(S));
+        for P in pp do        
+            _:=CohenMacaulayTypeAtPrime(S,P);
+        end for;
+        pp_ng:=NonGorensteinPrimes(S);
+        assert pp_ng subset pp;
+        _:=CohenMacaulayType(S);
+        printf ".";
+    end for;
+    SetAssertions(1);
+    printf " all good!\n"; 
 
 */

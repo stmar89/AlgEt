@@ -30,7 +30,7 @@ intrinsic TwoGeneratingSet(I::AlgEtIdl)
         a:=ShortestElement(I);
         S:=Order(I);
         Q,q:=Quotient(I,[a*z : z in ZBasis(S)]);
-        if #Q eq 0 then
+        if IsTrivial(Q) then
             I`Generators:=[a]; //the ideal is principal
         else
             repeat
@@ -40,27 +40,22 @@ intrinsic TwoGeneratingSet(I::AlgEtIdl)
                 b:=b@@q;
             //until I eq Ideal(S,[a,b]);
             until Q eq sub<Q|[q(b*z):z in ZBasis(S)]>;
+            I`Generators:=[a,b];
         end if;
-        I`Generators:=[a,b];
     end if;
 end intrinsic;
 
-/* TEST
+/* TESTS
 
+    printf "### TwoGenerators:";
 	AttachSpec("~/packages_github/AlgEt/spec");
-    Attach("~/packages_github/AlgEt/MinimalGenerators.m");
     SetClassGroupBounds("GRH");
 	_<x>:=PolynomialRing(Integers());
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
     K:=EtaleAlgebra(f);
     E:=EquationOrder(K);
-    time P,p:=PicardGroup(E : GRH:=true);
+    time P,p:=PicardGroup(E : GRH:=true); //~10 secs
 
-    t0:=Cputime();
-    for g in Generators(P) do 
-        I:=p(g);
-    end for;
-    Cputime(t0);
     t0:=Cputime();
     for g in Generators(P) do 
         I:=p(g);
@@ -69,29 +64,35 @@ end intrinsic;
     end for;
     Cputime(t0);
 
-    t0:=Cputime();
-    SetProfile(true);
-    for g in Generators(P) do 
-        I:=p(g);
-        TwoGeneratingSet(I);
-        assert #Generators(I) le 2;
-    end for;
-    SetProfile(false);
-    G:=ProfileGraph();
-    ProfilePrintByTotalTime(G);
-    Cputime(t0);
+    // test if TwoGeneratingSet makes the power faster
+    // Conlcusion: yes. By quite a bit!
+    f:=x^4-100*x^3-100*x^2-100*x-100;
+    A:=EtaleAlgebra(f);
+	E:=EquationOrder(A);
+    P,p:=PicardGroup(E : GRH:=true);
+    repeat
+        Ii:=Random(P);
+    until Ii ne Zero(P);
+    I:=p(Ii);
 
-    t0:=Cputime();
-    for g in P do 
-        I:=p(g);
-    end for;
-    Cputime(t0);
+    delete I`IsInvertible;
+    exp:=[ Random(2,30) : i in [1..100]];
+    time l1:=[ I^i : i in exp ];
 
-    t0:=Cputime();
-    for g in P do 
-        I:=p(g);
-        TwoGeneratingSet(~I);
-        assert #Genertors(I) le 2;
-    end for;
-    Cputime(t0);
+    assert IsInvertible(I);
+    TwoGeneratingSet(I);
+    assert #Generators(I) eq 2;
+    time l2:=[ I^i : i in exp ];
+    assert l1 eq l2;
+
+    I:=SmallRepresentative(I);
+    delete I`IsInvertible;
+    time l1:=[ I^i : i in exp ];
+
+    assert IsInvertible(I);
+    TwoGeneratingSet(I);
+    time l2:=[ I^i : i in exp ];
+    assert l1 eq l2;
+    printf " all good!\n"; 
+
 */

@@ -9,7 +9,7 @@ freeze;
 /////////////////////////////////////////////////////
 
 intrinsic Completion(P::AlgEtIdl : MinPrecision:=20) -> FldPad,Map
-{ Given a prime ideal of the maximal order of an etale algebra L it returns the p-adic field corresponding to the completion LP and a homormophism map:L->LP. The vararg MinPrecision is passed to Completion. map has preimage (it acts a bit weird).}
+{Given a prime ideal of the maximal order of an etale algebra L it returns the p-adic field corresponding to the completion LP and a homormophism map:L->LP. The vararg MinPrecision is passed to Completion. map has preimage (it acts a bit weird).}
     L:=Algebra(P);
     require IsMaximal(Order(P)) and IsPrime(P) : "the ideal must be a prime ideal of the maximal order";
     nfs,embs:=Components(L);
@@ -33,9 +33,9 @@ end intrinsic;
 /*
 //TESTS
     
+    printf "### Testing Completion:";
     AttachSpec("~/packages_github/AlgEt/spec");
     PP<x>:=PolynomialRing(Integers());
-
     polys:=[
         x^6+3*x^4-10*x^3+15*x^2+125,
         (x^2+5)*(x^4-4*x^3+5*x^2-20*x+25),
@@ -50,6 +50,8 @@ end intrinsic;
         for P in pp do
             C,mC:=Completion(P);
         end for;
+        printf ".";
     end for;
+    printf " all good!\n";
 
 */

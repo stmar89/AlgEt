@@ -148,8 +148,7 @@ intrinsic Order( gens::SeqEnum[AlgEtElt] : Check:=100 ) -> AlgEtOrd
         d:=Denominator(P); //this d might be different from Denomintor(M)
         R`Hash:=[d] cat [(Integers()!(d*P[i,j])) : j in [i..dim] , i in [1..dim]];
         // UNSAFE R`Hash:=Hash(P);
-        //zb:=MatrixQtoA(A,P);
-        zb:=MatrixQtoA(A,LLL(P)); // with LLL
+        zb:=MatrixQtoA(A,P);
     else
     //we assume that gens is a ZBasis of a multiplicativly closed lattice
         zb:=gens;
@@ -198,7 +197,7 @@ intrinsic Algebra(S::AlgEtOrd) -> AlgEt
 end intrinsic;
 
 intrinsic myHash(S::AlgEtOrd)->SeqEnum[RngInt]
-{hash function for AlgEtOrd}
+{Hash function for AlgEtOrd.}
 // two orders have the hash iff they are equal
     if not assigned S`Hash then
         /* OLD
@@ -236,7 +235,7 @@ end intrinsic;
 //----------
 
 intrinsic 'eq'(O1::AlgEtOrd,O2::AlgEtOrd)->BoolElt
-{checks equality of orders in an etale Algebra}
+{Checks equality of orders in an etale Algebra.}
     require Algebra(O1) cmpeq Algebra(O2) : "the orders must be defined in the same etale algebra";
     if 
     //O1`Generators eq O2`Generators or O1`ZBasis eq O2`ZBasis or //this seems to be slowe
@@ -276,7 +275,7 @@ inclusion_matrix:=function(O)
 end function;
 
 intrinsic 'in'(x::AlgEtElt,O::AlgEtOrd) -> BoolElt
-{inclusion of elements} 
+{Inclusion of elements.} 
     require Algebra(x) cmpeq Algebra(O) : "the algebra is not the same";
     /* //this check succeeds very rarely, and makes the code a bit slower.
     if (assigned O`Generators and x in O`Generators)
@@ -291,7 +290,7 @@ intrinsic 'in'(x::AlgEtElt,O::AlgEtOrd) -> BoolElt
 end intrinsic;
 
 intrinsic AbsoluteCoordinates(seq::SeqEnum[AlgEtElt],O::AlgEtOrd) -> SeqEnum
-{AbsoluteCoordinates with respect to the ZBasis}
+{AbsoluteCoordinates with respect to the ZBasis.}
     require forall{ x : x in seq | Algebra(x) cmpeq Algebra(O)} : "the algebra is not the same";
     Minv:=inclusion_matrix(O);
     M:=MatrixAtoQ(seq)*Minv;
@@ -299,12 +298,12 @@ intrinsic AbsoluteCoordinates(seq::SeqEnum[AlgEtElt],O::AlgEtOrd) -> SeqEnum
 end intrinsic;
 
 intrinsic 'in'(x::RngIntElt,O::AlgEtOrd) -> BoolElt
-{inclusion of elements} 
+{Inclusion of elements.}.
     return (Algebra(O)!x) in O;
 end intrinsic;
 
 intrinsic 'in'(x::FldRatElt,O::AlgEtOrd) -> BoolElt
-{inclusion of elements} 
+{Inclusion of elements.} 
     return (Algebra(O)!x) in O;
 end intrinsic;
 
@@ -313,20 +312,21 @@ end intrinsic;
 //----------
 
 intrinsic One(S::AlgEtOrd)->AlgEtElt
-{unit element of S}
+{Unit element of S.}
     A:=Algebra(S);
     return One(A);
 end intrinsic;
 
 intrinsic Zero(S::AlgEtOrd)->AlgEtElt
-{zero element of S}
+{Zero element of S.}
     A:=Algebra(S);
     return Zero(A);
 end intrinsic;
 
 intrinsic Random(O::AlgEtOrd , bd::RngIntElt : ZeroDivisorsAllowed:=false ) -> AlgEtElt
-{Random element of O. The Coefficients are bounded by the positive integer bd. One can allow zero-divisors using the optional argument "ZeroDivisorsAllowed", which by default is set to false }
+{Random element of O. The Coefficients are bounded by the positive integer bd. One can allow zero-divisors using the optional argument "ZeroDivisorsAllowed", which by default is set to false.}
     require bd gt 0 : "The bound needs to be a positive integer.";
+    ZBasisLLL(O); // to keep the element small.
     B := ZBasis(O);
     if ZeroDivisorsAllowed then
        elt:=&+[ Random([-bd..bd])*b : b in B];
@@ -339,9 +339,7 @@ intrinsic Random(O::AlgEtOrd , bd::RngIntElt : ZeroDivisorsAllowed:=false ) -> A
 end intrinsic;
 
 intrinsic Random(O::AlgEtOrd : CoeffRange:=3, ZeroDivisorsAllowed:=false ) -> AlgEtElt
-{ Returns a random (small coefficient) element of O. 
-  The range of the random coefficients can be increased by giving the optional argument CoeffRange.
-  One can allow zero-divisors using the optional argument "ZeroDivisorsAllowed", which by default is set to false }
+{Returns a random (small coefficient) element of O. The range of the random coefficients can be increased by giving the optional argument CoeffRange. One can allow zero-divisors using the optional argument "ZeroDivisorsAllowed", which by default is set to false.}
       return Random(O,CoeffRange : ZeroDivisorsAllowed:=ZeroDivisorsAllowed);
 end intrinsic;
 
@@ -350,7 +348,7 @@ end intrinsic;
 //----------
 
 intrinsic EquationOrder(A::AlgEt) -> AlgEtOrd
-{Given an étale algebra defined by a polynomial, returns the monogenic order defined by the same polynomial}
+{Given an étale algebra defined by a polynomial, returns the monogenic order defined by the same polynomial.}
     if not assigned A`EquationOrder then
         require PrimeField(A) eq BaseField(A) : "Defined only for algebras over the Rationals()";
         pow:=PowerBasis(A);
@@ -378,6 +376,7 @@ intrinsic MaximalOrder(A::AlgEt)->AlgEtOrd
 {Returns the maximal order of the étale algebra A.}
     if not assigned A`MaximalOrder then    
         O:=Order( A , <MaximalOrder(E) : E in Components(A)> );
+        ZBasisLLL(O);
         O`IsMaximal:=true;
         A`MaximalOrder:=O;
     end if;
@@ -426,7 +425,7 @@ end intrinsic;
 //----------
 
 intrinsic Index(T::AlgEtOrd) -> FldRatElt
-{given an order T computes its index with respect to the basis of the algebra of T as a free Z-module}
+{Given an order T computes its index with respect to the basis of the algebra of T as a free Z-module.}
   if not assigned T`Index then
     matT:=MatrixAtoQ(ZBasis(T));
     T`Index := Abs(Rationals() ! Determinant(matT));
@@ -435,7 +434,7 @@ intrinsic Index(T::AlgEtOrd) -> FldRatElt
 end intrinsic;
 
 intrinsic Index(S::AlgEtOrd, T::AlgEtOrd) -> Any
-{given two orders T \subset S, returns [S:T] = #S/T }
+{Given two orders T \subset S, returns [S:T] = #S/T.}
   assert Algebra(T) cmpeq Algebra(S);
   elt := Index(T)/Index(S);
   if IsCoercible(Integers(), elt) then
@@ -457,8 +456,8 @@ intrinsic 'subset'(O1 :: AlgEtOrd, O2 :: AlgEtOrd) -> BoolElt
   return forall{z : z in Generators(O1) | z in O2 };
 end intrinsic;
 
-intrinsic '*'(O1::AlgEtOrd,O2::AlgEtOrd)->BoolElt
-{checks equality of orders in an etale Algebra}
+intrinsic '*'(O1::AlgEtOrd,O2::AlgEtOrd)->AlgEtOrd
+{Returns the order generated by the orders O1 and O2.}
     require Algebra(O1) cmpeq Algebra(O2) : "the orders must be defined in the same algebra";
     if O1 eq O2 then
         return O1;
@@ -501,14 +500,13 @@ meet_zbasis:=function(zb1,zb2)
     //the hnf of zb1 meet zb2 is the lower-right quadrant of M
     P:=Matrix(N,N,[M[i,j] : i,j in [N+1..2*N]]);
     P:=(1/d)*crZQ(P);
-    //zb:=MatrixQtoA(A,P);
-    zb:=MatrixQtoA(A,LLL(P)); // with LLL
+    zb:=MatrixQtoA(A,P);
     return zb;
 end function;
 
 
-intrinsic 'meet'(O1::AlgEtOrd,O2::AlgEtOrd)->BoolElt
-{checks equality of orders in an etale Algebra}
+intrinsic 'meet'(O1::AlgEtOrd,O2::AlgEtOrd)->AlgEtOrd
+{Intersection of orders.}
     require Algebra(O1) cmpeq Algebra(O2) : "the orders must be defined in the same algebra";
     if assigned O1`IsMaximal and O1`IsMaximal then 
     //calling IsMaximal(O1) would trigger the computation of the maximal order, which might be expensive
@@ -537,48 +535,34 @@ end intrinsic;
 //----------
 
 intrinsic MultiplicatorRing(R::AlgEtOrd) -> AlgEtOrd
-{Returns the MultiplicatorRing of an order R, that is R itself.}
+{Returns the multiplicator ring of an order R, that is R itself.}
     return R;
 end intrinsic;
 
-/* CONTINUE from HERE
-
-intrinsic ListToSequence(L::List)->SeqEnum
-{given a list of elements returns the same sequence}
-    return [s : s in L];
-end intrinsic;
-
-intrinsic Discriminant(R::AlgEtOrd) -> RngInt
-{returns the discriminant of the order}
-    return Discriminant(AssOrder(R));
-end intrinsic;
-*/
-
-/* TEST
+/* TESTS
     
-    Attach("~/packages_github/AlgEt/AlgEt.m");
-    Attach("~/packages_github/AlgEt/Elt.m");
-    Attach("~/packages_github/AlgEt/Ord.m");
-    SetVerbose("AlgEtOrd",2);
+    printf "### Orders:";
+	AttachSpec("~/packages_github/AlgEt/spec");
+    SetVerbose("AlgEtOrd",1);
     SetAssertions(2);
 
     _<x>:=PolynomialRing(Integers());
     f:=(x^8+16)*(x^8+81);
     A:=EtaleAlgebra(f);
     time O1:=Order(Basis(A));
-    ZBasis(O1);
-    Generators(O1);
+    _:=ZBasis(O1);
+    _:=Generators(O1);
     time O2:=Order(AbsoluteBasis(A) : Check:=0);
     time O3:=Order(AbsoluteBasis(A));
-    time O1 eq O2;
-    time O2 eq O3;
+    time _:=O1 eq O2;
+    time _:=O2 eq O3;
     assert EquationOrder(A) ne ProductOfEquationOrders(A);
     
     OA:=MaximalOrder(A);
     O:=Order(ZBasis(OA));
     assert not assigned O`IsMaximal;
     assert O eq OA;
-    assert assigned O`IsMaximal;
+    assert not assigned O`IsMaximal; //not passing attributes at equality checks
 
     O:=Order(ZBasis(OA));
     assert IsProductOfOrders(O);
@@ -587,7 +571,7 @@ end intrinsic;
     O:=MaximalOrder(A);
     time G:=[[ Random(O) : i in [1..3] ] : i in [1..100]];
     time S:=[ Order(s) : s in G ];
-    time #Seqset(S);
+    time _:=#Seqset(S);
 
     assert forall{z : z in ZBasis(O1) | z in O1 };
     for O in [O1,O2,O3] do
@@ -615,19 +599,22 @@ end intrinsic;
     E4:=Order(A,<MaximalOrder(seq[1]) , EquationOrder(seq[2])>);
     OA:=MaximalOrder(A);
     for E in [E1,E2,E3,E4] do 
-        Index(OA,E);
+        _:=Index(OA,E);
     end for;
-    E1 subset E2;
-    E1 subset E3;
-    E3*E4 eq OA;
-    OA meet E1 eq E1;
-    E2 meet E1 eq E2;
-    E3 meet E4 eq E2;
+    assert E1 subset E2;
+    assert E1 subset E3;
+    assert E3*E4 eq OA;
+    assert OA meet E1 eq E1;
+    assert not E2 meet E1 eq E2;
+    assert E3 meet E4 eq E2;
     O:=MaximalOrder(A);
-    time #{ Order([ Random(O) : i in [1..3] ]) : i in [1..1000] };
+    printf " all good!\n"; 
 
 
-
+    //////////////////////
+    // Relative extensions
+    //////////////////////
+    
     K:=NumberField(x^2-5);
     _<y>:=PolynomialRing(K);
     p:=y^2-7;

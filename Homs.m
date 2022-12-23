@@ -9,10 +9,6 @@ freeze;
 
 declare verbose AlgEtHoms, 1;
 
-/*TODO:
-
-*/
-
 declare attributes AlgEt : HomsToC;
 
 //------------
@@ -33,8 +29,9 @@ intrinsic HomsToC(A::AlgEt : Precision:=30)->SeqEnum[Map]
     return A`HomsToC;
 end intrinsic;
 
-/* TEST
+/* TESTS
 
+    printf "### Testing Homs:";
     AttachSpec("~/packages_github/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());
     f:=(x^8+16)*(x^8+81);
@@ -42,5 +39,6 @@ end intrinsic;
     homs:=HomsToC(A);
     a:=PrimitiveElement(A);
     assert &and[ Abs(Evaluate(f,h(a))) lt 10^-20 : h in homs ];
+    printf " all good!\n"; 
 
 */

@@ -1,6 +1,6 @@
 /* vim: set syntax=magma :*/
 
-//freeze;
+freeze;
 
 /////////////////////////////////////////////////////
 // Stefano Marseglia, Utrecht University, s.marseglia@uu.nl
@@ -8,11 +8,6 @@
 /////////////////////////////////////////////////////
 
 declare verbose FactPrimes, 3;
-
-/*TODO:
- anyhting that is worth storing? like primes above the maximal order ?
-
-*/
 
 //----------
 // Factorization and Prime
@@ -40,6 +35,7 @@ function factorizationMaximalOrder(I)
                 tup_p[i]:=p[1]; // we replace the i-th ideal with P
                 assert2 tup_p ne tup_one_ideals;
                 P:=Ideal(O,tup_p);
+                ZBasisLLL(P);
                 assert2 P ne OneIdeal(O);
                 P`IsPrime:=true; //we know P is prime
                 assert2 IsPrimePower(Integers() ! Index(O,P));
@@ -69,6 +65,7 @@ intrinsic Factorization(I::AlgEtIdl) -> Tup
             facS:=<>;
             for i in [1..#primesS] do
                 P:=primesS[i];
+                ZBasisLLL(P);
                 P`IsPrime:=true;
                 expP:=&+([ pO[2] : pO in facO | (S meet (S!!pO[1])) eq P ]);
                 Append(~facS, <P,expP>);
@@ -109,13 +106,16 @@ intrinsic PrimesAbove(I::AlgEtIdl) -> SeqEnum[AlgAssEtOrdIdl]
             assert2 forall{P : P in primes | I subset P};
             assert2 forall{P : P in primes | IsPrimePower(Integers() ! Index(S,P))};
         end if;
+        for P in primes do
+            ZBasisLLL(P);
+        end for;
         I`PrimesAbove:=primes;
     end if;
     return I`PrimesAbove;
 end intrinsic;
 
 intrinsic IsPrime(I::AlgEtIdl) -> BoolElt
-{Given an integral S-ideal, returns if the ideal is a prime fractional ideal of S, that is a maximal S ideal}
+{Given an integral S-ideal, returns if the ideal is a prime fractional ideal of S, that is a maximal S ideal.}
     require IsIntegral(I): "the ideal must be integral";
     if not assigned I`IsPrime then
         prim:=PrimesAbove(I);
@@ -188,8 +188,9 @@ intrinsic IsGorensteinAtPrime(S::AlgEtOrd,P::AlgEtIdl) -> BoolElt
 end intrinsic;
 
 
-/* TEST
+/* TESTS
 
+    printf "### Testing Primes and Factorizaton:";
     Attach("~/packages_github/AlgEt/AlgEt.m");
     Attach("~/packages_github/AlgEt/Elt.m");
     Attach("~/packages_github/AlgEt/Ord.m");
@@ -205,7 +206,7 @@ end intrinsic;
     E1:=EquationOrder(A);
     ff:=Conductor(E1);
     time _:=PrimesAbove(Conductor(E1));
-
+    printf ".";
 
 
     f:=(x^8+16)*(x^8+81);
@@ -215,31 +216,34 @@ end intrinsic;
     
     time _:=PrimesAbove(Conductor(E1));
     time _:=PrimesAbove(Conductor(E2));
-    time IsGorenstein(E1);
-    time IsGorenstein(E2);
-
+    time assert IsGorenstein(E1);
+    time assert IsGorenstein(E2);
 
     time ids:=[ Ideal(E1,[Random(E1) : i in [1..10]]) : i in [1..100]]; 
     time facs:=[ Factorization(I) : I in ids | I ne OneIdeal(E1) ];
+    printf ".";
+    SetAssertions(1);
+    printf " all good!\n"; 
 
-
-
+    ///////////////////////
+    // Relative Extensions
+    ///////////////////////
     K:=NumberField(x^2-5);
     _<y>:=PolynomialRing(K);
     E1:=NumberField(y^2-49*7*K.1);
     E2:=NumberField(y^5-25*7*K.1);
     A:=EtaleAlgebra([E1,E2]); 
     time O:=MaximalOrder(A);
-    time IsBass(O);
+    time assert IsBass(O);
     time ids:=[ Ideal(O,[Random(O) : i in [1..10]]) : i in [1..100]]; 
     time facs:=[ Factorization(I) : I in ids | I ne OneIdeal(O) ];
 
     repeat 
         E:=Order( [Random(O) : i in [1..3]] );
     until not IsMaximal(E);
-    IsGorenstein(E);
-    IsBass(E);
-    PrimesAbove(Conductor(E));
+    // _:=IsGorenstein(E); // This triggers an ERROR since TraceDualIdeal is implemented only for AlgEt over Q.
+    _:=IsBass(E);
+    _:=PrimesAbove(Conductor(E));
 
 
 

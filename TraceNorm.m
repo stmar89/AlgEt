@@ -68,6 +68,7 @@ intrinsic TraceDualIdeal(I::AlgEtIdl) -> AlgEtIdl
         // the multiplicator ring of I is the same of its trace dual.
             It`MultiplicatorRing:=I`MultiplicatorRing;
         end if;
+        ZBasisLLL(It);
         I`TraceDualIdeal:=It;
     end if;
     return I`TraceDualIdeal;
@@ -76,15 +77,17 @@ end intrinsic;
 intrinsic TraceDualIdeal(O::AlgEtOrd) -> AlgEtIdl
 {Returns the trace dual ideal of an order in an etale algebra.}
     if not assigned O`TraceDualIdeal then
-        O`TraceDualIdeal := TraceDualIdeal(OneIdeal(O));
+        Ot:=TraceDualIdeal(OneIdeal(O));
+        O`TraceDualIdeal := Ot;
     end if;
     return O`TraceDualIdeal;
 end intrinsic;
 
 /* TEST
 
+    printf "### Testing Trace and Norm:";
     AttachSpec("~/packages_github/AlgEt/spec");
-    SetVerbose("AlgEtTraceNorm",2);
+    SetVerbose("AlgEtTraceNorm",1);
 
     _<x>:=PolynomialRing(Integers());
     f:=(x^8+16)*(x^8+81);
@@ -95,6 +98,11 @@ end intrinsic;
         assert Trace(a)+Trace(b) eq Trace(a+b);
         assert Norm(a)*Norm(b) eq Norm(a*b);
     end for;
+    printf " all good!\n"; 
+
+    /////////////////////
+    // Relative extension
+    /////////////////////
 
     K:=NumberField(x^2-5);
     _<y>:=PolynomialRing(K);

@@ -11,7 +11,7 @@ declare verbose OverOrders,3;
 // and Edgar Costa, MIT
 /////////////////////////////////////////////////////
 
-// most of the code here is taken from Hofman,Sircana "On the computation of overorders"
+// most of the code here is an implementation of  Hofman, Sircana "On the computation of overorders"
 
 /*TODO
  - prime per prime
@@ -25,8 +25,7 @@ declare attributes AlgEtOrd : MinimalOverOrders,
                               OverOrders;
 
 intrinsic MinimalOverOrders(R::AlgEtOrd : singular_primes := [], orders := {@ @}) -> SetIndx[AlgEtOrd]
-{ returns the minimal over orders of R given the singular primes of R 
-  Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana}
+{Returns the minimal over orders of R given the singular primes of R. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.}
 if not assigned R`MinimalOverOrders then
     min_oo := { };
     if not IsMaximal(R) then
@@ -92,9 +91,12 @@ if not assigned R`MinimalOverOrders then
     for S in min_oo do
       i := Index(orders, S);
       if i eq 0 then
+        ZBasisLLL(S);
         Include(~R`MinimalOverOrders, S);
       else
-        Include(~R`MinimalOverOrders, orders[i]);
+        T:=orders[i];
+        ZBasisLLL(T);
+        Include(~R`MinimalOverOrders, T);
       end if;
     end for;
   end if;
@@ -103,8 +105,7 @@ end intrinsic;
 
 
 intrinsic FindOverOrders_Minimal(R::AlgEtOrd) -> SetIndx[AlgEtOrd]
-{ Given an order R returns all the over orders by a recursive search of the minimal overordes.
-  Based on "On the computations of overorders" by TommyHofmann and Carlo Sircana}
+{Given an order R returns all the over orders by a recursive search of the minimal overordes. Based on "On the computations of overorders" by TommyHofmann and Carlo Sircana.}
     A := Algebra(R);
     singular_primes := PrimesAbove(MaximalOrder(A)!!Conductor(R));
     queue := {@ R @};
@@ -140,7 +141,7 @@ end intrinsic;
 
 
 intrinsic FindOverOrders(E::AlgEtOrd:  populateoo_in_oo := false) -> SetIndx[AlgEtOrd]
-{returns all the overorders of E, and populates }
+{Returns all the overorders of E. The boolean VarArg populateoo_in_oo determines whether to populate the attribute OverOrders of each overorder of E.}
   if not assigned E`OverOrders then
       E`OverOrders := FindOverOrders_Minimal(E);
   end if;
@@ -179,70 +180,10 @@ intrinsic pMaximalOrder(O::AlgEtOrd, p::RngIntElt) -> AlgEtOrd
 end intrinsic;
 */
 
-// // what follows is OLD
-// //
-// intrinsic FindOverOrders(E::AlgEtOrd, O::AlgEtOrd) -> SetIndx[AlgEtOrd]
-// {given E subset O, returns the sequence of orders between E and O}
-// 	require IsFiniteEtale(Algebra(E)): "the algebra of definition must be finite and etale over Q";
-// 	require E subset O : "the first argument must be a subset of the second";
-//   //modified by Edgar
-//   return {@ S: S in FindOverOrders(E) | S subset O @};
-// end intrinsic;
-// 
-// intrinsic FindOverOrders_Naive(E::AlgEtOrd) -> SetIndx[AlgEtOrd]
-// {returns all the overorders of E}
-//   A := Algebra(E);
-//   require IsFiniteEtale(A): "the algebra of definition must be finite and etale over Q";
-//   O := MaximalOrder(A);
-//   if IsMaximal(E) then
-//     return [E];
-//   end if;
-//   return FindOverOrders_Naive(E,O);
-// end intrinsic;
-// 
-// intrinsic FindOverOrders_Naive(E::AlgEtOrd, O::AlgEtOrd) -> SetIndx[AlgEtOrd]
-// {given E subset O, returns the sequence of orders between E and O}
-// //15/02/2018 we add the LowIndexProcess
-// 	require IsFiniteEtale(Algebra(E)): "the algebra of definition must be finite and etale over Q";
-// 	require E subset O : "the first argument must be a subset of the second";
-//   F := FreeAbelianGroup(Degree(O));
-//   E_ZBasis := ZBasis(E);
-//   O_ZBasis := ZBasis(O);
-//   rel := [F ! Eltseq(x) : x in Coordinates(E_ZBasis, ZBasis(O))];
-//   Q,q := quo<F|rel>; //q:F->Q quotient map
-//   FP,f := FPGroup(Q); //f:FP->Q isomorphism
-//   N := #FP;
-//   subg := LowIndexProcess(FP,<1,N>);
-//   seqOO := {@ @};
-//   while not IsEmpty(subg) do
-//     H := ExtractGroup(subg);
-//     NextSubgroup(~subg);
-//     geninF := [(f(FP ! x))@@q : x in Generators(H)];
-//     coeff := [Eltseq(x) : x in geninF];
-//     S := Order([&+[O_ZBasis[i]*x[i] : i in [1..Degree(Algebra(O))]] : x in coeff] cat E_ZBasis);
-//     if S ne O then
-//       Include(~seqOO, S);
-//     end if;
-//   end while;
-//   Include(~seqOO,O); //in this way O is the last of the list
-//   assert E in seqOO and O in seqOO;
-//   return seqOO;
-// end intrinsic;
-// 
-//
-//
-//
-/* TEST
+/* TESTS
 
-    Attach("~/packages_github/AlgEt/AlgEt.m");
-    Attach("~/packages_github/AlgEt/Elt.m");
-    Attach("~/packages_github/AlgEt/Ord.m");
-    Attach("~/packages_github/AlgEt/TraceNorm.m");
-    Attach("~/packages_github/AlgEt/Idl.m");
-    Attach("~/packages_github/AlgEt/WkTesting.m");
-    Attach("~/packages_github/AlgEt/FactPrimes.m");
-    Attach("~/packages_github/AlgEt/CRT.m");
-    Attach("~/packages_github/AlgEt/OverOrders.m");
+    printf "### OverOrders:";
+	  AttachSpec("~/packages_github/AlgEt/spec");
 
     SetVerbose("OverOrders",1);
     SetAssertions(1);
@@ -251,23 +192,8 @@ end intrinsic;
     f:=(x^4+16);
     A:=EtaleAlgebra(f);
     E:=EquationOrder(A);
-    SetProfile(true);
-        oo:=FindOverOrders(E);
-    SetProfile(false);
-    ProfilePrintByTotalTime(ProfileGraph());
+    oo:=FindOverOrders(E);
 
-
-    f:=(x^8+16)*(x^8+81);
-    A:=EtaleAlgebra(f);
-    E:=EquationOrder(A);
-    Index(MaximalOrder(A),E);
-    
-    t0:=Cputime();
-    SetProfile(true);
-        oo:=FindOverOrders(E);
-    SetProfile(false);
-    ProfilePrintByTotalTime(ProfileGraph());
-    Cputime(t0);
-
+    printf " all good!\n"; 
  
 */

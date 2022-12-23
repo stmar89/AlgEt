@@ -11,12 +11,21 @@
 
     TODO:
     ### Priority ###
-    - add ZBasisLLL for a reduced ZBasis. This one should be used for generating random elements and in other occasions. Actually, almost always.
-    Follow-up: I did ad LLL to ZBasis and it has made the timings of PicardGroup more consistent. But, on the other hand, WKICM is not 15% slower. My guess is that in the enumeration process I am creating many ideals and doing the LLL everytime is a waste. Also, I think this ideals have fairly small ZBasis because they come from a fixed range, which is 'close' to their multiplicator ring.
-    Probably it would be better to use LLL only after we known that a candidate needs to be stored.
-    - SmallRepresentative does not give a unique ideal: when you repeat the code it goes into a 'loop' of short ideals. It should be a canonical representative.
     - I have recently added the Type AlgEtMod. Many thinks that are valid for Idl should also be implemented for Modules. Eg, sum of modules, ideal*module, ...
     - Then I should convert PowerOfBass.m
+
+    ### SmallReps ###
+    - SmallRepresentative does not give a unique ideal: when you repeat the code it goes into a 'loop' of short ideals. It should be a canonical representative.
+      	AttachSpec("~/packages_github/AlgEt/spec");
+        _<x>:=PolynomialRing(Integers());
+        E:=EquationOrder(EtaleAlgebra(x^4-100*x^3-100*x^2-100*x-100));
+        time P,p:=PicardGroup(E);
+        I0:=p(Random(P));
+        I:=SmallRepresentative(I0);
+        for i in [1..10] do
+            Index(E,I);
+            I:=SmallRepresentative(I);
+        end for;
 
     ### Various ###
     - Improve saving and printing with LLL or MinimalGenerator (that is after CRT) to get smaller output.
@@ -25,9 +34,6 @@
     ### TEST SUIT ###
     - For each test, track the best running time. 
       If something get slower or faster than a previous version (up to some error)
-    
-    ### PICARD GROUP ###
-    - After fiddleing with SmallRepresentative I have achieved consistency in timings of PicardGroup. It seems that a lot of time was lost in CoprimeRepresentative. Do a final test, after I decide what to do with LLL.
 
     #### CRT ####
     - Make a CRT for modules : I/P1*...*Ps*I -> \prod_i (I/Pi*I)
@@ -55,6 +61,8 @@
     [ i gt 1 select Self(i-1)*2 else 2 ] constructs the same sequence recursively: at each step, it multiplies by 2.
 
     ### FIXED/DONE: kept for the record. ###
+    - After fiddleing with SmallRepresentative I have achieved consistency in timings of PicardGroup. It seems that a lot of time was lost in CoprimeRepresentative.
+    - Added ZBasisLLL. It is used only when one stores ideals/orders, and when one really wants a small representative.
     - Done: &+ for sequence of ideals. &* doesn't seem to be more efficient than taking products.
     - residue_class_field_primitive_element is replaced by PrimitiveElementResidueField which is cached
     - Done: residue_class_ring_unit_subgroup_generators can be improved. 

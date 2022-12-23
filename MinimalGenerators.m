@@ -30,7 +30,7 @@ intrinsic TwoGeneratingSet(I::AlgEtIdl)
         a:=ShortestElement(I);
         S:=Order(I);
         Q,q:=Quotient(I,[a*z : z in ZBasis(S)]);
-        if #Q eq 0 then
+        if IsTrivial(Q) then
             I`Generators:=[a]; //the ideal is principal
         else
             repeat

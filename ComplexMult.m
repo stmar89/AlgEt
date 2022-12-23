@@ -216,11 +216,6 @@ end intrinsic;
 /*
 //TESTS
 
-    quit;
-    git pull;
-    sleep 3;
-    magma;
-
     printf "### Testing CM-types:";
     AttachSpec("~/packages_github/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());

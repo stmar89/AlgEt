@@ -1,6 +1,6 @@
 /* vim: set syntax=magma :*/
 
-//freeze;
+freeze;
 
 /////////////////////////////////////////////////////
 // Stefano Marseglia, Utrecht University, s.marseglia@uu.nl
@@ -8,10 +8,6 @@
 /////////////////////////////////////////////////////
 
 declare verbose AlgEtElt, 3;
-
-/*TODO:
-
-*/
 
 declare attributes AlgEtElt : Algebra, // AlgEt
                               AbsoluteCoordinates,
@@ -73,7 +69,6 @@ function CreateAlgEtElt(A,comp)
 end function;
 
 intrinsic IsCoercible(A::AlgEt, x::.) -> BoolElt, .
-
 {Return whether x is coercible into A and the result of the coercion if so.}
     if Parent(x) cmpeq A then
         return true,x;
@@ -204,7 +199,7 @@ end intrinsic;
 
 // +
 intrinsic '+'(x1::AlgEtElt,x2::AlgEtElt) -> AlgEtElt
-{x1+x2}
+{x1+x2.}
     A:=Parent(x1);
     require A cmpeq Parent(x2): "The elements must belong to the same algebra.";
     x3:=CreateAlgEtElt(A,< Components(x1)[i] + Components(x2)[i] : i in [1..#Components(A)] >);
@@ -212,42 +207,42 @@ intrinsic '+'(x1::AlgEtElt,x2::AlgEtElt) -> AlgEtElt
 end intrinsic;
 
 intrinsic '+'(x1::.,x2::AlgEtElt) -> AlgEtElt
-{x1+x2}
+{x1+x2.}
     bool,x1:=IsCoercible(Algebra(x2),x1);
     require bool : "x1 not coercible";
     return x1 + x2;
 end intrinsic;
 
 intrinsic '+'(x1::AlgEtElt,x2::.) -> AlgEtElt
-{x1+x2}
+{x1+x2.}
     bool,x2:=IsCoercible(Algebra(x1),x2);
     require bool : "x2 not coercible";
     return x1 + x2;
 end intrinsic;
 
 intrinsic '+'(x1::RngIntElt,x2::AlgEtElt) -> AlgEtElt
-{x1+x2}
+{x1+x2.}
     return CreateAlgEtElt(Algebra(x2),<x1+c : c in Components(x2)>);
 end intrinsic;
 
 intrinsic '+'(x1::FldRatElt,x2::AlgEtElt) -> AlgEtElt
-{x1+x2}
+{x1+x2.}
     return CreateAlgEtElt(Algebra(x2),<x1+c : c in Components(x2)>);
 end intrinsic;
 
 intrinsic '+'(x1::AlgEtElt,x2::RngIntElt) -> AlgEtElt
-{x1+x2}
+{x1+x2.}
     return CreateAlgEtElt(Algebra(x1),<c+x2 : c in Components(x1)>);
 end intrinsic;
 
 intrinsic '+'(x1::AlgEtElt,x2::FldRatElt) -> AlgEtElt
-{x1+x2}
+{x1+x2.}
     return CreateAlgEtElt(Algebra(x1),<c+x2 : c in Components(x1)>);
 end intrinsic;
 
 // -
 intrinsic '-'(x::AlgEtElt) -> AlgEtElt
-{-x}
+{-x.}
     A:=Parent(x);
     comp:=< - Components(x)[i] : i in [1..#Components(A)] >;
     y:=CreateAlgEtElt(A,comp);
@@ -255,7 +250,7 @@ intrinsic '-'(x::AlgEtElt) -> AlgEtElt
 end intrinsic;
 
 intrinsic '-'(x1::AlgEtElt,x2::AlgEtElt) -> AlgEtElt
-{x1-x2}
+{x1-x2.}
     A:=Parent(x1);
     require A cmpeq Parent(x2): "The elements must belong to the same algebra.";
     comp:=< Components(x1)[i] - Components(x2)[i] : i in [1..#Components(A)] >;
@@ -264,42 +259,42 @@ intrinsic '-'(x1::AlgEtElt,x2::AlgEtElt) -> AlgEtElt
 end intrinsic;
 
 intrinsic '-'(x1::.,x2::AlgEtElt) -> AlgEtElt
-{x1-x2}
+{x1-x2.}
     bool,x1:=IsCoercible(Algebra(x2),x1);
     require bool : "x1 not coercible";
     return x1 - x2;
 end intrinsic;
 
 intrinsic '-'(x1::AlgEtElt,x2::.) -> AlgEtElt
-{x1-x2}
+{x1-x2.}
     bool,x2:=IsCoercible(Algebra(x1),x2);
     require bool : "x2 not coercible";
     return x1 - x2;
 end intrinsic;
 
 intrinsic '-'(x1::RngIntElt,x2::AlgEtElt) -> AlgEtElt
-{x1+x2}
+{x1-x2.}
     return Algebra(x2)! <x1-c : c in Components(x2)>;
 end intrinsic;
 
 intrinsic '-'(x1::FldRatElt,x2::AlgEtElt) -> AlgEtElt
-{x1+x2}
+{x1-x2.}
     return Algebra(x2)! <x1-c : c in Components(x2)>;
 end intrinsic;
 
 intrinsic '-'(x1::AlgEtElt,x2::RngIntElt) -> AlgEtElt
-{x1+x2}
+{x1-x2.}
     return Algebra(x1)! <c-x2 : c in Components(x1)>;
 end intrinsic;
 
 intrinsic '-'(x1::AlgEtElt,x2::FldRatElt) -> AlgEtElt
-{x1+x2}
+{x1-x2.}
     return Algebra(x1)! <c-x2 : c in Components(x1)>;
 end intrinsic;
 
 // *
 intrinsic '*'(x1::AlgEtElt,x2::AlgEtElt) -> AlgEtElt
-{x1*x2}
+{x1*x2.}
     A:=Parent(x1);
     require A cmpeq Parent(x2): "The elements must belong to the same algebra.";
     comp:=< Components(x1)[i] * Components(x2)[i] : i in [1..#Components(A)] >;
@@ -308,42 +303,42 @@ intrinsic '*'(x1::AlgEtElt,x2::AlgEtElt) -> AlgEtElt
 end intrinsic;
 
 intrinsic '*'(x1::.,x2::AlgEtElt) -> AlgEtElt
-{x1*x2}
+{x1*x2.}
     bool,x1:=IsCoercible(Algebra(x2),x1);
     require bool : "x1 not coercible";
     return x1 * x2;
 end intrinsic;
 
 intrinsic '*'(x1::AlgEtElt,x2::.) -> AlgEtElt
-{x1*x2}
+{x1*x2.}
     bool,x2:=IsCoercible(Algebra(x1),x2);
     require bool : "x2 not coercible";
     return x1 * x2;
 end intrinsic;
 
 intrinsic '*'(x1::RngIntElt,x2::AlgEtElt) -> AlgEtElt
-{x1+x2}
+{x1*x2.}
     return CreateAlgEtElt(Algebra(x2),<x1*c : c in Components(x2)>);
 end intrinsic;
 
 intrinsic '*'(x1::FldRatElt,x2::AlgEtElt) -> AlgEtElt
-{x1+x2}
+{x1*x2.}
     return CreateAlgEtElt(Algebra(x2),<x1*c : c in Components(x2)>);
 end intrinsic;
 
 intrinsic '*'(x1::AlgEtElt,x2::RngIntElt) -> AlgEtElt
-{x1+x2}
+{x1*x2.}
     return CreateAlgEtElt(Algebra(x1),<c*x2 : c in Components(x1)>);
 end intrinsic;
 
 intrinsic '*'(x1::AlgEtElt,x2::FldRatElt) -> AlgEtElt
-{x1+x2}
+{x1*x2.}
     return CreateAlgEtElt(Algebra(x1),<c*x2 : c in Components(x1)>);
 end intrinsic;
 
 // inverse and power
 intrinsic Inverse(x::AlgEtElt) -> AlgEtElt
-{1/x}
+{1/x.}
     require IsUnit(x) : "The element is not invertible.";
     A:=Parent(x);
     comp:=< 1/(Components(x)[i]) : i in [1..#Components(A)] >;
@@ -352,7 +347,7 @@ intrinsic Inverse(x::AlgEtElt) -> AlgEtElt
 end intrinsic;
 
 intrinsic '^'(x::AlgEtElt,n::RngIntElt) -> AlgEtElt
-{x^n}
+{x^n.}
     A:=Algebra(x);
     if n eq 0 then
         return One(A);
@@ -370,7 +365,7 @@ end intrinsic;
 
 // /
 intrinsic '/'(x1::AlgEtElt,x2::AlgEtElt) -> AlgEtElt
-{x1/x2}
+{x1/x2.}
     A:=Parent(x1);
     require A cmpeq Parent(x2): "The elements must belong to the same algebra.";
     require IsUnit(x2) : "The denominator is not invertible.";
@@ -380,36 +375,36 @@ intrinsic '/'(x1::AlgEtElt,x2::AlgEtElt) -> AlgEtElt
 end intrinsic;
 
 intrinsic '/'(x1::.,x2::AlgEtElt) -> AlgEtElt
-{x1/x2}
+{x1/x2.}
     bool,x1:=IsCoercible(Algebra(x2),x1);
     require bool : "x1 not coercible";
     return x1 / x2;
 end intrinsic;
 
 intrinsic '/'(x1::AlgEtElt,x2::.) -> AlgEtElt
-{x1/x2}
+{x1/x2.}
     bool,x2:=IsCoercible(Algebra(x1),x2);
     require bool : "x2 not coercible";
     return x1 / x2;
 end intrinsic;
 
 intrinsic '/'(x1::RngIntElt,x2::AlgEtElt) -> AlgEtElt
-{x1+x2}
+{x1/x2.}
     return CreateAlgEtElt(Algebra(x2),<x1/c : c in Components(x2)>);
 end intrinsic;
 
 intrinsic '/'(x1::FldRatElt,x2::AlgEtElt) -> AlgEtElt
-{x1+x2}
+{x1/x2.}
     return CreateAlgEtElt(Algebra(x2),<x1/c : c in Components(x2)>);
 end intrinsic;
 
 intrinsic '/'(x1::AlgEtElt,x2::RngIntElt) -> AlgEtElt
-{x1+x2}
+{x1/x2.}
     return CreateAlgEtElt(Algebra(x1),<c/x2 : c in Components(x1)>);
 end intrinsic;
 
 intrinsic '/'(x1::AlgEtElt,x2::FldRatElt) -> AlgEtElt
-{x1+x2}
+{x1/x2.}
     return CreateAlgEtElt(Algebra(x1),<c/x2 : c in Components(x1)>);
 end intrinsic;
 
@@ -553,7 +548,7 @@ intrinsic PrimitiveElement(A::AlgEt) -> AlgEtElt
 end intrinsic;
 
 intrinsic PowerBasis(A::AlgEt) -> SeqEnum[AlgEtElt]
-{Returns the power basis of the étale algebra A, consisting of powers of the PrimitiveElement of A}
+{Returns the power basis of the étale algebra A, consisting of powers of the PrimitiveElement of A.}
     if not assigned A`PowerBasis then
         a:=PrimitiveElement(A);
         pow_a:=[ i gt 1 select Self(i-1)*a else One(A) : i in [1..Dimension(A)]];
@@ -601,13 +596,12 @@ intrinsic AbsoluteCoordinates(seq::SeqEnum[AlgEtElt] , basis::SeqEnum[AlgEtElt])
     return out;
 end intrinsic;
 
-
 //------------
 // Idempotents
 //------------
 
 intrinsic OrthogonalIdempotents(A::AlgEt) -> SeqEnum
-{Returns the orthogonal ideampotent element of the étale algebra A}
+{Returns the orthogonal ideampotent element of the étale algebra A.}
     if not assigned A`OrthogonalIdempotents then
         nf,embs:=Components(A);
         A`OrthogonalIdempotents := [embs[i](One(nf[i])) : i in [1..#nf]];
@@ -616,7 +610,7 @@ intrinsic OrthogonalIdempotents(A::AlgEt) -> SeqEnum
 end intrinsic;
 
 intrinsic Idempotents(A::AlgEt) -> SeqEnum
-{Returns the ideampotent element of the étale algebra A}
+{Returns the ideampotent element of the étale algebra A.}
     if not assigned A`Idempotents then
         ortid:=Seqset(OrthogonalIdempotents(A));
         ss:=Subsets(ortid);
@@ -627,32 +621,9 @@ intrinsic Idempotents(A::AlgEt) -> SeqEnum
     return A`Idempotents;
 end intrinsic;
 
-/* CONTINUE FROM HERE
-
-intrinsic CoordinatesOverBaseRing(seq::SeqEnum[AlgEtElt] , basis::SeqEnum[AlgEtElt]) -> SeqEnum
-{//TODO I am not sure what this function should do}
-    return ;
-end intrinsic;
-
-*/
-
-
-/*TO MOVE OR REMOVE
-
-intrinsic '.'(A::AlgEt,i::RngIntElt) -> AlgEtElt
-{A.i returns the ith generator of the Algebra A}
-   alg:=AssociativeAlgebra(A);
-   y:=New(AlgEtElt);
-   y`AlgAssElt:=alg.i;
-   y`Algebra:=A;
-   return y;
-end intrinsic;
-
-
-*/
-
 /* TEST
 
+    printf "### Testing Eltements:";
     AttachSpec("~/packages_github/AlgEt/spec");
     SetVerbose("AlgEtElt",2);
 
@@ -661,22 +632,29 @@ end intrinsic;
     A:=EtaleAlgebra(f);
     a:=PrimitiveElement(A);
     assert MinimalPolynomial(a) eq f;
-    A!1,A!(1/2);
-    Random(A,3)+Random(A,3);
-    Random(A,3)-Random(A,3);
-    Random(A,3)*Random(A,3);
-    Random(A,3)/RandomUnit(A,3);
-    Random(A);
-    IsIntegral(A!1/2);
-    IsIntegral(A!2);
+    _:=A!1;
+    _:=A!(1/2);
+    _:=Random(A,3)+Random(A,3);
+    _:=Random(A,3)-Random(A,3);
+    _:=Random(A,3)*Random(A,3);
+    _:=Random(A,3)/RandomUnit(A,3);
+    _:=Random(A);
+    assert not IsIntegral(A!1/2);
+    assert IsIntegral(A!2);
 
-    OrthogonalIdempotents(A);
-    Idempotents(A);
+    ort:=OrthogonalIdempotents(A);
+    idem:=Idempotents(A);
+    assert ort subset idem;
+    assert One(A) in idem;
+    assert Zero(A) in idem;
+    assert forall{i : i in idem  i^2 eq i};
+    assert forall{i : i,j in [1..#ort] | ort[i]*ort[j] eq ort[i]*KroneckerDelta(i,j)};
 
     for n in [1..100] do
         a:=Random(A,3);
         coord1:=AbsoluteCoordinates([a],Basis(A));
         coord2:=AbsoluteCoordinates([a],PowerBasis(A));
+        printf ".";
     end for;
 
     seq:=[x^2-5,x^2-7];
@@ -684,16 +662,64 @@ end intrinsic;
     A:=EtaleAlgebra(seq);
     a:=PrimitiveElement(A);
     assert MinimalPolynomial(a) eq DefiningPolynomial(A);
-    A!1,A!(1/2),A!<seq[1]!1,seq[2]!(1/2)>,A![1,2];
-    A!1 + A!(1/2);
+    _:=A!1;
+    _:=A!(1/2);
+    _:=A!<seq[1]!1,seq[2]!(1/2)>;
+    _:=A![1,2];
+    assert A!1 + A!(1/2) eq A!3/2;
     e:=A!<seq[1]!1,seq[2]!(1/2)>/A![1,2];
-    IsIntegral(e);
+    assert not IsIntegral(e);
     for n in [1..100] do
         a:=Random(A,3);
         coord1:=AbsoluteCoordinates([a],Basis(A));
         coord2:=AbsoluteCoordinates([a],PowerBasis(A));
+        printf ".";
     end for;
 
+    // testing sequences
+    AttachSpec("~/packages_github/AlgEt/spec");
+    _<x>:=PolynomialRing(Integers());
+    f:=(x^8+16)*(x^8+81);
+    A:=EtaleAlgebra(f);
+    seq:=[Random(A) : i in [1..10^3]];
+    time c0:=&+seq;
+    t0:=Cputime();
+        c:=seq[1];
+        for i in [2..#seq] do
+            c+:=seq[i];
+        end for;
+    Cputime(t0);
+    assert c eq c0;
+    time c0:=&*seq;
+    t0:=Cputime();
+        c:=seq[1];
+        for i in [2..#seq] do
+            c*:=seq[i];
+        end for;
+    Cputime(t0);
+    assert c eq c0;
+
+    time s1:=&+[seq[i]*seq[i] : i in [1..#seq]];
+    time s2:=SumOfProducts(seq,seq);
+    assert s1 eq s2;
+    seq0:=[Random(-10,10) : i in [1..#seq]];
+    time s1:=&+[seq0[i]*seq[i] : i in [1..#seq]];
+    time s2:=SumOfProducts(seq0,seq);
+    time s3:=&+[seq[i]*seq0[i] : i in [1..#seq]];
+    time s4:=SumOfProducts(seq,seq0);
+    assert s1 eq s2 and s1 eq s3 and s1 eq s4;
+    seq1:=[Random(-10,10)/Random(1,20) : i in [1..#seq]];
+    time s1:=&+[seq1[i]*seq[i] : i in [1..#seq]];
+    time s2:=SumOfProducts(seq1,seq);
+    time s3:=&+[seq[i]*seq1[i] : i in [1..#seq]];
+    time s4:=SumOfProducts(seq,seq1);
+    assert s1 eq s2 and s1 eq s3 and s1 eq s4;
+
+    printf " all good!\n"; 
+
+    ///////////////////////
+    // Relative Extensions
+    ///////////////////////
     K:=NumberField(x^2-5);
     _<y>:=PolynomialRing(K);
     p:=y^2-7;
@@ -732,44 +758,5 @@ end intrinsic;
     assert #AbsoluteBasis(A) eq AbsoluteDimension(A);
     OrthogonalIdempotents(A);
     Idempotents(A);
-
-    // testing sequences
-    AttachSpec("~/packages_github/AlgEt/spec");
-    _<x>:=PolynomialRing(Integers());
-    f:=(x^8+16)*(x^8+81);
-    A:=EtaleAlgebra(f);
-    seq:=[Random(A) : i in [1..10^4]];
-    time c0:=&+seq;
-    t0:=Cputime();
-        c:=seq[1];
-        for i in [2..#seq] do
-            c+:=seq[i];
-        end for;
-    Cputime(t0);
-    assert c eq c0;
-    time c0:=&*seq;
-    t0:=Cputime();
-        c:=seq[1];
-        for i in [2..#seq] do
-            c*:=seq[i];
-        end for;
-    Cputime(t0);
-    assert c eq c0;
-
-    time s1:=&+[seq[i]*seq[i] : i in [1..#seq]];
-    time s2:=SumOfProducts(seq,seq);
-    assert s1 eq s2;
-    seq0:=[Random(-10,10) : i in [1..#seq]];
-    time s1:=&+[seq0[i]*seq[i] : i in [1..#seq]];
-    time s2:=SumOfProducts(seq0,seq);
-    time s3:=&+[seq[i]*seq0[i] : i in [1..#seq]];
-    time s4:=SumOfProducts(seq,seq0);
-    assert s1 eq s2 and s1 eq s3 and s1 eq s4;
-    seq1:=[Random(-10,10)/Random(1,20) : i in [1..#seq]];
-    time s1:=&+[seq1[i]*seq[i] : i in [1..#seq]];
-    time s2:=SumOfProducts(seq1,seq);
-    time s3:=&+[seq[i]*seq1[i] : i in [1..#seq]];
-    time s4:=SumOfProducts(seq,seq1);
-    assert s1 eq s2 and s1 eq s3 and s1 eq s4;
 
 */

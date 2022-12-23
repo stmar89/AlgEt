@@ -37,7 +37,7 @@
     fld:=input[1];
     for input_file0 in input[2..#input] do
         input_file:=fld cat "/" cat input_file0;
-        inp:=Read("../" cat input_file);
+        inp:=Read("../../" cat input_file);
         out:="";
         pos:=1;
         start:=find_next(inp,pos,"TESTS");

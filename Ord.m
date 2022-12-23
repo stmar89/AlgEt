@@ -298,7 +298,7 @@ intrinsic AbsoluteCoordinates(seq::SeqEnum[AlgEtElt],O::AlgEtOrd) -> SeqEnum
 end intrinsic;
 
 intrinsic 'in'(x::RngIntElt,O::AlgEtOrd) -> BoolElt
-{Inclusion of elements.}.
+{Inclusion of elements.}
     return (Algebra(O)!x) in O;
 end intrinsic;
 

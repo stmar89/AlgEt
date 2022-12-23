@@ -38,12 +38,12 @@ intrinsic DefiningPolynomial(A::AlgEt) -> RngUPolElt
 end intrinsic;
 
 intrinsic Components(A::AlgEt) -> SeqEnum
-{Returns the number fields of which A is a product of,together with embeddings and projections}
+{Returns the number fields of which A is a product of,together with embeddings and projections.}
     return Explode(A`Components);
 end intrinsic;
 
 intrinsic Dimension(A::AlgEt)->RngInt
-{Dimension of A}    
+{Dimension of A.}    
     if not assigned A`Dimension then
         nf:=Components(A);
         require HasBaseField(A) : "The number fields of A shoud all be defined over the same base ring.";
@@ -53,7 +53,7 @@ intrinsic Dimension(A::AlgEt)->RngInt
 end intrinsic;
 
 intrinsic AbsoluteDimension(A::AlgEt)->RngInt
-{Dimension of A over the prime field}    
+{Dimension of A over the prime field.}    
     if not assigned A`AbsoluteDimension then
         A`AbsoluteDimension:=&+[AbsoluteDegree(E) : E in Components(A)];
     end if;
@@ -84,7 +84,7 @@ intrinsic BaseField(A::AlgEt) -> FldNum
 end intrinsic;
 
 intrinsic PrimeField(A::AlgEt) -> FldNum
-{Returns the prime field of the Algebra}
+{Returns the prime field of the Algebra.}
     if not assigned A`PrimeField then
         nf:=Components(A);
         F:=PrimeField(nf[1]); //this should always be Rationals()
@@ -98,7 +98,7 @@ end intrinsic;
 //------------
 
 intrinsic 'eq'(A1::AlgEt,A2::AlgEt) -> BoolElt
-{A1 eq A2}
+{A1 eq A2.}
    c1,e1,p1:=Components(A1);
    c2,e2,p2:=Components(A2);
    return <c1,e1,p1> eq <c2,e2,p2>;
@@ -107,6 +107,7 @@ end intrinsic;
 /* TEST
 
     AttachSpec("~/packages_github/AlgEt/spec");
+    printf "### Testing Attributes and Equality:";
     SetAssertions(2);
     _<x>:=PolynomialRing(Integers());
     f:=(x^8+16)*(x^8+81);
@@ -117,5 +118,32 @@ end intrinsic;
     assert A eq A;
     assert A cmpeq A;
     assert not A cmpeq B;
+    printf ".";
+
+    // Tests for relative extensions.
+    K:=NumberField(x^2-5);
+    _<y>:=PolynomialRing(K);
+    p:=y^2-7;
+    A:=EtaleAlgebra(p);
+    F,mFA:=BaseField(A);
+    _:=[ mFA(b) : b in Basis(MaximalOrder(F)) ];
+    printf ".";
+
+    E:=NumberField(p);
+    seq:=[E,K];
+    A:=EtaleAlgebra(seq);
+    assert not HasBaseField(A); // A is a product of an absolute and a relative extensions
+    assert AbsoluteDimension(A) eq 6;
+    assert PrimeField(A) eq RationalField();
+    printf ".";
+
+    A:=EtaleAlgebra([E,E]);
+    assert Dimension(A) eq 4;
+    assert AbsoluteDimension(A) eq 8;
+    assert BaseField(A) eq K;
+    assert PrimeField(A) eq RationalField();
+    SetAssertions(1);
+    printf ".";
+    printf " all good!\n";
 
 */

@@ -65,8 +65,10 @@ end intrinsic;
 /* TEST
 
     AttachSpec("~/packages_github/AlgEt/spec");
+    printf "### Testing Creation of Algebra:";
     SetAssertions(2);
     _<x>:=PolynomialRing(Integers());
+    printf ".";
     f:=(x^8+16)*(x^8+81);
     A:=EtaleAlgebra(f);
     assert #Basis(A) eq Dimension(A);
@@ -74,26 +76,8 @@ end intrinsic;
     seq:=[x^2-5,x^2-7];
     seq:=[NumberField(f) : f in seq];
     A:=EtaleAlgebra(seq);
-
-    K:=NumberField(x^2-5);
-    _<y>:=PolynomialRing(K);
-    p:=y^2-7;
-    A:=EtaleAlgebra(p);
-    A;
-    F,mFA:=BaseField(A);
-    [ mFA(b) : b in Basis(MaximalOrder(F)) ];
-
-    E:=NumberField(p);
-    seq:=[E,K];
-    A:=EtaleAlgebra(seq);
-    HasBaseField(A);
-    AbsoluteDimension(A);
-    PrimeField(A);
-
-    A:=EtaleAlgebra([E,E]);
-    Dimension(A);
-    AbsoluteDimension(A);
-    BaseField(A);
-    PrimeField(A);
+    printf ".";
+    SetAssertions(1);
+    printf " all good!\n";
 
 */

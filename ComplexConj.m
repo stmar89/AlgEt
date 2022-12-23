@@ -15,7 +15,7 @@ declare attributes AlgEtOrd : IsConjugateStable;
 declare attributes AlgEtIdl : IsConjugateStable;
 
 intrinsic HasComplexConjugate(A::AlgEt) -> BoolElt
-{Returns if the algebra is the product of CM fields}
+{Returns if the algebra is the product of CM fields.}
     if not assigned A`HasComplexConjugate then
         A`HasComplexConjugate:=forall{L : L in A`Components[1] | HasComplexConjugate(L)};
     end if;
@@ -23,7 +23,7 @@ intrinsic HasComplexConjugate(A::AlgEt) -> BoolElt
 end intrinsic;
 
 intrinsic ComplexConjugate(x::AlgEtElt) -> AlgEtElt
-{If A is a product of CM fields, it returns the complex conjugate of the argument}
+{If A is a product of CM fields, it returns the complex conjugate of the argument.}
 	A:=Parent(x);
 	require HasComplexConjugate(A) : "it is not a product of CM fields";
     return A!<ComplexConjugate(xi) : xi in Components(x)>;
@@ -73,7 +73,7 @@ intrinsic IsConjugateStable(I::AlgEtIdl) -> BoolElt,AlgEtIdl
 end intrinsic;
 
 intrinsic ComplexConjugate(I::AlgEtIdl) -> AlgEtIdl
-{if A is a product of CM fields, it returns the complex conjugate of the argument}
+{If A is a product of CM fields, it returns the complex conjugate of the argument.}
     _,Ib:=IsConjugateStable(I); //if stable Ib = I, to preserve atttributes!
 	return Ib;
 end intrinsic;
@@ -81,6 +81,7 @@ end intrinsic;
 /*
 //TESTS
 
+    printf "### Testing Complex Conjugation:";
     AttachSpec("~/packages_github/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());
     f:=x^4 + 6*x^2 + 25;
@@ -98,20 +99,8 @@ end intrinsic;
     assert IsConjugateStable(TraceDualIdeal(O));
     assert IsConjugateStable(S);
     assert IsConjugateStable(TraceDualIdeal(S));
-
-
-    wkS:=WKICM_bar(S);
-    #wkS;
-    S eq Order(ZBasis(2*O));
-
-    for I in wkS do
-        GI:=Quotient(I,(1-pi)*I);
-        Iv:=TraceDualIdeal(ComplexConjugate(I));
-        GIv:=Quotient(Iv,(1-pi)*Iv);
-        IsIsomorphic(I,Iv);
-        ElementaryDivisors(GI),
-        ElementaryDivisors(GIv);
-        "\n";
-    end for;
+    assert not IsConjugateStable(EquationOrder(K));
+    printf ".";
+    printf " all good!\n";
 
 */

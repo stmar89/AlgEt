@@ -2,7 +2,7 @@
 --
 
 <pre>
-<b>EtaleAlgebra</b>(seq::SeqEnum[FldNum[FldRat]]) -> AlgEtQ
+<b>EtaleAlgebra</b>(seq::SeqEnum[FldNum]) -> AlgEtQ
 </pre>
 
 *Given a sequence of number fields returns the étale algebra corresponding to the direct product.*

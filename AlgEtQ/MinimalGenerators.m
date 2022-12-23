@@ -18,7 +18,7 @@ freeze;
 //------------
 import "Ord.m" : MatrixAtoQ,MatrixAtoZ;
 
-intrinsic TwoGeneratingSet(I::AlgEtIdl)
+intrinsic TwoGeneratingSet(I::AlgEtQIdl)
 {A procedure that given an invertible ideal I put in the attibute I`Generators two non-zerodivisors in I that generate I. If I is known to be principal, that is I`Generators consists of one single element, nothing is done.}
     require IsInvertible(I) : "the ideal must be invertible";
     if #Generators(I) gt 2 then
@@ -48,7 +48,7 @@ end intrinsic;
 /* TESTS
 
     printf "### TwoGenerators:";
-	AttachSpec("~/packages_github/AlgEt/spec");
+	AttachSpec("~/packages_github/AlgEtQ/spec");
     SetClassGroupBounds("GRH");
 	_<x>:=PolynomialRing(Integers());
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;

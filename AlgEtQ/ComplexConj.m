@@ -3,18 +3,18 @@
 freeze;
 
 /////////////////////////////////////////////////////
-// Complex Conjugation for AlgEt
+// Complex Conjugation for AlgEtQ
 // Stefano Marseglia, Utrecht University, s.marseglia@uu.nl
 // http://www.staff.science.uu.nl/~marse004/
 /////////////////////////////////////////////////////
 
 declare verbose ComplexConj, 1;
 
-declare attributes AlgEt : HasComplexConjugate;
-declare attributes AlgEtOrd : IsConjugateStable;
-declare attributes AlgEtIdl : IsConjugateStable;
+declare attributes AlgEtQ : HasComplexConjugate;
+declare attributes AlgEtQOrd : IsConjugateStable;
+declare attributes AlgEtQIdl : IsConjugateStable;
 
-intrinsic HasComplexConjugate(A::AlgEt) -> BoolElt
+intrinsic HasComplexConjugate(A::AlgEtQ) -> BoolElt
 {Returns if the algebra is the product of CM fields.}
     if not assigned A`HasComplexConjugate then
         A`HasComplexConjugate:=forall{L : L in A`Components[1] | HasComplexConjugate(L)};
@@ -22,14 +22,14 @@ intrinsic HasComplexConjugate(A::AlgEt) -> BoolElt
 	return A`HasComplexConjugate;
 end intrinsic;
 
-intrinsic ComplexConjugate(x::AlgEtElt) -> AlgEtElt
+intrinsic ComplexConjugate(x::AlgEtQElt) -> AlgEtQElt
 {If A is a product of CM fields, it returns the complex conjugate of the argument.}
 	A:=Parent(x);
 	require HasComplexConjugate(A) : "it is not a product of CM fields";
     return A!<ComplexConjugate(xi) : xi in Components(x)>;
 end intrinsic;
 
-intrinsic IsConjugateStable(O::AlgEtOrd) -> BoolElt,AlgEtOrd
+intrinsic IsConjugateStable(O::AlgEtQOrd) -> BoolElt,AlgEtQOrd
 {Returns wheter O is conjugate stable and the complex conjugate.}
     if not assigned O`IsConjugateStable then
         A:=Algebra(O);
@@ -44,14 +44,14 @@ intrinsic IsConjugateStable(O::AlgEtOrd) -> BoolElt,AlgEtOrd
 	return Explode(O`IsConjugateStable);
 end intrinsic;
 
-intrinsic ComplexConjugate(O::AlgEtOrd) -> AlgEtOrd
+intrinsic ComplexConjugate(O::AlgEtQOrd) -> AlgEtQOrd
 {It returns the complex conjugate of the argument.}
 	A:=Algebra(O);
     _,Ob:=IsConjugateStable(O); //if stable Ob = O, to preserve atttributes!
 	return Ob;
 end intrinsic;
 
-intrinsic IsConjugateStable(I::AlgEtIdl) -> BoolElt,AlgEtIdl
+intrinsic IsConjugateStable(I::AlgEtQIdl) -> BoolElt,AlgEtQIdl
 {Returns wheter O is conjugate stable and the complex conjugate.}
     if not assigned I`IsConjugateStable then
         O:=Order(I);
@@ -72,7 +72,7 @@ intrinsic IsConjugateStable(I::AlgEtIdl) -> BoolElt,AlgEtIdl
 	return Explode(I`IsConjugateStable);
 end intrinsic;
 
-intrinsic ComplexConjugate(I::AlgEtIdl) -> AlgEtIdl
+intrinsic ComplexConjugate(I::AlgEtQIdl) -> AlgEtQIdl
 {If A is a product of CM fields, it returns the complex conjugate of the argument.}
     _,Ib:=IsConjugateStable(I); //if stable Ib = I, to preserve atttributes!
 	return Ib;
@@ -82,7 +82,7 @@ end intrinsic;
 //TESTS
 
     printf "### Testing Complex Conjugation:";
-    AttachSpec("~/packages_github/AlgEt/spec");
+    AttachSpec("~/packages_github/AlgEtQ/spec");
     _<x>:=PolynomialRing(Integers());
     f:=x^4 + 6*x^2 + 25;
     K:=EtaleAlgebra(f);

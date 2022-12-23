@@ -11,13 +11,13 @@ import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQ
 
 declare verbose Quotients, 1;
 
-declare attributes AlgEtIdl : ResidueField,PrimitiveElementResidueField;
+declare attributes AlgEtQIdl : ResidueField,PrimitiveElementResidueField;
 
 //------------
 // Quotients
 //------------
 
-intrinsic Quotient(I::AlgEtIdl, zbJ::SeqEnum[AlgEtElt]) -> GrpAb, Map
+intrinsic Quotient(I::AlgEtQIdl, zbJ::SeqEnum[AlgEtQElt]) -> GrpAb, Map
 {Given an ideal I and the ZBasis of an ideal J such that  J subset I, returns the abelian group Q=I/J together with the quotient map q:I->J. J can also be an order.} 
     // if J is not inside I, an error occurs while forming Q. so no need to check in advance
     A:=Algebra(I);
@@ -33,12 +33,12 @@ intrinsic Quotient(I::AlgEtIdl, zbJ::SeqEnum[AlgEtElt]) -> GrpAb, Map
     return Q,q;
 end intrinsic;
 
-intrinsic Quotient(I::AlgEtIdl, J::AlgEtIdl) -> GrpAb, Map
+intrinsic Quotient(I::AlgEtQIdl, J::AlgEtQIdl) -> GrpAb, Map
 {Given fractional ideals J subset I, returns the abelian group Q=I/J together with the quotient map q:I->J.} 
     return Quotient(I,ZBasis(J));
 end intrinsic;
 
-intrinsic Quotient(S::AlgEtOrd, zbJ::SeqEnum[AlgEtElt]) -> GrpAb, Map
+intrinsic Quotient(S::AlgEtQOrd, zbJ::SeqEnum[AlgEtQElt]) -> GrpAb, Map
 {Given an order S and the ZBasis of an ideal J such that  J subset S, returns the abelian group Q=S/J together with the quotient map q:S->J. J can also be an order.} 
     // if J is not inside S, an error occurs while forming Q. so no need to check in advance
     A:=Algebra(S);
@@ -54,13 +54,13 @@ intrinsic Quotient(S::AlgEtOrd, zbJ::SeqEnum[AlgEtElt]) -> GrpAb, Map
     return Q,q;
 end intrinsic;
 
-intrinsic ResidueRing(S::AlgEtOrd,I::AlgEtIdl) -> GrpAb , Map
+intrinsic ResidueRing(S::AlgEtQOrd,I::AlgEtQIdl) -> GrpAb , Map
 {Given an integral ideal I of S, returns the abelian group S/I and the epimorphism pi:S -> S/I (with inverse map). Important: the domain of pi is the Algebra of S, since the elements of S are usually expressed al elements of A. For eg Parent(Random(S)) = Algebra(S). We stress that the output is a group and does not have a multiplication. This can be obtained by first taking preimages, doing the multiplication, and then applying the projection.}
     require Order(I) eq S : "wrong order";
     return Quotient(S,ZBasis(I));
 end intrinsic;
 
-intrinsic ResidueField(P::AlgEtIdl) -> FldFin, Map
+intrinsic ResidueField(P::AlgEtQIdl) -> FldFin, Map
 {Given P a prime of S, returns a finite field F isomorphic to S/P and a surjection (with inverse) S->F.}
     if not assigned P`ResidueField then
         assert IsPrime(P);
@@ -87,7 +87,7 @@ intrinsic ResidueField(P::AlgEtIdl) -> FldFin, Map
     return Explode(P`ResidueField);
 end intrinsic;
 
-intrinsic PrimitiveElementResidueField(P::AlgEtIdl)->AlgEtElt
+intrinsic PrimitiveElementResidueField(P::AlgEtQIdl)->AlgEtQElt
 {Returns an element of P that maps to the primitive element of the residue field S/P, that is a multiplicative generator of (S/P)^*.}
     if not assigned P`PrimitiveElementResidueField then
         F,f:=ResidueField(P);
@@ -97,7 +97,7 @@ intrinsic PrimitiveElementResidueField(P::AlgEtIdl)->AlgEtElt
 end intrinsic;
 
 /* The following version is promising, but still bugged. One assertions fails.
-intrinsic QuotientVS(I::AlgEtIdl, J::AlgEtIdl, P::AlgEtIdl) -> ModRng, Map
+intrinsic QuotientVS(I::AlgEtQIdl, J::AlgEtQIdl, P::AlgEtQIdl) -> ModRng, Map
 {Let I, J, P be fractional R-ideals such that:
  - P is prime of of some order R, with residue field K;
  - J in I and I/J is a vector space V over K, say of dimension d.
@@ -134,7 +134,7 @@ intrinsic QuotientVS(I::AlgEtIdl, J::AlgEtIdl, P::AlgEtIdl) -> ModRng, Map
 end intrinsic;
 */
 
-intrinsic QuotientVS(I::AlgEtOrd, J::AlgEtOrd, P::AlgEtIdl) -> ModRng, Map
+intrinsic QuotientVS(I::AlgEtQOrd, J::AlgEtQOrd, P::AlgEtQIdl) -> ModRng, Map
 {Let I, J be orders, P a fractional R-ideals such that:
  - P is prime of of some order R, with residue field K;
  - J in I and I/J is a vector space V over K, say of dimension d.
@@ -143,7 +143,7 @@ intrinsic QuotientVS(I::AlgEtOrd, J::AlgEtOrd, P::AlgEtIdl) -> ModRng, Map
     return QuotientVS(S!!OneIdeal(I),S!!OneIdeal(J),P);
 end intrinsic;
 
-intrinsic QuotientVS(I::AlgEtOrd, J::AlgEtIdl, P::AlgEtIdl) -> ModRng, Map
+intrinsic QuotientVS(I::AlgEtQOrd, J::AlgEtQIdl, P::AlgEtQIdl) -> ModRng, Map
 {Let I be an order, J and  P be fractional R-ideals such that:
  - P is prime of of some order R, with residue field K;
  - J in I and I/J is a vector space V over K, say of dimension d.
@@ -152,7 +152,7 @@ intrinsic QuotientVS(I::AlgEtOrd, J::AlgEtIdl, P::AlgEtIdl) -> ModRng, Map
     return QuotientVS(S!!OneIdeal(I),S!!J,P);
 end intrinsic;
 
-intrinsic QuotientVS(I::AlgEtIdl, J::AlgEtOrd, P::AlgEtIdl) -> ModRng, Map
+intrinsic QuotientVS(I::AlgEtQIdl, J::AlgEtQOrd, P::AlgEtQIdl) -> ModRng, Map
 {Let J be an order, I and  P be fractional R-ideals such that:
  - P is prime of of some order R, with residue field K;
  - J in I and I/J is a vector space V over K, say of dimension d.
@@ -161,7 +161,7 @@ intrinsic QuotientVS(I::AlgEtIdl, J::AlgEtOrd, P::AlgEtIdl) -> ModRng, Map
     return QuotientVS(S!!I,S!!OneIdeal(J),P);
 end intrinsic;
 
-intrinsic QuotientVS(I::AlgEtIdl, J::AlgEtIdl, P::AlgEtIdl) -> ModRng, Map
+intrinsic QuotientVS(I::AlgEtQIdl, J::AlgEtQIdl, P::AlgEtQIdl) -> ModRng, Map
 {let I, J, P be fractional R-ideals such that:
  - P is prime of of some order R;
  - J in I and I/J is a vector space over R/P, say of dimension d;
@@ -235,7 +235,7 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing Quotients:";
-    AttachSpec("~/packages_github/AlgEt/spec");
+    AttachSpec("~/packages_github/AlgEtQ/spec");
 	SetAssertions(2);
 	_<x>:=PolynomialRing(Integers());
     f:=(x^4+16);

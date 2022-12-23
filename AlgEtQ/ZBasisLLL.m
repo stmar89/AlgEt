@@ -9,8 +9,8 @@ freeze;
 
 declare verbose ZBasisLLL, 2;
 
-declare attributes AlgEtIdl : IsZBasisLLLReduced;
-declare attributes AlgEtOrd : IsZBasisLLLReduced;
+declare attributes AlgEtQIdl : IsZBasisLLLReduced;
+declare attributes AlgEtQOrd : IsZBasisLLLReduced;
 
 import "Ord.m" : MatrixAtoQ , MatrixQtoA;
 
@@ -18,7 +18,7 @@ import "Ord.m" : MatrixAtoQ , MatrixQtoA;
 // LLL - Reduce ZBasis. This should be called whenever we are storing some orders or ideals.
 //------------
 
-intrinsic ZBasisLLL(S::AlgEtOrd)
+intrinsic ZBasisLLL(S::AlgEtQOrd)
 {A procedure that replaces the ZBasis with an LLL-reduced one.}
   if (not assigned S`IsZBasisLLLReduced) or (not S`IsZBasisLLLReduced) then
     S`ZBasis:=MatrixQtoA(Algebra(S),LLL(MatrixAtoQ(ZBasis(S))));
@@ -27,7 +27,7 @@ intrinsic ZBasisLLL(S::AlgEtOrd)
   end if;
 end intrinsic;
 
-intrinsic ZBasisLLL(S::AlgEtIdl)
+intrinsic ZBasisLLL(S::AlgEtQIdl)
 {A procedure that replaces the ZBasis with an LLL-reduced one.}
   if (not assigned S`IsZBasisLLLReduced) or (not S`IsZBasisLLLReduced) then
     S`ZBasis:=MatrixQtoA(Algebra(S),LLL(MatrixAtoQ(ZBasis(S))));
@@ -39,7 +39,7 @@ end intrinsic;
 /* TEST
 
   printf "### Testing ZBasisLLL:";
-	AttachSpec("~/packages_github/AlgEt/spec");
+	AttachSpec("~/packages_github/AlgEtQ/spec");
 	SetAssertions(2);
 	_<x>:=PolynomialRing(Integers());
   f:=x^4-100*x^3-100*x^2-100*x-100;

@@ -7,13 +7,13 @@
 // http://www.staff.science.uu.nl/~marse004/
 /////////////////////////////////////////////////////
 
-declare verbose AlgEt, 1;
+declare verbose AlgEtQ, 1;
 
 //------------
-// Creation and Printing for AlgEt
+// Creation and Printing for AlgEtQ
 //------------
 
-intrinsic Print(A::AlgEt)
+intrinsic Print(A::AlgEtQ)
 {Prints the defining polynomial or the components defining A.}
     if assigned A`DefiningPolynomial then
         f:=DefiningPolynomial(A);
@@ -27,7 +27,7 @@ end intrinsic;
 // Access attributes
 //------------
 
-intrinsic DefiningPolynomial(A::AlgEt) -> RngUPolElt
+intrinsic DefiningPolynomial(A::AlgEtQ) -> RngUPolElt
 {Returns the defining polynomial of A, if the corresponding number fields are distinct.}
     if not assigned A`DefiningPolynomial then
         polys:=[DefiningPolynomial(L) : L in Components(A)];
@@ -37,12 +37,12 @@ intrinsic DefiningPolynomial(A::AlgEt) -> RngUPolElt
     return A`DefiningPolynomial;
 end intrinsic;
 
-intrinsic Components(A::AlgEt) -> SeqEnum
+intrinsic Components(A::AlgEtQ) -> SeqEnum
 {Returns the number fields of which A is a product of,together with embeddings and projections.}
     return Explode(A`Components);
 end intrinsic;
 
-intrinsic Dimension(A::AlgEt)->RngInt
+intrinsic Dimension(A::AlgEtQ)->RngInt
 {Dimension of A.}    
     if not assigned A`Dimension then
         nf:=Components(A);
@@ -52,7 +52,7 @@ intrinsic Dimension(A::AlgEt)->RngInt
     return A`Dimension;
 end intrinsic;
 
-intrinsic AbsoluteDimension(A::AlgEt)->RngInt
+intrinsic AbsoluteDimension(A::AlgEtQ)->RngInt
 {Dimension of A over the prime field.}    
     if not assigned A`AbsoluteDimension then
         A`AbsoluteDimension:=&+[AbsoluteDegree(E) : E in Components(A)];
@@ -60,7 +60,7 @@ intrinsic AbsoluteDimension(A::AlgEt)->RngInt
     return A`AbsoluteDimension;
 end intrinsic;
 
-intrinsic HasBaseField(A::AlgEt) -> BoolElt,FldNum
+intrinsic HasBaseField(A::AlgEtQ) -> BoolElt,FldNum
 {Returns whether A has common base field. If this is the case it returns it.}
     if not assigned A`HasBaseField then
         nf,embs:=Components(A);
@@ -74,7 +74,7 @@ intrinsic HasBaseField(A::AlgEt) -> BoolElt,FldNum
     return A`HasBaseField;
 end intrinsic;
 
-intrinsic BaseField(A::AlgEt) -> FldNum
+intrinsic BaseField(A::AlgEtQ) -> FldNum
 {Returns the common base field of the Algebra, if it exists.}
     if not assigned A`BaseField then
         require HasBaseField(A) : "The number fields should all be defined over the same Base ring/field.";
@@ -83,7 +83,7 @@ intrinsic BaseField(A::AlgEt) -> FldNum
     return Explode(A`BaseField);
 end intrinsic;
 
-intrinsic PrimeField(A::AlgEt) -> FldNum
+intrinsic PrimeField(A::AlgEtQ) -> FldNum
 {Returns the prime field of the Algebra.}
     if not assigned A`PrimeField then
         nf:=Components(A);
@@ -97,7 +97,7 @@ end intrinsic;
 // Equality
 //------------
 
-intrinsic 'eq'(A1::AlgEt,A2::AlgEt) -> BoolElt
+intrinsic 'eq'(A1::AlgEtQ,A2::AlgEtQ) -> BoolElt
 {A1 eq A2.}
    c1,e1,p1:=Components(A1);
    c2,e2,p2:=Components(A2);
@@ -107,7 +107,7 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing Attributes and Equality:";
-    AttachSpec("~/packages_github/AlgEt/spec");
+    AttachSpec("~/packages_github/AlgEtQ/spec");
     SetAssertions(2);
     _<x>:=PolynomialRing(Integers());
     f:=(x^8+16)*(x^8+81);

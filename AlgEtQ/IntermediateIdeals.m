@@ -14,7 +14,7 @@ declare verbose IntermediateIdeals, 2;
 */
 
 
-intrinsic MinimalIntermediateIdeals(I::AlgEtIdl,J::AlgEtIdl)->SetIndx[AlgEtIdl]
+intrinsic MinimalIntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]
 {Given fractional S-ideals J subset I, returns the minimal (with respect to inclusion) fractional S-ideals K such that J subset K subset I.}
     assert2 J subset I; // "the ideal J needs to be inside I";
     S:=Order(I);
@@ -56,7 +56,7 @@ intrinsic MinimalIntermediateIdeals(I::AlgEtIdl,J::AlgEtIdl)->SetIndx[AlgEtIdl]
     end if;
 end intrinsic;
 
-intrinsic IntermediateIdeals(I::AlgEtIdl,J::AlgEtIdl)->SetIndx[AlgEtIdl]
+intrinsic IntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]
 {Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that J subset K subset I. They are produced recursively using from the minimal ones.}
     require J subset I : "The ideal J needs to be inside I";
     require Order(I) eq Order(J) : "The ideals must be over the same order";
@@ -72,7 +72,7 @@ intrinsic IntermediateIdeals(I::AlgEtIdl,J::AlgEtIdl)->SetIndx[AlgEtIdl]
     return output;
 end intrinsic;
 
-intrinsic IntermediateIdealsWithPrescribedMultiplicatorRing(I::AlgEtIdl,J::AlgEtIdl)->SetIndx[AlgEtIdl]
+intrinsic IntermediateIdealsWithPrescribedMultiplicatorRing(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]
 {Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that (K:K)=S and  J subset K subset I. They are produced recursively using from the minimal ones.}
     require J subset I : "The ideal J needs to be inside I";
     S:=Order(I);
@@ -89,7 +89,7 @@ intrinsic IntermediateIdealsWithPrescribedMultiplicatorRing(I::AlgEtIdl,J::AlgEt
     return output;
 end intrinsic;
 
-intrinsic MaximalIntermediateIdeals(I::AlgEtIdl,J::AlgEtIdl)->SetIndx[AlgEtIdl]
+intrinsic MaximalIntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]
 {Given fractional S-ideals J subset I, returns the maximal (with respect to inclusion) fractional S-ideals K such that J subset K subset I.}
     assert2 J subset I; // "the ideal J needs to be inside I";
     S:=Order(I);
@@ -127,7 +127,7 @@ intrinsic MaximalIntermediateIdeals(I::AlgEtIdl,J::AlgEtIdl)->SetIndx[AlgEtIdl]
 end intrinsic;
 
 // // Using TraceDualIdeal. Slightly slower 
-// intrinsic MaximalIntermediateIdeals(I::AlgEtIdl,J::AlgEtIdl)->SetIndx[AlgEtIdl]
+// intrinsic MaximalIntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]
 // { Given fractional S-ideals J subset I, returns the maximal (with respect to inclusion) fractional S-ideals K such that J subset K subset I. }
 //     assert2 J subset I; // "the ideal J needs to be inside I";
 //     S:=Order(I);
@@ -142,7 +142,7 @@ end intrinsic;
 //     end if;
 // end intrinsic;
 
-intrinsic IntermediateIdealsWithTrivialExtension(I::AlgEtIdl,J::AlgEtIdl, O::AlgEtOrd)->SetIndx[AlgEtIdl]
+intrinsic IntermediateIdealsWithTrivialExtension(I::AlgEtQIdl,J::AlgEtQIdl, O::AlgEtQOrd)->SetIndx[AlgEtQIdl]
 {Given fractional S-ideals J subset I, returns all the fractional S-ideals K J subset K subset I, and O!!K = I. Note that we need O subset (J:J). They are produced recursively using from the maximal ones.}
     require J subset I : "The ideal J needs to be inside I";
     S:=Order(I);
@@ -165,7 +165,7 @@ intrinsic IntermediateIdealsWithTrivialExtension(I::AlgEtIdl,J::AlgEtIdl, O::Alg
     return output;
 end intrinsic;
 
-intrinsic IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing(I::AlgEtIdl,J::AlgEtIdl, O::AlgEtOrd)->SetIndx[AlgEtIdl]
+intrinsic IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing(I::AlgEtQIdl,J::AlgEtQIdl, O::AlgEtQOrd)->SetIndx[AlgEtQIdl]
 {Given fractional S-ideals J subset I, returns all the fractional S-ideals K J subset K subset I, O!!K = I, and (K:K) eq S. Note that we need O subset (J:J). They are produced recursively using from the maximal ones.}
     require J subset I : "The ideal J needs to be inside I";
     S:=Order(I);
@@ -190,7 +190,7 @@ end intrinsic;
 
 /* // this version of the code seems to be a tiny bit slower
 
-intrinsic MinimalIntermediateIdealsVS(I::AlgEtIdl,J::AlgEtIdl : primes:=[])->SetIndx[AlgEtIdl]
+intrinsic MinimalIntermediateIdealsVS(I::AlgEtQIdl,J::AlgEtQIdl : primes:=[])->SetIndx[AlgEtQIdl]
 { Given fractional S-ideals J subset I, returns the minimal with respect to inclusion fractional S-ideals K such that J subset K subset I. }
     assert2 J subset I; // "the ideal J needs to be inside I";
     S:=Order(I);
@@ -222,7 +222,7 @@ intrinsic MinimalIntermediateIdealsVS(I::AlgEtIdl,J::AlgEtIdl : primes:=[])->Set
     end if;
 end intrinsic;
 
-intrinsic IntermediateIdealsVS(I::AlgEtIdl,J::AlgEtIdl)->SetIndx[AlgEtIdl]
+intrinsic IntermediateIdealsVS(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]
 { Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that J subset K subset I. They are produced recursively using from the minimal ones }
     S:=Order(I);
     require J subset I : "The ideal J needs to be inside I";

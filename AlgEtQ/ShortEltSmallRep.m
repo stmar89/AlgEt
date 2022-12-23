@@ -10,13 +10,13 @@ freeze;
 declare verbose ShortEltSmallRep, 2;
 import "Ord.m" : MatrixQtoA,MatrixAtoQ,MatrixAtoZ;
 
-declare attributes AlgEtIdl : ShortestElement, SmallRepresentative;
+declare attributes AlgEtQIdl : ShortestElement, SmallRepresentative;
 
 //------------
 // ShortestElement
 //------------
 
-intrinsic ShortestElement(I::AlgEtIdl) ->AlgEtElt
+intrinsic ShortestElement(I::AlgEtQIdl) ->AlgEtQElt
 {Given an ideal I returns a non-zerodivisor in I with small coefficients (in the LLL sense). This is achieved by enumerating short vectors in I, and pick the first one which is a non-zerodivisor.}
     if not assigned I`ShortestElement then
         ZBasisLLL(I);
@@ -47,7 +47,7 @@ end intrinsic;
 // SmallRepresentative
 //------------
 
-intrinsic SmallRepresentative(I::AlgEtIdl) ->AlgEtIdl,AlgEtElt
+intrinsic SmallRepresentative(I::AlgEtQIdl) ->AlgEtQIdl,AlgEtQElt
 {Given a fractional R-ideal I, it returns an isomorphic ideal a*I, and the element a, such that a*I is a subset of R, and the cardinality of R/aI is small. This is achieved by computing the ShortestElement a of (R:I). Note that if I is invertible R/aI is isomorphic to (R:I)/aR.}
     if not assigned I`SmallRepresentative then                                            
         R:=Order(I);
@@ -57,7 +57,7 @@ intrinsic SmallRepresentative(I::AlgEtIdl) ->AlgEtIdl,AlgEtElt
         // the ZBasis of aI might be very big. We make it smaller.
         ZBasisLLL(aI);
         vprintf ShortEltSmallRep,2: "SmallRepresentative:\n
-                                I = %o\n,aI = %o\n",PrintSeqAlgEtElt(ZBasis(I)),PrintSeqAlgEtElt(ZBasis(aI));
+                                I = %o\n,aI = %o\n",PrintSeqAlgEtQElt(ZBasis(I)),PrintSeqAlgEtQElt(ZBasis(aI));
         I`SmallRepresentative:=<aI,a>;
     end if;
     return Explode(I`SmallRepresentative);
@@ -67,7 +67,7 @@ end intrinsic;
 /* TESTS
     
     printf "### Testing SmallRepresentative:";
-	AttachSpec("~/packages_github/AlgEt/spec");
+	AttachSpec("~/packages_github/AlgEtQ/spec");
 	_<x>:=PolynomialRing(Integers());
     f:=(x^2+5)*(x^2+7)*(x^2+11);
     assert IsSquarefree(f);

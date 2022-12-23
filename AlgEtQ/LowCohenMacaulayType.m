@@ -10,13 +10,13 @@ freeze;
 // Reference: S. Marseglia, "Cohen-Macaulay type of orders, generators and ideal classes".
 // https://arxiv.org/abs/2206.03758
 
-declare attributes AlgEtOrd:NonGorensteinPrimes, CohenMacaulayType;
+declare attributes AlgEtQOrd:NonGorensteinPrimes, CohenMacaulayType;
 
 //------------
 // NonGorensteinPrimes
 //------------
 
-intrinsic NonGorensteinPrimes(S::AlgEtOrd)->SeqEnum,SeqEnum
+intrinsic NonGorensteinPrimes(S::AlgEtQOrd)->SeqEnum,SeqEnum
 {Given an order S it returns two sequences the first containing the primes at which S is locally not Gorenstein and the second containing the CohenMacaulay types of S at this primes, that is, the dimension of S^t/PS^t over S/P, where S^t is the TraceDualIdeal of S.}
     if not assigned S`NonGorensteinPrimes then
         if IsGorenstein(S) then
@@ -45,7 +45,7 @@ end intrinsic;
 // CohenMacaulayType
 //------------
 
-intrinsic CohenMacaulayTypeAtPrime(S::AlgEtOrd,P::AlgEtIdl)->RngIntElt
+intrinsic CohenMacaulayTypeAtPrime(S::AlgEtQOrd,P::AlgEtQIdl)->RngIntElt
 {Given an order S and a prime ideal P, it returns its Cohen-Macaulay Type at P. This integer equals the dimension of S^t/P*S^t where S^t is the trace dual of S.}
     if IsGorenstein(S) then
         return 1;
@@ -67,7 +67,7 @@ intrinsic CohenMacaulayTypeAtPrime(S::AlgEtOrd,P::AlgEtIdl)->RngIntElt
     return dP;
 end intrinsic;
 
-intrinsic CohenMacaulayType(S::AlgEtOrd)->RngIntElt
+intrinsic CohenMacaulayType(S::AlgEtQOrd)->RngIntElt
 {Given an order S returns its Cohen-Macaulay Type. This integer equals the max dimension of S^t/P*S^t where S^t is the trace dual of S and P runs over all (non-Gorenstein) primes of S.}
     if not assigned S`CohenMacaulayType then
         pp,dps:=NonGorensteinPrimes(S);
@@ -125,7 +125,7 @@ end function;
     SetAssertions(2);
     _<x>:=PolynomialRing(Integers());
     f:=x^4-10000*x^3-10000*x^2-10000*x-10000; 
-    AttachSpec("~/packages_github/AlgEt/spec");
+    AttachSpec("~/packages_github/AlgEtQ/spec");
     A:=EtaleAlgebra(f);
     E:=EquationOrder(A);
     oo:=FindOverOrders(E); // ~13 secs

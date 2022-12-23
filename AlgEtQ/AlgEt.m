@@ -7,15 +7,15 @@
 // http://www.staff.science.uu.nl/~marse004/
 /////////////////////////////////////////////////////
 
-declare verbose AlgEt, 1;
+declare verbose AlgEtQ, 1;
 
 /*TODO:
 
 */
 
-declare type AlgEt[AlgEtElt];
+declare type AlgEtQ[AlgEtQElt];
 
-declare attributes AlgEt : DefiningPolynomial, 
+declare attributes AlgEtQ : DefiningPolynomial, 
                            // ass_algebra, 
                            Dimension,
                            AbsoluteDimension,
@@ -26,19 +26,19 @@ declare attributes AlgEt : DefiningPolynomial,
                                          //the second are embeddings and the third are projections
 
 //------------
-// Creation for AlgEt
+// Creation for AlgEtQ
 //------------
 
-intrinsic EtaleAlgebra(seq::SeqEnum[FldNum[FldRat]]) -> AlgEt
+intrinsic EtaleAlgebra(seq::SeqEnum[FldNum[FldRat]]) -> AlgEtQ
 {Given a sequence of number fields returns the étale algebra corresponding to the direct product.}
-    A:=New(AlgEt);
+    A:=New(AlgEtQ);
     embs:=[ map< seq[i]->A | x:-> A! (<seq[j]!0 : j in [1..i-1]> cat <x> cat <seq[j]!0 : j in [i+1..#seq]>)  > : i in [1..#seq] ];
     projs:=[ map< A->seq[i] | y:-> Components(y)[i] > : i in [1..#seq] ];
     A`Components:=<seq,embs,projs>;
     return A;
 end intrinsic;
 
-intrinsic EtaleAlgebra(f::RngUPolElt[RngInt]) -> AlgEt
+intrinsic EtaleAlgebra(f::RngUPolElt[RngInt]) -> AlgEtQ
 {Given a squarefree polynomial over the integers returns the product of the number fields defined by the irreducible factors.}
     require IsSquarefree(f) : "The polynomial must be squarefree.";
     A:=EtaleAlgebra([NumberField(g[1]) : g in Factorization(f)]);
@@ -46,7 +46,7 @@ intrinsic EtaleAlgebra(f::RngUPolElt[RngInt]) -> AlgEt
     return A;
 end intrinsic;
 
-intrinsic EtaleAlgebra(f::RngUPolElt[FldRat]) -> AlgEt
+intrinsic EtaleAlgebra(f::RngUPolElt[FldRat]) -> AlgEtQ
 {Given a squarefree polynomial over the rationals returns the product of the number fields defined by the irreducible factors.}
     require IsSquarefree(f) : "The polynomial must be squarefree.";
     A:=EtaleAlgebra([NumberField(g[1]) : g in Factorization(f)]);
@@ -57,7 +57,7 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing Creation of Algebra:";
-    AttachSpec("~/packages_github/AlgEt/spec");
+    AttachSpec("~/packages_github/AlgEtQ/spec");
     SetAssertions(2);
     _<x>:=PolynomialRing(Integers());
     printf ".";

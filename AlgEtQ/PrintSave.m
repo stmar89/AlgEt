@@ -22,15 +22,15 @@ end function;
 // Print to string
 //------------
 
-intrinsic PrintSeqAlgEtElt(seq::SeqEnum[AlgEtElt]) -> SeqEnum,MonStgElt
-{Given a sequence of elements of an AlgEt, returns a sequence of tuples of sequence of integers that can be coerced into the original algebra to obtain the input sequece. As a second output it reuturns a string that can be printed to file.}
+intrinsic PrintSeqAlgEtQElt(seq::SeqEnum[AlgEtQElt]) -> SeqEnum,MonStgElt
+{Given a sequence of elements of an AlgEtQ, returns a sequence of tuples of sequence of integers that can be coerced into the original algebra to obtain the input sequece. As a second output it reuturns a string that can be printed to file.}
     seq:=[ < Eltseq(c) : c in Components(elt) > : elt in seq ];
     str:=RemoveBlanks(Sprint(seq));
     return seq,str;
 end intrinsic;
 
-intrinsic PrintWKICM(R::AlgEtOrd) -> MonStgElt
-{Given an order R in an AlgEt, it returns a string that contains the weak equivalence classes of R, sorted by multiplicator ring. In particular, the overorders of R can be recovered fro this string. Such string can be easily printed to file. To load the string, after using Read() on the file, use the intrinsic LoadWKICM.}
+intrinsic PrintWKICM(R::AlgEtQOrd) -> MonStgElt
+{Given an order R in an AlgEtQ, it returns a string that contains the weak equivalence classes of R, sorted by multiplicator ring. In particular, the overorders of R can be recovered fro this string. Such string can be easily printed to file. To load the string, after using Read() on the file, use the intrinsic LoadWKICM.}
     str:="<\n";
     A:=Algebra(R);
     nf:=Components(A);
@@ -64,7 +64,7 @@ intrinsic PrintWKICM(R::AlgEtOrd) -> MonStgElt
         // produce the string
         str cat:="<\n";
         for iI->I in wkS do
-            _,strI:=PrintSeqAlgEtElt(ZBasis(I));
+            _,strI:=PrintSeqAlgEtQElt(ZBasis(I));
             if iI ne #wkS then
                 str cat:=strI cat ",\n";
             else
@@ -81,7 +81,7 @@ intrinsic PrintWKICM(R::AlgEtOrd) -> MonStgElt
     return str;
 end intrinsic;
 
-intrinsic LoadWKICM(str::MonStgElt) -> AlgEtOrd
+intrinsic LoadWKICM(str::MonStgElt) -> AlgEtQOrd
 {Given a string produced with PrintWKICM it returns the corresponding order R. In the attributes of R, its algebra and its overorders one can find the weak equivalence classes. This can be recovered with the approriate intrinsics.}
 
     data:=eval(str);
@@ -140,15 +140,15 @@ end intrinsic;
 /* TESTS
     
     printf "### Testing Print Saving:";
-    AttachSpec("~/packages_github/AlgEt/spec");
+    AttachSpec("~/packages_github/AlgEtQ/spec");
     _<x>:=PolynomialRing(Integers());
     f:=x^6 - 3*x^5 - 3*x^4 + 65*x^3 - 48*x^2 - 768*x + 4096;
     A:=EtaleAlgebra(f);
     E:=EquationOrder(A);
-    seq,str:=PrintSeqAlgEtElt(ZBasis(E));
+    seq,str:=PrintSeqAlgEtQElt(ZBasis(E));
     assert Order([ A! s : s in eval(str)]) eq E;
 
-    AttachSpec("~/packages_github/AlgEt/spec");
+    AttachSpec("~/packages_github/AlgEtQ/spec");
     _<x>:=PolynomialRing(Integers());
     f:=x^8+16;
     A:=EtaleAlgebra(f);
@@ -156,7 +156,7 @@ end intrinsic;
     time str:=PrintWKICM(O);
     time O1:=LoadWKICM(str);
 
-    AttachSpec("~/packages_github/AlgEt/spec");
+    AttachSpec("~/packages_github/AlgEtQ/spec");
     _<x>:=PolynomialRing(Integers());
     f:=x^8+16;
     A:=EtaleAlgebra(f);

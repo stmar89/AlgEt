@@ -8,10 +8,10 @@
 // http://www.staff.science.uu.nl/~marse004/
 /////////////////////////////////////////////////////
 
-declare attributes AlgEtOrd:ICM,
+declare attributes AlgEtQOrd:ICM,
                             ICM_bar;
 
-intrinsic ICM_bar(S::AlgEtOrd : GRH:=false ) -> SeqEnum
+intrinsic ICM_bar(S::AlgEtQOrd : GRH:=false ) -> SeqEnum
 {returns the ideal classes of the order S having S as MultiplicatorRing, that is the orbits of the action of PicardGroup(S) on WKICM_bar(S).}
     if not assigned S`ICM_bar then
         seqWKS_bar:=WKICM_bar(S);
@@ -28,7 +28,7 @@ intrinsic ICM_bar(S::AlgEtOrd : GRH:=false ) -> SeqEnum
     return S`ICM_bar;
 end intrinsic;
 
-intrinsic ICM(S::AlgEtOrd : GRH:=false ) -> SeqEnum
+intrinsic ICM(S::AlgEtQOrd : GRH:=false ) -> SeqEnum
 {returns the ideal class monoid of the order, that is a set of representatives for the isomorphism classes of the fractiona ideals.}
     if not assigned S`ICM then
         seqOO:=FindOverOrders(S);

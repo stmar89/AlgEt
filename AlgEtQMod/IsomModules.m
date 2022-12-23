@@ -21,11 +21,11 @@ declare verbose IsomModules, 2;
 // Isomorphism Testing for modules
 //------------
 
-intrinsic IsIsomorphic(I::AlgEtMod,J::AlgEtMod : Method:="Magma") -> BoolElt
+intrinsic IsIsomorphic(I::AlgEtQMod,J::AlgEtQMod : Method:="Magma") -> BoolElt
 {Given two modules I and J returns wheater they are isomorphic.
 The vararg Method allows to choose if the isomorphism testing is done with "Magma", very slow, or with the Hecke/Nemo package for julia, which is much faster.
 In the latter case, the Method should be of the form
-"julia path/to/AlgEt/", or if Hecke/Nemo has been built,"julia -J /tmp/Hecke.so ~/path/to/AlgEt/" (the ".so" might be different according to your SO. See the documentation of Hecke.Build()).}
+"julia path/to/AlgEtQ/", or if Hecke/Nemo has been built,"julia -J /tmp/Hecke.so ~/path/to/AlgEtQ/" (the ".so" might be different according to your SO. See the documentation of Hecke.Build()).}
     require Method eq "Magma" or Method[1..5] eq "julia" : "Method should be Magma or julia or a string of julia command";
     V,m:=UniverseAlgebra(I);
     VJ,mJ:=UniverseAlgebra(I);
@@ -68,10 +68,10 @@ end intrinsic;
 // Isomorphism Classes for modules
 //------------
 
-intrinsic IsomorphismClasses(R::AlgEtOrd,m::Map : Method:="Magma") -> SeqEnum[AlgEtMod]
-{Given an order R in some AlgEt K, where K acts on some V, by m:K->V, returns representatives of hte isomorphism classes of the S-module lattices in V.
+intrinsic IsomorphismClasses(R::AlgEtQOrd,m::Map : Method:="Magma") -> SeqEnum[AlgEtQMod]
+{Given an order R in some AlgEtQ K, where K acts on some V, by m:K->V, returns representatives of hte isomorphism classes of the S-module lattices in V.
 The vararg Method allows to choose if the isomorphism testing is done with "Magma", very slow, or with the Hecke/Nemo package for julia, which is much faster.
-In the latter case, the Method should be of the form "julia path/to/AlgEt/", or if Hecke/Nemo has been built,"julia -J /tmp/Hecke.so ~/path/to/AlgEt/" (the ".so" might be different according to your SO. See the documentation of Hecke.Build()).}
+In the latter case, the Method should be of the form "julia path/to/AlgEtQ/", or if Hecke/Nemo has been built,"julia -J /tmp/Hecke.so ~/path/to/AlgEtQ/" (the ".so" might be different according to your SO. See the documentation of Hecke.Build()).}
     require Method eq "Magma" or Method[1..5] eq "julia" : "Method should be Magma or julia or a string of julia command";
     V:=Codomain(m);
     K:=Domain(m);
@@ -157,10 +157,10 @@ In the latter case, the Method should be of the form "julia path/to/AlgEt/", or 
 end intrinsic;
 
 // OLD VERSION, where we produce the candidates for each Steinitz decomposition.
-// intrinsic IsomorphismClasses(R::AlgEtOrd,m::Map : Method:="Magma") -> SeqEnum[AlgEtMod]
-// {Given an order R in some AlgEt K, where K acts on some V, by m:K->V, returns representatives of hte isomorphism classes of the S-module lattices in V.
+// intrinsic IsomorphismClasses(R::AlgEtQOrd,m::Map : Method:="Magma") -> SeqEnum[AlgEtQMod]
+// {Given an order R in some AlgEtQ K, where K acts on some V, by m:K->V, returns representatives of hte isomorphism classes of the S-module lattices in V.
 // The vararg Method allows to choose if the isomorphism testing is done with "Magma", very slow, or with the Hecke/Nemo package for julia, which is much faster.
-// In the latter case, the Method should be of the form "julia path/to/AlgEt/", or if Hecke/Nemo has been built,"julia -J /tmp/Hecke.so ~/path/to/AlgEt/" (the ".so" might be different according to your SO. See the documentation of Hecke.Build()).}
+// In the latter case, the Method should be of the form "julia path/to/AlgEtQ/", or if Hecke/Nemo has been built,"julia -J /tmp/Hecke.so ~/path/to/AlgEtQ/" (the ".so" might be different according to your SO. See the documentation of Hecke.Build()).}
 //     require Method eq "Magma" or Method[1..5] eq "julia" : "Method should be Magma or julia or a string of julia command";
 //     V:=Codomain(m);
 //     K:=Domain(m);
@@ -246,10 +246,10 @@ end intrinsic;
     // Fast Tests
     // ##########
 
-    AttachSpec("~/packages_github/AlgEt/spec");
-    Attach("~/packages_github/AlgEt/Modules.m");
-    Attach("~/packages_github/AlgEt/IntermediateModules.m");
-    Attach("~/packages_github/AlgEt/IsomModules.m");
+    AttachSpec("~/packages_github/AlgEtQ/spec");
+    Attach("~/packages_github/AlgEtQ/Modules.m");
+    Attach("~/packages_github/AlgEtQ/IntermediateModules.m");
+    Attach("~/packages_github/AlgEtQ/IsomModules.m");
     SetVerbose("IsomModules",1);
     _<x>:=PolynomialRing(Integers()); 
     g:=x^2+5;
@@ -261,14 +261,14 @@ end intrinsic;
     time icm:=ICM(R);
     time classes:=IsomorphismClasses(R,m : Method:="Magma");
     assert #classes eq #icm; // Since R is Bass, the ICM is Pic(R) cup Pic(O)
-    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/"); // this is the ICM
+    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEtQ/"); // this is the ICM
     assert #classes eq #icm; // Since R is Bass, the ICM is Pic(R) cup Pic(O)
 
     // Pic(O) is non trivial
-    AttachSpec("~/packages_github/AlgEt/spec");
-    Attach("~/packages_github/AlgEt/Modules.m");
-    Attach("~/packages_github/AlgEt/IntermediateModules.m");
-    Attach("~/packages_github/AlgEt/IsomModules.m");
+    AttachSpec("~/packages_github/AlgEtQ/spec");
+    Attach("~/packages_github/AlgEtQ/Modules.m");
+    Attach("~/packages_github/AlgEtQ/IntermediateModules.m");
+    Attach("~/packages_github/AlgEtQ/IsomModules.m");
     SetVerbose("IsomModules",1);
     _<x>:=PolynomialRing(Integers()); 
     g:=x^2+15;
@@ -278,7 +278,7 @@ end intrinsic;
     R:=Order([pi]);
     m:=NaturalAction(K,K);
     time classes:=IsomorphismClasses(R,m : Method:="Magma");
-    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/"); // this is the ICM
+    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEtQ/"); // this is the ICM
     time icm:=ICM(R);
     assert #classes eq #icm; // Since R is Bass, the ICM is Pic(R) cup Pic(O)
     // V = K^2
@@ -286,13 +286,13 @@ end intrinsic;
     m:=NaturalAction(K,V);
     time classes:=IsomorphismClasses(R,m : Method:="Magma");
     assert #classes eq 6; // because R is Bass 
-    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/");
+    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEtQ/");
     assert #classes eq 6; // because R is Bass 
 
-    AttachSpec("~/packages_github/AlgEt/spec");
-    Attach("~/packages_github/AlgEt/Modules.m");
-    Attach("~/packages_github/AlgEt/IntermediateModules.m");
-    Attach("~/packages_github/AlgEt/IsomModules.m");
+    AttachSpec("~/packages_github/AlgEtQ/spec");
+    Attach("~/packages_github/AlgEtQ/Modules.m");
+    Attach("~/packages_github/AlgEtQ/IntermediateModules.m");
+    Attach("~/packages_github/AlgEtQ/IsomModules.m");
     SetVerbose("IsomModules",1);
     _<x>:=PolynomialRing(Integers());
     SetVerbose("IsomModules",2);
@@ -309,14 +309,14 @@ end intrinsic;
     O:=MaximalOrder(K);
     V:=EtaleAlgebra([K1,K1,K2]); // V = K1^s1 x K2^s2
     m:=NaturalAction(K,V); // m:K -> V component-wise diagonal action of K on V
-    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/"); // changes this line accordingly to wheter you have used Hecke.Build() or not,
-                                                                                                       // and to the appriopriate path to the the packages AlgEt
+    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEtQ/"); // changes this line accordingly to wheter you have used Hecke.Build() or not,
+                                                                                                       // and to the appriopriate path to the the packages AlgEtQ
     assert #classes eq 4;
 
-    AttachSpec("~/packages_github/AlgEt/spec");
-    Attach("~/packages_github/AlgEt/Modules.m");
-    Attach("~/packages_github/AlgEt/IntermediateModules.m");
-    Attach("~/packages_github/AlgEt/IsomModules.m");
+    AttachSpec("~/packages_github/AlgEtQ/spec");
+    Attach("~/packages_github/AlgEtQ/Modules.m");
+    Attach("~/packages_github/AlgEtQ/IntermediateModules.m");
+    Attach("~/packages_github/AlgEtQ/IsomModules.m");
     SetVerbose("IsomModules",1);
     _<x>:=PolynomialRing(Integers()); 
     g:=x^6-x^5+2*x^4-2*x^3+4*x^2-4*x+8;
@@ -328,7 +328,7 @@ end intrinsic;
     O:=MaximalOrder(K);
     assert IsBass(R);
     m:=NaturalAction(K,K);
-    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/"); // this is the ICM
+    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEtQ/"); // this is the ICM
     time icm:=ICM(R);
     assert #classes eq #icm; // Since R is Bass, the ICM is Pic(R) cup Pic(O)
 
@@ -337,10 +337,10 @@ end intrinsic;
     // #########
 
     // Pic(O) is non triviali. Class construction is rther fast, isomorphism sieveng requires ~10000 secs using julia.
-    AttachSpec("~/packages_github/AlgEt/spec");
-    Attach("~/packages_github/AlgEt/Modules.m");
-    Attach("~/packages_github/AlgEt/IntermediateModules.m");
-    Attach("~/packages_github/AlgEt/IsomModules.m");
+    AttachSpec("~/packages_github/AlgEtQ/spec");
+    Attach("~/packages_github/AlgEtQ/Modules.m");
+    Attach("~/packages_github/AlgEtQ/IntermediateModules.m");
+    Attach("~/packages_github/AlgEtQ/IsomModules.m");
     SetVerbose("IsomModules",1);
     _<x>:=PolynomialRing(Integers()); 
     g:=x^2+15;
@@ -354,13 +354,13 @@ end intrinsic;
     m:=NaturalAction(K,V);
     //time classes:=IsomorphismClasses(R,m : Method:="Magma"); // 800 secs. Faster than expected.
     //assert #classes eq 8; // because R is Bass. Note that the Magma method is bugged.
-    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/");
+    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEtQ/");
     assert #classes eq 8; // because R is Bass 
 
-    AttachSpec("~/packages_github/AlgEt/spec");
-    Attach("~/packages_github/AlgEt/Modules.m");
-    Attach("~/packages_github/AlgEt/IntermediateModules.m");
-    Attach("~/packages_github/AlgEt/IsomModules.m");
+    AttachSpec("~/packages_github/AlgEtQ/spec");
+    Attach("~/packages_github/AlgEtQ/Modules.m");
+    Attach("~/packages_github/AlgEtQ/IntermediateModules.m");
+    Attach("~/packages_github/AlgEtQ/IsomModules.m");
     SetVerbose("IsomModules",1);
     _<x>:=PolynomialRing(Integers()); 
     g:=x^6-x^5+2*x^4-2*x^3+4*x^2-4*x+8;
@@ -373,7 +373,7 @@ end intrinsic;
     // V = K^3
     V:=EtaleAlgebra(&cat[nf : i in [1..3]]);
     m:=NaturalAction(K,V);
-    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/");
+    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEtQ/");
     assert #classes eq 6; // Example 6.1 in "Computing abelian varieties over finite fields isogenous to a power", by Marseglia
 
 */

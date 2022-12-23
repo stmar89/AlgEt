@@ -21,10 +21,10 @@ declare verbose OverOrders,3;
 
 import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQtoA , meet_zbasis , inclusion_matrix;
 
-declare attributes AlgEtOrd : MinimalOverOrders,
+declare attributes AlgEtQOrd : MinimalOverOrders,
                               OverOrders;
 
-intrinsic MinimalOverOrders(R::AlgEtOrd : singular_primes := [], orders := {@ @}) -> SetIndx[AlgEtOrd]
+intrinsic MinimalOverOrders(R::AlgEtQOrd : singular_primes := [], orders := {@ @}) -> SetIndx[AlgEtQOrd]
 {Returns the minimal over orders of R given the singular primes of R. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.}
 if not assigned R`MinimalOverOrders then
     min_oo := { };
@@ -104,7 +104,7 @@ if not assigned R`MinimalOverOrders then
 end intrinsic;
 
 
-intrinsic FindOverOrders_Minimal(R::AlgEtOrd) -> SetIndx[AlgEtOrd]
+intrinsic FindOverOrders_Minimal(R::AlgEtQOrd) -> SetIndx[AlgEtQOrd]
 {Given an order R returns all the over orders by a recursive search of the minimal overordes. Based on "On the computations of overorders" by TommyHofmann and Carlo Sircana.}
     A := Algebra(R);
     singular_primes := PrimesAbove(MaximalOrder(A)!!Conductor(R));
@@ -140,7 +140,7 @@ intrinsic FindOverOrders_Minimal(R::AlgEtOrd) -> SetIndx[AlgEtOrd]
 end intrinsic;
 
 
-intrinsic FindOverOrders(E::AlgEtOrd:  populateoo_in_oo := false) -> SetIndx[AlgEtOrd]
+intrinsic FindOverOrders(E::AlgEtQOrd:  populateoo_in_oo := false) -> SetIndx[AlgEtQOrd]
 {Returns all the overorders of E. The boolean VarArg populateoo_in_oo determines whether to populate the attribute OverOrders of each overorder of E.}
   if not assigned E`OverOrders then
       E`OverOrders := FindOverOrders_Minimal(E);
@@ -162,7 +162,7 @@ end intrinsic;
 /*
 // for this one, I need Driscriminant and AritmeticRadical
 
-intrinsic pMaximalOrder(O::AlgEtOrd, p::RngIntElt) -> AlgEtOrd
+intrinsic pMaximalOrder(O::AlgEtQOrd, p::RngIntElt) -> AlgEtQOrd
 {given O, retuns the maximal p over order}
   if (Abs(Integers() ! Discriminant(O)) mod p^2) ne 0 then
     return O;
@@ -183,7 +183,7 @@ end intrinsic;
 /* TESTS
 
     printf "### OverOrders:";
-	  AttachSpec("~/packages_github/AlgEt/spec");
+	  AttachSpec("~/packages_github/AlgEtQ/spec");
 
     SetVerbose("OverOrders",1);
     SetAssertions(1);

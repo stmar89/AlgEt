@@ -9,8 +9,8 @@ freeze;
 
 declare verbose CRT, 2;
 
-declare attributes AlgEtOrd : CRT_data;
-declare attributes AlgEtIdl : CRT_data;
+declare attributes AlgEtQOrd : CRT_data;
+declare attributes AlgEtQIdl : CRT_data;
 
 import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQtoA , meet_zbasis ;
 
@@ -33,7 +33,7 @@ CRT_data_ideal:=function(I)
      return I`CRT_data;
 end function;
 
-intrinsic ChineseRemainderTheorem(Is::SeqEnum[AlgEtIdl],as::SeqEnum[AlgEtElt])-> AlgEtElt
+intrinsic ChineseRemainderTheorem(Is::SeqEnum[AlgEtQIdl],as::SeqEnum[AlgEtQElt])-> AlgEtQElt
 {Given a sequence Is of coprime ideals of S, and a sequence as of elements of S, it returns an element e such that e-as[i] in Is[i] for every i.}
     N:=#as;
     S:=Order(Is[1]);
@@ -70,12 +70,12 @@ intrinsic ChineseRemainderTheorem(Is::SeqEnum[AlgEtIdl],as::SeqEnum[AlgEtElt])->
     e:=SumOfProducts(cs,ashat);
     assert2 &+cs eq One(Algebra(S));
     assert2 forall{ cs : i in [1..N] | cs[i] in Is[i] };
-    vprintf CRT,2 : "e := %o;\n",PrintSeqAlgEtElt([e])[1];
+    vprintf CRT,2 : "e := %o;\n",PrintSeqAlgEtQElt([e])[1];
     assert forall{ i : i in [1..N] | e-as[i] in Is[i]};
     return e;
 end intrinsic;
 
-intrinsic ChineseRemainderTheorem(I::AlgEtIdl,J::AlgEtIdl,a::AlgEtElt,b::AlgEtElt)-> AlgEtElt
+intrinsic ChineseRemainderTheorem(I::AlgEtQIdl,J::AlgEtQIdl,a::AlgEtQElt,b::AlgEtQElt)-> AlgEtQElt
 {Given two coprime ideals I and J of S, two elements a,b in S, finds e such that (e-a) in I and (e-b) in J.}
     return ChineseRemainderTheorem([I,J],[a,b]);
 end intrinsic;
@@ -83,7 +83,7 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing CRT:";
-    AttachSpec("~/packages_github/AlgEt/spec");
+    AttachSpec("~/packages_github/AlgEtQ/spec");
     SetVerbose("CRT",1);
     SetAssertions(2);
 

@@ -7,15 +7,15 @@
 // http://www.staff.science.uu.nl/~marse004/
 /////////////////////////////////////////////////////
 
-declare verbose AlgEt, 1;
+declare verbose AlgEtNF, 1;
 
 /*TODO:
 
 */
 
-declare type AlgEt[AlgEtElt];
+declare type AlgEtNF[AlgEtNFElt];
 
-declare attributes AlgEt : DefiningPolynomial, 
+declare attributes AlgEtNF : DefiningPolynomial, 
                            // ass_algebra, 
                            Dimension,
                            AbsoluteDimension,
@@ -26,19 +26,19 @@ declare attributes AlgEt : DefiningPolynomial,
                                          //the second are embeddings and the third are projections
 
 //------------
-// Creation for AlgEt
+// Creation for AlgEtNF
 //------------
 
-intrinsic EtaleAlgebra(seq::SeqEnum[FldNum[FldNum]]) -> AlgEt
+intrinsic EtaleAlgebra(seq::SeqEnum[FldNum[FldNum]]) -> AlgEtNF
 {Given a sequence of number fields returns the étale algebra corresponding to the direct product.}
-    A:=New(AlgEt);
+    A:=New(AlgEtNF);
     embs:=[ map< seq[i]->A | x:-> A! (<seq[j]!0 : j in [1..i-1]> cat <x> cat <seq[j]!0 : j in [i+1..#seq]>)  > : i in [1..#seq] ];
     projs:=[ map< A->seq[i] | y:-> Components(y)[i] > : i in [1..#seq] ];
     A`Components:=<seq,embs,projs>;
     return A;
 end intrinsic;
 
-intrinsic EtaleAlgebra(f::RngUPolElt[FldNum]) -> AlgEt
+intrinsic EtaleAlgebra(f::RngUPolElt[FldNum]) -> AlgEtNF
 {Given a squarefree polynomial over the integers returns the product of the number fields defined by the irreducible factors.}
     require IsSquarefree(f) : "The polynomial must be squarefree.";
     A:=EtaleAlgebra([NumberField(g[1]) : g in Factorization(f)]);
@@ -46,7 +46,7 @@ intrinsic EtaleAlgebra(f::RngUPolElt[FldNum]) -> AlgEt
     return A;
 end intrinsic;
 
-intrinsic EtaleAlgebra(f::RngUPolElt[FldNum]) -> AlgEt
+intrinsic EtaleAlgebra(f::RngUPolElt[FldNum]) -> AlgEtNF
 {Given a squarefree polynomial over the rationals returns the product of the number fields defined by the irreducible factors.}
     require IsSquarefree(f) : "The polynomial must be squarefree.";
     A:=EtaleAlgebra([NumberField(g[1]) : g in Factorization(f)]);
@@ -183,7 +183,7 @@ end intrinsic;
     repeat 
         E:=Order( [Random(O) : i in [1..3]] );
     until not IsMaximal(E);
-    // _:=IsGorenstein(E); // This triggers an ERROR since TraceDualIdeal is implemented only for AlgEt over Q.
+    // _:=IsGorenstein(E); // This triggers an ERROR since TraceDualIdeal is implemented only for AlgEtNF over Q.
     _:=IsBass(E);
     _:=PrimesAbove(Conductor(E));
 

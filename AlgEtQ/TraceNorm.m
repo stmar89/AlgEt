@@ -7,7 +7,7 @@
 // http://www.staff.science.uu.nl/~marse004/
 /////////////////////////////////////////////////////
 
-declare verbose AlgEtTraceNorm, 3;
+declare verbose AlgEtQTraceNorm, 3;
 
 /*TODO:
 
@@ -19,24 +19,24 @@ import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQ
 // Trace and Norm
 //------------
 
-intrinsic Trace(x::AlgEtElt) -> Any
+intrinsic Trace(x::AlgEtQElt) -> Any
 {Returns the trace of the element x of an étale algebra.}
     require HasBaseField(Algebra(x)) : "The numeber fields are not all defined over the same BaseField.";
     return &+[Trace(y) : y in Components(x)];
 end intrinsic;
 
-intrinsic Norm(x::AlgEtElt) -> Any
+intrinsic Norm(x::AlgEtQElt) -> Any
 {Returns the norm of the element x of an étale algebra.}
     require HasBaseField(Algebra(x)) : "The numeber fields are not all defined over the same BaseField.";
     return &*[Norm(y) : y in Components(x)];
 end intrinsic;
 
-intrinsic AbsoluteTrace(x::AlgEtElt) -> Any
+intrinsic AbsoluteTrace(x::AlgEtQElt) -> Any
 {Returns the absolute trace of the element x of an étale algebra.}
     return &+[AbsoluteTrace(y) : y in Components(x)];
 end intrinsic;
 
-intrinsic AbsoluteNorm(x::AlgEtElt) -> Any
+intrinsic AbsoluteNorm(x::AlgEtQElt) -> Any
 {Returns the absolute norm of the element x of an étale algebra.}
     return &*[AbsoluteNorm(y) : y in Components(x)];
 end intrinsic;
@@ -46,7 +46,7 @@ end intrinsic;
 // Trace dual ideal
 //------------
 
-intrinsic TraceDualIdeal(I::AlgEtIdl) -> AlgEtIdl
+intrinsic TraceDualIdeal(I::AlgEtQIdl) -> AlgEtQIdl
 {Returns the trace dual ideal of an ideal in an order in an etale algebra.}
     if not assigned I`TraceDualIdeal then
         A:=Algebra(I);
@@ -74,7 +74,7 @@ intrinsic TraceDualIdeal(I::AlgEtIdl) -> AlgEtIdl
     return I`TraceDualIdeal;
 end intrinsic;
 
-intrinsic TraceDualIdeal(O::AlgEtOrd) -> AlgEtIdl
+intrinsic TraceDualIdeal(O::AlgEtQOrd) -> AlgEtQIdl
 {Returns the trace dual ideal of an order in an etale algebra.}
     if not assigned O`TraceDualIdeal then
         Ot:=TraceDualIdeal(OneIdeal(O));
@@ -86,8 +86,8 @@ end intrinsic;
 /* TEST
 
     printf "### Testing Trace and Norm:";
-    AttachSpec("~/packages_github/AlgEt/spec");
-    SetVerbose("AlgEtTraceNorm",1);
+    AttachSpec("~/packages_github/AlgEtQ/spec");
+    SetVerbose("AlgEtQTraceNorm",1);
 
     _<x>:=PolynomialRing(Integers());
     f:=(x^8+16)*(x^8+81);

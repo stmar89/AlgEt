@@ -13,7 +13,7 @@ declare verbose IntermediateModules, 2;
 
 */
 
-intrinsic MinimalIntermediateModules(I::AlgEtMod,J::AlgEtMod)->SetIndx[AlgEtMod]
+intrinsic MinimalIntermediateModules(I::AlgEtQMod,J::AlgEtQMod)->SetIndx[AlgEtQMod]
 { Given S-modules J subset I, returns the minimal (with respect to inclusion) S-modules M such that J subset M subset I. }
     assert2 J subset I; // "the ideal J needs to be inside I";
     S:=Order(I);
@@ -55,7 +55,7 @@ intrinsic MinimalIntermediateModules(I::AlgEtMod,J::AlgEtMod)->SetIndx[AlgEtMod]
     end if;
 end intrinsic;
 
-intrinsic IntermediateModules(I::AlgEtMod,J::AlgEtMod)->SetIndx[AlgEtMod]
+intrinsic IntermediateModules(I::AlgEtQMod,J::AlgEtQMod)->SetIndx[AlgEtQMod]
 { Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that J subset K subset I. They are produced recursively using from the minimal ones }
     V,m:=UniverseAlgebra(I);
     VJ,mJ:=UniverseAlgebra(I);
@@ -74,7 +74,7 @@ intrinsic IntermediateModules(I::AlgEtMod,J::AlgEtMod)->SetIndx[AlgEtMod]
     return output;
 end intrinsic;
 
-intrinsic MaximalIntermediateModules(I::AlgEtMod,J::AlgEtMod)->SetIndx[AlgEtMod]
+intrinsic MaximalIntermediateModules(I::AlgEtQMod,J::AlgEtQMod)->SetIndx[AlgEtQMod]
 { Given S-modules J subset I, returns the maximal (with respect to inclusion) S-modules K such that J subset K subset I. }
     assert2 J subset I; // "the ideal J needs to be inside I";
     S:=Order(I);
@@ -112,7 +112,7 @@ intrinsic MaximalIntermediateModules(I::AlgEtMod,J::AlgEtMod)->SetIndx[AlgEtMod]
     end if;
 end intrinsic;
 
-intrinsic IntermediateModulesWithTrivialExtension(I::AlgEtMod,J::AlgEtMod,O::AlgEtOrd)->SetIndx[AlgEtMod]
+intrinsic IntermediateModulesWithTrivialExtension(I::AlgEtQMod,J::AlgEtQMod,O::AlgEtQOrd)->SetIndx[AlgEtQMod]
 { Given S-modules J subset I, and overorder O of S, it returns all the S-modules N such that J subset N subset I and NO=I. Note: we need O!!I eq I.
   They are produced recursively using from the maximal ones }
     V,m:=UniverseAlgebra(I);
@@ -139,7 +139,7 @@ intrinsic IntermediateModulesWithTrivialExtension(I::AlgEtMod,J::AlgEtMod,O::Alg
 end intrinsic;
 
 /* CONTINUE FROM HERE
-intrinsic IntermediateIdealsWithPrescribedMultiplicatorRing(I::AlgEtIdl,J::AlgEtIdl)->SetIndx[AlgEtIdl]
+intrinsic IntermediateIdealsWithPrescribedMultiplicatorRing(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]
 { Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that (K:K)=S and  J subset K subset I. 
   They are produced recursively using from the minimal ones }
     require J subset I : "The ideal J needs to be inside I";
@@ -161,9 +161,9 @@ end intrinsic;
 
 /* TEST
 
-    AttachSpec("~/packages_github/AlgEt/spec");
-    Attach("~/packages_github/AlgEt/Modules.m");
-    Attach("~/packages_github/AlgEt/IntermediateModules.m");
+    AttachSpec("~/packages_github/AlgEtQ/spec");
+    Attach("~/packages_github/AlgEtQ/Modules.m");
+    Attach("~/packages_github/AlgEtQ/IntermediateModules.m");
     _<x>:=PolynomialRing(Integers());
     m1:=x^4 - 2*x^2 + 9;
     m2:=x^2 -5*x + 7;
@@ -203,10 +203,10 @@ end intrinsic;
     assert #l2 eq #l3;
 
     // a much bigger test!
-    AttachSpec("~/packages_github/AlgEt/spec");
-    Attach("~/packages_github/AlgEt/Modules.m");
-    Attach("~/packages_github/AlgEt/IntermediateModules.m");
-    Attach("~/packages_github/AlgEt/IsomModules.m");
+    AttachSpec("~/packages_github/AlgEtQ/spec");
+    Attach("~/packages_github/AlgEtQ/Modules.m");
+    Attach("~/packages_github/AlgEtQ/IntermediateModules.m");
+    Attach("~/packages_github/AlgEtQ/IsomModules.m");
     _<x>:=PolynomialRing(Integers()); 
     h:=x^8 - 4*x^6 + 22*x^4 - 36*x^2 + 81;
     q:=Integers() ! Truncate( ConstantCoefficient(h)^(2/Degree(h)) );

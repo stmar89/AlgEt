@@ -10,12 +10,12 @@
 
 declare verbose WkClasses, 3;
 
-declare attributes AlgEtOrd:WKICM,
+declare attributes AlgEtQOrd:WKICM,
                             WKICM_bar;
 
 import "LowCohenMacaulayType.m" : wkicm_bar_CM_type2;
 
-intrinsic WKICM_bar(S::AlgEtOrd : Method:="Auto") -> SeqEnum
+intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum
 {Returns all the weak eq classes I, such that (I:I)=S. The VarArg Method (default "Auto") determines if we should use the "IntermediateIdeals" routine or the "LowIndexProcess", which is potentially much slower but more memory efficient.}
     if not assigned S`WKICM_bar then
         if IsGorenstein(S) then
@@ -101,7 +101,7 @@ intrinsic WKICM_bar(S::AlgEtOrd : Method:="Auto") -> SeqEnum
     return S`WKICM_bar;
 end intrinsic;
 
-intrinsic WKICM(E::AlgEtOrd : Method:="Auto")->SeqEnum
+intrinsic WKICM(E::AlgEtQOrd : Method:="Auto")->SeqEnum
 {Computes the Weak equivalence class monoid of E. The VarArg Method (default "Auto") determines if we should use the "IntermediateIdeals" routine or the "LowIndexProcess", which is potentially much slower but more memory efficient.}
     if not assigned E`WKICM then
         require Method in {"Auto","LowIndexProcess","IntermediateIdeals"} : "The VarArg parameter Method is assigned to a not avaialble value";
@@ -118,7 +118,7 @@ end intrinsic;
 /*TEST
 
     printf "### Testing WKICM:";
-	AttachSpec("~/packages_github/AlgEt/spec");
+	AttachSpec("~/packages_github/AlgEtQ/spec");
 	SetAssertions(2);
 	_<x>:=PolynomialRing(Integers());
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;

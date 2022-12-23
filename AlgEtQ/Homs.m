@@ -7,15 +7,15 @@ freeze;
 // http://www.staff.science.uu.nl/~marse004/
 /////////////////////////////////////////////////////
 
-declare verbose AlgEtHoms, 1;
+declare verbose AlgEtQHoms, 1;
 
-declare attributes AlgEt : HomsToC;
+declare attributes AlgEtQ : HomsToC;
 
 //------------
 // Homomorphism to the Compelx Numbers
 //------------
 
-intrinsic HomsToC(A::AlgEt : Precision:=30)->SeqEnum[Map]
+intrinsic HomsToC(A::AlgEtQ : Precision:=30)->SeqEnum[Map]
 {returns Hom(A,\C) as a sequence of maps. The precision of \C is given by the optional parameter "Precision". Default value is 30}
     if not assigned A`HomsToC then
         require Type(PrimeField(A)) eq  FldRat : "The algebra needs to be over Q";
@@ -32,7 +32,7 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing Homs:";
-    AttachSpec("~/packages_github/AlgEt/spec");
+    AttachSpec("~/packages_github/AlgEtQ/spec");
     _<x>:=PolynomialRing(Integers());
     f:=(x^8+16)*(x^8+81);
     A:=EtaleAlgebra(f);

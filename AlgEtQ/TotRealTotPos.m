@@ -8,20 +8,20 @@ freeze;
 // http://www.staff.science.uu.nl/~marse004/
 /////////////////////////////////////////////////////
 
-    declare attributes AlgEt:TotallyRealSubAlgebra;
-    declare attributes AlgEtOrd:TotallyRealUnitGroup;
-    declare attributes AlgEtOrd:TotallyRealPositiveUnitGroup;
+    declare attributes AlgEtQ:TotallyRealSubAlgebra;
+    declare attributes AlgEtQOrd:TotallyRealUnitGroup;
+    declare attributes AlgEtQOrd:TotallyRealPositiveUnitGroup;
 
 //////////////////////////
 // IsTotallyReal, IsTotallyRealPositive
 //////////////////////////
 
-    intrinsic IsTotallyReal(a::AlgEtElt) -> BoolElt
+    intrinsic IsTotallyReal(a::AlgEtQElt) -> BoolElt
     {Returns whther a is totally real.}
         return a eq ComplexConjugate(a); 
     end intrinsic;
 
-    intrinsic IsTotallyRealPositive(a::AlgEtElt) -> BoolElt
+    intrinsic IsTotallyRealPositive(a::AlgEtQElt) -> BoolElt
     {Returns whether a is totally positive, that is, totally real and with positive image in C.}
         return IsTotallyReal(a) and forall{ h : h in HomsToC(Parent(a)) | Re(h(a)) gt 0 }; 
     end intrinsic;
@@ -30,7 +30,7 @@ freeze;
 // Totally Real SubAlgebra
 //////////////////////////
 
-    intrinsic TotallyRealSubAlgebra(K::AlgEt) -> AlgEt,Map
+    intrinsic TotallyRealSubAlgebra(K::AlgEtQ) -> AlgEtQ,Map
     {Given a CM algebra K returns the unique totally real subalgebra, and an embedding.}
         if not assigned K`TotallyRealSubAlgebra then
             require HasComplexConjugate(K) : "the algebra does not have CM ";
@@ -54,7 +54,7 @@ freeze;
 // Totally Real Units
 //////////////////////////
 
-    intrinsic TotallyRealUnitGroup(S::AlgEtOrd) -> Grp
+    intrinsic TotallyRealUnitGroup(S::AlgEtQOrd) -> Grp
     {Given an order S in a CM étale algebra A returns the groups of totally real units of S, as a subgroup of S^*.}
         if not assigned S`TotallyRealUnitGroup then
             K:=Algebra(S);
@@ -109,7 +109,7 @@ freeze;
         return Htp eq S_tot_pos_in_US;
     end function;
 
-    intrinsic TotallyRealPositiveUnitGroup(S::AlgEtOrd) -> Grp
+    intrinsic TotallyRealPositiveUnitGroup(S::AlgEtQOrd) -> Grp
     {Given an order S in a CM étale algebra A. Returns the groups of totally positive units of S, as a subgroup of S^*.}
         if not assigned S`TotallyRealPositiveUnitGroup then
             K:=Algebra(S);
@@ -139,7 +139,7 @@ freeze;
 /* TESTS
 
     printf "### Testing SmallRepresentative:";
-    AttachSpec("packages_github/AlgEt/spec");
+    AttachSpec("packages_github/AlgEtQ/spec");
     PP<x>:=PolynomialRing(Integers());
     SetAssertions(2);
 

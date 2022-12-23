@@ -51,7 +51,7 @@ intrinsic CohenMacaulayTypeAtPrime(S::AlgEtOrd,P::AlgEtIdl)->RngIntElt
         return 1;
     end if;
     if assigned S`NonGorensteinPrimes then
-        pp,dPs:=NonGorensteinPrimes(P);
+        pp,dPs:=NonGorensteinPrimes(S);
         i:=Index(pp,P);
         if i eq 0 then // S is Gorenstein at P
             return 1;
@@ -121,6 +121,11 @@ end function;
 
 /* TEST
 
+    quit;
+    git pull;
+    sleep 3;
+    magma;
+
     printf "### Testing LowCohenMacaulayType:";
     SetAssertions(2);
     _<x>:=PolynomialRing(Integers());
@@ -132,9 +137,10 @@ end function;
     assert #oo eq 297;
     for S in oo do
         pp:=PrimesAbove(Conductor(S));
-        if #pp gt 1 then
-            _:=CohenMacaulayTypeAtP(S,P);
-        end if;
+        #pp;
+        for P in pp do        
+            _:=CohenMacaulayTypeAtPrime(S,P);
+        end for;
         pp_ng:=NonGorensteinPrimes(S);
         assert pp_ng subset pp;
         _:=CohenMacaulayType(S);

@@ -314,9 +314,9 @@
     out_new:=[]; //oo[15] takes ~100 seconds
     for i->S in oo do
         t0:=Cputime();
+        delete S`WKICM_bar;
         N:=#WKICM_bar(S : Method:="IntermediateIdeals");
         t1:=Cputime(t0);
-        delete S`WKICM_bar;
         out:=<i,N,t1>; out;
         Append(~out_new,out);
     end for;

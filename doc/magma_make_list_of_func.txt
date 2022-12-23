@@ -12,7 +12,7 @@
 
 
     clean:=function(str0)
-    // removes "\n" and " " frome the begininig and the end of the string;
+    // removes "\n" and " " from the beginning and the end of the string;
         str:=str0;
         for i in [1,2] do
             while str[#str] in {"\n"," "} do
@@ -24,7 +24,7 @@
     end function;
 
     find_next:=function(inp,pos,str);
-        //find the next occurence in inp of str. returns returns the position of the character right after str.
+        //find the next occurrence in inp of str. returns the position of the character right after str.
         // if Eof is reached returns 0;
         assert pos gt 0;
         if pos eq #inp then

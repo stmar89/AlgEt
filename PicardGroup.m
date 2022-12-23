@@ -15,7 +15,7 @@ declare attributes AlgEtOrd:PicardGroup,
 declare attributes AlgEtIdl:residue_class_ring_unit_subgroup_generator;
 
 intrinsic ResidueRingUnits(S::AlgEtOrd,I::AlgEtIdl) -> GrpAb,Map
-{returns the group (S/I)^* and a map (S/I)^* -> S. It is required S to be maximal }
+{Returns the group (S/I)^* and a map (S/I)^* -> S. It is required S to be maximal.}
     //the following code works only for maximal orders in etale algebras
     require IsMaximal(S): "implemented only for the maximal order";
     test,I_asProd:=IsProductOfIdeals(I);
@@ -49,23 +49,6 @@ intrinsic ResidueRingUnits(S::AlgEtOrd,I::AlgEtIdl) -> GrpAb,Map
     assert2 forall{ gen: gen in Generators(D) | (map(gen))@@map eq gen };
     return D,map;
 end intrinsic;
-
-// USE INSTEAD PrimitiveElementResidueField from Quotients.m
-// residue_class_field_primitive_element := function(P)
-// //given a maximal ideal P in S, returns a generator of (S/P)* as an element of S;
-//     S:=Order(P);
-//     Q,m:=ResidueRing(S,P);
-//     ord:=#Q-1; //ord = #(S/P)-1;
-//     assert IsPrimePower(#Q); // #(S/P) must be a prime power
-//     proper_divisors_ord:=Exclude(Divisors(ord),ord);
-//     repeat
-//         repeat 
-//             a:=Random(Q);
-//         until a ne Zero(Q);
-//     until forall{f : f in proper_divisors_ord | m((a@@m)^f) ne m(One(Algebra(S)))};
-//     assert2 (m((a@@m)^ord) eq m(One(Algebra(S)))); 
-//     return a@@m;
-// end function;
 
 residue_class_ring_unit_subgroup_generators:=function(F)
 // determine generators of the subgroup of (S/F)^* as elements of A=Algebra(S)
@@ -113,7 +96,7 @@ residue_class_ring_unit_subgroup_generators:=function(F)
         end for;
         assert2 forall{x : x in elts | x in S and not x in F};
         F`residue_class_ring_unit_subgroup_generator:=elts;
-        vprintf AlgEtPicardGroup, 1:"residue_class_ring_unit_subgroup_generator:\n
+        vprintf AlgEtPicardGroup, 2 :"residue_class_ring_unit_subgroup_generator:\n
                                          elts = %o\n",PrintSeqAlgEtElt(Setseq(elts));
     end if;
 	return F`residue_class_ring_unit_subgroup_generator ;
@@ -204,10 +187,7 @@ IsPrincipal_prod_internal:=function( II , GRH )
 end function;
 
 intrinsic IsPrincipal(I1::AlgEtIdl : GRH:=false )->BoolElt, AlgAssElt
-{   
-    Return if the argument is a principal ideal; if so the function returns also the generator.
-    The optional argument "GRH" decides wheter the bound for the IsPrincipal test should be conditional. The default value is "false".
-}
+{Return if the argument is a principal ideal; if so the function returns also the generator. The optional argument "GRH" decides wheter the bound for the IsPrincipal test should be conditional. The default value is "false".}
     if not IsInvertible(I1) then return false,_; end if;
     if #Generators(I1) eq 1 then return true,Generators(I1)[1]; end if;
     // we try with LLL
@@ -347,10 +327,7 @@ PicardGroup_prod_internal:=function( O , GRH )
 end function;
 
 intrinsic PicardGroup( S::AlgEtOrd : GRH:=false ) -> GrpAb, Map
-{
-    Return the PicardGroup of the order S, which is not required to be maximal, and a map from the PicardGroup to a set of representatives of the ideal classes
-    The optional argument "GRH" decides the bound for the computations of the ClassGroup and UnitGroup of the maximal order. The default value is "false".
-}
+{Return the PicardGroup of the order S, which is not required to be maximal, and a map from the PicardGroup to a set of representatives of the ideal classes. The optional argument "GRH" decides the bound for the computations of the ClassGroup and UnitGroup of the maximal order. The default value is "false".}
     if assigned S`PicardGroup then 
         return Explode(S`PicardGroup); 
     end if;
@@ -523,10 +500,7 @@ UnitGroup_prod_internal:=function(O, GRH)
 end function;
 
 intrinsic UnitGroup(S::AlgEtOrd : GRH:=false ) -> GrpAb, Map
-{   
-    Return the unit group of a order in a etale algebra
-    The optional argument "GRH" decides the bound for the computation of the unit group of the maximal order. The default value is "false".
-}
+{Return the unit group of a order in a etale algebra. The optional argument "GRH" decides the bound for the computation of the unit group of the maximal order. The default value is "false".}
     if assigned S`UnitGroup then 
         return Explode(S`UnitGroup);
     end if;
@@ -574,10 +548,7 @@ intrinsic UnitGroup(S::AlgEtOrd : GRH:=false ) -> GrpAb, Map
 end intrinsic;
 
 intrinsic IsIsomorphic(I::AlgEtIdl, J::AlgEtIdl : GRH:=false ) -> BoolElt, AlgAssElt
-{
-    Checks if I=x*J, for some x. If so, also x is returned
-    The optional argument "GRH" decides wheter the bound for the IsPrincipal test should be conditional. The default value is "false"
-}
+{Checks if I=x*J, for some x. If so, also x is returned. The optional argument "GRH" decides wheter the bound for the IsPrincipal test should be conditional. The default value is "false".}
     test:=IsWeakEquivalent(I,J); //if so I=(I:J)*J and (I:J) is invertible in its MultiplicatorRing
     if test then
         S:=MultiplicatorRing(I);
@@ -596,10 +567,11 @@ intrinsic IsIsomorphic(I::AlgEtIdl, J::AlgEtIdl : GRH:=false ) -> BoolElt, AlgAs
     end if;
 end intrinsic;
 
-/*TEST
+/* TESTS
 	
-	AttachSpec("~/packages_github/AlgEt/spec");
-	SetAssertions(1);
+    printf "### Testing PicardGroup and UnitGroup:";
+    AttachSpec("~/packages_github/AlgEt/spec");
+	SetAssertions(2);
 	_<x>:=PolynomialRing(Integers());
 
 	// very fast
@@ -615,36 +587,14 @@ end intrinsic;
     Cputime(t0);
 
 	AttachSpec("~/packages_github/AlgEt/spec");
-	SetAssertions(1);
-	_<x>:=PolynomialRing(Integers());
-    //SetProfile(true);
-    for i in [1..10] do
-        f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
-        A:=EtaleAlgebra(f);
-        E:=EquationOrder(A);
-        t0:=Cputime();
-            P,p:=PicardGroup(E : GRH:=true);
-            //U,u:=UnitGroup(E : GRH:=true);	
-        Cputime(t0);
-    end for;
-	//SetProfile(false);
-    //ProfilePrintByTotalTime(ProfileGraph() : Max:=30);
-
-	AttachSpec("~/packages_github/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
-    SetClassGroupBounds("GRH");
-    SetVerbose("AlgEtPicardGroup",2);
-    SetVerbose("AlgEtIdl",2);
-    SetVerbose("ShortEltSmallRep",2);
+    SetVerbose("AlgEtPicardGroup",1);
+    SetVerbose("AlgEtIdl",1);
+    SetVerbose("ShortEltSmallRep",1);
     for i in [1..10^0] do
-        //"NF";
-        //time P,p:=PicardGroup(EquationOrder(NumberField(f)));
-        //assert #P eq 3548000;
-        "Et";
         time P,p:=PicardGroup(EquationOrder(EtaleAlgebra(f)) : GRH:=true);
         assert #P eq 3548000;
-        "\n";
     end for;
     
     AttachSpec("~/packages_github/AlgEt/spec");
@@ -661,8 +611,9 @@ end intrinsic;
     ];
     gensT:=[ A ! g : g in gensT ];
     T:=Order(gensT);
-    #PicardGroup(T); // this used to trigger a bug in CRT. now fixed
+    _:=#PicardGroup(T); // this used to trigger a bug in CRT. now fixed
 
+    printf " all good!\n"; 
 
 
 */

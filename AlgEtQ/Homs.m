@@ -32,7 +32,7 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing Homs:";
-    AttachSpec("~/packages_github/AlgEtQ/spec");
+    AttachSpec("~/packages_github/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());
     f:=(x^8+16)*(x^8+81);
     A:=EtaleAlgebra(f);

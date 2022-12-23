@@ -118,7 +118,7 @@ end intrinsic;
 /*TEST
 
     printf "### Testing WKICM:";
-	AttachSpec("~/packages_github/AlgEtQ/spec");
+	AttachSpec("~/packages_github/AlgEt/spec");
 	SetAssertions(2);
 	_<x>:=PolynomialRing(Integers());
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;

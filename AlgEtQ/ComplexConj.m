@@ -82,7 +82,7 @@ end intrinsic;
 //TESTS
 
     printf "### Testing Complex Conjugation:";
-    AttachSpec("~/packages_github/AlgEtQ/spec");
+    AttachSpec("~/packages_github/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());
     f:=x^4 + 6*x^2 + 25;
     K:=EtaleAlgebra(f);

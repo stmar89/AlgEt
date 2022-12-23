@@ -139,7 +139,7 @@ freeze;
 /* TESTS
 
     printf "### Testing SmallRepresentative:";
-    AttachSpec("packages_github/AlgEtQ/spec");
+    AttachSpec("packages_github/AlgEt/spec");
     PP<x>:=PolynomialRing(Integers());
     SetAssertions(2);
 

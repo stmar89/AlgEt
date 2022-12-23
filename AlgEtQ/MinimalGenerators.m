@@ -48,7 +48,7 @@ end intrinsic;
 /* TESTS
 
     printf "### TwoGenerators:";
-	AttachSpec("~/packages_github/AlgEtQ/spec");
+	AttachSpec("~/packages_github/AlgEt/spec");
     SetClassGroupBounds("GRH");
 	_<x>:=PolynomialRing(Integers());
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;

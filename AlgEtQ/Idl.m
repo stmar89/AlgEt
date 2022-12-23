@@ -847,7 +847,7 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing Ideals:";
-    AttachSpec("~/packages_github/AlgEtQ/spec");
+    AttachSpec("~/packages_github/AlgEt/spec");
     SetVerbose("AlgEtQIdl",1);
     SetAssertions(2);
 

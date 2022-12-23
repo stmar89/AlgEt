@@ -570,7 +570,7 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing PicardGroup and UnitGroup:";
-    AttachSpec("~/packages_github/AlgEtQ/spec");
+    AttachSpec("~/packages_github/AlgEt/spec");
 	SetAssertions(2);
 	_<x>:=PolynomialRing(Integers());
 
@@ -586,7 +586,7 @@ end intrinsic;
     end for;
     Cputime(t0);
 
-	AttachSpec("~/packages_github/AlgEtQ/spec");
+	AttachSpec("~/packages_github/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
     SetAssertions(1);

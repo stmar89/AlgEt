@@ -235,7 +235,7 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing Quotients:";
-    AttachSpec("~/packages_github/AlgEtQ/spec");
+    AttachSpec("~/packages_github/AlgEt/spec");
 	SetAssertions(2);
 	_<x>:=PolynomialRing(Integers());
     f:=(x^4+16);

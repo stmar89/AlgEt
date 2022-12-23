@@ -39,7 +39,7 @@ end intrinsic;
 /* TEST
 
   printf "### Testing ZBasisLLL:";
-	AttachSpec("~/packages_github/AlgEtQ/spec");
+	AttachSpec("~/packages_github/AlgEt/spec");
 	SetAssertions(2);
 	_<x>:=PolynomialRing(Integers());
   f:=x^4-100*x^3-100*x^2-100*x-100;

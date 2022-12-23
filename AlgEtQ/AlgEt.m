@@ -57,7 +57,7 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing Creation of Algebra:";
-    AttachSpec("~/packages_github/AlgEtQ/spec");
+    AttachSpec("~/packages_github/AlgEt/spec");
     SetAssertions(2);
     _<x>:=PolynomialRing(Integers());
     printf ".";

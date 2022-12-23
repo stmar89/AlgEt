@@ -86,7 +86,7 @@ end intrinsic;
 /* TEST
 
     printf "### Testing Trace and Norm:";
-    AttachSpec("~/packages_github/AlgEtQ/spec");
+    AttachSpec("~/packages_github/AlgEt/spec");
     SetVerbose("AlgEtQTraceNorm",1);
 
     _<x>:=PolynomialRing(Integers());

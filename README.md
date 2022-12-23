@@ -15,14 +15,14 @@ Please send comments and bug reports to `stefano.marseglia89@gmail.com`.
 Details
 --
 
-We introduce new type *AlgEtQ*, *AlgEtQElt*, *AlgEtQOrd* and *AlgEtQIdl* which correspond to étale algebras over the rationals, their elements, orders and ideals, respectively.
+We introduce new type `AlgEtQ`, `AlgEtQElt`, `AlgEtQOrd` and `AlgEtQIdl` which correspond to étale algebras over the rationals, their elements, orders and ideals, respectively.
 For complete descriptions and more details we refer to the [`List of commands for AlgEtQ`](https://github.com/stmar89/AlgEt/blob/main/doc/ListOfCommandsAlgEtQ.md).
 The code for these types has been tested a lot.
-To use them, use the magma command *AttachSpec("spec")*, after opening magma in the folder where you have downloaded the repo.
+To use them, use the magma command `AttachSpec("spec")`, after opening magma in the folder where you have downloaded the repo.
 
-We also introduce the type *AlgEtQMod*, for modules over *AlgEtQ*. This code is functional but less mature.
+We also introduce the type `AlgEtQMod`, for modules over `AlgEtQ`. This code is functional but less mature.
 For complete descriptions and more details we refer to the [`List of commands for AlgEtQMod`](https://github.com/stmar89/AlgEt/blob/main/doc/ListOfCommandsAlgEtQMod.md)
-To use them, use the magma command *AttachSpec("specMod")*, after opening magma in the folder where you have downloaded the repo.
+To use them, use the magma command `AttachSpec("specMod")`, after opening magma in the folder where you have downloaded the repo.
 
 Functionalities for p-adic etale algebras, including how to build completion at rational primes, are developed by Casper Putz. Available [`here`](https://github.com/CPutz/etale-algebra-family).
 

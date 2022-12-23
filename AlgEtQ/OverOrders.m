@@ -183,7 +183,7 @@ end intrinsic;
 /* TESTS
 
     printf "### OverOrders:";
-	  AttachSpec("~/packages_github/AlgEtQ/spec");
+	  AttachSpec("~/packages_github/AlgEt/spec");
 
     SetVerbose("OverOrders",1);
     SetAssertions(1);

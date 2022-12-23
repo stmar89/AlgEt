@@ -67,7 +67,7 @@ end intrinsic;
 /* TESTS
     
     printf "### Testing SmallRepresentative:";
-	AttachSpec("~/packages_github/AlgEtQ/spec");
+	AttachSpec("~/packages_github/AlgEt/spec");
 	_<x>:=PolynomialRing(Integers());
     f:=(x^2+5)*(x^2+7)*(x^2+11);
     assert IsSquarefree(f);

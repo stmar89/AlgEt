@@ -33,10 +33,9 @@ end intrinsic;
 /*
 //TESTS
     
+    printf "### Testing Completion:";
     AttachSpec("~/packages_github/AlgEt/spec");
     PP<x>:=PolynomialRing(Integers());
-
-    printf "### Testing Completion:";
     polys:=[
         x^6+3*x^4-10*x^3+15*x^2+125,
         (x^2+5)*(x^4-4*x^3+5*x^2-20*x+25),

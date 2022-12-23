@@ -148,7 +148,7 @@ end intrinsic;
 //----------
 
 intrinsic '!!'(T::AlgEtOrd,I::AlgEtIdl) -> AlgEtIdl
-{Given an S-ideal I and an order T, returns the extension IT as a T-ideal. Note that if T is in S, then IT=I}
+{Given an S-ideal I and an order T, returns the extension IT as a T-ideal. Note that if T is in S, then IT=I.}
     if Order(I) eq T then
         return I;
     elif T subset Order(I) then
@@ -221,7 +221,7 @@ intrinsic Generators(I::AlgEtIdl) -> SeqEnum[AlgEtElt]
 end intrinsic;
 
 intrinsic myHash(I::AlgEtIdl)->RngInt
-{Hash function}
+{Hash function.}
     if not assigned I`Hash then
         dim:=AbsoluteDimension(Algebra(I));
         P:=MatrixAtoQ(ZBasis(I));
@@ -264,7 +264,7 @@ intrinsic 'eq'(I::AlgEtIdl , J::AlgEtIdl ) -> BoolElt
 end intrinsic;
 
 intrinsic 'ne'(I::AlgEtIdl , J::AlgEtIdl ) -> BoolElt
-{Equality testing}
+{Equality testing.}
     return not I eq J;
 end intrinsic;
 
@@ -284,7 +284,7 @@ intrinsic 'eq'(S::AlgEtOrd,I::AlgEtIdl) -> BoolElt
 end intrinsic;
 
 intrinsic AbsoluteCoordinates(seq::SeqEnum[AlgEtElt],I::AlgEtIdl) -> SeqEnum
-{AbsoluteCoordiantes with respect to the ZBasis} 
+{AbsoluteCoordiantes with respect to the ZBasis.} 
     require forall{x : x in seq | Algebra(x) cmpeq Algebra(I)} : "the algebra is not the same";
     Minv:=inclusion_matrix(I);
     M:=MatrixAtoQ(seq)*Minv;
@@ -320,21 +320,21 @@ intrinsic 'in'(x::FldRatElt , I::AlgEtIdl ) -> BoolElt
 end intrinsic;
 
 intrinsic 'subset'(S::AlgEtOrd,I::AlgEtIdl) -> BoolElt
-{given an ideal I of S, return if S subseteq I}
+{Given an ideal I of S, return if S subseteq I.}
     assert Algebra(I) cmpeq Algebra(S);
     require Order(I) eq S: "the second argument must be an ideal of the first argument";
     return OneIdeal(S) subset I;
 end intrinsic;
 
 intrinsic 'subset'(I::AlgEtIdl,S::AlgEtOrd) -> BoolElt
-{given an ideal I of S, return if I subseteq S}
+{Given an ideal I of S, return if I subseteq S.}
     assert Algebra(I) cmpeq Algebra(S);
     require Order(I) eq S: "the first argument must be an ideal of the second argument";
     return I subset OneIdeal(S);
 end intrinsic;
 
 intrinsic 'subset'(I1 :: AlgEtIdl, I2 :: AlgEtIdl) -> BoolElt
-{Checks if the first argument is inside the second. The ideals need to be fractional}
+{Checks if the first argument is inside the second. The ideals need to be fractional.}
   require Order(I1) eq Order(I2) : "The ideals must be in the same order.";
   if not Index(I2, I1) in Integers() then
     return false;
@@ -356,7 +356,7 @@ intrinsic Index(T::AlgEtIdl) -> FldRatElt
 end intrinsic;
 
 intrinsic Index(J::AlgEtIdl, I::AlgEtIdl) -> Any
-{Given fractional ideals J and I defined over the same order returns [J:I] = [J:J cap I]/[I : J cap I]}
+{Given fractional ideals J and I defined over the same order returns [J:I] = [J:J cap I]/[I : J cap I].}
     require Order(I) eq Order(J): "the ideals must be of the same order";
   out:=Index(I)/Index(J);
   if IsCoercible(Integers(),out) then
@@ -366,7 +366,7 @@ intrinsic Index(J::AlgEtIdl, I::AlgEtIdl) -> Any
 end intrinsic;
 
 intrinsic Index(S::AlgEtOrd, I::AlgEtIdl) -> Any
-{given and ideal I of an order S returns [S:I] = [S:S cap I]/[I : S cap I] }
+{Given and ideal I of an order S returns [S:I] = [S:S cap I]/[I : S cap I].}
     require Order(I) eq S: "the ideal must be of the appropriate order";
     return Index(OneIdeal(S), I);
 end intrinsic;
@@ -377,7 +377,7 @@ end intrinsic;
 //----------
 
 intrinsic OneIdeal(S::AlgEtOrd) -> AlgEtIdl
-{Given an order S returns the ideal 1*S which will be cached}
+{Given an order S returns the ideal 1*S which will be cached.}
   if not assigned S`OneIdeal then
     S`OneIdeal := Ideal(S,One(S));
     S`OneIdeal`IsInvertible:=true;
@@ -387,7 +387,7 @@ intrinsic OneIdeal(S::AlgEtOrd) -> AlgEtIdl
 end intrinsic;
 
 intrinsic Conductor(O::AlgEtOrd) ->AlgEtOrdIdl
-{computes the conductor of an order}
+{Computes the conductor of an order, defined as he colon ideal (O:OK), where OK is the maximal order of the algebra.}
     if not assigned O`Conductor then
         A:=Algebra(O);
         OA:=MaximalOrder(A);
@@ -403,7 +403,7 @@ end intrinsic;
 //----------
 
 intrinsic '+'(I::AlgEtIdl , J::AlgEtIdl ) -> AlgEtIdl
-{ returns the sum of two ideals }
+{Returns the sum of two ideals.}
     require Algebra(I) cmpeq Algebra(J) : "they must be ideals of the same algebra";
     require Order(I) cmpeq Order(J) : "they must be ideals of the same order";
     if I eq J then
@@ -566,18 +566,18 @@ intrinsic '^'(I::AlgEtIdl, n::RngIntElt) -> AlgEtIdl
 end intrinsic;
  
 intrinsic 'meet'(I::AlgEtIdl, S::AlgEtOrd) -> AlgEtIdl
-{given an ideal I of S, return S cap I}
+{Given an ideal I of S, return S cap I.}
     return S meet I;
 end intrinsic;
 
 intrinsic 'meet'(S::AlgEtOrd,I::AlgEtIdl) -> AlgEtIdl
-{given an ideal I of S, return S cap I}
+{Given an ideal I of S, return S cap I.}
     output := OneIdeal(S) meet I;
     return output;
 end intrinsic;
 
 intrinsic 'meet'(I::AlgEtIdl, J::AlgEtIdl) -> AlgEtIdl
-{given ideals I and J, return J cap I}
+{Given ideals I and J, return J cap I.}
 // this code is inspired by H.Cohen "Advanced Topics in ...", page 36.]
 // note that the hnf in Magma is not the same as in the book. This is why the matrix M and P are take in a slightly different way compared to the refernce.
     require Algebra(I) eq Algebra(J): "the ideals must lie in the same algebra";
@@ -646,7 +646,7 @@ intrinsic ColonIdeal(I::AlgEtIdl,J::AlgEtIdl)->AlgEtIdl
         P:=Transpose(P)^-1;
         zbIJ:=MatrixQtoA(A,P);
         IJ:=Ideal(O,zbIJ);
-        IJ`ZBasis:=zbIJ; //we know that zbIJ is a ZBasisA
+        IJ`ZBasis:=zbIJ; //we know that zbIJ is a ZBasis
     //end if;
 
     assert2 IJ*J subset I;
@@ -654,17 +654,17 @@ intrinsic ColonIdeal(I::AlgEtIdl,J::AlgEtIdl)->AlgEtIdl
 end intrinsic;
 
 intrinsic ColonIdeal(O::AlgEtOrd,J::AlgEtIdl)->AlgEtIdl
-{computes the colon ideal (1*O:J) (as an O-ideal)}
+{Computes the colon ideal (1*O:J) (as an O-ideal).}
     return ColonIdeal(OneIdeal(O), J);
 end intrinsic;
 
 intrinsic ColonIdeal(I::AlgEtIdl,O::AlgEtOrd)->AlgEtIdl
-{computes the colon ideal (I:1*O) (as an O-ideal)}
+{Computes the colon ideal (I:1*O) (as an O-ideal).}
     return I; //since we require O=Order(I)
 end intrinsic;
 
 intrinsic IsInvertible(I::AlgEtIdl) ->BoolElt
-{ checks if the ideal I is invertible in its order of definition O }
+{Checks if the ideal I is invertible in its order of definition O.}
     if not assigned I`IsInvertible then
         O:=Order(I);
         COI:=ColonIdeal(O,I);
@@ -683,7 +683,7 @@ intrinsic IsInvertible(I::AlgEtIdl) ->BoolElt
 end intrinsic;
 
 intrinsic Inverse(I::AlgEtIdl) ->AlgEtIdl
-{computes the inverse of an ideal of a maximal order}
+{Computes the inverse of an ideal of a maximal order.}
     require IsInvertible(I) : "the ideal is not invertible in the order of definition";
     if not assigned I`Inverse then
         O:=Order(I);
@@ -750,7 +750,7 @@ end intrinsic;
 //----------
 
 intrinsic Random(I::AlgEtIdl , bd::RngIntElt : ZeroDivisorsAllowed:=false ) -> AlgEtElt
-{Random element of I. The Coefficients are bounded by the positive integer bd. One can allow zero-divisors using the optional argument "ZeroDivisorsAllowed", which by default is set to false }
+{Random element of I. The Coefficients are bounded by the positive integer bd. One can allow zero-divisors using the optional argument "ZeroDivisorsAllowed", which by default is set to false.}
     require bd gt 0 : "The bound needs to be a positive integer.";
     ZBasisLLL(I); // to keep it small
     B := ZBasis(I);
@@ -765,9 +765,7 @@ intrinsic Random(I::AlgEtIdl , bd::RngIntElt : ZeroDivisorsAllowed:=false ) -> A
 end intrinsic;
 
 intrinsic Random(I::AlgEtIdl : CoeffRange:=3, ZeroDivisorsAllowed:=false ) -> AlgEtElt
-{ Returns a random (small coefficient) element of I. 
-  The range of the random coefficients can be increased by giving the optional argument CoeffRange.
-  One can allow zero-divisors using the optional argument "ZeroDivisorsAllowed", which by default is set to false }
+{Returns a random (small coefficient) element of I. The range of the random coefficients can be increased by giving the optional argument CoeffRange. One can allow zero-divisors using the optional argument "ZeroDivisorsAllowed", which by default is set to false.}
       return Random(I,CoeffRange : ZeroDivisorsAllowed:=ZeroDivisorsAllowed);
 end intrinsic;
 
@@ -776,7 +774,7 @@ end intrinsic;
 //----------
 
 intrinsic IsCoprime(I::AlgEtIdl,J::AlgEtIdl) -> BoolElt
-{given two integral ideals I and J of an order S, returns whether I+J=R}
+{Given two integral ideals I and J of an order S, returns whether I+J=R.}
     require Algebra(I) cmpeq Algebra(J) : "the ideals must lie in the same algebra";
     S:=Order(J);
     require Order(I) eq S: "the ideals must be over the same order";
@@ -798,7 +796,7 @@ intrinsic IsCoprime(I::AlgEtIdl,J::AlgEtIdl) -> BoolElt
 end intrinsic;
 
 intrinsic IsIntegral(I::AlgEtIdl) -> BoolElt
-{returns wheter the ideal I of S is integral, that is I \subseteq S}
+{Returns wheter the ideal I of S is integral, that is I \subseteq S.}
     if not assigned I`IsIntegral then
         S:=Order(I);
         I`IsIntegral:=I subset S;
@@ -807,7 +805,7 @@ intrinsic IsIntegral(I::AlgEtIdl) -> BoolElt
 end intrinsic;
 
 intrinsic MakeIntegral(I::AlgEtIdl) -> AlgEtIdl,RngIntElt
-{given a fractional S ideal I, returns the ideal d*I,d when d is the smallest integer such that d*I is integral in S}
+{Given a fractional S ideal I, returns the ideal d*I,d when d is the smallest integer such that d*I is integral in S.}
     if IsIntegral(I) then return I,1; end if;
     S:=Order(I);
     d:=LCM(&cat[ [Denominator(x_coord) : x_coord in x] : x in AbsoluteCoordinates(Generators(I),S)]);
@@ -817,7 +815,7 @@ intrinsic MakeIntegral(I::AlgEtIdl) -> AlgEtIdl,RngIntElt
 end intrinsic;
 
 intrinsic MinimalInteger(I::AlgEtIdl) -> RngIntElt
-{returns the smallest integer contained in the ideal I}
+{Returns the smallest integer contained in the ideal I.}
     if not assigned I`MinimalInteger then
         require IsIntegral(I): "the ideal must be integral";
         ZZ:=Integers();
@@ -830,7 +828,7 @@ intrinsic MinimalInteger(I::AlgEtIdl) -> RngIntElt
 end intrinsic;
 
 intrinsic CoprimeRepresentative(I::AlgEtIdl,J::AlgEtIdl) -> AlgEtElt,AlgEtIdl
-{return an element x such that x*I is an integral ideal coprime with J, togheter with the product x*I.. The first ideal must be invertible and the second should be integral}
+{Return an element x such that x*I is an integral ideal coprime with J, togheter with the product x*I. The first ideal must be invertible and the second should be integral.}
     require IsIntegral(J) : "the second ideal must be integral";
     S:=Order(I);
     require S eq Order(J): "the ideals must be defined over the same order";
@@ -845,15 +843,12 @@ intrinsic CoprimeRepresentative(I::AlgEtIdl,J::AlgEtIdl) -> AlgEtElt,AlgEtIdl
     return x,xI;
 end intrinsic;
 
-/* Continue from here
 
+/* TESTS
 
-*/
-
-/* TEST
-
+    printf "### Testing Ideals:";
     AttachSpec("~/packages_github/AlgEt/spec");
-    SetVerbose("AlgEtIdl",2);
+    SetVerbose("AlgEtIdl",1);
     SetAssertions(2);
 
     _<x>:=PolynomialRing(Integers());
@@ -868,8 +863,8 @@ end intrinsic;
         assert a*E2 eq E2!!(a*E1);
         assert E1!!(E2!!(a*E1)) ne a*E1;
     end for;
-    time #{ Random(E1)*E1 : i in [1..100] };
-    a*E1 + E1!!(a*E2);
+    time _:={ Random(E1)*E1 : i in [1..100] };
+    _:=a*E1 + E1!!(a*E2);
     time _:=&*[Random(E1)*E1 : i in [1..100]];
     time _:=&*[(Random(E1)*E1+Random(E1)*E1) : i in [1..100]];
     l:=[(Random(E1)*E1+Random(E1)*E1) : i in [1..100]];
@@ -888,10 +883,10 @@ end intrinsic;
     time _:=[IsIntegral(Random(E1)*E1+Random(E1)*E1) : i in [1..100]];
     time _:=[MakeIntegral(Random(E1)*E1+Random(E1)*E1) : i in [1..100]];
 
-    time ids:=[ Ideal(E1,[Random(E1) : i in [1..10]]) : i in [1..2000]]; 
+    time ids:=[ Ideal(E1,[Random(E1) : i in [1..10]]) : i in [1..200]]; 
     time _:=&meet(ids);
     time rr:=[ResidueRing(E1,I) : I in ids ];
-    time cc:=[ ColonIdeal(I,J) : I,J in ids  ];
+    time cc:=[ ColonIdeal(I,J) : I,J in ids[1..10]  ];
 
     O:=MaximalOrder(A);
     test,O_prod:=IsProductOfOrders(O);
@@ -900,13 +895,17 @@ end intrinsic;
         _:=Ideal(O,<ideal< O_prod[i] | [Random(O_prod[i],3): j in [1..3]]> : i in [1..#O_prod] >);
     end for;
 
-    SetAssertions(1);
     time ids:=[ Ideal(E1,[Random(E1) : i in [1..10]]) : i in [1..20]]; 
     time cc2:=[ TraceDualIdeal(TraceDualIdeal(I)*J) : I,J in ids  ];
     time cc:=[ ColonIdeal(I,J) : I,J in ids  ];
     assert cc eq cc2;
 
+    SetAssertions(1);
+    printf " all good!\n";
 
+    ///////////////////////
+    // Relative Extensions
+    ///////////////////////
     K:=NumberField(x^2-5);
     _<y>:=PolynomialRing(K);
     E1:=NumberField(y^2-49*7*K.1);
@@ -921,8 +920,8 @@ end intrinsic;
         I:=a*O;
         I:=O*a;
     end for;
-    time #{ Random(O)*O : i in [1..100] };
-    a*O + O!!(a*O);
+    time _:={ Random(O)*O : i in [1..100] };
+    _:=a*O + O!!(a*O);
     time _:=&*[Random(O)*O : i in [1..100]];
     time _:=&*[(Random(O)*O+Random(O)*O) : i in [1..100]];
     time I:=Ideal(O,[Random(O) : i in [1..100]]);
@@ -931,94 +930,6 @@ end intrinsic;
     time assert J eq JJ;
     time _:=&meet[(Random(O)*O+Random(O)*O) : i in [1..100]];
     time assert forall{ I : I in [Random(O)*O : i in [1..100]] | IsProductOfIdeals(I)};
-
-//to modify from here on    
-    A:=EtaleAlgebra([K,K]);
-    for i in [1..100] do
-        a:=Random(A);
-        b:=Random(A);
-        assert Trace(a)+Trace(b) eq Trace(a+b);
-        assert Norm(a)*Norm(b) eq Norm(a*b);
-    end for;
-
-
-    seq:=[NumberField(p),NumberField(x^2-5)];
-    A:=EtaleAlgebra(seq);
-    time O2:=Order(AbsoluteBasis(A));
-    for O in [O2] do
-        for i in [1..100] do
-            assert Random(O) in O;
-        end for;
-    end for;
-
-    K:=NumberField(x^2-25*5);
-    _<y>:=PolynomialRing(K);
-    p:=y^2-7;
-    E:=NumberField(p); //relative ext
-    A:=EtaleAlgebra([E,E]);
-    O:=MaximalOrder(A);
-    for i in [1..100] do
-        a:=Random(O);
-        b:=Random(O);
-        assert AbsoluteTrace(a)+AbsoluteTrace(b) eq AbsoluteTrace(a+b);
-        assert Trace(a)+Trace(b) eq Trace(a+b);
-        assert AbsoluteNorm(a)*AbsoluteNorm(b) eq AbsoluteNorm(a*b);
-        assert Norm(a)*Norm(b) eq Norm(a*b);
-    end for;
-
-
-    A:=EtaleAlgebra([K]);
-    O:=MaximalOrder(A);
-    I:=Ideal(O,[Random(O) : i in [1..100]]);
-    J:=Ideal(O,[Random(O) : i in [1..100]]);
-    C:=ColonIdeal(I,J);
-    CC:=&meet[(1/g)*I : g in Generators(J)];
-    assert C eq CC;
-
-    A:=EtaleAlgebra([E]);
-    O:=MaximalOrder(A);
-    I:=Ideal(O,[Random(O) : i in [1..100]]);
-    J:=Ideal(O,[Random(O) : i in [1..100]]);
-    C:=ColonIdeal(I,J);
-    CC:=&meet[(1/g)*I : g in Generators(J)];
-    assert C eq CC;
-
-    // test if TwoGeneratingSet makes the power faster
-    // Conlcusion: yes. By quite a bit!
-	AttachSpec("~/packages_github/AlgEt/spec");
-	_<x>:=PolynomialRing(Integers());
-    f:=x^4-100*x^3-100*x^2-100*x-100;
-    //f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
-    A:=EtaleAlgebra(f);
-	E:=EquationOrder(A);
-    P,p:=PicardGroup(E : GRH:=true); //this might take a while. timings are very inconsistent
-    repeat
-        Ii:=Random(P);
-    until Ii ne Zero(P);
-    I:=p(Ii);
-    #Generators(I);
-    
-    delete I`IsInvertible;
-    exp:=[ Random(2,30) : i in [1..100]];
-    time l1:=[ I^i : i in exp ];
-    #Generators(I);
-
-    assert IsInvertible(I);
-    TwoGeneratingSet(I);
-    #Generators(I);
-    time l2:=[ I^i : i in exp ];
-    assert l1 eq l2;
-
-    I:=SmallRepresentative(I);
-    delete I`IsInvertible;
-    time l1:=[ I^i : i in exp ];
-    #Generators(I);
-
-    assert IsInvertible(I);
-    TwoGeneratingSet(I);
-    #Generators(I);
-    time l2:=[ I^i : i in exp ];
-    assert l1 eq l2;
 
 */
 

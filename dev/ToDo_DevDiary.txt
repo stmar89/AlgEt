@@ -16,6 +16,16 @@
 
     ### SmallReps ###
     - SmallRepresentative does not give a unique ideal: when you repeat the code it goes into a 'loop' of short ideals. It should be a canonical representative.
+      	AttachSpec("~/packages_github/AlgEt/spec");
+        _<x>:=PolynomialRing(Integers());
+        E:=EquationOrder(EtaleAlgebra(x^4-100*x^3-100*x^2-100*x-100));
+        time P,p:=PicardGroup(E);
+        I0:=p(Random(P));
+        I:=SmallRepresentative(I0);
+        for i in [1..10] do
+            Index(E,I);
+            I:=SmallRepresentative(I);
+        end for;
 
     ### Various ###
     - Improve saving and printing with LLL or MinimalGenerator (that is after CRT) to get smaller output.

@@ -621,9 +621,9 @@ intrinsic Idempotents(A::AlgEt) -> SeqEnum
     return A`Idempotents;
 end intrinsic;
 
-/* TEST
+/* TESTS
 
-    printf "### Testing Eltements:";
+    printf "### Testing Elements:";
     AttachSpec("~/packages_github/AlgEt/spec");
     SetVerbose("AlgEtElt",2);
 

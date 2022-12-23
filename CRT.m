@@ -80,7 +80,7 @@ intrinsic ChineseRemainderTheorem(I::AlgEtIdl,J::AlgEtIdl,a::AlgEtElt,b::AlgEtEl
     return ChineseRemainderTheorem([I,J],[a,b]);
 end intrinsic;
 
-/* TEST
+/* TESTS
 
     printf "### Testing CRT:";
     AttachSpec("~/packages_github/AlgEt/spec");

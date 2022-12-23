@@ -213,8 +213,7 @@ intrinsic AllCMTypes(A::AlgEt : Precision := 30 ) -> SeqEnum[AlgEtCMType]
     return A`AllCMTypes;
 end intrinsic;
 
-/*
-//TESTS
+/* TESTS
 
     printf "### Testing CM-types:";
     AttachSpec("~/packages_github/AlgEt/spec");

@@ -15,7 +15,7 @@ declare verbose IntermediateIdeals, 2;
 
 
 intrinsic MinimalIntermediateIdeals(I::AlgEtIdl,J::AlgEtIdl)->SetIndx[AlgEtIdl]
-{ Given fractional S-ideals J subset I, returns the minimal (with respect to inclusion) fractional S-ideals K such that J subset K subset I. }
+{Given fractional S-ideals J subset I, returns the minimal (with respect to inclusion) fractional S-ideals K such that J subset K subset I.}
     assert2 J subset I; // "the ideal J needs to be inside I";
     S:=Order(I);
     assert2 S eq Order(J); // "The ideals must be over the same order";
@@ -57,7 +57,7 @@ intrinsic MinimalIntermediateIdeals(I::AlgEtIdl,J::AlgEtIdl)->SetIndx[AlgEtIdl]
 end intrinsic;
 
 intrinsic IntermediateIdeals(I::AlgEtIdl,J::AlgEtIdl)->SetIndx[AlgEtIdl]
-{ Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that J subset K subset I. They are produced recursively using from the minimal ones }
+{Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that J subset K subset I. They are produced recursively using from the minimal ones.}
     require J subset I : "The ideal J needs to be inside I";
     require Order(I) eq Order(J) : "The ideals must be over the same order";
     queue:={@ J @};
@@ -73,8 +73,7 @@ intrinsic IntermediateIdeals(I::AlgEtIdl,J::AlgEtIdl)->SetIndx[AlgEtIdl]
 end intrinsic;
 
 intrinsic IntermediateIdealsWithPrescribedMultiplicatorRing(I::AlgEtIdl,J::AlgEtIdl)->SetIndx[AlgEtIdl]
-{ Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that (K:K)=S and  J subset K subset I. 
-  They are produced recursively using from the minimal ones }
+{Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that (K:K)=S and  J subset K subset I. They are produced recursively using from the minimal ones.}
     require J subset I : "The ideal J needs to be inside I";
     S:=Order(I);
     require S eq Order(J) : "The ideals must be over the same order";
@@ -91,7 +90,7 @@ intrinsic IntermediateIdealsWithPrescribedMultiplicatorRing(I::AlgEtIdl,J::AlgEt
 end intrinsic;
 
 intrinsic MaximalIntermediateIdeals(I::AlgEtIdl,J::AlgEtIdl)->SetIndx[AlgEtIdl]
-{ Given fractional S-ideals J subset I, returns the maximal (with respect to inclusion) fractional S-ideals K such that J subset K subset I. }
+{Given fractional S-ideals J subset I, returns the maximal (with respect to inclusion) fractional S-ideals K such that J subset K subset I.}
     assert2 J subset I; // "the ideal J needs to be inside I";
     S:=Order(I);
     assert2 S eq Order(J); // "The ideals must be over the same order";
@@ -144,9 +143,7 @@ end intrinsic;
 // end intrinsic;
 
 intrinsic IntermediateIdealsWithTrivialExtension(I::AlgEtIdl,J::AlgEtIdl, O::AlgEtOrd)->SetIndx[AlgEtIdl]
-{ Given fractional S-ideals J subset I, returns all the fractional S-ideals K J subset K subset I, and O!!K = I. 
-  Note that we need O subset (J:J).
-  They are produced recursively using from the maximal ones }
+{Given fractional S-ideals J subset I, returns all the fractional S-ideals K J subset K subset I, and O!!K = I. Note that we need O subset (J:J). They are produced recursively using from the maximal ones.}
     require J subset I : "The ideal J needs to be inside I";
     S:=Order(I);
     require S eq Order(J) : "The ideals must be over the same order";
@@ -169,9 +166,7 @@ intrinsic IntermediateIdealsWithTrivialExtension(I::AlgEtIdl,J::AlgEtIdl, O::Alg
 end intrinsic;
 
 intrinsic IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing(I::AlgEtIdl,J::AlgEtIdl, O::AlgEtOrd)->SetIndx[AlgEtIdl]
-{ Given fractional S-ideals J subset I, returns all the fractional S-ideals K J subset K subset I, O!!K = I, and (K:K) eq S.
-  Note that we need O subset (J:J).
-  They are produced recursively using from the maximal ones. }
+{Given fractional S-ideals J subset I, returns all the fractional S-ideals K J subset K subset I, O!!K = I, and (K:K) eq S. Note that we need O subset (J:J). They are produced recursively using from the maximal ones.}
     require J subset I : "The ideal J needs to be inside I";
     S:=Order(I);
     require S eq Order(J) : "The ideals must be over the same order";
@@ -248,8 +243,34 @@ end intrinsic;
 */
 
 
-/* TEST
+/* TESTS
 
-   
+    printf "### Testing IntermediateModules:";
+	SetAssertions(2);
+	_<x>:=PolynomialRing(Integers());
+    f:=x^3-100*x^2-100*x-100;
+    K:=EtaleAlgebra(f);
+    E:=EquationOrder(K);
+    O:=MaximalOrder(K);
+    ff:=Conductor(E);
+    time _:=MinimalIntermediateIdeals(E!!OneIdeal(O),ff);
+    time _:=IntermediateIdeals(E!!OneIdeal(O),ff);
+    time _:=IntermediateIdealsWithPrescribedMultiplicatorRing(E!!OneIdeal(O),ff);
+    time _:=MaximalIntermediateIdeals(E!!OneIdeal(O),ff);
+    time _:=IntermediateIdealsWithTrivialExtension(E!!OneIdeal(O),ff,O);
+    time _:=IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing(E!!OneIdeal(O),ff,O);
+    printf ".";
+    f:=x^4+291*x^3-988*x^2-1000*x-1000;
+    K:=EtaleAlgebra(f);
+    E:=EquationOrder(K);
+    O:=MaximalOrder(K);
+    ff:=Conductor(E);
+    time _:=MinimalIntermediateIdeals(E!!OneIdeal(O),ff);
+    time _:=MaximalIntermediateIdeals(E!!OneIdeal(O),ff);
+    time _:=IntermediateIdealsWithTrivialExtension(E!!OneIdeal(O),ff,O);
+    time _:=IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing(E!!OneIdeal(O),ff,O);
+    printf ".";
+    SetAssertions(1);
+    printf " all good!\n"; 
 
 */

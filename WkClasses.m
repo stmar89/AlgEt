@@ -16,7 +16,7 @@ declare attributes AlgEtOrd:WKICM,
 import "LowCohenMacaulayType.m" : wkicm_bar_CM_type2;
 
 intrinsic WKICM_bar(S::AlgEtOrd : Method:="Auto") -> SeqEnum
-{ Returns all the weak eq classes I, such that (I:I)=S. The VarArg Method (default "Auto") determines if we should use the "IntermediateIdeals" routine or the "LowIndexProcess", which is potentially much slower but more memory efficient.}
+{Returns all the weak eq classes I, such that (I:I)=S. The VarArg Method (default "Auto") determines if we should use the "IntermediateIdeals" routine or the "LowIndexProcess", which is potentially much slower but more memory efficient.}
     if not assigned S`WKICM_bar then
         if IsGorenstein(S) then
             S`WKICM_bar:=[OneIdeal(S)];
@@ -85,9 +85,6 @@ intrinsic WKICM_bar(S::AlgEtOrd : Method:="Auto") -> SeqEnum
                     while not IsEmpty(subg) do
                         H := ExtractGroup(subg);
                         NextSubgroup(~subg);
-                        //geninF:=[(f(QP ! x))@@q : x in Generators(H)];
-                        //coeff:=[Eltseq(x) : x in geninF];
-                        //I:=ideal<S| [&+[T_ZBasis[i]*x[i] : i in [1..degA]] : x in coeff] cat ff_ZBasis>;
                         I:=Ideal(S, [ (f(QP!x))@@q : x in Generators(H) ] cat gens_ff_over_S);
                         if not I in seqWk_bar and 
                             MultiplicatorRing(I) eq S and 
@@ -120,44 +117,27 @@ end intrinsic;
 
 /*TEST
 
+    printf "### Testing WKICM:";
 	AttachSpec("~/packages_github/AlgEt/spec");
-
 	SetAssertions(2);
-
 	_<x>:=PolynomialRing(Integers());
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
     K:=EtaleAlgebra(f);
     E:=EquationOrder(K);
-    SeqWC:=WKICM(E);
-    if #SeqWC ne 25 then
-      test:=false;
-      printf"\nERROR: SeqWC of f=%o\n",f;
-    end if;
-    // _:=ICM(E); //computing the Pics is very slow!
+    assert #WKICM(E) eq 25;
 
     f:=x^4+291*x^3-988*x^2-1000*x-1000;
     K:=EtaleAlgebra(f);
     E:=EquationOrder(K);
-    SeqWC:=WKICM(E);
-    if #SeqWC ne 20 then
-      test:=false;
-      printf"\nERROR: SeqWC of f=%o\n",f;
-    end if;
-    _:=ICM(E);
+    assert #WKICM(E) eq 20;
 
     f:=x^3+31*x^2+43*x+77;
     K:=EtaleAlgebra(f);
     E:=EquationOrder(K);
-    if #FindOverOrders(E) ne 15 then 
-      test:=false;
-      printf"\nERROR: OverOrders of f=%o\n",f;
-    end if;
-    SeqWC:=WKICM(E);
-    if #SeqWC ne 23 then
-      test:=false;
-      printf"\nERROR: SeqWC of f=%o\n",f;
-    end if;
-    _:=ICM(E);
+    assert #FindOverOrders(E) eq 15;
+    assert #WKICM(E) eq 23;
+    SetAssertions(1);
+    printf " all good!\n"; 
 
 */
 

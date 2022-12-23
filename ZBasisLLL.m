@@ -36,8 +36,21 @@ intrinsic ZBasisLLL(S::AlgEtIdl)
   end if;
 end intrinsic;
 
-
-
 /* TEST
+
+  printf "### Testing ZBasisLLL:";
+	AttachSpec("~/packages_github/AlgEt/spec");
+	SetAssertions(2);
+	_<x>:=PolynomialRing(Integers());
+  f:=x^4-100*x^3-100*x^2-100*x-100;
+  K:=EtaleAlgebra(f);
+  E:=EquationOrder(K);
+  pp:=PrimesAbove(Conductor(E));
+  I:=&*(pp);
+  J:=&*(pp);
+  ZBasisLLL(I);
+  assert ZBasis(J) ne ZBasis(I);
+  assert J eq I;
+  printf " all good!\n"; 
 
 */

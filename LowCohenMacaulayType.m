@@ -121,11 +121,6 @@ end function;
 
 /* TEST
 
-    quit;
-    git pull;
-    sleep 3;
-    magma;
-
     printf "### Testing LowCohenMacaulayType:";
     SetAssertions(2);
     _<x>:=PolynomialRing(Integers());
@@ -137,7 +132,6 @@ end function;
     assert #oo eq 297;
     for S in oo do
         pp:=PrimesAbove(Conductor(S));
-        #pp;
         for P in pp do        
             _:=CohenMacaulayTypeAtPrime(S,P);
         end for;

@@ -104,10 +104,10 @@ intrinsic 'eq'(A1::AlgEt,A2::AlgEt) -> BoolElt
    return <c1,e1,p1> eq <c2,e2,p2>;
 end intrinsic;
 
-/* TEST
+/* TESTS
 
-    AttachSpec("~/packages_github/AlgEt/spec");
     printf "### Testing Attributes and Equality:";
+    AttachSpec("~/packages_github/AlgEt/spec");
     SetAssertions(2);
     _<x>:=PolynomialRing(Integers());
     f:=(x^8+16)*(x^8+81);

@@ -62,10 +62,10 @@ intrinsic EtaleAlgebra(f::RngUPolElt[FldNum]) -> AlgEt
     return A;
 end intrinsic;
 
-/* TEST
+/* TESTS
 
-    AttachSpec("~/packages_github/AlgEt/spec");
     printf "### Testing Creation of Algebra:";
+    AttachSpec("~/packages_github/AlgEt/spec");
     SetAssertions(2);
     _<x>:=PolynomialRing(Integers());
     printf ".";

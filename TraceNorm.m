@@ -85,8 +85,9 @@ end intrinsic;
 
 /* TEST
 
+    printf "### Testing Trace and Norm:";
     AttachSpec("~/packages_github/AlgEt/spec");
-    SetVerbose("AlgEtTraceNorm",2);
+    SetVerbose("AlgEtTraceNorm",1);
 
     _<x>:=PolynomialRing(Integers());
     f:=(x^8+16)*(x^8+81);
@@ -97,6 +98,11 @@ end intrinsic;
         assert Trace(a)+Trace(b) eq Trace(a+b);
         assert Norm(a)*Norm(b) eq Norm(a*b);
     end for;
+    printf " all good!\n"; 
+
+    /////////////////////
+    // Relative extension
+    /////////////////////
 
     K:=NumberField(x^2-5);
     _<y>:=PolynomialRing(K);

@@ -64,11 +64,11 @@ intrinsic SmallRepresentative(I::AlgEtIdl) ->AlgEtIdl,AlgEtElt
 end intrinsic;
 
 
-/* TEST
+/* TESTS
     
+    printf "### Testing SmallRepresentative:";
 	AttachSpec("~/packages_github/AlgEt/spec");
 	_<x>:=PolynomialRing(Integers());
-    //f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
     f:=(x^2+5)*(x^2+7)*(x^2+11);
     assert IsSquarefree(f);
     K:=EtaleAlgebra(f);
@@ -77,43 +77,10 @@ end intrinsic;
     _:=ShortestElement(ff);
     oo:=FindOverOrders(E); 
     for S in oo do
+        printf ".";
         ff:=Conductor(S);
         _:=ShortestElement(ff);
     end for;
-
-	AttachSpec("~/packages_github/AlgEt/spec");
-	_<x>:=PolynomialRing(Integers());
-    f:=x^4-100*x^3-100*x^2-100*x-100;
-    f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
-    A:=EtaleAlgebra(f);
-	E:=EquationOrder(A);
-    P,p:=PicardGroup(E : GRH:=true); //this might take a while. timings are very inconsistent
-    repeat
-        Ii:=Random(P);
-    until Ii ne Zero(P);
-    I:=p(Ii);
-    #Generators(I);
-
-    myHash(I);
-    aI:=SmallRepresentative(I);
-    myHash(aI);
-    time TwoGeneratingSet(I);
-    time TwoGeneratingSet(aI);
-
-    // is small representative, canonical? mmm confusing...
-
-	AttachSpec("~/packages_github/AlgEt/spec");
-	_<x>:=PolynomialRing(Integers());
-    f:=x^4-100*x^3-100*x^2-100*x-100;
-    //f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
-    A:=EtaleAlgebra(f);
-	E:=EquationOrder(A);
-    time P,p:=PicardGroup(E);
-    I0:=p(Random(P));
-    I:=SmallRepresentative(I0);
-    for i in [1..10] do
-        Index(E,I);
-        I:=SmallRepresentative(I);
-    end for;
+    printf " all good!\n"; 
 
 */

@@ -1,0 +1,50 @@
+/* vim: set syntax=magma : */
+
+/*
+
+    this magma script collects all the fast tests from the various .m files in AlgEtQ/ and puts them in a file fast_tests_AlgEtQ.txt which can then be run.
+
+    input:
+        - input: = a spec file containing a folder and a sequence of .m files to be scanned
+        - output_file:= fast_tests_AlgEtQ.txt
+
+*/
+
+    find_next:=function(inp,pos,str);
+        //find the next occurrence in inp of str starting from the character inp[pos]. returns the position of the character right after str.
+        // if Eof is reached returns 0;
+        assert pos gt 0;
+        if pos eq #inp then
+            return 0;
+        end if;
+        while inp[pos] ne str[1] do
+            pos+:=1;
+            if pos eq #inp then
+                return 0;
+            end if;
+        end while;
+        n:=#str-1;
+        while not inp[pos..pos+n] eq str do
+            if pos+n+1 gt #inp then
+                return 0;
+            end if;
+            pos +:=1;
+        end while;
+        return pos+n+1;
+    end function;
+
+    input:=Split(Read(input),"{\n}");
+    fld:=input[1];
+    for input_file0 in input[2..#input] do
+        input_file:=fld cat "/" cat input_file0;
+        inp:=Read("../" cat input_file);
+        out:="";
+        pos:=1;
+        start:=find_next(inp,pos,"/* TESTS");
+        end:=find_next(inp,start,"*/")-3;
+        out cat:=inp[start...end];
+        fprintf output_file,"%o\n\n\n",out;
+    end for;
+     
+    quit;
+

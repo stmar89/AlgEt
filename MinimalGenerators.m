@@ -40,8 +40,8 @@ intrinsic TwoGeneratingSet(I::AlgEtIdl)
                 b:=b@@q;
             //until I eq Ideal(S,[a,b]);
             until Q eq sub<Q|[q(b*z):z in ZBasis(S)]>;
+            I`Generators:=[a,b];
         end if;
-        I`Generators:=[a,b];
     end if;
 end intrinsic;
 

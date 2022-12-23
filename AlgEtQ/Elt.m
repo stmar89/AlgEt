@@ -717,46 +717,4 @@ end intrinsic;
 
     printf " all good!\n"; 
 
-    ///////////////////////
-    // Relative Extensions
-    ///////////////////////
-    K:=NumberField(x^2-5);
-    _<y>:=PolynomialRing(K);
-    p:=y^2-7;
-    A:=EtaleAlgebra(p);
-    a:=PrimitiveElement(A);
-    assert MinimalPolynomial(a) eq p;
-    A!1 - A!(1/2);
-    A!1 / A!(1/2);
-
-    
-    A:=EtaleAlgebra([K,K]);
-    e:=A!<K.1,K.1^2>;
-    MinimalPolynomial(e);
-    IsIntegral(e);
-    e2:=A!<K.1^2,K.1^2>;
-    assert MinimalPolynomial(e2) eq MinimalPolynomial(K.1^2);
-    _,embs,projs:=Components(A);
-    assert embs[1](K.1)+embs[2](K.1^2) eq e;
-    assert projs[1](e) eq K.1;
-    assert projs[2](e) eq K.1^2;
-
-    E:=NumberField(p);
-    seq:=[E,K];
-    A:=EtaleAlgebra(seq);
-    A!1 + A!(1/2);
-    A!<seq[1]!1,seq[2]!(1/2)>/A![1,2];
-    assert #AbsoluteBasis(A) eq AbsoluteDimension(A);
-    e:=A!<K.1+E.1,K.1^2>;
-    assert #AbsoluteCoordinates(e) eq AbsoluteDimension(A);
-    assert e eq &+[AbsoluteCoordinates(e)[i]*AbsoluteBasis(A)[i] : i in [1..AbsoluteDimension(A)]];
-    OrthogonalIdempotents(A);
-    Idempotents(A);
-
-    A:=EtaleAlgebra([E,E]);
-    assert #Basis(A) eq Dimension(A);
-    assert #AbsoluteBasis(A) eq AbsoluteDimension(A);
-    OrthogonalIdempotents(A);
-    Idempotents(A);
-
 */

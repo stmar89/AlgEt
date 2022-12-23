@@ -903,33 +903,6 @@ end intrinsic;
     SetAssertions(1);
     printf " all good!\n";
 
-    ///////////////////////
-    // Relative Extensions
-    ///////////////////////
-    K:=NumberField(x^2-5);
-    _<y>:=PolynomialRing(K);
-    E1:=NumberField(y^2-49*7*K.1);
-    E2:=NumberField(y^5-25*7*K.1);
-    A:=EtaleAlgebra([E1,E2]); 
-    assert HasBaseField(A);
-    time O:=MaximalOrder(A);
-    for i in [1..100] do
-        a:=Random(O);
-        b:=Random(O);
-        I:=Ideal(O,a);
-        I:=a*O;
-        I:=O*a;
-    end for;
-    time _:={ Random(O)*O : i in [1..100] };
-    _:=a*O + O!!(a*O);
-    time _:=&*[Random(O)*O : i in [1..100]];
-    time _:=&*[(Random(O)*O+Random(O)*O) : i in [1..100]];
-    time I:=Ideal(O,[Random(O) : i in [1..100]]);
-    time J:=&*[I : i in [1..100]];
-    time JJ:=I^100;
-    time assert J eq JJ;
-    time _:=&meet[(Random(O)*O+Random(O)*O) : i in [1..100]];
-    time assert forall{ I : I in [Random(O)*O : i in [1..100]] | IsProductOfIdeals(I)};
 
 */
 

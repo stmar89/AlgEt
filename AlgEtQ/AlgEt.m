@@ -29,7 +29,7 @@ declare attributes AlgEt : DefiningPolynomial,
 // Creation for AlgEt
 //------------
 
-intrinsic EtaleAlgebra(seq::SeqEnum[FldNum]) -> AlgEt
+intrinsic EtaleAlgebra(seq::SeqEnum[FldNum[FldRat]]) -> AlgEt
 {Given a sequence of number fields returns the étale algebra corresponding to the direct product.}
     A:=New(AlgEt);
     embs:=[ map< seq[i]->A | x:-> A! (<seq[j]!0 : j in [1..i-1]> cat <x> cat <seq[j]!0 : j in [i+1..#seq]>)  > : i in [1..#seq] ];
@@ -47,14 +47,6 @@ intrinsic EtaleAlgebra(f::RngUPolElt[RngInt]) -> AlgEt
 end intrinsic;
 
 intrinsic EtaleAlgebra(f::RngUPolElt[FldRat]) -> AlgEt
-{Given a squarefree polynomial over the rationals returns the product of the number fields defined by the irreducible factors.}
-    require IsSquarefree(f) : "The polynomial must be squarefree.";
-    A:=EtaleAlgebra([NumberField(g[1]) : g in Factorization(f)]);
-    A`DefiningPolynomial:=f;
-    return A;
-end intrinsic;
-
-intrinsic EtaleAlgebra(f::RngUPolElt[FldNum]) -> AlgEt
 {Given a squarefree polynomial over the rationals returns the product of the number fields defined by the irreducible factors.}
     require IsSquarefree(f) : "The polynomial must be squarefree.";
     A:=EtaleAlgebra([NumberField(g[1]) : g in Factorization(f)]);

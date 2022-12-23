@@ -225,26 +225,4 @@ end intrinsic;
     SetAssertions(1);
     printf " all good!\n"; 
 
-    ///////////////////////
-    // Relative Extensions
-    ///////////////////////
-    K:=NumberField(x^2-5);
-    _<y>:=PolynomialRing(K);
-    E1:=NumberField(y^2-49*7*K.1);
-    E2:=NumberField(y^5-25*7*K.1);
-    A:=EtaleAlgebra([E1,E2]); 
-    time O:=MaximalOrder(A);
-    time assert IsBass(O);
-    time ids:=[ Ideal(O,[Random(O) : i in [1..10]]) : i in [1..100]]; 
-    time facs:=[ Factorization(I) : I in ids | I ne OneIdeal(O) ];
-
-    repeat 
-        E:=Order( [Random(O) : i in [1..3]] );
-    until not IsMaximal(E);
-    // _:=IsGorenstein(E); // This triggers an ERROR since TraceDualIdeal is implemented only for AlgEt over Q.
-    _:=IsBass(E);
-    _:=PrimesAbove(Conductor(E));
-
-
-
 */

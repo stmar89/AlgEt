@@ -87,10 +87,6 @@ end intrinsic;
     SetVerbose("CRT",1);
     SetAssertions(2);
 
-    ////////////////
-    //Simple extension of Q
-    ///////////////
-
     _<x>:=PolynomialRing(Integers());
     f:=(x^8+16)*(x^8+81);
     A:=EtaleAlgebra(f);
@@ -137,44 +133,5 @@ end intrinsic;
     assert forall{i : i in [1..#out1] | (out1[i] - out2[i]) in pp};
     SetAssertions(1);    
     printf " all good!\n"; 
-
-    //////////////////
-    //Relative setting
-    /////////////////
-
-    _<x>:=PolynomialRing(Integers());
-    K:=NumberField(x^2-5);
-    _<y>:=PolynomialRing(K);
-    K1:=NumberField(y^2-49*7*K.1);
-    K2:=NumberField(y^5-25*7*K.1);
-    A:=EtaleAlgebra([K1,K2]); 
-    idem:=OrthogonalIdempotents(A);
-    time O:=MaximalOrder(A);
-    repeat 
-        E:=Order( [Random(O) : i in [1..3]] );
-    until exists{ i : i in idem | not i in E} and not 1 in ZBasis(E);
-    n:=100;
-    repeat
-        n+:=1;
-        I:=n*E;
-    until IsPrime(n) and #PrimesAbove(I) gt 1;
-    pp:=PrimesAbove(I);
-
-    pairs:=[];
-    for i in [1..100] do
-        repeat
-            a:=Random(E);
-        until not a in pp[1];
-        repeat
-            b:=Random(E);
-        until not b in pp[2];
-        Append(~pairs,[a,b]);
-    end for;
-    t0:=Cputime();
-    for pair in pairs do
-        e:=ChineseRemainderTheorem(pp[1],pp[2],a,b);
-    end for;
-    Cputime(t0);
-
 
 */

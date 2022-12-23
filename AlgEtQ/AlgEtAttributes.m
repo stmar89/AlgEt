@@ -120,30 +120,4 @@ end intrinsic;
     assert not A cmpeq B;
     printf ".";
 
-    // Tests for relative extensions.
-    K:=NumberField(x^2-5);
-    _<y>:=PolynomialRing(K);
-    p:=y^2-7;
-    A:=EtaleAlgebra(p);
-    F,mFA:=BaseField(A);
-    _:=[ mFA(b) : b in Basis(MaximalOrder(F)) ];
-    printf ".";
-
-    E:=NumberField(p);
-    seq:=[E,K];
-    A:=EtaleAlgebra(seq);
-    assert not HasBaseField(A); // A is a product of an absolute and a relative extensions
-    assert AbsoluteDimension(A) eq 6;
-    assert PrimeField(A) eq RationalField();
-    printf ".";
-
-    A:=EtaleAlgebra([E,E]);
-    assert Dimension(A) eq 4;
-    assert AbsoluteDimension(A) eq 8;
-    assert BaseField(A) eq K;
-    assert PrimeField(A) eq RationalField();
-    SetAssertions(1);
-    printf ".";
-    printf " all good!\n";
-
 */

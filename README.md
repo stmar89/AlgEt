@@ -7,7 +7,7 @@ A package for Magma to make computation with étale algebras.
 The goal is to make the Ideal Class Monoid algorithm available.
 
 This will be built using direct product of number fields as core, for superior speed.
-Currently the packages are in the developing stage. More functionalities and faster code is to be expected.
+Currently, the packages are in the developing stage. More functionalities and faster code is to be expected.
 
 Functionalities for p-adic etale algebras, including how to build completion at rational primes, are developed by Casper Putz. Available [`here`](https://github.com/CPutz/etale-algebra-family).
 

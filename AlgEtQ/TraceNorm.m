@@ -100,47 +100,4 @@ end intrinsic;
     end for;
     printf " all good!\n"; 
 
-    /////////////////////
-    // Relative extension
-    /////////////////////
-
-    K:=NumberField(x^2-5);
-    _<y>:=PolynomialRing(K);
-    E1:=NumberField(y^2-49*7*K.1);
-    E2:=NumberField(y^5-25*7*K.1);
-    A:=EtaleAlgebra([E1,E2]); 
-    assert HasBaseField(A);
-    O:=MaximalOrder(A);
-    for i in [1..100] do
-        a:=Random(O);
-        b:=Random(O);
-        assert AbsoluteTrace(a)+AbsoluteTrace(b) eq AbsoluteTrace(a+b);
-        assert Trace(a)+Trace(b) eq Trace(a+b);
-        assert AbsoluteNorm(a)*AbsoluteNorm(b) eq AbsoluteNorm(a*b);
-        assert Norm(a)*Norm(b) eq Norm(a*b);
-    end for;
-    
-    A:=EtaleAlgebra([K,K]);
-    for i in [1..100] do
-        a:=Random(A);
-        b:=Random(A);
-        assert Trace(a)+Trace(b) eq Trace(a+b);
-        assert Norm(a)*Norm(b) eq Norm(a*b);
-    end for;
-
-    K:=NumberField(x^2-25*5);
-    _<y>:=PolynomialRing(K);
-    p:=y^2-7;
-    E:=NumberField(p); //relative ext
-    A:=EtaleAlgebra([E,E]);
-    O:=MaximalOrder(A);
-    for i in [1..100] do
-        a:=Random(O);
-        b:=Random(O);
-        assert AbsoluteTrace(a)+AbsoluteTrace(b) eq AbsoluteTrace(a+b);
-        assert Trace(a)+Trace(b) eq Trace(a+b);
-        assert AbsoluteNorm(a)*AbsoluteNorm(b) eq AbsoluteNorm(a*b);
-        assert Norm(a)*Norm(b) eq Norm(a*b);
-    end for;
-
 */

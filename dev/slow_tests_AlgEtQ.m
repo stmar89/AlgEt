@@ -35,6 +35,7 @@
         assert #P1 eq #P2;
     end for;
     printf "\n";
+    printf "Current running time = %o \n",t_tot;
     tprevbest:=13.7; //on diophantus
     if Abs(t_tot - tprevbest) gt 0.1*tprevbest then
         if t_tot lt tprevbest then
@@ -73,6 +74,7 @@
     t0:=Cputime();
         _:=#PicardGroup(T);
     t1:=Cputime(t0);
+    printf "Current running time = %o \n",t1;
     tprevbest:=13.7; //on diophantus
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
@@ -128,7 +130,8 @@
     Eet:=EquationOrder(Aet);
     t0:=Cputime();
         ooet:=FindOverOrders(Eet);
-    t1:=Cputime(t0); t1;
+    t1:=Cputime(t0);
+    printf "Current running time = %o \n",t1;
     tprevbest:=693; // on diophantus
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
@@ -169,7 +172,8 @@
     oo:=FindOverOrders(R : populateoo_in_oo:=true); //to avoid any computation related to the OverOrders
     t0:=Cputime();
         #WKICM(R);
-    t1:=Cputime(t0); t1;
+    t1:=Cputime(t0);
+    printf "Current running time = %o \n",t1;
     tprevbest:=4.5; // diophantus
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then

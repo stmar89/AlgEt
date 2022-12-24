@@ -11,7 +11,6 @@
 
     TODO:
     ### Modules ###
-    - Run one more time the examples for Modules, to check that everything is in orders.
     - Polish tests, both fast and slow. Add more printing.
     - I have recently added the Type AlgEtMod. Many thinks that are valid for Idl should also be implemented for Modules. Eg, sum of modules, ideal*module, ...
     - Then I should convert PowerOfBass.m

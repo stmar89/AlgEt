@@ -19,7 +19,6 @@
     t_tot:=0;
     for i in [1..10] do
         printf "%o-th round..",i;
-        time P1,p1:=PicardGroup(E1 : GRH:=true );
         "RngOrd";
         K2:=NumberField(f);
         E2:=EquationOrder(K2);

@@ -130,6 +130,8 @@ end intrinsic;
     
     // slow tests from remote
     screen -S slow_tests;
+    screen -r slow_tests;
+
     cd ~/packages_github/AlgEt/dev/
     git pull; sleep 1;
     magma -b slow_tests.m

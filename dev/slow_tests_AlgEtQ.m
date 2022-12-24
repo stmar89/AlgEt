@@ -19,7 +19,7 @@
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
     t_tot:=0;
     for i in [1..10] do
-        printf "%o-th round..",i;
+        printf "%o-th round.\n",i;
         "RngOrd";
         K2:=NumberField(f);
         E2:=EquationOrder(K2);

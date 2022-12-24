@@ -11,7 +11,7 @@
     "------------------------Picard Groups------------------------";
     "-------------------------------------------------------------";
     "-------------------------------------------------------------";
-    "Picard group for AlgEtQOrd used to have very incosistent timings because of how certain randomized choices in CoprimeRepresentatives. Now the timings are consistent and comparable to the code for RngOrd.";
+    "Picard group for AlgEtQOrd used to have very incosistent timings because of how certain randomized choices in CoprimeRepresentatives. Now the timings are consistent and better than RngOrd.";
     //picard groups
 	AttachSpec("~/packages_github/AlgEt/spec");
     SetClassGroupBounds("GRH");

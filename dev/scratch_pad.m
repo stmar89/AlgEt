@@ -123,6 +123,8 @@ end intrinsic;
     assert 1 eq #{I1,I2,I3,I4};
 
     // fast tests from remote
+    screen -r fast_tests;
+
     quit;
     cd ~/packages_github/AlgEt/dev/test/
     git pull; sleep 1;

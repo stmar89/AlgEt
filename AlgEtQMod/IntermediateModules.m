@@ -53,7 +53,7 @@ intrinsic MinimalIntermediateModules(I::AlgEtQMod,J::AlgEtQMod)->SetIndx[AlgEtQM
 end intrinsic;
 
 intrinsic IntermediateModules(I::AlgEtQMod,J::AlgEtQMod)->SetIndx[AlgEtQMod]
-{ Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that J subset K subset I. They are produced recursively using from the minimal ones }
+{Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that J subset K subset I. They are produced recursively using from the minimal ones.}
     V,m:=UniverseAlgebra(I);
     VJ,mJ:=UniverseAlgebra(I);
     require Order(I) eq Order(J) : "The modules must be over the same order";
@@ -110,8 +110,7 @@ intrinsic MaximalIntermediateModules(I::AlgEtQMod,J::AlgEtQMod)->SetIndx[AlgEtQM
 end intrinsic;
 
 intrinsic IntermediateModulesWithTrivialExtension(I::AlgEtQMod,J::AlgEtQMod,O::AlgEtQOrd)->SetIndx[AlgEtQMod]
-{Given S-modules J subset I, and overorder O of S, it returns all the S-modules N such that J subset N subset I and NO=I. Note: we need O!!I eq I.
-  They are produced recursively using from the maximal ones}
+{Given S-modules J subset I, and overorder O of S, it returns all the S-modules N such that J subset N subset I and NO=I. Note: we need O!!I eq I. They are produced recursively using from the maximal ones}
     V,m:=UniverseAlgebra(I);
     VJ,mJ:=UniverseAlgebra(J);
     S:=Order(I);

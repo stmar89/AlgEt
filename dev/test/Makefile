@@ -19,4 +19,4 @@ magma_script:
 	magma -b input:=${inputAlgEtQ} output_file:=${outfileAlgEtQ} magma_make_fast_tests_AlgEtQ.txt
 	@echo "...Done"
 	@echo "We now run the fast tests. It should take only a few minutes."
-	magma -b ../../fast_tests_AlgEtQ.txt
+	magma -b ../fast_tests_AlgEtQ.m

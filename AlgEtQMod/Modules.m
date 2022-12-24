@@ -316,38 +316,6 @@ intrinsic Quotient(I::AlgEtQMod, J::AlgEtQMod) -> GrpAb, Map
 end intrinsic;
 
 
-/* TEST
-
-    AttachSpec("~/packages_github/AlgEtQ/spec");
-    AttachSpec("~/packages_github/AlgEtQ/specMod");
-    _<x>:=PolynomialRing(Integers());
-    m1:=x^4 - 2*x^2 + 9;
-    m2:=x^2 -5*x + 7;
-    K1:=NumberField(m1);
-    K2:=NumberField(m2);
-    K:=EtaleAlgebra([K1,K2]);
-    V:=EtaleAlgebra([K1,K2,K1,K2,K2]);
-    m:=NaturalAction(K,V);
-    F:=PrimitiveElement(K);
-    [MinimalPolynomial(c) : c in Components(m(F))];
-
-    Vnf,Ve:=Components(V);
-    gens:=&cat[ [Ve[i](z) : z in Basis(MaximalOrder(Vnf[i])) ] : i in [1..#Vnf]];
-    gens;
-    O:=MaximalOrder(K);
-    M:=Module(O,m,gens);
-    N:=Module(O,m,< 1*MaximalOrder(Vnf[i]) : i in [1..#Vnf] >);
-    Generators(M);
-    ZBasis(M) eq ZBasis(N);
-    assert N eq M;
-    E:=EquationOrder(K);
-    assert not IsMaximal(E);
-    NE:=Module(E,m,< 1*MaximalOrder(Vnf[i]) : i in [1..#Vnf] >);
-    assert N subset NE and NE subset N; // N has multiplicatorring O
-    N2:=Module(E,m,< 4*MaximalOrder(Vnf[i]) : i in [1..#Vnf] >);
-    assert N2 ne NE;
-    assert N2 subset NE;
-    assert not NE subset N2;
-    Quotient(N,NE); 
-
+/* TESTS
+    // see all_tests_AlgEtQMod.m
 */

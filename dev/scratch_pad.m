@@ -144,9 +144,10 @@ end intrinsic;
     screen -r examples_Modules;
 
     quit;
-    cd ~/packages_github/AlgEt/examples/
+    cd ~/packages_github/AlgEt/
     git pull; sleep 1;
-    magma -b modules_conjugacy_AVs.txt
+    magma -b ~/packages_github/AlgEt/dev/all_tests_AlgEtQMod.m
+    magma -b ~/packages_github/AlgEt/examples/modules_conjugacy_AVs.txt
 
 
 

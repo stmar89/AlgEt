@@ -36,12 +36,12 @@
     end for;
     printf "\n";
     printf "Current running time = %o \n",t_tot;
-    tprevbest:=13.7; //on diophantus
+    tprevbest:=109.890; //on diophantus
     if Abs(t_tot - tprevbest) gt 0.1*tprevbest then
         if t_tot lt tprevbest then
-            printf "FindOverOrders for %o got faster. Update the previous best known time\n",f;
+            printf "PicardGroup for %o got faster. Update the previous best known time\n",f;
         elif t_tot gt tprevbest then
-            printf "FindOverOrders for %o got slower. The previous code was better.\n",f;
+            printf "PicardGroup for %o got slower. The previous code was better.\n",f;
         end if;
     end if;
 
@@ -78,9 +78,9 @@
     tprevbest:=13.7; //on diophantus
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
-            printf "FindOverOrders for %o got faster. Update the previous best known time\n",f;
+            printf "PicardGroup for %o got faster. Update the previous best known time\n",f;
         elif t1 gt tprevbest then
-            printf "FindOverOrders for %o got slower. The previous code was better.\n",f;
+            printf "PicardGroup for %o got slower. The previous code was better.\n",f;
         end if;
     end if;
 

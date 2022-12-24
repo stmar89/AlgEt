@@ -115,7 +115,7 @@ intrinsic WKICM(E::AlgEtQOrd : Method:="Auto")->SeqEnum
     return E`WKICM;
 end intrinsic;
 
-/*TEST
+/* TESTS
 
     printf "### Testing WKICM:";
 	AttachSpec("~/packages_github/AlgEt/spec");

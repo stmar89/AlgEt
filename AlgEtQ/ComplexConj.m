@@ -78,8 +78,7 @@ intrinsic ComplexConjugate(I::AlgEtQIdl) -> AlgEtQIdl
 	return Ib;
 end intrinsic;
 
-/*
-//TESTS
+/* TESTS
 
     printf "### Testing Complex Conjugation:";
     AttachSpec("~/packages_github/AlgEt/spec");

@@ -119,7 +119,7 @@ wkicm_bar_CM_type2:=function(S,pp)
      end if;
 end function;
 
-/* TEST
+/* TESTS
 
     printf "### Testing LowCohenMacaulayType:";
     SetAssertions(2);

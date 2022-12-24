@@ -126,7 +126,7 @@ end intrinsic;
     quit;
     cd ~/packages_github/AlgEt/dev/test/
     git pull; sleep 1;
-    make
+    make;
     
     magma;
 

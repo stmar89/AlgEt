@@ -64,7 +64,7 @@ end intrinsic
 
 
 
-/* TEST
+/* TESTS
 
     printf "### Testing WKICM:";
 	AttachSpec("~/packages_github/AlgEt/spec");

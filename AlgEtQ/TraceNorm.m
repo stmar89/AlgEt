@@ -83,7 +83,7 @@ intrinsic TraceDualIdeal(O::AlgEtQOrd) -> AlgEtQIdl
     return O`TraceDualIdeal;
 end intrinsic;
 
-/* TEST
+/* TESTS
 
     printf "### Testing Trace and Norm:";
     AttachSpec("~/packages_github/AlgEt/spec");

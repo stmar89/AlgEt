@@ -36,7 +36,7 @@ intrinsic ZBasisLLL(S::AlgEtQIdl)
   end if;
 end intrinsic;
 
-/* TEST
+/* TESTS
 
   printf "### Testing ZBasisLLL:";
 	AttachSpec("~/packages_github/AlgEt/spec");

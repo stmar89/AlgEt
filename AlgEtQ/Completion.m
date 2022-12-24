@@ -30,8 +30,7 @@ intrinsic Completion(P::AlgEtQIdl : MinPrecision:=20) -> FldPad,Map
     return LP1,map;
 end intrinsic;
 
-/*
-//TESTS
+/* TESTS
     
     printf "### Testing Completion:";
     AttachSpec("~/packages_github/AlgEt/spec");

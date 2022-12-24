@@ -682,37 +682,33 @@ end intrinsic;
     f:=(x^8+16)*(x^8+81);
     A:=EtaleAlgebra(f);
     seq:=[Random(A) : i in [1..10^3]];
-    time c0:=&+seq;
-    t0:=Cputime();
-        c:=seq[1];
-        for i in [2..#seq] do
-            c+:=seq[i];
-        end for;
-    Cputime(t0);
+    c0:=&+seq;
+    c:=seq[1];
+    for i in [2..#seq] do
+        c+:=seq[i];
+    end for;
     assert c eq c0;
-    time c0:=&*seq;
-    t0:=Cputime();
-        c:=seq[1];
-        for i in [2..#seq] do
-            c*:=seq[i];
-        end for;
-    Cputime(t0);
+    c0:=&*seq;
+    c:=seq[1];
+    for i in [2..#seq] do
+        c*:=seq[i];
+    end for;
     assert c eq c0;
 
-    time s1:=&+[seq[i]*seq[i] : i in [1..#seq]];
-    time s2:=SumOfProducts(seq,seq);
+    s1:=&+[seq[i]*seq[i] : i in [1..#seq]];
+    s2:=SumOfProducts(seq,seq);
     assert s1 eq s2;
     seq0:=[Random(-10,10) : i in [1..#seq]];
-    time s1:=&+[seq0[i]*seq[i] : i in [1..#seq]];
-    time s2:=SumOfProducts(seq0,seq);
-    time s3:=&+[seq[i]*seq0[i] : i in [1..#seq]];
-    time s4:=SumOfProducts(seq,seq0);
+    s1:=&+[seq0[i]*seq[i] : i in [1..#seq]];
+    s2:=SumOfProducts(seq0,seq);
+    s3:=&+[seq[i]*seq0[i] : i in [1..#seq]];
+    s4:=SumOfProducts(seq,seq0);
     assert s1 eq s2 and s1 eq s3 and s1 eq s4;
     seq1:=[Random(-10,10)/Random(1,20) : i in [1..#seq]];
-    time s1:=&+[seq1[i]*seq[i] : i in [1..#seq]];
-    time s2:=SumOfProducts(seq1,seq);
-    time s3:=&+[seq[i]*seq1[i] : i in [1..#seq]];
-    time s4:=SumOfProducts(seq,seq1);
+    s1:=&+[seq1[i]*seq[i] : i in [1..#seq]];
+    s2:=SumOfProducts(seq1,seq);
+    s3:=&+[seq[i]*seq1[i] : i in [1..#seq]];
+    s4:=SumOfProducts(seq,seq1);
     assert s1 eq s2 and s1 eq s3 and s1 eq s4;
 
     printf " all good!\n"; 

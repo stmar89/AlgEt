@@ -236,10 +236,10 @@ end intrinsic;
         all:=AllCMTypes(A);
         _:=[ CMPositiveElement(PHI) : PHI in all ];
         for i,j in [1..#all] do
-            (i eq j) eq (all[i] eq all[j]);
+            assert (i eq j) eq (all[i] eq all[j]);
         end for;
-        for i,j in [1..all] do
-            (i eq j) eq (all[i] eq ChangePrecision(all[j],2*Precision(all[j])));
+        for i,j in [1..#all] do
+            assert (i eq j) eq (all[i] eq ChangePrecision(all[j],2*Precision(all[j])));
         end for; 
         printf ".";
     end for;

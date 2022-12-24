@@ -54,7 +54,7 @@ end intrinsic;
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
     K:=EtaleAlgebra(f);
     E:=EquationOrder(K);
-    time P,p:=PicardGroup(E : GRH:=true); //~10 secs
+    P,p:=PicardGroup(E : GRH:=true); //~10 secs
 
     t0:=Cputime();
     for g in Generators(P) do 
@@ -77,21 +77,21 @@ end intrinsic;
 
     delete I`IsInvertible;
     exp:=[ Random(2,30) : i in [1..100]];
-    time l1:=[ I^i : i in exp ];
+    l1:=[ I^i : i in exp ];
 
     assert IsInvertible(I);
     TwoGeneratingSet(I);
     assert #Generators(I) eq 2;
-    time l2:=[ I^i : i in exp ];
+    l2:=[ I^i : i in exp ];
     assert l1 eq l2;
 
     I:=SmallRepresentative(I);
     delete I`IsInvertible;
-    time l1:=[ I^i : i in exp ];
+    l1:=[ I^i : i in exp ];
 
     assert IsInvertible(I);
     TwoGeneratingSet(I);
-    time l2:=[ I^i : i in exp ];
+    l2:=[ I^i : i in exp ];
     assert l1 eq l2;
     printf " all good!\n"; 
 

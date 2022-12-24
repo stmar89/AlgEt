@@ -549,13 +549,13 @@ end intrinsic;
     _<x>:=PolynomialRing(Integers());
     f:=(x^8+16)*(x^8+81);
     A:=EtaleAlgebra(f);
-    time O1:=Order(Basis(A));
+    O1:=Order(Basis(A));
     _:=ZBasis(O1);
     _:=Generators(O1);
-    time O2:=Order(AbsoluteBasis(A) : Check:=0);
-    time O3:=Order(AbsoluteBasis(A));
-    time _:=O1 eq O2;
-    time _:=O2 eq O3;
+    O2:=Order(AbsoluteBasis(A) : Check:=0);
+    O3:=Order(AbsoluteBasis(A));
+    _:=O1 eq O2;
+    _:=O2 eq O3;
     assert EquationOrder(A) ne ProductOfEquationOrders(A);
     
     OA:=MaximalOrder(A);
@@ -569,9 +569,9 @@ end intrinsic;
     assert IsMaximal(O);
 
     O:=MaximalOrder(A);
-    time G:=[[ Random(O) : i in [1..3] ] : i in [1..100]];
-    time S:=[ Order(s) : s in G ];
-    time _:=#Seqset(S);
+    G:=[[ Random(O) : i in [1..3] ] : i in [1..100]];
+    S:=[ Order(s) : s in G ];
+    _:=#Seqset(S);
 
     assert forall{z : z in ZBasis(O1) | z in O1 };
     for O in [O1,O2,O3] do
@@ -584,9 +584,9 @@ end intrinsic;
     seq:=[x^2-5*25,x^2-7*49];
     seq:=[NumberField(f) : f in seq];
     A:=EtaleAlgebra(seq);
-    time O1:=Order(Basis(A));
-    time O2:=Order(AbsoluteBasis(A));
-    time O1 eq O2;
+    O1:=Order(Basis(A));
+    O2:=Order(AbsoluteBasis(A));
+    O1 eq O2;
     for O in [O1,O2] do
         for i in [1..100] do
             assert Random(O) in O;

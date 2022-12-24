@@ -60,7 +60,7 @@ end intrinsic;
     for f in polys do
         K:=EtaleAlgebra(f);
         E:=EquationOrder(K);
-        time _:=ICM(E);
+        _:=ICM(E);
     end for;
     SetAssertions(1);
     printf " all good!\n";

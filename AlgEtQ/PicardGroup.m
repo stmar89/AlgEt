@@ -122,7 +122,7 @@ IsPrincipal_prod_internal_old:=function( I , GRH )
         //The next call is to prevent a bug of the in-built function IsPrincipal (which might have been corrected by now...).
         //Also if one wants to use the GRH bound rather than one needs to precompute the class groups, since IsPrincipal does not accepts varargs )       
         OL,oL:=ClassGroup(OrdIL);
-        // the next line seems to be the most time consuming part of the package. 
+        // the next line seems to be the most consuming part of the package. 
         // It is 10/20 times slower than the RngOrdIdl version. Need to investigate
         testL,genL:=IsPrincipal(IL);
         assert2 (Zero(OL) eq (IL@@oL)) eq testL;
@@ -168,7 +168,7 @@ IsPrincipal_prod_internal:=function( II , GRH )
         //The next call is to prevent a bug of the in-built function IsPrincipal (which might have been corrected by now...).
         //Also if one wants to use the GRH bound rather than one needs to precompute the class groups, since IsPrincipal does not accepts varargs )       
         OL,oL:=ClassGroup(OrdIL);
-        // the next line seems to be the most time consuming part of the package. 
+        // the next line seems to be the most consuming part of the package. 
         // It is 10/20 times slower than the RngOrdIdl version. Need to investigate
         testL,genL:=IsPrincipal(IL);
         assert2 (Zero(OL) eq (IL@@oL)) eq testL;
@@ -579,12 +579,10 @@ end intrinsic;
 	A:=EtaleAlgebra(f);
 	E:=EquationOrder(A);
 	oo:=FindOverOrders(E);
-    t0:=Cputime();
     for S in oo do
         P,p:=PicardGroup(S);
         U,u:=UnitGroup(S);	
     end for;
-    Cputime(t0);
 
 	AttachSpec("~/packages_github/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());
@@ -596,8 +594,8 @@ end intrinsic;
     for i in [1..10^1] do
         A:=EtaleAlgebra(f);
         E:=EquationOrder(A);
-        time P,p:=PicardGroup(E : GRH:=true);
-        time U,u:=UnitGroup(E : GRH:=true);
+        P,p:=PicardGroup(E : GRH:=true);
+        U,u:=UnitGroup(E : GRH:=true);
         assert #P eq 3548000;
     end for;
     SetAssertions(1);

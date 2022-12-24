@@ -107,7 +107,6 @@ end intrinsic;
     end for;
     // test 1
     
-    t0:=Cputime();
     out1:=[];
     for pair in pairs do
         a:=pair[1];
@@ -115,10 +114,9 @@ end intrinsic;
         e:=ChineseRemainderTheorem(pp13[1],pp13[2],a,b);
         Append(~out1,e);
     end for;
-    Cputime(t0); // old code ~14 secs. new code ~7 secs. w/o profiler
+    // old code ~14 secs. new code ~7 secs. w/o profiler
 
     // test 2
-    t0:=Cputime();
     out2:=[];
     e1:=ChineseRemainderTheorem(pp13[1],pp13[2],A!1,A!0);
     e2:=ChineseRemainderTheorem(pp13[1],pp13[2],A!0,A!1);
@@ -128,7 +126,6 @@ end intrinsic;
         e:=a*e1+b*e2;
         Append(~out2,e);
     end for;
-    Cputime(t0);
     pp:=pp13[1]*pp13[2];
     assert forall{i : i in [1..#out1] | (out1[i] - out2[i]) in pp};
     SetAssertions(1);    

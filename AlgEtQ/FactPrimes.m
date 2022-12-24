@@ -205,7 +205,7 @@ end intrinsic;
     A:=EtaleAlgebra(f);
     E1:=EquationOrder(A);
     ff:=Conductor(E1);
-    time _:=PrimesAbove(Conductor(E1));
+    _:=PrimesAbove(Conductor(E1));
     printf ".";
 
 
@@ -214,13 +214,13 @@ end intrinsic;
     E1:=EquationOrder(A);
     E2:=ProductOfEquationOrders(A);
     
-    time _:=PrimesAbove(Conductor(E1));
-    time _:=PrimesAbove(Conductor(E2));
-    time assert IsGorenstein(E1);
-    time assert IsGorenstein(E2);
+    _:=PrimesAbove(Conductor(E1));
+    _:=PrimesAbove(Conductor(E2));
+    assert IsGorenstein(E1);
+    assert IsGorenstein(E2);
 
-    time ids:=[ Ideal(E1,[Random(E1) : i in [1..10]]) : i in [1..100]]; 
-    time facs:=[ Factorization(I) : I in ids | I ne OneIdeal(E1) ];
+    ids:=[ Ideal(E1,[Random(E1) : i in [1..10]]) : i in [1..100]]; 
+    facs:=[ Factorization(I) : I in ids | I ne OneIdeal(E1) ];
     printf ".";
     SetAssertions(1);
     printf " all good!\n"; 

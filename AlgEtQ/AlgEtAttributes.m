@@ -118,6 +118,7 @@ end intrinsic;
     assert A eq A;
     assert A cmpeq A;
     assert not A cmpeq B;
-    printf ".";
+    SetAssertions(1);
+    printf " all good!\n";
 
 */

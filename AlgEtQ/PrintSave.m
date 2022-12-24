@@ -153,8 +153,8 @@ end intrinsic;
     f:=x^8+16;
     A:=EtaleAlgebra(f);
     O:=MaximalOrder(A);
-    time str:=PrintWKICM(O);
-    time O1:=LoadWKICM(str);
+    str:=PrintWKICM(O);
+    O1:=LoadWKICM(str);
 
     AttachSpec("~/packages_github/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());
@@ -162,8 +162,8 @@ end intrinsic;
     A:=EtaleAlgebra(f);
     F:=PrimitiveElement(A);
     R:=Order([F,2/F]);
-    time str:=PrintWKICM(R);
-    time R1:=LoadWKICM(str);
+    str:=PrintWKICM(R);
+    R1:=LoadWKICM(str);
     assert #WKICM(R) eq #WKICM(R1);
     assert #FindOverOrders(R) eq #FindOverOrders(R1);
 

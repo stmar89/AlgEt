@@ -647,7 +647,7 @@ end intrinsic;
     assert ort subset idem;
     assert One(A) in idem;
     assert Zero(A) in idem;
-    assert forall{i : i in idem  i^2 eq i};
+    assert forall{i : i in idem | i^2 eq i};
     assert forall{i : i,j in [1..#ort] | ort[i]*ort[j] eq ort[i]*KroneckerDelta(i,j)};
 
     for n in [1..100] do

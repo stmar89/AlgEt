@@ -135,7 +135,7 @@ end intrinsic;
     quit;
     cd ~/packages_github/AlgEt/dev/
     git pull; sleep 1;
-    magma -b slow_tests.m
+    magma -b slow_tests_AlgEtQ.m
 
 
 

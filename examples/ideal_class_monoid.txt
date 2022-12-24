@@ -1,0 +1,62 @@
+/* vim: set syntax=magma :*/
+
+/////////////////////////////////////////////////////
+// Stefano Marseglia, Utrecht University, s.marseglia@uu.nl
+// http://www.staff.science.uu.nl/~marse004/
+/////////////////////////////////////////////////////
+
+/*
+    Here you can find the code to reproduce the examples in the papers:
+    - [1] "Computing the ideal class monoid of an order",
+        J. Lond. Math. Soc. 101 (2020), no. 3, 984-1007
+        Stefano Marseglia
+        https://doi.org/10.1112/jlms.12294
+        https://arxiv.org/abs/1805.09671
+    
+    - [2] "Cohen-Macaulay type of orders, generators and ideal classes",
+        Stefano Marseglia
+        https://arxiv.org/abs/2206.03758
+
+*/
+
+// ########################
+// ### [1, Example 7.1] ###
+// ########################
+
+AttachSpec("~/packages_github/AlgEt/spec");
+
+P<x>:=PolynomialRing(Integers());
+f:=x^3+31*x^2+43*x+77;
+A:=EtaleAlgebra(f);
+// we define E=Z[x]/(f)
+E:=EquationOrder(A);
+// the Picard Group of E
+E_pic:=PicardGroup(E);
+#E_pic;
+// we compute the ideal classes of fractional ideals with multiplicator ring equal to E
+E_icm_bar:=ICM_bar(E);
+#E_icm_bar;
+// since E is monogenic we know that it is Gorenstein, but it is not Bass, that is there is at least one over-order which is not Gorenstein
+IsGorenstein(E);
+IsBass(E);
+//and hence we get that there are no other fractional ideals I with (I:I)=E other than the invertible ones.
+#E_pic eq #E_icm_bar;
+// We now compute the over-orders of E
+E_over_orders:=FindOverOrders(E);
+#E_over_orders;
+// and the weak equivalence classes of all fractional E-ideals
+E_wk:=WKICM(E);
+#E_wk;
+// and all the ideal classes of E
+E_icm:=ICM(E);
+#E_icm;
+
+//there are ideals which are not invertible in their own multiplicator rings.
+for I in E_icm do 
+    ZBasis(I);
+    S:=MultiplicatorRing(I);
+    IsWeakEquivalent(I,S);
+    IsWeakEquivalent(TraceDualIdeal(S),I);
+    IsIsomorphic(TraceDualIdeal(S),I);
+end for;
+

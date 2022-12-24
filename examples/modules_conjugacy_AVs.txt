@@ -10,7 +10,7 @@
         "Modules over orders, conjugacy classes of integral matrices, and abelian varieties over finite fields",
         Stefano Marseglia
         https://arxiv.org/abs/2208.05409
-    One needs several functionalities for étle algebra.
+    One needs several functionalities for étale algebra.
     Please download the following repository on your machine:
         https://github.com/stmar89/AlgEt
 

@@ -834,7 +834,7 @@ intrinsic CoprimeRepresentative(I::AlgEtQIdl,J::AlgEtQIdl) -> AlgEtQElt,AlgEtQId
     require S eq Order(J): "the ideals must be defined over the same order";
     x:=One(Algebra(I));
     xI:=I;
-    while not IsCoprime(xI,J) do
+    while not IsIntegral(I) and IsCoprime(xI,J) do
         x:=Random(Inverse(I)); //Inverse is cached
         xI:=x*I;
     end while;

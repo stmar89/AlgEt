@@ -139,7 +139,14 @@ end intrinsic;
     git pull; sleep 1;
     magma -b slow_tests_AlgEtQ.m
 
+    // examples Modules
+    screen -S examples_Modules;
+    screen -r examples_Modules;
 
+    quit;
+    cd ~/packages_github/AlgEt/examples/
+    git pull; sleep 1;
+    magma -b modules_conjugacy_AVs.txt
 
 
 

@@ -49,7 +49,7 @@ R:=Order([pi,q/pi]);
 O:=MaximalOrder(K);
 V:=EtaleAlgebra([K1,K1,K2]); // V = K1^s1 x K2^s2
 m:=NaturalAction(K,V); // m:K -> V component-wise diagonal action of K on V
-time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/"); // changes this line accordingly to wheter you have used Hecke.Build() or not,
+time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/AlgEtMod/"); // changes this line accordingly to wheter you have used Hecke.Build() or not,
                                                                                                    // and to the appriopriate path to the the packages AlgEt. 
                                                                                                    // It should take ~12 seconds.
 #classes;
@@ -83,7 +83,7 @@ R:=Order([pi]);
 O:=MaximalOrder(K);
 V:=EtaleAlgebra([K1,K1,K2]); // V = K1^s1 x K2^s2
 m:=NaturalAction(K,V); // m:K -> V component-wise diagonal action of K on V
-time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/"); // changes this line accordingly to wheter you have used Hecke.Build() or not,
+time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/AlgEtMod/"); // changes this line accordingly to wheter you have used Hecke.Build() or not,
                                                                                                    // and to the appriopriate path to the the packages AlgEt
                                                                                                    // It should take ~200 secs
 #classes;

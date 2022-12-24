@@ -122,13 +122,17 @@ end intrinsic;
 
     assert 1 eq #{I1,I2,I3,I4};
 
-    // work from remote
+    // fast tests from remote
     quit;
     cd ~/packages_github/AlgEt/dev/test/
     git pull; sleep 1;
     make;
     
-    magma;
+    // slow tests from remote
+    screen -S slow_tests;
+    cd ~/packages_github/AlgEt/dev/
+    git pull; sleep 1;
+    magma -b slow_tests.m
 
 
 

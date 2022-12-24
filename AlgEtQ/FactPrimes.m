@@ -191,13 +191,7 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing Primes and Factorizaton:";
-    Attach("~/packages_github/AlgEtQ/AlgEtQ.m");
-    Attach("~/packages_github/AlgEtQ/Elt.m");
-    Attach("~/packages_github/AlgEtQ/Ord.m");
-    Attach("~/packages_github/AlgEtQ/TraceNorm.m");
-    Attach("~/packages_github/AlgEtQ/Idl.m");
-    Attach("~/packages_github/AlgEtQ/WkTesting.m");
-    Attach("~/packages_github/AlgEtQ/FactPrimes.m");
+    Attach("~/packages_github/AlgEt/spec");
     SetAssertions(2);
 
     _<x>:=PolynomialRing(Integers());

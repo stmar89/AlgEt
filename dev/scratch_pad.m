@@ -126,7 +126,7 @@ end intrinsic;
     screen -r fast_tests;
 
     quit;
-    cd ~/packages_github/AlgEt/dev/test/
+    cd ~/packages_github/AlgEt/dev/fast_tests_AlgEtQ_make/
     git pull; sleep 1;
     make;
     

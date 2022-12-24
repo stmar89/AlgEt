@@ -319,7 +319,7 @@ end intrinsic;
 /* TEST
 
     AttachSpec("~/packages_github/AlgEtQ/spec");
-    Attach("~/packages_github/AlgEtQ/Modules.m");
+    AttachSpec("~/packages_github/AlgEtQ/specMod");
     _<x>:=PolynomialRing(Integers());
     m1:=x^4 - 2*x^2 + 9;
     m2:=x^2 -5*x + 7;

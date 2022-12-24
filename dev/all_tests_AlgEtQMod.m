@@ -84,8 +84,7 @@
     time l:=IntermediateModules(NE,N2); #l; // 5 secs
     time l3:=IntermediateModulesWithTrivialExtension(NE,N2,O); // ~1 secs
     NEO:=O!!NE;
-    assert #l2 eq #[ M : M in l | O!!M eq NEO ];
-    assert #l2 eq #l3;
+    assert #l3 eq #[ M : M in l | O!!M eq NEO ];
 
     // a much bigger test!
     AttachSpec("~/packages_github/AlgEt/spec");

@@ -44,7 +44,7 @@
         t1:=find_next(inp,t0,"*/")-3;
         out cat:=inp[t0..t1] cat "\n\n\n";
     end for;
-    out cat:="Cputime(time_Start);";
+    out cat:="Cputime(time_start);";
     fprintf output_file,"%o",out; 
 
     quit;

@@ -104,8 +104,8 @@ end intrinsic;
             b:=Random(E1);
         until not b in pp13[2];
         Append(~pairs,[a,b]);
-        printf ".";
     end for;
+    printf ".";
     // test 1
     
     out1:=[];
@@ -114,8 +114,8 @@ end intrinsic;
         b:=pair[2];
         e:=ChineseRemainderTheorem(pp13[1],pp13[2],a,b);
         Append(~out1,e);
-        printf ".";
     end for;
+    printf ".";
     // old code ~14 secs. new code ~7 secs. w/o profiler
 
     // test 2
@@ -127,8 +127,8 @@ end intrinsic;
         b:=pair[2];
         e:=a*e1+b*e2;
         Append(~out2,e);
-        printf ".";
     end for;
+    printf ".";
     pp:=pp13[1]*pp13[2];
     assert forall{i : i in [1..#out1] | (out1[i] - out2[i]) in pp};
     SetAssertions(1);    

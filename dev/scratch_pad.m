@@ -132,6 +132,7 @@ end intrinsic;
     screen -S slow_tests;
     screen -r slow_tests;
 
+    quit;
     cd ~/packages_github/AlgEt/dev/
     git pull; sleep 1;
     magma -b slow_tests.m

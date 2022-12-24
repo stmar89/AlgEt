@@ -31,7 +31,7 @@
             time P1,p1:=PicardGroup(E1 : GRH:=true );
         t1:=Cputime(t0);
         t_tot+:=t1;
-        assert #Pq eq #P2;
+        assert #P1 eq #P2;
     end for;
     printf "\n";
     tprevbest:=13.7; //on diophantus

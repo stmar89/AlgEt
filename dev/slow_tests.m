@@ -1,5 +1,6 @@
 /* vim: set syntax=magma :*/
-    
+    "-------------------------------------------------------------";
+    "-------------------------------------------------------------";
     "Slow tests, maily to compare timings (on diophantus)";
     "Code with profiler is commented out";
     "If the timing is off by more than 10%% with respect to the previous best (achieved on diophantus) then a warning is printed.";

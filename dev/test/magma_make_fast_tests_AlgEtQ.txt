@@ -41,8 +41,8 @@
         out:="";
         pos:=1;
         t0:=find_next(inp,pos,"TESTS");
-        t1:=find_next(inp,start,"*/")-3;
-        out cat:=inp[start...end];
+        t1:=find_next(inp,t0,"*/")-3;
+        out cat:=inp[t0...t1];
         fprintf output_file,"%o\n\n\n",out;
     end for;
      

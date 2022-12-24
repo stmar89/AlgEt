@@ -10,7 +10,9 @@
     - padictocc.m ?
 
     TODO:
-    ### Priority ###
+    ### Modules ###
+    - Run one more time the examples for Modules, to check that everything is in orders.
+    - Polish tests, both fast and slow. Add more printing.
     - I have recently added the Type AlgEtMod. Many thinks that are valid for Idl should also be implemented for Modules. Eg, sum of modules, ideal*module, ...
     - Then I should convert PowerOfBass.m
 
@@ -31,16 +33,12 @@
     - Improve saving and printing with LLL or MinimalGenerator (that is after CRT) to get smaller output.
     - add MaxCMTypeOverOrders
 
-    ### TEST SUIT ###
-    - For each test, track the best running time. 
-      If something get slower or faster than a previous version (up to some error)
-
     #### CRT ####
     - Make a CRT for modules : I/P1*...*Ps*I -> \prod_i (I/Pi*I)
       This is needed for finding a minimal set of generators of non-necessarly invertible ideals.
 
     #### OverOrders ####
-    - I think that implenting equality testing for orders on a lower level would improve the situation a lot.
+    - I think that implementing equality testing for orders on a lower level would improve the situation a lot.
 
     ### WKICM ###
     - Possible improvement to WKICM(S).
@@ -56,17 +54,15 @@
       But there are many cases where this is still too slow with only one non-Gorestein prime.
 
     ### Other ###
-    - Check if I can use Self() to improve construction of sequences. This is based on the following observation:
-    [ 2^i : i in [1..10^1000]] computes each power of 2 separately.
-    [ i gt 1 select Self(i-1)*2 else 2 ] constructs the same sequence recursively: at each step, it multiplies by 2.
+    ...
 
     ### FIXED/DONE: kept for the record. ###
-    - After fiddleing with SmallRepresentative I have achieved consistency in timings of PicardGroup. It seems that a lot of time was lost in CoprimeRepresentative.
+    - After fiddling with SmallRepresentative I have achieved consistency in timings of PicardGroup. It seems that a lot of time was lost in CoprimeRepresentative.
     - Added ZBasisLLL. It is used only when one stores ideals/orders, and when one really wants a small representative.
     - Done: &+ for sequence of ideals. &* doesn't seem to be more efficient than taking products.
     - residue_class_field_primitive_element is replaced by PrimitiveElementResidueField which is cached
     - Done: residue_class_ring_unit_subgroup_generators can be improved. 
-      calling CRT makes a lot of unecessary computations see test2 in CRT.m: 
+      calling CRT makes a lot of unnecessary computations see test2 in CRT.m: 
       currently CRT given (a,b)->e such that e-a in I and e-b in J. 
       If one needs to run it several times for the same I and J, 
       then it is better to first run it with input (1,0)->e1 and (0,1)->e2.
@@ -78,19 +74,19 @@
       Faster since we can skip some part of the recursion.
     - Introduced IntermediateIdealsWithTrivialExtension, which uses MaximalIntermediateIdeals. 
       Faster since we can skip some part of the recursion.
-    - I tryed to speed up equality checking using the inbuild Hash function of the output of myHash function 
+    - I tried to speed up equality checking using the inbuilt Hash function of the output of myHash function 
       for both AlgEtIdl and AlgEtOrd. But for EquationOrder of  f:=x^6 - 3*x^5 - 3*x^4 + 65*x^3 - 48*x^2 - 768*x + 4096 
       I got some collisions, so I reverted it. Also, the gain in speed was very small.
     - moved quotient stuff from OverOrders.m and MinimalGenerators.m (quo_frac_idl) into a new package.
-    - in TwoGenerators, if the ideal is knwon to be principal, then I should only return one generator. 
+    - in TwoGenerators, if the ideal is known to be principal, then I should only return one generator. 
       We act only if #Generators gt 2.
-    - I have made some cahnges in the way ColonIdeals are computed. I need to test with some wkicm
+    - I have made some changes in the way ColonIdeals are computed. I need to test with some wkicm
     - FindOverOrders seems now faster or comparable with the AlgAss version. We have improved the recursion, 
       by lowering the number of equality testing performed. 
       Note that if the same improvement is applied to AlgAss then we would probably lose the advantage.
     - IntermediateIdeals the results of 253_test_new3.txt are quite revealing. The raw output is contained in OUTPUT_new3.txt.
-      In particular for Z[F] of x^8+16 we see that there are some orders S such the quotient T/(S:T) has a giganting number of
-      subgroups, of which only a tiny numbers are S-modules. This contrary to the behaviour we see when the quotient is smaller.
+      In particular for Z[F] of x^8+16 we see that there are some orders S such the quotient T/(S:T) has a gigantic number of
+      subgroups, of which only a tiny numbers are S-modules. This contrary to the behavior we see when the quotient is smaller.
       This has been implemented. The recomputation of 148_* took around 30hours, compared to the 9 original months. 
       I have restart the recomputation of the whole set.
 

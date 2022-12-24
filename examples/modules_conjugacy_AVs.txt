@@ -31,9 +31,7 @@
 
 // Modify the following lines with the folder where you have downloaded the repository https://github.com/stmar89/AlgEt
 AttachSpec("~/packages_github/AlgEt/spec");
-Attach("~/packages_github/AlgEt/Modules.m");
-Attach("~/packages_github/AlgEt/IntermediateModules.m");
-Attach("~/packages_github/AlgEt/IsomModules.m");
+AttachSpec("~/packages_github/AlgEt/specMod");
 
 _<x>:=PolynomialRing(Integers());
 m1:=x^2-x+3;
@@ -69,9 +67,8 @@ time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/package
 
 // Modify the following lines with the folder where you have downloaded the repository https://github.com/stmar89/AlgEt
 AttachSpec("~/packages_github/AlgEt/spec");
-Attach("~/packages_github/AlgEt/Modules.m");
-Attach("~/packages_github/AlgEt/IntermediateModules.m");
-Attach("~/packages_github/AlgEt/IsomModules.m");
+AttachSpec("~/packages_github/AlgEt/specMod");
+
 _<x>:=PolynomialRing(Integers());
 m1:=x^2-x+3;
 m2:=x^2+x+3;

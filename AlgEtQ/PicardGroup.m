@@ -581,7 +581,8 @@ end intrinsic;
 	oo:=FindOverOrders(E);
     for S in oo do
         P,p:=PicardGroup(S);
-        U,u:=UnitGroup(S);	
+        U,u:=UnitGroup(S);
+        printf ".";	
     end for;
 
 	AttachSpec("~/packages_github/AlgEt/spec");
@@ -597,6 +598,7 @@ end intrinsic;
         P,p:=PicardGroup(E : GRH:=true);
         U,u:=UnitGroup(E : GRH:=true);
         assert #P eq 3548000;
+        printf ".";
     end for;
     SetAssertions(1);
 

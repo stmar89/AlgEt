@@ -245,7 +245,7 @@ end intrinsic;
 
 /* TESTS
 
-    printf "### Testing IntermediateModules:";
+    printf "### Testing IntermediateIdeals:";
 	SetAssertions(2);
 	_<x>:=PolynomialRing(Integers());
     f:=x^3-100*x^2-100*x-100;
@@ -254,10 +254,15 @@ end intrinsic;
     O:=MaximalOrder(K);
     ff:=Conductor(E);
     _:=MinimalIntermediateIdeals(E!!OneIdeal(O),ff);
+    printf ".";
     _:=IntermediateIdeals(E!!OneIdeal(O),ff);
+    printf ".";
     _:=IntermediateIdealsWithPrescribedMultiplicatorRing(E!!OneIdeal(O),ff);
+    printf ".";
     _:=MaximalIntermediateIdeals(E!!OneIdeal(O),ff);
+    printf ".";
     _:=IntermediateIdealsWithTrivialExtension(E!!OneIdeal(O),ff,O);
+    printf ".";
     _:=IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing(E!!OneIdeal(O),ff,O);
     printf ".";
     f:=x^4+291*x^3-988*x^2-1000*x-1000;
@@ -266,8 +271,11 @@ end intrinsic;
     O:=MaximalOrder(K);
     ff:=Conductor(E);
     _:=MinimalIntermediateIdeals(E!!OneIdeal(O),ff);
-    _:=MaximalIntermediateIdeals(E!!OneIdeal(O),ff);
+    printf ".";
+    _:=MaximalIntermediateIdeals(E!!OneIdeal(O),ff);    
+    printf ".";
     _:=IntermediateIdealsWithTrivialExtension(E!!OneIdeal(O),ff,O);
+    printf ".";
     _:=IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing(E!!OneIdeal(O),ff,O);
     printf ".";
     SetAssertions(1);

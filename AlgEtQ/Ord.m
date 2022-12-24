@@ -557,21 +557,26 @@ end intrinsic;
     _:=O1 eq O2;
     _:=O2 eq O3;
     assert EquationOrder(A) ne ProductOfEquationOrders(A);
-    
+    printf ".";
+
+
     OA:=MaximalOrder(A);
     O:=Order(ZBasis(OA));
     assert not assigned O`IsMaximal;
     assert O eq OA;
     assert not assigned O`IsMaximal; //not passing attributes at equality checks
+    printf ".";
 
     O:=Order(ZBasis(OA));
     assert IsProductOfOrders(O);
     assert IsMaximal(O);
+    printf ".";
 
     O:=MaximalOrder(A);
     G:=[[ Random(O) : i in [1..3] ] : i in [1..100]];
     S:=[ Order(s) : s in G ];
     _:=#Seqset(S);
+    printf ".";
 
     assert forall{z : z in ZBasis(O1) | z in O1 };
     for O in [O1,O2,O3] do
@@ -579,6 +584,7 @@ end intrinsic;
             assert Random(O) in O;
         end for;
     end for;
+    printf ".";
 
 
     seq:=[x^2-5*25,x^2-7*49];
@@ -586,13 +592,14 @@ end intrinsic;
     A:=EtaleAlgebra(seq);
     O1:=Order(Basis(A));
     O2:=Order(AbsoluteBasis(A));
-    O1 eq O2;
+    assert O1 eq O2;
     for O in [O1,O2] do
         for i in [1..100] do
             assert Random(O) in O;
         end for;
     end for;
-    
+    printf ".";
+
     E1:=EquationOrder(A);
     E2:=ProductOfEquationOrders(A);
     E3:=Order(A,<EquationOrder(seq[1]) , MaximalOrder(seq[2])>);

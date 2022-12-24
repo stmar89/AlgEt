@@ -56,13 +56,13 @@ end intrinsic;
     E:=EquationOrder(K);
     P,p:=PicardGroup(E : GRH:=true); //~10 secs
 
-    t0:=Cputime();
     for g in Generators(P) do 
         I:=p(g);
         TwoGeneratingSet(I);
         assert #Generators(I) le 2;
+        printf ".";
     end for;
-    Cputime(t0);
+
 
     // test if TwoGeneratingSet makes the power faster
     // Conlcusion: yes. By quite a bit!
@@ -78,12 +78,14 @@ end intrinsic;
     delete I`IsInvertible;
     exp:=[ Random(2,30) : i in [1..100]];
     l1:=[ I^i : i in exp ];
+    printf ".";
 
     assert IsInvertible(I);
     TwoGeneratingSet(I);
     assert #Generators(I) eq 2;
     l2:=[ I^i : i in exp ];
     assert l1 eq l2;
+    printf ".";
 
     I:=SmallRepresentative(I);
     delete I`IsInvertible;

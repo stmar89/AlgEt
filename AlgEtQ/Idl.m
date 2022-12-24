@@ -862,7 +862,9 @@ end intrinsic;
         assert 1 eq #{Ideal(E2,a),a*E2,E2*a};
         assert a*E2 eq E2!!(a*E1);
         assert E1!!(E2!!(a*E1)) ne a*E1;
+        printf ".";
     end for;
+
     _:={ Random(E1)*E1 : i in [1..100] };
     _:=a*E1 + E1!!(a*E2);
     _:=&*[Random(E1)*E1 : i in [1..100]];
@@ -878,10 +880,12 @@ end intrinsic;
     assert J eq JJ;
     _:=&meet[(Random(E1)*E1+Random(E1)*E1) : i in [1..100]];
     assert forall{ I : I in [Random(E1)*E1 : i in [1..100]] | not IsProductOfIdeals(I)};
+    printf ".";
     assert forall{ I : I in [Random(E2)*E2 : i in [1..100]] | IsProductOfIdeals(I)};
     _:=[TraceDualIdeal(Random(E1)*E1+Random(E1)*E1) : i in [1..100]];
     _:=[IsIntegral(Random(E1)*E1+Random(E1)*E1) : i in [1..100]];
     _:=[MakeIntegral(Random(E1)*E1+Random(E1)*E1) : i in [1..100]];
+    printf ".";
 
     ids:=[ Ideal(E1,[Random(E1) : i in [1..10]]) : i in [1..200]]; 
     _:=&meet(ids);
@@ -893,12 +897,14 @@ end intrinsic;
     assert test;
     for i in [1..100] do
         _:=Ideal(O,<ideal< O_prod[i] | [Random(O_prod[i],3): j in [1..3]]> : i in [1..#O_prod] >);
+        printf ".";
     end for;
 
     ids:=[ Ideal(E1,[Random(E1) : i in [1..10]]) : i in [1..20]]; 
     cc2:=[ TraceDualIdeal(TraceDualIdeal(I)*J) : I,J in ids  ];
     cc:=[ ColonIdeal(I,J) : I,J in ids  ];
     assert cc eq cc2;
+    printf ".";
 
     SetAssertions(1);
     printf " all good!\n";

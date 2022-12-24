@@ -122,6 +122,17 @@ end intrinsic;
 
     assert 1 eq #{I1,I2,I3,I4};
 
+    // work from remote
+    quit;
+    cd ~/packages_github/AlgEt/dev/test/
+    git pull; sleep 1;
+    make
+    
+    magma;
+
+
+
+
 
 /* TEST
 

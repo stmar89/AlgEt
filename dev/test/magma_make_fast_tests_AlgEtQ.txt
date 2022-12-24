@@ -40,8 +40,8 @@
         inp:=Read("../../" cat input_file);
         out:="";
         pos:=1;
-        start:=find_next(inp,pos,"TESTS");
-        end:=find_next(inp,start,"*/")-3;
+        t0:=find_next(inp,pos,"TESTS");
+        t1:=find_next(inp,start,"*/")-3;
         out cat:=inp[start...end];
         fprintf output_file,"%o\n\n\n",out;
     end for;

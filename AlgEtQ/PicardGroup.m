@@ -592,14 +592,12 @@ end intrinsic;
     SetVerbose("AlgEtQPicardGroup",1);
     SetVerbose("AlgEtQIdl",1);
     SetVerbose("ShortEltSmallRep",1);
-    for i in [1..10^1] do
-        A:=EtaleAlgebra(f);
-        E:=EquationOrder(A);
-        P,p:=PicardGroup(E : GRH:=true);
-        U,u:=UnitGroup(E : GRH:=true);
-        assert #P eq 3548000;
-        printf ".";
-    end for;
+    A:=EtaleAlgebra(f);
+    E:=EquationOrder(A);
+    P,p:=PicardGroup(E : GRH:=true);
+    U,u:=UnitGroup(E : GRH:=true);
+    assert #P eq 3548000;
+    printf ".";
     SetAssertions(1);
 
     printf " all good!\n"; 

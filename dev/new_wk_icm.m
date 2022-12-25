@@ -33,7 +33,7 @@ intrinsic IntermediateIdealsVSWithTrivialExtensionAndPrescribedMultiplicatorRing
         pot_new:=&join[MaximalSubmodules(elt) : elt in queue ];
         pot_new_lifts:=[ Ideal(S,[ (Q!b)@@q : b in Basis(W) ] cat zbPI) : W in pot_new]; 
         pot_new:={@ pot_new[i] : i in [1..#pot_new] | O!!pot_new_lifts[i] eq IO @}; //we keep only the ones with trivial extension
-        output join:={@ pot_new[i] : i in [1..#pot_new] | not pot_new[i] in done and MultiplicatorRing(pot_new_lift[i]) eq S @};
+        output join:={@ pot_new[i] : i in [1..#pot_new] | not pot_new[i] in done and MultiplicatorRing(pot_new_lifts[i]) eq S @};
         done join:=queue;
         // Note: if O!!pot_new_lift[i] is not IO, then all the subvector spaces of pot_new[i] will also not have trivial extension IO.
         // Hence we don't need to continue the recursion on pot_new_lift[i].
@@ -200,9 +200,15 @@ end intrinsic;
     "NEW method";
     AttachSpec("~/packages_github/AlgEt/spec");
     Attach("~/packages_github/AlgEt/dev/new_wk_icm.m");
+    P<x>:=PolynomialRing(Integers());
     str:=Split(Read("~/packages_github/AlgEt/dev/input_slow_sorted.txt"));
     poly:=[ P!eval(l) : l in str[1..10] ];
-
+    for f in poly do
+        A:=EtaleAlgebra(f);
+        R:=EquationOrder(A);
+        time _:=FindOverOrders(R);
+        time #WKICM(R);
+    end for;
 
 
 
@@ -213,12 +219,10 @@ end intrinsic;
     "NEW method";
     AttachSpec("~/packages_github/AlgEt/spec");
     Attach("~/packages_github/AlgEt/dev/new_wk_icm.m");
-
-  	_<x>:=PolynomialRing(Integers());
+    P<x>:=PolynomialRing(Integers());
     f:=x^8+16; 
     AttachSpec("~/packages_github/AlgEt/spec");
     A:=EtaleAlgebra(f);
-    F:=PrimitiveElement(A);
     R:=EquationOrder(A);
     time _:=FindOverOrders(R);
     time #WKICM(R);

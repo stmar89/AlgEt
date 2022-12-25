@@ -13,7 +13,7 @@ freeze;
 // 
 //------------
 
-import "../LowCohenMacaulayType.m" : wkicm_bar_CM_type2;
+import "../AlgEtQ/LowCohenMacaulayType.m" : wkicm_bar_CM_type2;
 
 intrinsic IntermediateIdealsVSWithTrivialExtensionAndPrescribedMultiplicatorRing(I::AlgEtQIdl,P::AlgEtQIdl, O::AlgEtQOrd)->SetIndx[AlgEtQIdl]
 {Given a fractional S-ideal I, a prime ideal P of S, and an overorder O of S such that O subset (I:I), it returns all the fractional S-ideal J such that PI subset J subset I such that (J:J) eq S and JO=I.}

@@ -122,6 +122,42 @@ end intrinsic;
 
     assert 1 eq #{I1,I2,I3,I4};
 
+    // fast tests from remote
+    screen -r fast_tests;
+
+    quit;
+    cd ~/packages_github/AlgEt/dev/fast_tests_AlgEtQ_make/
+    git pull; sleep 1;
+    make;
+    
+    // slow tests from remote
+    screen -S slow_tests;
+    screen -r slow_tests;
+
+    quit;
+    cd ~/packages_github/AlgEt/dev/
+    git pull; sleep 1;
+    magma -b slow_tests_AlgEtQ.m
+
+    // examples AlgEtQ
+    screen -r examples_papers_AlgEtQ;
+
+    quit;
+    cd ~/packages_github/AlgEt/examples/
+    git pull; sleep 1;
+    magma -b ideal_class_monoid.txt
+
+    // examples Modules
+    screen -S examples_Modules;
+    screen -r examples_Modules;
+
+    quit;
+    cd ~/packages_github/AlgEt/
+    git pull; sleep 1;
+    magma -b ~/packages_github/AlgEt/examples/modules_conjugacy_AVs.txt
+    magma -b ~/packages_github/AlgEt/dev/all_tests_AlgEtQMod.m
+
+
 
 /* TEST
 

@@ -5,7 +5,7 @@
     magma script to automatically create a .md file with the documentation for all intrinsics.
 
     input:
-        - input: = a string containing a sequence of .m files to be scanned
+        - input: = a spec file containing a folder and a sequence of .m files to be scanned
         - output_file:= an output file
 
 */
@@ -65,8 +65,9 @@
     end function;
 
     input:=Split(Read(input),"{\n}");
-    for input_file in input do
-        input_file;
+    fld:=input[1];
+    for input_file0 in input[2..#input] do
+        input_file:=fld cat "/" cat input_file0;
         inp:=Read("../" cat input_file);
         out:="";
         pos:=1;

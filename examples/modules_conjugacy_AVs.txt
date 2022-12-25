@@ -10,7 +10,7 @@
         "Modules over orders, conjugacy classes of integral matrices, and abelian varieties over finite fields",
         Stefano Marseglia
         https://arxiv.org/abs/2208.05409
-    One needs several functionalities for étle algebra.
+    One needs several functionalities for étale algebra.
     Please download the following repository on your machine:
         https://github.com/stmar89/AlgEt
 
@@ -31,9 +31,7 @@
 
 // Modify the following lines with the folder where you have downloaded the repository https://github.com/stmar89/AlgEt
 AttachSpec("~/packages_github/AlgEt/spec");
-Attach("~/packages_github/AlgEt/Modules.m");
-Attach("~/packages_github/AlgEt/IntermediateModules.m");
-Attach("~/packages_github/AlgEt/IsomModules.m");
+AttachSpec("~/packages_github/AlgEt/specMod");
 
 _<x>:=PolynomialRing(Integers());
 m1:=x^2-x+3;
@@ -51,7 +49,7 @@ R:=Order([pi,q/pi]);
 O:=MaximalOrder(K);
 V:=EtaleAlgebra([K1,K1,K2]); // V = K1^s1 x K2^s2
 m:=NaturalAction(K,V); // m:K -> V component-wise diagonal action of K on V
-time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/"); // changes this line accordingly to wheter you have used Hecke.Build() or not,
+time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/AlgEtQMod/"); // changes this line accordingly to wheter you have used Hecke.Build() or not,
                                                                                                    // and to the appriopriate path to the the packages AlgEt. 
                                                                                                    // It should take ~12 seconds.
 #classes;
@@ -69,9 +67,8 @@ time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/package
 
 // Modify the following lines with the folder where you have downloaded the repository https://github.com/stmar89/AlgEt
 AttachSpec("~/packages_github/AlgEt/spec");
-Attach("~/packages_github/AlgEt/Modules.m");
-Attach("~/packages_github/AlgEt/IntermediateModules.m");
-Attach("~/packages_github/AlgEt/IsomModules.m");
+AttachSpec("~/packages_github/AlgEt/specMod");
+
 _<x>:=PolynomialRing(Integers());
 m1:=x^2-x+3;
 m2:=x^2+x+3;
@@ -86,7 +83,7 @@ R:=Order([pi]);
 O:=MaximalOrder(K);
 V:=EtaleAlgebra([K1,K1,K2]); // V = K1^s1 x K2^s2
 m:=NaturalAction(K,V); // m:K -> V component-wise diagonal action of K on V
-time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/"); // changes this line accordingly to wheter you have used Hecke.Build() or not,
+time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/AlgEtQMod/"); // changes this line accordingly to wheter you have used Hecke.Build() or not,
                                                                                                    // and to the appriopriate path to the the packages AlgEt
                                                                                                    // It should take ~200 secs
 #classes;
@@ -99,3 +96,4 @@ for I in classes do
    printf "%o\n\n",mat;
 end for;
 
+quit;

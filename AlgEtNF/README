@@ -1,0 +1,4 @@
+All Tests are collected in AlgEtNF/AlgEt.m
+
+TODO:
+- intrinsic AbsoluteEtaleAlgebra which returns and AlgEtQ isomorphic to the original one.

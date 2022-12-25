@@ -10,37 +10,50 @@ freeze;
 declare verbose ShortEltSmallRep, 2;
 import "Ord.m" : MatrixQtoA,MatrixAtoQ,MatrixAtoZ;
 
-declare attributes AlgEtQIdl : ShortestElement, SmallRepresentative;
+declare attributes AlgEtQIdl : ShortElement, SmallRepresentative;
 
 //------------
-// ShortestElement
+// ShortElement
 //------------
 
-intrinsic ShortestElement(I::AlgEtQIdl) ->AlgEtQElt
-{Given an ideal I returns a non-zerodivisor in I with small coefficients (in the LLL sense). This is achieved by enumerating short vectors in I, and pick the first one which is a non-zerodivisor.}
-    if not assigned I`ShortestElement then
+intrinsic ShortElement(I::AlgEtQIdl) ->AlgEtQElt
+{Given an ideal I returns a non-zerodivisor in I with small coefficients (in the LLL sense). This is achieved by picking an element with small coefficients in a LLL-reduced basis (wrt the T2 norm as a Z-lattice).}
+    if not assigned I`ShortElement then
         ZBasisLLL(I);
-        L:=Lattice(MatrixAtoQ(ZBasis(I)));
-        // b:=Basis(LLL(L)); //we reduce above, so it is cached.
-        b:=Basis(L);
-        b:=[ Norm(c) : c in b ];
-        k:=0;
-        stop:=false;
-        min:=Min(b);
+        B := ZBasis(I);
+        bd:=1;
         repeat
-            p:=ShortVectors(L,2^(-k)*min,min*2^k);
-            for i in [1..#p] do
-                elt:=MatrixQtoA(Algebra(I),Matrix([Eltseq(p[i][1])]))[1];
-                if not IsZeroDivisor(elt) then
-                    stop:=true;
-                    break i;
-                end if;
-            end for;
-            k+:=1;
-        until stop;
-        I`ShortestElement:= elt;
+            rndm_coeffs:=[ [Random([-bd..bd]) : i in [1..#B]] : j in [1..10]];
+            elts:=[ SumOfProducts(rndm,B) : rndm in rndm_coeffs];
+            elts:=[ x : x in elts | not IsZeroDivisor(x) ];
+            bd +:=1;
+        until #elts ne 0;
+        _,i:=Min([Norm(x) : x in elt]);
+        return elts[i];
+        
+        // // The following is deterministic, but does not always work. Also, enumerating all short vectors is too much, and too memory extensive.
+        // L:=Lattice(MatrixAtoQ(ZBasis(I)));
+        // // b:=Basis(LLL(L)); //we reduce above, so it is cached.
+        // b:=Basis(L);
+        // b:=[ Norm(c) : c in b ];
+        // k:=0;
+        // stop:=false;
+        // min:=Min(b);
+        // repeat
+        //     k,Round(2^(-k)*min),Round((min+1)*2^k);
+        //     p:=ShortVectors(L,2^(-k)*min,(min+1)*2^k);
+        //     for i in [1..#p] do
+        //         elt:=MatrixQtoA(Algebra(I),Matrix([Eltseq(p[i][1])]))[1];
+        //         if not IsZeroDivisor(elt) then
+        //             stop:=true;
+        //             break i;
+        //         end if;
+        //     end for;
+        //     k+:=1;
+        // until stop;
+        I`ShortElement:= elt;
     end if;
-    return I`ShortestElement;
+    return I`ShortElement;
 end intrinsic;
 
 //------------
@@ -48,11 +61,11 @@ end intrinsic;
 //------------
 
 intrinsic SmallRepresentative(I::AlgEtQIdl) ->AlgEtQIdl,AlgEtQElt
-{Given a fractional R-ideal I, it returns an isomorphic ideal a*I, and the element a, such that a*I is a subset of R, and the cardinality of R/aI is small. This is achieved by computing the ShortestElement a of (R:I). Note that if I is invertible R/aI is isomorphic to (R:I)/aR.}
+{Given a fractional R-ideal I, it returns an isomorphic ideal a*I, and the element a, such that a*I is a subset of R, and the cardinality of R/aI is small. This is achieved by computing the ShortElement a of (R:I). Note that if I is invertible R/aI is isomorphic to (R:I)/aR.}
     if not assigned I`SmallRepresentative then                                            
         R:=Order(I);
         cRI:=ColonIdeal(R,I);
-        a:=ShortestElement(cRI);
+        a:=ShortElement(cRI);
         aI:=a*I;
         // the ZBasis of aI might be very big. We make it smaller.
         ZBasisLLL(aI);
@@ -74,12 +87,12 @@ end intrinsic;
     K:=EtaleAlgebra(f);
     E:=EquationOrder(K);
     ff:=Conductor(E);
-    _:=ShortestElement(ff);
+    _:=ShortElement(ff);
     oo:=FindOverOrders(E); 
     for S in oo do
         printf ".";
         ff:=Conductor(S);
-        _:=ShortestElement(ff);
+        _:=ShortElement(ff);
     end for;
     printf " all good!\n"; 
 

@@ -164,6 +164,7 @@ intrinsic WKICM(E::AlgEtQOrd : Method:="Auto")->SeqEnum
     if not assigned E`WKICM then
         wk:=[];
         oo:=FindOverOrders(E : populateoo_in_oo:=true);
+        O:=MaximalOrder(Algebra(E));
         edges:=[];
         for j in [1..#oo] do
             for i in [Index(oo,T) : T in MinimalOverOrders(oo[j])] do
@@ -173,9 +174,9 @@ intrinsic WKICM(E::AlgEtQOrd : Method:="Auto")->SeqEnum
         end for;
         D:=Digraph<#oo|edges>;
         vv:=VertexSet(D);
-        max_dist:=Distance(vv.Index(oo,MaximalOrder(A)),vv.Index(oo,E));
+        max_dist:=Distance(vv.Index(oo,O),vv.Index(oo,E));
         for d in [0..max_dist] do
-            oo_d:=Sphere(vv.Index(oo,MaximalOrder(A)),d);
+            oo_d:=Sphere(vv.Index(oo,O),d);
             oo_d:={@ oo[Index(v)] : v in oo_d @};
             for T in oo_d do
               wk cat:=[(E!!I) : I in WKICM_bar(T : Method:=Method)];

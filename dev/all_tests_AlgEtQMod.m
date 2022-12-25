@@ -88,7 +88,7 @@
 
     "-------------------------------------------------------------";
     "-------------------------------------------------------------";
-    "-----------------------IsomModules.m-------------------------";
+    "------------------IsomModules.m Fast Tests-------------------";
     "-------------------------------------------------------------";
     "-------------------------------------------------------------";
     
@@ -191,7 +191,10 @@
 
     "-------------------------------------------------------------";
     "-------------------------------------------------------------";
-    "The following test should require around ~10000 for the julia sieving. Here R is Bass, but we compute it with the slow method to test it."
+    "------------------IsomModules.m Slow Tests-------------------";
+    "-------------------------------------------------------------";
+    "-------------------------------------------------------------";
+    "The following test should require around ~10000 for the julia sieving. Here R is Bass, but we compute it with the slow method to test it.";
     // Pic(O) is non triviali. Class construction is rther fast, isomorphism sieveng requires ~10000 secs using julia.
     AttachSpec("~/packages_github/AlgEt/spec");
     AttachSpec("~/packages_github/AlgEt/specMod");

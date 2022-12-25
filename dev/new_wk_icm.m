@@ -70,7 +70,7 @@ intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum
                 sub_vs_T:=[];
                 for iP->P in [1..#pp] do
                   wkT:=WKICM_bar(mult_pp[iP]);
-                  q:=Inde(S,P);
+                  q:=Index(S,P);
                   dimsT:=[ Ilog(q,Index(J,(mult_pp[iP]!!P)*J)) : J in wkT ];
                   Append(~sub_vs_T,&+[num_sub_vect_sp(q,d) : d in dimsT]);
                 end for;
@@ -204,6 +204,7 @@ end intrinsic;
     str:=Split(Read("~/packages_github/AlgEt/dev/input_slow_sorted.txt"));
     poly:=[ P!eval(l) : l in str[1..10] ];
     for f in poly do
+        f;
         A:=EtaleAlgebra(f);
         R:=EquationOrder(A);
         time _:=FindOverOrders(R);

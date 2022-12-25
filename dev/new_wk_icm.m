@@ -78,7 +78,7 @@ intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum
                 P:=pp[iP];
                 T:=mult_pp[iP];
                 wkT:=WKICM_bar(mult_pp[iP]);
-                cands:=[ IntermediateIdealsVSWithTrivialExtensionAndPrescribedMultiplicatorRing(J,P,T), J in wkT ];
+                cands:=[ IntermediateIdealsVSWithTrivialExtensionAndPrescribedMultiplicatorRing(J,P,T) : J in wkT ];
                 for I in cand do
                   if not exists{J : J in seqWk_bar | IsWeakEquivalent(I,J)} then
                     ZBasisLLL(I);

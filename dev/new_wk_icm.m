@@ -177,7 +177,7 @@ intrinsic WKICM(E::AlgEtQOrd : Method:="Auto")->SeqEnum
             oo_d:=Sphere(vv.Index(oo,MaximalOrder(A)),d);
             oo_d:={@ oo[Index(v)] : v in oo_d @};
             for T in oo_d do
-              wk &cat:=[(E!!I) : I in WKICM_bar(T : Method:=Method)];
+              wk cat:=[(E!!I) : I in WKICM_bar(T : Method:=Method)];
             end for;
         end for;
         for I in wk do
@@ -198,6 +198,7 @@ end intrinsic;
 
     AttachSpec("~/packages_github/AlgEt/spec");
     Attach("~/packages_github/AlgEt/dev/new_wk_icm.m");
+
   	_<x>:=PolynomialRing(Integers());
     f:=x^8+16; 
     AttachSpec("~/packages_github/AlgEt/spec");

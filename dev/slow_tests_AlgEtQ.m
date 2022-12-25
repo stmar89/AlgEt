@@ -172,7 +172,7 @@
     R:=Order([F,2/F]); 
     oo:=FindOverOrders(R : populateoo_in_oo:=true); //to avoid any computation related to the OverOrders
     t0:=Cputime();
-        #WKICM(R);
+        _:=#WKICM(R);
     t1:=Cputime(t0);
     printf "Current running time = %o \n",t1;
     tprevbest:=4.5; // diophantus

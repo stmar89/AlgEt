@@ -215,7 +215,7 @@ end intrinsic;
 
     ids:=[ Ideal(E1,[Random(E1) : i in [1..10]]) : i in [1..100]];
     ids:=[ I : I in ids | I ne OneIdeal(E1) and IsInvertible(I) ];
-    ids:=[ CoprimeRepresentative(I,Conductor(E1) : I in ids ];
+    ids:=[ CoprimeRepresentative(I,Conductor(E1)) : I in ids ];
     facs:=[ Factorization(I) : I in ids ];
     printf ".";
     SetAssertions(1);

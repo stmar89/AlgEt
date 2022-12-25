@@ -30,10 +30,10 @@ intrinsic IntermediateIdealsVSWithTrivialExtensionAndPrescribedMultiplicatorRing
     output:={@  @};
     done:={@ @};
     while #queue gt 0 do
-        pot_new:=Seqset(&cat[ MaximalSubmodules(elt) : elt in queue ]);
+        pot_new:={@ x : x in &cat[ MaximalSubmodules(elt) : elt in queue ]@};
         pot_new_lifts:=[ Ideal(S,[ (Q!b)@@q : b in Basis(W) ] cat zbPI) : W in pot_new]; 
         pot_new:={@ pot_new[i] : i in [1..#pot_new] | O!!pot_new_lifts[i] eq IO @}; //we keep only the ones with trivial extension
-        output join:={@ pot_new[i] : i in [1..#pot_new] | not pot_new[i] in done and MultiplicatorRing(pot_new_lifts[i]) eq S @};
+        output join:={@ pot_new_lifts[i] : i in [1..#pot_new] | not pot_new[i] in done and MultiplicatorRing(pot_new_lifts[i]) eq S @};
         done join:=queue;
         // Note: if O!!pot_new_lift[i] is not IO, then all the subvector spaces of pot_new[i] will also not have trivial extension IO.
         // Hence we don't need to continue the recursion on pot_new_lift[i].

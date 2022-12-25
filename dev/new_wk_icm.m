@@ -30,7 +30,7 @@ intrinsic IntermediateIdealsVSWithTrivialExtensionAndPrescribedMultiplicatorRing
     output:={@  @};
     done:={@ @};
     while #queue gt 0 do
-        pot_new:=&join{@ MaximalSubmodules(elt) : elt in queue @};
+        pot_new:=Seqset(&cat[ MaximalSubmodules(elt) : elt in queue ]);
         pot_new_lifts:=[ Ideal(S,[ (Q!b)@@q : b in Basis(W) ] cat zbPI) : W in pot_new]; 
         pot_new:={@ pot_new[i] : i in [1..#pot_new] | O!!pot_new_lifts[i] eq IO @}; //we keep only the ones with trivial extension
         output join:={@ pot_new[i] : i in [1..#pot_new] | not pot_new[i] in done and MultiplicatorRing(pot_new_lifts[i]) eq S @};

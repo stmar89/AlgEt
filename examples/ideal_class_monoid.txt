@@ -168,3 +168,5 @@ for T in FindOverOrders(R) do
     size_icm_R +:=#WKICM_bar(T)*#PicardGroup(T);
 end for;
 size_icm_R;
+
+quit;

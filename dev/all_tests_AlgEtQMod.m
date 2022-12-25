@@ -29,8 +29,8 @@
     O:=MaximalOrder(K);
     M:=Module(O,m,gens);
     N:=Module(O,m,< 1*MaximalOrder(Vnf[i]) : i in [1..#Vnf] >);
-    Generators(M);
-    ZBasis(M) eq ZBasis(N);
+    _:=Generators(M);
+    assert ZBasis(M) eq ZBasis(N);
     assert N eq M;
     E:=EquationOrder(K);
     assert not IsMaximal(E);
@@ -86,52 +86,6 @@
     NEO:=O!!NE;
     assert #l3 eq #[ M : M in l | O!!M eq NEO ];
 
-    // a much bigger test!
-    AttachSpec("~/packages_github/AlgEt/spec");
-    AttachSpec("~/packages_github/AlgEt/specMod");
-    _<x>:=PolynomialRing(Integers()); 
-    h:=x^8 - 4*x^6 + 22*x^4 - 36*x^2 + 81;
-    q:=Integers() ! Truncate( ConstantCoefficient(h)^(2/Degree(h)) );
-    fac:=Factorization(h);
-    g:=&*[f[1] : f in fac];
-    K:=EtaleAlgebra(g);
-    F:=PrimitiveElement(K);
-    V:=q/F;
-    ZFV:=Order([F,V]);
-    oo:=FindOverOrders(ZFV);
-    // The situation is the following: (we denote inclusion by c)
-    // ZFV c S c T c O,
-    // each inclusion with index 2.
-    // S has CohenMacaulayType 2, while ZFV,T and O are Gorenstein.
-    // All have only one prime above 2.
-    // All have trivial PicardGroup
-    // If ZFV were Bass then we woulc have the followin isomorphism classes of AVs in IsogenClass(h):
-    ss:={1,2,3,4};
-    #[ c : c in car<ss,ss,ss,ss> | c[1] le c[2] and c[2] le c[3] and c[3] le c[4] ];
-    // we get 35 classes.
-    // But ZFV is NOT Bass!/
-    assert #PicardGroup(ZFV) eq 1;
-
-    R:=ZFV;
-    O:=MaximalOrder(K);
-    nf:=Components(K);
-    V:=EtaleAlgebra(&cat[nf : i in [1..2]]);
-    Vnf:=Components(V);
-    m:=NaturalAction(K,V);
-    MO:=Module(R,m,<1*MaximalOrder(Vnf[i]) : i in [1..#Vnf]>);
-    MOO:=O!!MO;
-    ff:=O!!Conductor(R);
-    test,ff_prod:=IsProductOfIdeals(ff);
-    assert test;
-    // the following works for this exmaple, not in general.
-    Mff:=Module(R,m,<ff_prod[1] : i in [1..2]>);
-    gensMff:=Generators(Mff);
-    time l0:=IntermediateModulesWithTrivialExtension(MO,Mff,O);
-    time l1:=IntermediateModules(MO,Mff);
-    time l2:=[ I : I in l1 | O!!I eq MO ];
-    assert #l2 eq #l0;
-    "then do the julia thing...";
-
     "-------------------------------------------------------------";
     "-------------------------------------------------------------";
     "-----------------------IsomModules.m-------------------------";
@@ -142,6 +96,7 @@
     // Fast Tests
     // ##########
 
+    "A very quick test.";
     AttachSpec("~/packages_github/AlgEt/spec");
     AttachSpec("~/packages_github/AlgEt/specMod");
     SetVerbose("IsomModules",1);
@@ -158,6 +113,9 @@
     time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/AlgEtQMod/"); // this is the ICM
     assert #classes eq #icm; // Since R is Bass, the ICM is Pic(R) cup Pic(O)
 
+    "-------------------------------------------------------------";
+    "-------------------------------------------------------------";
+    "A quick test, with non trivial Class group, first with V=K and then with V = K^2";
     // Pic(O) is non trivial
     AttachSpec("~/packages_github/AlgEt/spec");
     AttachSpec("~/packages_github/AlgEt/specMod");
@@ -181,6 +139,30 @@
     time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/AlgEtQMod/");
     assert #classes eq 6; // because R is Bass 
 
+    "-------------------------------------------------------------";
+    "-------------------------------------------------------------";
+    "A very quick test, where V = K, that is we compute the ICM";
+    AttachSpec("~/packages_github/AlgEt/spec");
+    AttachSpec("~/packages_github/AlgEt/specMod");
+    SetVerbose("IsomModules",1);
+    _<x>:=PolynomialRing(Integers()); 
+    g:=x^6-x^5+2*x^4-2*x^3+4*x^2-4*x+8;
+    K:=EtaleAlgebra(g);
+    nf:=Components(K);
+    q:=2;
+    pi:=PrimitiveElement(K);
+    R:=Order([pi,q/pi]);
+    O:=MaximalOrder(K);
+    assert IsBass(R);
+    m:=NaturalAction(K,K);
+    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/AlgEtQMod/"); // this is the ICM
+    time icm:=ICM(R);
+    assert #classes eq #icm; // Since R is Bass, the ICM is Pic(R) cup Pic(O)
+
+
+    "-------------------------------------------------------------";
+    "-------------------------------------------------------------";
+    "A test that takes ~3 minutes, where V = K1^2 x K2";
     AttachSpec("~/packages_github/AlgEt/spec");
     AttachSpec("~/packages_github/AlgEt/specMod");
     SetVerbose("IsomModules",1);
@@ -203,27 +185,13 @@
                                                                                                        // and to the appriopriate path to the the packages AlgEtQ
     assert #classes eq 4;
 
-    AttachSpec("~/packages_github/AlgEt/spec");
-    AttachSpec("~/packages_github/AlgEt/specMod");
-    SetVerbose("IsomModules",1);
-    _<x>:=PolynomialRing(Integers()); 
-    g:=x^6-x^5+2*x^4-2*x^3+4*x^2-4*x+8;
-    K:=EtaleAlgebra(g);
-    nf:=Components(K);
-    q:=2;
-    pi:=PrimitiveElement(K);
-    R:=Order([pi,q/pi]);
-    O:=MaximalOrder(K);
-    assert IsBass(R);
-    m:=NaturalAction(K,K);
-    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/AlgEtQMod/"); // this is the ICM
-    time icm:=ICM(R);
-    assert #classes eq #icm; // Since R is Bass, the ICM is Pic(R) cup Pic(O)
-
     // ########## 
     // Slow Tests
     // #########
 
+    "-------------------------------------------------------------";
+    "-------------------------------------------------------------";
+    "The following test should require around ~10000 for the julia sieving. Here R is Bass, but we compute it with the slow method to test it."
     // Pic(O) is non triviali. Class construction is rther fast, isomorphism sieveng requires ~10000 secs using julia.
     AttachSpec("~/packages_github/AlgEt/spec");
     AttachSpec("~/packages_github/AlgEt/specMod");
@@ -259,3 +227,41 @@
     m:=NaturalAction(K,V);
     time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/AlgEtQMod/");
     assert #classes eq 6; // Example 6.1 in "Computing abelian varieties over finite fields isogenous to a power", by Marseglia
+
+
+    
+    "The following test is much bigger! (so far it never finished)";
+    // a much bigger test!
+    AttachSpec("~/packages_github/AlgEt/spec");
+    AttachSpec("~/packages_github/AlgEt/specMod");
+    _<x>:=PolynomialRing(Integers()); 
+    h:=x^8 - 4*x^6 + 22*x^4 - 36*x^2 + 81;
+    q:=Integers() ! Truncate( ConstantCoefficient(h)^(2/Degree(h)) );
+    fac:=Factorization(h);
+    g:=&*[f[1] : f in fac];
+    K:=EtaleAlgebra(g);
+    F:=PrimitiveElement(K);
+    V:=q/F;
+    ZFV:=Order([F,V]);
+    oo:=FindOverOrders(ZFV);
+    " The situation is the following: (we denote inclusion by c)
+    ZFV c S c T c O,
+    each inclusion with index 2.
+    S has CohenMacaulayType 2, while ZFV,T and O are Gorenstein.
+    All have only one prime above 2.
+    All have trivial PicardGroup
+    If ZFV were Bass then we would have the following number of isomorphism classes of ZFV modules in V=K^2:";
+    ss:={1,2,3,4};
+    #[ c : c in car<ss,ss,ss,ss> | c[1] le c[2] and c[2] le c[3] and c[3] le c[4] ];
+    // we would get 35 classes.
+    "But ZFV is NOT Bass";
+    assert #PicardGroup(ZFV) eq 1;
+
+    O:=MaximalOrder(K);
+    nf:=Components(K);
+    V:=EtaleAlgebra(&cat[nf : i in [1..2]]);
+    m:=NaturalAction(K,V);
+    time classes:=IsomorphismClasses(ZFV,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/AlgEtQMod/");
+    "We get this many classes:";
+    #classes;
+    

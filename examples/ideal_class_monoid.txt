@@ -150,7 +150,7 @@ end for;
 // Hence among the overorders of S, there is one with CohenMacaulayType equal to 2, which is the maximum.
 oo:=FindOverOrders(S);
 [ CohenMacaulayType(T) : T in oo ];
-// We compute the weak equivalence classes of s
+// We compute the weak equivalence classes of S
 #WKICM(S);
 // and the size of ICM(S), by looping over the overorders:
 size_icm_S:=0;

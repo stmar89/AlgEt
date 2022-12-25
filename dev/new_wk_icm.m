@@ -69,7 +69,7 @@ intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum
                     return 2+&+[ (1-q^n)*(1-q) div (1-q^k)*(1-q^(n-k)) : k in [1..n-1]];
                 end function;
                 sub_vs_T:=[];
-                for iP->P in [1..#pp] do
+                for iP->P in pp do
                   wkT:=WKICM_bar(mult_pp[iP]);
                   q:=Index(S,P);
                   dimsT:=[ Ilog(q,Index(J,(mult_pp[iP]!!P)*J)) : J in wkT ];

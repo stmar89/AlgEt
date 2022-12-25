@@ -190,12 +190,14 @@ end intrinsic;
 
 
 /* TESTS
+    screen -r test_new_wk_icm
 
     quit;
     cd ~/packages_github/AlgEt/
     git pull; sleep 1;
     magma
 
+    "NEW method";
     AttachSpec("~/packages_github/AlgEt/spec");
     Attach("~/packages_github/AlgEt/dev/new_wk_icm.m");
 
@@ -204,6 +206,21 @@ end intrinsic;
     AttachSpec("~/packages_github/AlgEt/spec");
     A:=EtaleAlgebra(f);
     R:=EquationOrder(A);
+    time _:=FindOverOrders(R);
     time #WKICM(R);
+    quit;
+
+    magma
+
+    AttachSpec("~/packages_github/AlgEt/spec");
+    "OLD method";
+  	_<x>:=PolynomialRing(Integers());
+    f:=x^8+16; 
+    AttachSpec("~/packages_github/AlgEt/spec");
+    A:=EtaleAlgebra(f);
+    R:=EquationOrder(A);
+    time _:=FindOverOrders(R);
+    time #WKICM(R);
+    quit;
 
 */

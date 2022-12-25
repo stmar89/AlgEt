@@ -22,12 +22,13 @@ intrinsic ShortElement(I::AlgEtQIdl) ->AlgEtQElt
         ZBasisLLL(I);
         B := ZBasis(I);
         bd:=1;
-        repeat
+        elts:=[ x : x in B | not IsZeroDivisor(x) ];
+        while #elts eq 0 do //if all ZeroDiv
             rndm_coeffs:=[ [Random([-bd..bd]) : i in [1..#B]] : j in [1..10]];
             elts:=[ SumOfProducts(rndm,B) : rndm in rndm_coeffs];
             elts:=[ x : x in elts | not IsZeroDivisor(x) ];
             bd +:=1;
-        until #elts ne 0;
+        end while;
         _,i:=Min([Norm(x) : x in elts]);
         elt:=elts[i];
         

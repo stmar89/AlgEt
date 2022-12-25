@@ -200,11 +200,25 @@ end intrinsic;
     "NEW method";
     AttachSpec("~/packages_github/AlgEt/spec");
     Attach("~/packages_github/AlgEt/dev/new_wk_icm.m");
+    str:=Split(Read("~/packages_github/AlgEt/dev/input_slow_sorted.txt"));
+    poly:=[ P!eval(l) : l in str[1..10] ];
+
+
+
+
+
+
+
+
+    "NEW method";
+    AttachSpec("~/packages_github/AlgEt/spec");
+    Attach("~/packages_github/AlgEt/dev/new_wk_icm.m");
 
   	_<x>:=PolynomialRing(Integers());
     f:=x^8+16; 
     AttachSpec("~/packages_github/AlgEt/spec");
     A:=EtaleAlgebra(f);
+    F:=PrimitiveElement(A);
     R:=EquationOrder(A);
     time _:=FindOverOrders(R);
     time #WKICM(R);

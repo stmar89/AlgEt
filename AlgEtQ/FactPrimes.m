@@ -213,8 +213,10 @@ end intrinsic;
     assert IsGorenstein(E1);
     assert IsGorenstein(E2);
 
-    ids:=[ CoprimeRepresentative(Ideal(E1,[Random(E1) : i in [1..10]]),Conductor(E1)) : i in [1..100]]; 
-    facs:=[ Factorization(I) : I in ids | I ne OneIdeal(E1) ];
+    ids:=[ Ideal(E1,[Random(E1) : i in [1..10]]) : i in [1..100]];
+    ids:=[ I : I in ids | I ne OneIdeal(E1) and IsInvertible(I) ];
+    ids:=[ CoprimeRepresentative(I,Conductor(E1) : I in ids ];
+    facs:=[ Factorization(I) : I in ids ];
     printf ".";
     SetAssertions(1);
     printf " all good!\n"; 

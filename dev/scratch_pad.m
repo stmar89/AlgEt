@@ -139,6 +139,14 @@ end intrinsic;
     git pull; sleep 1;
     magma -b slow_tests_AlgEtQ.m
 
+    // examples AlgEtQ
+    screen -r examples_papers_AlgEtQ;
+
+    quit;
+    cd ~/packages_github/AlgEt/examples/
+    git pull; sleep 1;
+    magma -b ideal_class_monoid.txt
+
     // examples Modules
     screen -S examples_Modules;
     screen -r examples_Modules;

@@ -746,7 +746,7 @@ intrinsic IsProductOfIdeals(I::AlgEtQIdl) -> BoolElt, Tup
 end intrinsic;
 
 //----------
-// Random Elemnts
+// Random Elements
 //----------
 
 intrinsic Random(I::AlgEtQIdl , bd::RngIntElt : ZeroDivisorsAllowed:=false ) -> AlgEtQElt

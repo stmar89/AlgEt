@@ -52,7 +52,7 @@ E_wk:=WKICM(E);
 // and all the ideal classes of E
 E_icm:=ICM(E);
 #E_icm;
-// For each over_order we compute the index, the weak equivalence classes, the Picard group and the number of isomorphism classes with that muliplicator ring:
+// For each over_order we compute the index, the weak equivalence classes, the Picard group and the number of isomorphism classes with that multiplicator ring:
 for S in E_over_orders do
     Index(O,S), #WKICM_bar(S), #PicardGroup(S), #ICM_bar(S);
 end for;

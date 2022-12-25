@@ -58,6 +58,7 @@ intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum
             seqWk_bar:=[];
             St:=TraceDualIdeal(S);
             if Method in {"Auto","IntermediateIdealsVSWithTrivialExtensionAndPrescribedMultiplicatorRing"} then
+    "using new method";
                 pp:=PrimesAbove(Conductor(S));
                 oo:=FindOverOrders(S);
                 mult_pp:=[ oo[Index(oo,MultiplicatorRing(P))] : P in pp ];
@@ -79,7 +80,7 @@ intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum
                 T:=mult_pp[iP];
                 wkT:=WKICM_bar(mult_pp[iP]);
                 cands:=[ IntermediateIdealsVSWithTrivialExtensionAndPrescribedMultiplicatorRing(J,P,T) : J in wkT ];
-                for I in cand do
+                for I in cands do
                   if not exists{J : J in seqWk_bar | IsWeakEquivalent(I,J)} then
                     ZBasisLLL(I);
                     Append(~seqWk_bar,I);

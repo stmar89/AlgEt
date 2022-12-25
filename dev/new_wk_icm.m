@@ -68,7 +68,7 @@ intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum
                     return 2+&+[ (1-q^n)*(1-q) div (1-q^k)*(1-q^(n-k)) : k in [1..n-1]];
                 end function;
                 sub_vs_T:=[];
-                for iP->P do
+                for iP->P in [1..#pp] do
                   wkT:=WKICM_bar(mult_pp[iP]);
                   q:=Inde(S,P);
                   dimsT:=[ Ilog(q,Index(J,(mult_pp[iP]!!P)*J)) : J in wkT ];
@@ -190,7 +190,7 @@ end intrinsic;
 
 
 /* TESTS
-    quit;
+
     quit;
     cd ~/packages_github/AlgEt/
     git pull; sleep 1;
@@ -204,4 +204,5 @@ end intrinsic;
     A:=EtaleAlgebra(f);
     R:=EquationOrder(A);
     time #WKICM(R);
+
 */

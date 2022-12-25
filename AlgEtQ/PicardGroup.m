@@ -141,7 +141,7 @@ IsPrincipal_prod_internal:=function( II , GRH )
     assert IsMaximal(Order(II)); //this function should be called only for ideals of the maximal order
     if #Generators(II) eq 1 then return true,Generators(II)[1]; end if;
     // we try with LLL
-    elt:=ShortestElement(II);
+    elt:=ShortElement(II);
     if elt*Order(II) eq II then
             II`Generators:=[elt];
             return true,Generators(II)[1];
@@ -191,7 +191,7 @@ intrinsic IsPrincipal(I1::AlgEtQIdl : GRH:=false )->BoolElt, AlgAssElt
     if not IsInvertible(I1) then return false,_; end if;
     if #Generators(I1) eq 1 then return true,Generators(I1)[1]; end if;
     // we try with LLL
-    elt:=ShortestElement(I1);
+    elt:=ShortElement(I1);
     if elt*Order(I1) eq I1 then
             I1`Generators:=[elt];
             return true,Generators(I1)[1];

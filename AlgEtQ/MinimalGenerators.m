@@ -27,7 +27,7 @@ intrinsic TwoGeneratingSet(I::AlgEtQIdl)
         // else
         //     a:=Random(I : ZeroDivisorsAllowed:=false );
         // end if;
-        a:=ShortestElement(I);
+        a:=ShortElement(I);
         S:=Order(I);
         Q,q:=Quotient(I,[a*z : z in ZBasis(S)]);
         if IsTrivial(Q) then

@@ -71,7 +71,7 @@ intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum
                     idls:=IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing(T1,ff,T);
                     for I in idls do
                         if not exists{ J : J in seqWk_bar | IsWeakEquivalent(I,J) } then
-                            // ZBasisLLL(I);
+                            ZBasisLLL(I);
                             Append(~seqWk_bar,I);
                         end if;
                     end for;
@@ -89,7 +89,7 @@ intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum
                         if not I in seqWk_bar and 
                             MultiplicatorRing(I) eq S and 
                             not exists{J : J in seqWk_bar | IsWeakEquivalent(I,J)} then 
-                                // ZBasisLLL(I);
+                                ZBasisLLL(I);
                                 Append(~seqWk_bar,I);
                         end if;
                     end while;
@@ -107,9 +107,9 @@ intrinsic WKICM(E::AlgEtQOrd : Method:="Auto")->SeqEnum
         require Method in {"Auto","LowIndexProcess","IntermediateIdeals"} : "The VarArg parameter Method is assigned to a not avaialble value";
         seqOO:=FindOverOrders(E : populateoo_in_oo:=true);
         wk:=&cat[[(E!!I) : I in WKICM_bar(S : Method:=Method)] : S in seqOO ];
-        // for I in wk do
-        //     ZBasisLLL(I);
-        // end for;
+        for I in wk do
+            ZBasisLLL(I);
+        end for;
         E`WKICM:=wk;
     end if;
     return E`WKICM;

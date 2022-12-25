@@ -56,7 +56,7 @@
 
     "-------------------------------------------------------------";
     "The following order used to trigger a bug in CRT. now fixed";
-    clear;
+    
     AttachSpec("~/packages_github/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());
     f:=x^6 - 3*x^5 - 3*x^4 + 65*x^3 - 48*x^2 - 768*x + 4096;
@@ -91,7 +91,7 @@
     "-------------------------------------------------------------";
     "-------------------------------------------------------------";
     "A quick one.";
-    clear;
+    
 	_<x>:=PolynomialRing(Integers());
     f:=x^4-10000*x^3-10000*x^2-10000*x-10000; 
     AttachSpec("~/packages_github/AlgEt/spec");
@@ -122,7 +122,7 @@
 
     "-------------------------------------------------------------";
     "A bigger example.";
-    clear;
+    
     AttachSpec("~/packages_github/AlgEt/spec");
     // no profiler
 	_<x>:=PolynomialRing(Integers());
@@ -161,7 +161,7 @@
     "-------------------------------------------------------------";
 
     "A very quick example.";
-    clear;
+    
 	_<x>:=PolynomialRing(Integers());
     f:=x^8+16; 
     AttachSpec("~/packages_github/AlgEt/spec");
@@ -197,7 +197,7 @@
     */
     "-------------------------------------------------------------";
     "A much bigger example: the interesting overorders, with CohenMacaulyType > 2, have been already computed and saved in a special file. We compute the WkICM_bar for this order, and compare timings. The orders are sorted from the fastest to the slowest.";
-    clear;
+    
 	_<x>:=PolynomialRing(Integers());
     f:=x^8+16; 
     AttachSpec("~/packages_github/AlgEt/spec");

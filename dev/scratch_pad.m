@@ -157,6 +157,29 @@ end intrinsic;
     magma -b ~/packages_github/AlgEt/examples/modules_conjugacy_AVs.txt
     magma -b ~/packages_github/AlgEt/dev/all_tests_AlgEtQMod.m
 
+    ////////////////////////////////////
+    // Graph of inclusions of overorders
+    ////////////////////////////////////
+    _<x>:=PolynomialRing(Integers());
+    f:=x^4-10000*x^3-10000*x^2-10000*x-10000; 
+    AttachSpec("~/packages_github/AlgEt/spec");
+    // no profiler
+    A:=EtaleAlgebra(f);
+    E:=EquationOrder(A);
+    oo:=FindOverOrders(E);
+    edges:=[];
+    for j in [1..#oo] do
+        for i in [Index(oo,T) : T in MinimalOverOrders(oo[j])] do
+        // oo[j] subset oo[i] 
+            Append(~edges,[i,j]); //the edge is a reversed inclusion
+        end for;
+    end for;
+    D:=Digraph<#oo|edges>;
+    vv:=VertexSet(D);
+
+    for d in [0..Distance(vv.Index(oo,MaximalOrder(A)),vv.Index(oo,E))] do
+        #Sphere(vv.Index(oo,MaximalOrder(A)),d);
+    end for;
 
 
 /* TEST

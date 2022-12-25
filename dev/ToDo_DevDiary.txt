@@ -11,7 +11,7 @@
 
     TODO:
     ### Modules ###
-    - Polish tests, both fast and slow. Add more printing.
+    - In IsomorphismClasses and IsIsomorphic, I should first order/test whether M and N have the same multiplicator ring S in K and with #M/PM = #N/PN for every singular prime of S, since these are necessary conditions of being isomorphic.
     - I have recently added the Type AlgEtMod. Many thinks that are valid for Idl should also be implemented for Modules. Eg, sum of modules, ideal*module, ...
     - Then I should convert PowerOfBass.m
 

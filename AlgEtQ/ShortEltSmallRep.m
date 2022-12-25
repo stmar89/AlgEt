@@ -28,8 +28,8 @@ intrinsic ShortElement(I::AlgEtQIdl) ->AlgEtQElt
             elts:=[ x : x in elts | not IsZeroDivisor(x) ];
             bd +:=1;
         until #elts ne 0;
-        _,i:=Min([Norm(x) : x in elt]);
-        return elts[i];
+        _,i:=Min([Norm(x) : x in elts]);
+        elt:=elts[i];
         
         // // The following is deterministic, but does not always work. Also, enumerating all short vectors is too much, and too memory extensive.
         // L:=Lattice(MatrixAtoQ(ZBasis(I)));

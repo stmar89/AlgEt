@@ -7,16 +7,17 @@ freeze;
 // http://www.staff.science.uu.nl/~marse004/
 /////////////////////////////////////////////////////
 
-// declare verbose ?????, 1;
+declare verbose new_wk_icm_bar, 2;
 
 //------------
-// 
+// NOTES: in the end we will need ideals up to isomorphism. I think that in the recursion we can skip the 1-dimensional vector spaces (which are probably the wast majority) since they will all give rise to the invertible weak equivalence class. Need to think about it more.
 //------------
 
+// when incorporating in package, the next line will not be necessary
 import "../AlgEtQ/LowCohenMacaulayType.m" : wkicm_bar_CM_type2;
 
 intrinsic IntermediateIdealsVSWithTrivialExtensionAndPrescribedMultiplicatorRing(I::AlgEtQIdl,P::AlgEtQIdl, O::AlgEtQOrd)->SetIndx[AlgEtQIdl]
-{Given a fractional S-ideal I, a prime ideal P of S, and an overorder O of S such that O subset (I:I), it returns all the fractional S-ideal J such that PI subset J subset I such that (J:J) eq S and JO=I.}
+{Given a fractional S-ideal I, a prime ideal P of S, and an overorder O of S such that O subset (I:I), it returns all the fractional S-ideal J such that PI subset J subset I, (J:J) eq S, and JO=I.}
     require IsPrime(P) : "The ideal P must be prime";
     S:=Order(P);
     require S eq Order(I) : "The ideals must be over the same order";
@@ -58,7 +59,7 @@ intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum
             seqWk_bar:=[];
             St:=TraceDualIdeal(S);
             if Method in {"Auto","IntermediateIdealsVSWithTrivialExtensionAndPrescribedMultiplicatorRing"} then
-    "using new method";
+                vprint new_wk_icm_bar,2 : "using new method";
                 pp:=PrimesAbove(Conductor(S));
                 oo:=FindOverOrders(S);
                 mult_pp:=[ oo[Index(oo,MultiplicatorRing(P))] : P in pp ];
@@ -209,7 +210,9 @@ end intrinsic;
         f;
         A:=EtaleAlgebra(f);
         R:=EquationOrder(A);
+        "overorders";
         time _:=FindOverOrders(R);
+        "wk icm";
         time #WKICM(R);
     end for;
 
@@ -224,11 +227,11 @@ end intrinsic;
     Attach("~/packages_github/AlgEt/dev/new_wk_icm.m");
     P<x>:=PolynomialRing(Integers());
     f:=x^8+16; 
-    AttachSpec("~/packages_github/AlgEt/spec");
     A:=EtaleAlgebra(f);
     R:=EquationOrder(A);
     time _:=FindOverOrders(R);
-    time #WKICM(R);
+    time assert #WKICM(R) eq 173;
+    "the size of the output, 173 classes, has been computed using the OLD method below, in 189000 seconds";
     quit;
 
     magma
@@ -237,7 +240,6 @@ end intrinsic;
     "OLD method";
   	_<x>:=PolynomialRing(Integers());
     f:=x^8+16; 
-    AttachSpec("~/packages_github/AlgEt/spec");
     A:=EtaleAlgebra(f);
     R:=EquationOrder(A);
     time _:=FindOverOrders(R);

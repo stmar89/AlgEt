@@ -196,7 +196,7 @@
     ProfilePrintByTotalTime(ProfilePruneGraphByTime(G2,30));
     */
     "-------------------------------------------------------------";
-    "A much bigger example: the interesting overorders, with CohenMacaulyType > 2, have been already computed and saved in a special file. We compute the WkICM_bar for this order, and compare timings. The orders are sorted from the fastest to the slowest.";
+    "A much bigger example: the interesting overorders, with CohenMacaulyType > 2, have been already computed and saved in a special file. We compute the WkICM_bar for these orders, and compare timings. The orders are sorted from the fastest to the slowest.";
     
 	_<x>:=PolynomialRing(Integers());
     f:=x^8+16; 

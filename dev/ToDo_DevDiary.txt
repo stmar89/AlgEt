@@ -1,10 +1,10 @@
    
     .m files from AbVarFq to 'translate':
 
-    - IdealsOfIndex.m
+--> - IdealsOfIndex.m
     - IntegralMatrices.m
     - RepsZConjugacy.m
-    - PowerBass.m
+--> - PowerBass.m
     - stuff about AVs 
     - CMAlgAss.m // CMType missing stuff for IsogenyClassFq
     - padictocc.m ?
@@ -13,7 +13,6 @@
     ### Modules ###
     - In IsomorphismClasses and IsIsomorphic, I should first order/test whether M and N have the same multiplicator ring S in K and with #M/PM = #N/PN for every singular prime of S, since these are necessary conditions of being isomorphic.
     - I have recently added the Type AlgEtMod. Many thinks that are valid for Idl should also be implemented for Modules. Eg, sum of modules, ideal*module, ...
-    - Then I should convert PowerOfBass.m
 
     ### SmallReps ###
     - SmallRepresentative does not give a unique ideal: when you repeat the code it goes into a 'loop' of short ideals. It should be a canonical representative.

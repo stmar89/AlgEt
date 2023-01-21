@@ -9,6 +9,8 @@ freeze;
 
 declare verbose FactPrimes, 3;
 
+declare attributes AlgEtQOrd : SingularPrimes;
+
 //----------
 // Factorization and Prime
 //----------
@@ -114,6 +116,19 @@ intrinsic PrimesAbove(I::AlgEtQIdl) -> SeqEnum[AlgAssEtOrdIdl]
     return I`PrimesAbove;
 end intrinsic;
 
+intrinsic SingularPrimes(R::AlgEtQOrd) -> SetIndx
+{Returns the non-invertible primes of the order.}
+    if not assigned R`SingularPrimes then
+        R`SingularPrimes:=PrimesAbove(Conductor(R));
+    end if;
+    return R`SingularPrimes;
+end intrinsic;
+
+intrinsic NonInvertiblePrimes(R::AlgEtQOrd) -> SetIndx
+{Returns the non-invertible primes of the order.}
+    return SingularPrimes(R);
+end intrinsic;
+
 intrinsic IsPrime(I::AlgEtQIdl) -> BoolElt
 {Given an integral S-ideal, returns if the ideal is a prime fractional ideal of S, that is a maximal S ideal.}
     require IsIntegral(I): "the ideal must be integral";
@@ -199,9 +214,15 @@ end intrinsic;
     A:=EtaleAlgebra(f);
     E1:=EquationOrder(A);
     ff:=Conductor(E1);
-    _:=PrimesAbove(Conductor(E1));
+    assert PrimesAbove(Conductor(E1)) eq SingularPrimes(E1);
     printf ".";
 
+    f:=x^6 + 8*x^5 + 50*x^4 + 200*x^3 + 1250*x^2 + 5000*x + 15625;
+    A:=EtaleAlgebra(f);
+    R:=EquationOrder(A);
+    assert #SingularPrimes(R) eq 5;
+    assert #NonInvertiblePrimes(R) eq 5;
+    printf ".";
 
     f:=(x^8+16)*(x^8+81);
     A:=EtaleAlgebra(f);

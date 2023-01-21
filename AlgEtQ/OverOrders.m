@@ -13,7 +13,6 @@ declare verbose OverOrders,3;
 /////////////////////////////////////////////////////
 
 /*TODO
- - OverOrders should first compute all the OverOrdersAtPrime and then take direct product.
      When I form the cartesian product, I can construct all minimal inclusions as follows: 
      given an entry S=<S1, ... ,Sn>, then T=<T1,...,Tn> is a minimal overoder of S 
      if and only if Ti=Si for all i's except one, say j, for which Tj is a minimal overorder of Sj
@@ -25,6 +24,9 @@ import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQ
 declare attributes AlgEtQOrd : MinimalOverOrders, // a sequence of tuples <P,{@ T1,...,Tn @}>, where
                                                   // P is a singular prime of the order R, and
                                                   // T1,..,Tn are all the minimal overorders with conductor (R:Ti)=P.
+                               OverOrdersAtPrimes, // a sequence of tuples <P,{@ T1,...,Tn @}>, where
+                                                  // P is a singular prime of the order R, and
+                                                  // T1,..,Tn are all the overorders with P-primary conductor (R:Ti), plus R
                                OverOrders;  // all overorders
 
 
@@ -140,14 +142,21 @@ intrinsic MinimalOverOrders(R::AlgEtQOrd) -> SetIndx[AlgEtQOrd]
 end intrinsic;
 
 intrinsic OverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQOrd]
-{Given an order R and prime P of R, it returns the overorders S of R with conductor (R:S) which is P-primary. We recursively produce the minimal PP-overorders where PP are primes above P. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.}
+{Given an order R and prime P of R, it returns R and the overorders S of R with conductor (R:S) which is P-primary. We recursively produce the minimal PP-overorders where PP are primes above P. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.}
     require IsPrime(P) : "The ideal P must be prime.";
     require Order(P) eq R : "P must be an ideal of R";
 
-    if assigned R`OverOrders then
+    if assigned R`OverOrdersAtPrimes and exists(output){ tup : tup in R`OverOrdersAtPrimes | tup[1] eq P } then
     // early exit if already computed
+        output := output[2];
+        return output;
+    end if;
+
+    if assigned R`OverOrders then
+    // early exit if already computed. This is useful when Loading the data using LoadWKICM
         return {@ R @} join {@ S : S in R`OverOrders | PrimesAbove(ColonIdeal(R,R!!OneIdeal(S))) eq [ P ] @};
     end if;
+
     ppO:=PrimesAbove(MaximalOrder(Algebra(R))!!P);
     queue := {@ R @};
     output:={@ R @};
@@ -175,6 +184,11 @@ intrinsic OverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQOrd]
         ZBasisLLL(S);
     end for;
     assert2 forall{S : S in output | S eq R or PrimesAbove(ColonIdeal(R,R!!OneIdeal(S))) eq [ P ]};
+    if not assigned R`OverOrdersAtPrimes then
+        R`OverOrdersAtPrimes:=[<P,output>];
+    else
+        Append(~R`OverOrdersAtPrimes,<P,output>);
+    end if;
     return output;
 end intrinsic;
 

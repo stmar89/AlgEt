@@ -80,7 +80,7 @@ end intrinsic;
 
 /* TESTS
     
-    printf "### Testing SmallRepresentative:";
+    printf "### Testing ShortEltSmallRep:";
 	AttachSpec("~/packages_github/AlgEt/spec");
 	_<x>:=PolynomialRing(Integers());
     f:=(x^2+5)*(x^2+7)*(x^2+11);

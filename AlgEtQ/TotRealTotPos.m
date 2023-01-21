@@ -138,8 +138,8 @@ freeze;
 
 /* TESTS
 
-    printf "### Testing SmallRepresentative:";
-    AttachSpec("packages_github/AlgEt/spec");
+    printf "### Testing TotRealPos:";
+    AttachSpec("~/packages_github/AlgEt/spec");
     PP<x>:=PolynomialRing(Integers());
     SetAssertions(2);
 

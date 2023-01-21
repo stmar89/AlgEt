@@ -569,7 +569,7 @@ end intrinsic;
 
 /* TESTS
     
-    printf "### Orders:";
+    printf "### Testing Orders:";
 	AttachSpec("~/packages_github/AlgEt/spec");
     SetVerbose("AlgEtQOrd",1);
     SetAssertions(2);

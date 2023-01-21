@@ -53,7 +53,7 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQ
     end if;
 
     // not already_computed
-    output := {@  @};
+    output:={@ Universe({@ R @}) | @}; //empty set
     if not IsMaximalAtPrime(R,P) then
         zbR := ZBasis(R);
         // A minimal P-overorder S of R is contained in T=(P:P) and S/P is either 
@@ -128,6 +128,10 @@ end intrinsic;
 
 intrinsic MinimalOverOrders(R::AlgEtQOrd) -> SetIndx[AlgEtQOrd]
 {Computes the minimal overorders of R.}
+    output:={@ Universe({@ R @}) | @}; //empty set
+    if IsMaximal(R) then
+        return output;
+    end if;
     // Note: every overorders is a P-MinimalOverOrder for some singular prime P.
     pp:={@ P : P in SingularPrimes(R) @};
     if assigned R`MinimalOverOrders then
@@ -137,7 +141,7 @@ intrinsic MinimalOverOrders(R::AlgEtQOrd) -> SetIndx[AlgEtQOrd]
     for P in pp do 
         _:=MinimalOverOrdersAtPrime(R,P); //this populates the attribute R`MinimalOverOrders
     end for;
-    output:=&join[ tup[2] : tup in R`MinimalOverOrders ];
+    output join:=&join[ tup[2] : tup in R`MinimalOverOrders ];
     return output; 
 end intrinsic;
 
@@ -195,31 +199,33 @@ end intrinsic;
 intrinsic OverOrders(R::AlgEtQOrd : populateoo_in_oo:=false) -> SetIndx[AlgEtQOrd]
 {We compute all the overorders of R. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana. The Vararg "populateoo_inoo" (default false) determines whether we should fill the attribute T`OverOrders for every overorder T of R.}
     if not assigned R`OverOrders then
-        pp:=SingularPrimes(R);
-        vtime OverOrders,2 : oo_at_Ps:=[ OverOrdersAtPrime(R,P) : P in pp ];
-        vprintf OverOrders,2 : "P-overorders for each P %o\n",[#x : x in oo_at_Ps];
-        vprintf OverOrders,2 : "total number of overorders %o\n",&*[#x : x in oo_at_Ps];
         output:={@ @};
-        assert forall{x : x in oo_at_Ps | x[1] eq R};
-        cc:=CartesianProduct([[1..#x] : x in oo_at_Ps]);
-        for c in cc do
-            S:=[ c[j] : j in [1..#c] ]; //R is contained in all of them
-            if forall{x : x in S | x eq 1 } then
-                S:=R;
-            elif #[x : x in S | x ne 1] eq 1 then
-                // this case happens only for the minimal overorders of R
-                _,j:=Max(S); // the position of the non-1 entry
-                S:=oo_at_Ps[j][S[j]]; // the only order in the tuple bigger than R
-            else
-                gens:=&cat[ZBasis(oo_at_Ps[j][S[j]]) : j in [1..#S] | S[j] ne 1];
-                S:=Order(gens);
-            end if;
-            Include(~output,S);
-        end for;
+        if not IsMaximal(R) then
+            pp:=SingularPrimes(R);
+            vtime OverOrders,2 : oo_at_Ps:=[ OverOrdersAtPrime(R,P) : P in pp ];
+            vprintf OverOrders,2 : "P-overorders for each P %o\n",[#x : x in oo_at_Ps];
+            vprintf OverOrders,2 : "total number of overorders %o\n",&*[#x : x in oo_at_Ps];
+            assert forall{x : x in oo_at_Ps | x[1] eq R};
+            cc:=CartesianProduct([[1..#x] : x in oo_at_Ps]);
+            for c in cc do
+                S:=[ c[j] : j in [1..#c] ]; //R is contained in all of them
+                if forall{x : x in S | x eq 1 } then
+                    S:=R;
+                elif #[x : x in S | x ne 1] eq 1 then
+                    // this case happens only for the minimal overorders of R
+                    _,j:=Max(S); // the position of the non-1 entry
+                    S:=oo_at_Ps[j][S[j]]; // the only order in the tuple bigger than R
+                else
+                    gens:=&cat[ZBasis(oo_at_Ps[j][S[j]]) : j in [1..#S] | S[j] ne 1];
+                    S:=Order(gens);
+                end if;
+                Include(~output,S);
+            end for;
+            assert #cc eq #output;
+        end if;
         O:=MaximalOrder(Algebra(R));
         output:={@ T : T in output | Index(O,T) ne 1 @} join {@ O @}; // maximal order : last of list
         R`OverOrders:=output;
-        assert #cc eq #output;
     end if;
     // there might be a better way to do this
     if populateoo_in_oo then
@@ -240,7 +246,7 @@ end intrinsic;
 
 /* TESTS
 
-    printf "### OverOrders:";
+    printf "### Testing OverOrders:";
 	AttachSpec("~/packages_github/AlgEt/spec");
 
     SetVerbose("OverOrders",1);
@@ -249,6 +255,10 @@ end intrinsic;
     _<x>:=PolynomialRing(Integers());
     f:=(x^4+16);
     A:=EtaleAlgebra(f);
+    O:=MaximalOrder(A);
+    assert #FindOverOrders(O) eq 1;
+    assert #MinimalOverOrders(O) eq 0;
+
     E:=EquationOrder(A);
     oo:=FindOverOrders(E);
     assert #oo eq 11;

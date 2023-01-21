@@ -131,8 +131,9 @@ intrinsic LoadWKICM(str::MonStgElt) -> AlgEtQOrd
         S`WKICM_bar:=wkS;
     end for;
     // we populate the attribute A`KnownOrders
-    for iS in iS in [1..#ooR] do
-       IsKnownOrder(~ooR[iS]); 
+    for iS in [1..#ooR] do
+        S:=ooR[iS];
+       IsKnownOrder(~S); 
     end for;
     R`OverOrders:=ooR;
     R`WKICM:=wkR;
@@ -151,6 +152,7 @@ end intrinsic;
     E:=EquationOrder(A);
     seq,str:=PrintSeqAlgEtQElt(ZBasis(E));
     assert Order([ A! s : s in eval(str)]) eq E;
+    printf ".";
 
     AttachSpec("~/packages_github/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());
@@ -159,6 +161,7 @@ end intrinsic;
     O:=MaximalOrder(A);
     str:=PrintWKICM(O);
     O1:=LoadWKICM(str);
+    printf ".";
 
     AttachSpec("~/packages_github/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());
@@ -170,6 +173,7 @@ end intrinsic;
     R1:=LoadWKICM(str);
     assert #WKICM(R) eq #WKICM(R1);
     assert #FindOverOrders(R) eq #FindOverOrders(R1);
+    printf ".";
 
     printf " all good!\n"; 
 

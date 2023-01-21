@@ -823,7 +823,7 @@ intrinsic MinimalInteger(I::AlgEtQIdl) -> RngIntElt
 end intrinsic;
 
 intrinsic CoprimeRepresentative(I::AlgEtQIdl,J::AlgEtQIdl) -> AlgEtQElt,AlgEtQIdl
-{Return an element x such that x*I is an integral ideal coprime with J, togheter with the product x*I. The first ideal must be invertible and the second should be integral.}
+{Returns an element x such that x*I is an integral ideal coprime with J, togheter with the product x*I. The first ideal must be invertible and the second should be integral.}
     require IsIntegral(J) : "the second ideal must be integral";
     S:=Order(I);
     require S eq Order(J): "the ideals must be defined over the same order";

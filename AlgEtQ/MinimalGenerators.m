@@ -47,7 +47,7 @@ end intrinsic;
 
 /* TESTS
 
-    printf "### TwoGenerators:";
+    printf "### Testing MinimalGenerators:";
 	AttachSpec("~/packages_github/AlgEt/spec");
     SetClassGroupBounds("GRH");
 	_<x>:=PolynomialRing(Integers());

@@ -18,7 +18,13 @@ declare type AlgEtQOrd;
 
 declare attributes AlgEtQ : MaximalOrder,
                            ProductOfEquationOrders,
-                           EquationOrder;
+                           EquationOrder,
+                           KnownOrders; // This is a SetIndx containing orders in the algebra that are cached for some reason.
+                                        // We store them, because to avoid creating multiple copies of the same order.
+                                        // In particular, this is more efficient for the attributes.
+                                        // The attribute is populated by the following intrinsics: 
+                                        // ComplexConjugate, MultiplicatorRing, EquationOrder, ProductOfEquationOrders, 
+                                        //   MaximalOrder, FindOverOrders, MinimalOverOrders, LoadWKICM
 
 declare attributes AlgEtQOrd : IsMaximal,
                               IsProductOfOrders,
@@ -343,6 +349,24 @@ intrinsic Random(O::AlgEtQOrd : CoeffRange:=3, ZeroDivisorsAllowed:=false ) -> A
       return Random(O,CoeffRange : ZeroDivisorsAllowed:=ZeroDivisorsAllowed);
 end intrinsic;
 
+
+//----------
+// IsKnownOrder
+//----------
+
+intrinsic IsKnownOrder(~R::AlgEtQOrd)
+{This procedure checks wheter the order R is already in the list of known orders of the algebra A of definition of R. If so then it replaces R with the copy stored in the attribute KnownOrders. If not it adds it to KnownOrders. This is done to avoid creating multiple copies of the same order.}
+    A:=Algebra(R);
+    if not assigned A`KnownOrders then
+        A`KnownOrders:={@ @};
+    end if;
+    if exists(S){ T : T in A`KnownOrders | R eq T } then
+        R:=S;
+    else
+        Include(~A`KnownOrders,R);
+    end if;
+end intrinsic;
+
 //----------
 // Equation Orders
 //----------
@@ -356,6 +380,7 @@ intrinsic EquationOrder(A::AlgEtQ) -> AlgEtQOrd
         assert2 E eq Order([pow[2]]);
         E`Generators:=[pow[2]]; // I want the genertor set to be small, so I put only the primitive element
         A`EquationOrder:=E;
+        IsKnownOrder(~E); // the order was not already known. this call caches it in A`KnownOrders
     end if;
     return A`EquationOrder;
 end intrinsic;
@@ -363,7 +388,9 @@ end intrinsic;
 intrinsic ProductOfEquationOrders(A::AlgEtQ)->AlgEtQOrd
 {Given a product of number field A, returns the order consisting of the product of the equation orders of the number fields.}
     if not assigned A`ProductOfEquationOrders then
-        A`ProductOfEquationOrders := Order( A , <EquationOrder(E) : E in Components(A)> );
+        E:=Order( A , <EquationOrder(E) : E in Components(A)> );
+        A`ProductOfEquationOrders := E;
+        IsKnownOrder(~E); // the order was not already known. this call caches it in A`KnownOrders
     end if;
     return A`ProductOfEquationOrders ;
 end intrinsic;
@@ -379,6 +406,7 @@ intrinsic MaximalOrder(A::AlgEtQ)->AlgEtQOrd
         ZBasisLLL(O);
         O`IsMaximal:=true;
         A`MaximalOrder:=O;
+        IsKnownOrder(~O); // the order was not already known. this call caches it in A`KnownOrders
     end if;
     return A`MaximalOrder;
 end intrinsic;
@@ -559,13 +587,23 @@ end intrinsic;
     assert EquationOrder(A) ne ProductOfEquationOrders(A);
     printf ".";
 
-
+    // we test KnownOrders
     OA:=MaximalOrder(A);
     O:=Order(ZBasis(OA));
     assert not assigned O`IsMaximal;
     assert O eq OA;
     assert not assigned O`IsMaximal; //not passing attributes at equality checks
+    IsKnownOrder(~O); //now we known that O eq OA
+    assert assigned O`IsMaximal;
     printf ".";
+
+    ff:=Conductor(EquationOrder(A));
+    T:=MultiplicatorRing(ff);
+    assert T in A`KnownOrders;
+    assert assigned T`IsMaximal and assigned T`IsProductOfOrders; //these two attributes are assigned when we created OA above.
+                                                                  // hence T points to the same memory spot of OA
+    printf ".";
+
 
     O:=Order(ZBasis(OA));
     assert IsProductOfOrders(O);
@@ -585,7 +623,6 @@ end intrinsic;
         end for;
     end for;
     printf ".";
-
 
     seq:=[x^2-5*25,x^2-7*49];
     seq:=[NumberField(f) : f in seq];
@@ -615,6 +652,7 @@ end intrinsic;
     assert not E2 meet E1 eq E2;
     assert E3 meet E4 eq E2;
     O:=MaximalOrder(A);
+
     printf " all good!\n"; 
 
 */

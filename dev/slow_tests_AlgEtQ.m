@@ -92,9 +92,9 @@
     "-------------------------------------------------------------";
     "A quick one.";
     
+    AttachSpec("~/packages_github/AlgEt/spec");
 	_<x>:=PolynomialRing(Integers());
     f:=x^4-10000*x^3-10000*x^2-10000*x-10000; 
-    AttachSpec("~/packages_github/AlgEt/spec");
     // no profiler
     Aet:=EtaleAlgebra(f);
     Eet:=EquationOrder(Aet);
@@ -102,7 +102,7 @@
         ooet:=FindOverOrders(Eet);
     t1:=Cputime(t0);
     printf "Current running time = %o \n",t1;
-    tprevbest:=13.7; //on diophantus
+    tprevbest:=2; //on diophantus
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "FindOverOrders for %o got faster. Update the previous best known time\n",f;
@@ -133,7 +133,7 @@
         ooet:=FindOverOrders(Eet);
     t1:=Cputime(t0);
     printf "Current running time = %o \n",t1;
-    tprevbest:=693; // on diophantus
+    tprevbest:=122; // on diophantus
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "FindOverOrders for %o got faster. Update the previous best known time\n",f;
@@ -154,6 +154,30 @@
     ProfilePrintByTotalTime(ProfilePruneGraphByTime(G2,30));
     */
 
+    "-------------------------------------------------------------";
+    "A big example.";
+    quit;
+    magma 
+    AttachSpec("~/packages_github/AlgEt/spec");
+    Attach("~/packages_github/AlgEt/dev/OverOrders_new.m");
+    P<x>:=PolynomialRing(Integers());
+    f:=x^6 + 8*x^5 + 50*x^4 + 200*x^3 + 1250*x^2 + 5000*x + 15625;
+    A:=EtaleAlgebra(f);
+    R:=EquationOrder(A); 
+    t0:=Cputime();
+        ooet:=FindOverOrders(R);
+    t1:=Cputime(t0);
+    assert #oo eq 3200;
+    printf "Current running time = %o \n",t1;
+    tprevbest:=114; // on diophantus
+    if Abs(t1 - tprevbest) gt 0.1*tprevbest then
+        if t1 lt tprevbest then
+            printf "FindOverOrders for %o got faster. Update the previous best known time\n",f;
+        elif t1 gt tprevbest then
+            printf "FindOverOrders for %o got slower. The previous code was better.\n",f;
+        end if;
+    end if;
+        
     "-------------------------------------------------------------";
     "-------------------------------------------------------------";
     "------------------------WkEquivClasses-----------------------";

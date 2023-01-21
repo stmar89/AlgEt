@@ -38,6 +38,8 @@ intrinsic IsConjugateStable(O::AlgEtQOrd) -> BoolElt,AlgEtQOrd
         if is_stable then
             O`IsConjugateStable:=<true,O>;
         else
+            IsKnownOrder(Ob);
+            Ob`IsConjugateStable:=<false,O>;
             O`IsConjugateStable:=<false,Ob>;
         end if;
     end if;

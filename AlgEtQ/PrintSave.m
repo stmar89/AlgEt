@@ -89,7 +89,7 @@ intrinsic LoadWKICM(str::MonStgElt) -> AlgEtQOrd
     ff:=[ PP!f : f in data[1]];
     A:=EtaleAlgebra([NumberField(f) : f in ff ]);
     wk:=data[2];
-    O:=Order([ A ! s : s in wk[#wk][1]]); // the first one is maximal
+    O:=Order([ A ! s : s in wk[#wk][1]]); // the last one is maximal
     O`IsMaximal:=true;
     test,OasProd:=IsProductOfOrders(O);
     assert test;
@@ -129,6 +129,10 @@ intrinsic LoadWKICM(str::MonStgElt) -> AlgEtQOrd
             Append(~wkR,IR); //attributes are already moved
         end for;
         S`WKICM_bar:=wkS;
+    end for;
+    // we populate the attribute A`KnownOrders
+    for iS in iS in [1..#ooR] do
+       IsKnownOrder(~ooR[iS]); 
     end for;
     R`OverOrders:=ooR;
     R`WKICM:=wkR;

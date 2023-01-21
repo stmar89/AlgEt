@@ -710,12 +710,7 @@ intrinsic MultiplicatorRing(I::AlgEtQIdl) -> AlgEtQOrd
             A:=Algebra(I);
             zbS:=ZBasis(ColonIdeal(I,I));
             S:=Order(zbS : Check:=0 );
-            if assigned R`OverOrders then
-            //this is to move the attributes
-                ooR:=FindOverOrders(R);
-                pos:=Index(ooR,S);
-                S:=ooR[pos];
-            end if;
+            IsKnownOrder(~S); //has S already created?
             I`MultiplicatorRing:=S;
         end if;
     end if;

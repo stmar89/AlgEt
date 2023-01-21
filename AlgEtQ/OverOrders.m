@@ -8,182 +8,226 @@ declare verbose OverOrders,3;
 // OverOrders for Etale Q algebras
 // Stefano Marseglia, Utrecht University, s.marseglia@uu.nl
 // http://www.staff.science.uu.nl/~marse004/
-// and Edgar Costa, MIT
+// We are grateful to Edgar Costa (MIT) who helped 
+// with a preliminary version of this code
 /////////////////////////////////////////////////////
 
-// most of the code here is an implementation of  Hofman, Sircana "On the computation of overorders"
-
 /*TODO
- - prime per prime
- - can I use Check:=false in creating the orders?
+ - OverOrders should first compute all the OverOrdersAtPrime and then take direct product.
+     When I form the cartesian product, I can construct all minimal inclusions as follows: 
+     given an entry S=<S1, ... ,Sn>, then T=<T1,...,Tn> is a minimal overoder of S 
+     if and only if Ti=Si for all i's except one, say j, for which Tj is a minimal overorder of Sj
 */
 
 
 import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQtoA , meet_zbasis , inclusion_matrix;
 
-declare attributes AlgEtQOrd : MinimalOverOrders,
-                              OverOrders;
+declare attributes AlgEtQOrd : MinimalOverOrders, // a sequence of tuples <P,{@ T1,...,Tn @}>, where
+                                                  // P is a singular prime of the order R, and
+                                                  // T1,..,Tn are all the minimal overorders with conductor (R:Ti)=P.
+                               OverOrders;  // all overorders
 
-intrinsic MinimalOverOrders(R::AlgEtQOrd : singular_primes := [], orders := {@ @}) -> SetIndx[AlgEtQOrd]
-{Returns the minimal over orders of R given the singular primes of R. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.}
-if not assigned R`MinimalOverOrders then
-    min_oo := { };
-    if not IsMaximal(R) then
-      zbR := ZBasis(R);
-      if singular_primes ne [] then
-        pp := [(R!!P) meet (OneIdeal(R)) : P in singular_primes];
-        pp := Setseq(Seqset(pp)); //remove duplicates
-        pp := [P : P in pp | Index(P, P*P) ne Index(R,P)]; //only the sing ones
-        assert2 SequenceToSet(pp) eq SequenceToSet(PrimesAbove(Conductor(R)));
-      else
-        pp := PrimesAbove(Conductor(R));
-      end if;
-      for P in pp do
-        pot_min_oo := {@ @}; // will contain all potential minimal over-orders.
-        pot_min_oo_2 := {@ @}; // will contain all potential minimal over-orders of dimension ge 2
-        F, f := ResidueField(P);
-        T := MultiplicatorRing(P);
-        V,mTV := QuotientVS(T, R, P);
+
+intrinsic IsMaximalAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> BoolElt
+{Returns whether R is maximal at the prime P, that is, if (R:O) is not contained in P, where O is the maximal order.}
+    if IsMaximal(R) then
+        return true;
+    end if;
+    if assigned R`SingularPrimes then
+        return not P in SingularPrimes(R);
+    end if;
+    return not (Conductor(R) subset P);
+end intrinsic;
+
+intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQOrd]
+{Given an order R and prime P of R, it returns the minimal overorders S of R with conductor (R:S) which is P-primary. The minimality assumption forces the conductor (R:S) to be exactly P. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.}
+    require IsPrime(P) : "The ideal P must be prime.";
+    require Order(P) eq R : "P must be an ideal of R";
+
+    if assigned R`MinimalOverOrders and exists(output){ tup : tup in R`MinimalOverOrders | tup[1] eq P } then
+    // early exit if already computed
+        output := output[2];
+        return output;
+    end if;
+
+    // not already_computed
+    output := {@  @};
+    if not IsMaximalAtPrime(R,P) then
+        zbR := ZBasis(R);
+        // A minimal P-overorder S of R is contained in T=(P:P) and S/P is either 
+        // a 2-dimensional vector space over R/P,
+        // or a field extension of prime degree over R/P.
+        // We call the overorder S of R contained in T that satisfy one of these two 
+        // conditions 'potential minimal P-overoerders'i of R.
+        pot_min_oo := {@ @};   // will contain all potential minimal P-overorders.
+        pot_min_oo_2 := {@ @}; // will contain all potential minimal P-overorders where 
+                               // the second necessary condition is satisfied
+        F, f := ResidueField(P);      // f:R->R/P=F
+        T := MultiplicatorRing(P);    // T=(P:P)
+        V,mTV := QuotientVS(T, R, P); // mTV: T->T/R=V
         assert2 forall{ v : v in Basis(V) | mTV((v@@mTV)^2) in V };
         assert2 forall{ v : v in Basis(V) | mTV((v@@mTV)) eq v };
         assert2 forall{ t : t in ZBasis(T) | t-((mTV(t))@@mTV) in R };
         d := Dimension(V);
-        //see Proposition 5.3 of Tommy's paper
-        if d eq 1 then
-          Include(~min_oo, T);
+        if d eq 1 then // If d=1 then T/P had dimension 2 over R/T. This means that T is a minimal P-overorders of R
+                       // See Proposition 5.3 of referenced paper
+            Include(~output, T);
         else
-          q:=#F; //need to use q! not the characterstic of F!
-          qpow:=hom<V->V | [mTV((v@@mTV)^q) : v in Basis(V)]>;
-          eigen_vals:=[e[1] : e in Setseq(Eigenvalues(Matrix(qpow)))];
-          eigen_spaces:=[Kernel(hom<V->V | [qpow(v)-e*v : v in Basis(V)]>)
-                               : e in eigen_vals]; //in this way there are naturally embedded in V
-          subs_1:=[ W: W in &cat[Submodules(E) : E in eigen_spaces] | Dimension(W) eq 1];
-          for W in subs_1 do //dim eq 1
-            wT:=W.1@@mTV;
-            if q eq 2 or mTV(wT^2) in W then
-            //doing this square directly on the finite field level would probably be faster.
-            //for p eq 2 being a subspace of the eigenspace garantuees that it is mult closed
-                S:=Order([wT] cat zbR);
+            // minimal P-overorder S of R such that S/R has dimension 1 over R/P satisfy the followin property:
+            // S/R is necessarily contained in an eigenspace of x->x^q acting on V=T/R.
+            q:=#F;
+            qpow:=hom<V->V | [mTV((v@@mTV)^q) : v in Basis(V)]>;
+            eigen_vals:=[e[1] : e in Setseq(Eigenvalues(Matrix(qpow)))];
+            eigen_spaces:=[Kernel(hom<V->V | [qpow(v)-e*v : v in Basis(V)]>): e in eigen_vals]; // eigenspaces in V
+            subs_1:=[ W: W in &cat[Submodules(E) : E in eigen_spaces] | Dimension(W) eq 1];
+            for W in subs_1 do
+                // for each W of dim 1 we check whether is an order, that is, multiplicatively closed
+                wT:=W.1@@mTV;
+                if q eq 2 or mTV(wT^2) in W then
+                    // for p eq 2 being a subspace of the eigenspace garantees that it is mult closed
+                    S:=Order([wT] cat zbR);
+                    Include(~pot_min_oo,S);
+                    Include(~output,S);// necessarly minimal, because it has dim 1
+                end if;
+            end for;
+            // the other minimal overorders S of R are such that S/P is a finite field extension of prime degree of R/P
+            dims := PrimesUpTo(d+1); //the plus one is to prevent issues when d=2.
+            subs_2 := Submodules(V : CodimensionLimit := d-2); //we exclude dim 0 and 1
+            subs_2 := [W : W in subs_2 | Dimension(W)+1 in dims]; // the +1 is there because we are 
+                                                                  // working in T/R instead of T/P
+            for W in subs_2 do //dim at least 2
+                S := Order([(w@@mTV) : w in Basis(W)] cat zbR);
                 Include(~pot_min_oo,S);
-                Include(~min_oo,S);//necessarly minimal
-            end if;
-          end for;
-          dims := PrimesUpTo(d+1); //the plus one is to prevent issues when d=2.
-          subs_2 := Submodules(V : CodimensionLimit := d-2); //we exclude dim 0 and 1
-          subs_2 := [W : W in subs_2 | Dimension(W)+1 in dims];
-          //only subs of dim a prime number
-          //the +1 comes from using (P:P)/R instead of (P:P)/P, see Remark 5.4
-          for W in subs_2 do //dim at least 2
-            S := Order([(w@@mTV) : w in Basis(W)] cat zbR);
-            Include(~pot_min_oo,S);
-            Include(~pot_min_oo_2,S);
-          end for;
-          //we remove non-minimals
-          for S in pot_min_oo_2 do
-            if not exists {T : T in pot_min_oo | S ne T and T subset S} then
-              Include(~min_oo, S);
-            end if;
-          end for;
+                Include(~pot_min_oo_2,S);
+            end for;
+            //we remove non-minimals overorders from the potential ones in pot_min_oo_2
+            for S in pot_min_oo_2 do
+                if not exists {T : T in pot_min_oo | S ne T and T subset S} then
+                    Include(~output, S);
+                end if;
+            end for;
         end if;
-      end for;
+        // we check if any of these orders was already computed
+        assert2 forall{S : S in output | ColonIdeal(R,R!!OneIdeal(S)) eq P};
+        for i in [1..#output] do
+            S:=output[i];
+            IsKnownOrder(~S);
+            ZBasisLLL(S);
+        end for;
+        if not assigned R`MinimalOverOrders then
+            R`MinimalOverOrders:=[<P,output>];
+        else
+            Append(~R`MinimalOverOrders,<P,output>);
+        end if;
     end if;
-    R`MinimalOverOrders := {@ @};
-    for S in min_oo do
-      i := Index(orders, S);
-      if i eq 0 then
-        ZBasisLLL(S);
-        Include(~R`MinimalOverOrders, S);
-      else
-        T:=orders[i];
-        ZBasisLLL(T);
-        Include(~R`MinimalOverOrders, T);
-      end if;
-    end for;
-  end if;
-  return R`MinimalOverOrders;
+    return output;
 end intrinsic;
 
 
-intrinsic FindOverOrders_Minimal(R::AlgEtQOrd) -> SetIndx[AlgEtQOrd]
-{Given an order R returns all the over orders by a recursive search of the minimal overordes. Based on "On the computations of overorders" by TommyHofmann and Carlo Sircana.}
-    A := Algebra(R);
-    singular_primes := PrimesAbove(MaximalOrder(A)!!Conductor(R));
+intrinsic MinimalOverOrders(R::AlgEtQOrd) -> SetIndx[AlgEtQOrd]
+{Computes the minimal overorders of R.}
+    // Note: every overorders is a P-MinimalOverOrder for some singular prime P.
+    pp:={@ P : P in SingularPrimes(R) @};
+    if assigned R`MinimalOverOrders then
+        done:={@ tup[1] : tup in R`MinimalOverOrders @};
+        pp:=pp diff done;
+    end if;
+    for P in pp do 
+        _:=MinimalOverOrdersAtPrime(R,P); //this populates the attribute R`MinimalOverOrders
+    end for;
+    output:=&join[ tup[2] : tup in R`MinimalOverOrders ];
+    return output; 
+end intrinsic;
+
+intrinsic OverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQOrd]
+{Given an order R and prime P of R, it returns the overorders S of R with conductor (R:S) which is P-primary. We recursively produce the minimal PP-overorders where PP are primes above P. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.}
+    require IsPrime(P) : "The ideal P must be prime.";
+    require Order(P) eq R : "P must be an ideal of R";
+
+    if assigned R`OverOrders then
+    // early exit if already computed
+        return {@ R @} join {@ S : S in R`OverOrders | PrimesAbove(ColonIdeal(R,R!!OneIdeal(S))) eq [ P ] @};
+    end if;
+    ppO:=PrimesAbove(MaximalOrder(Algebra(R))!!P);
     queue := {@ R @};
     output:={@ R @};
     done:={@ @};
     while #queue gt 0 do
-        pot_new:=&join[ MinimalOverOrders(elt : singular_primes := singular_primes, orders := output) : elt in queue ];
+        pot_new:={@ @};
+        for T in queue do
+            pp:={@ OneIdeal(T) meet T!!Q : Q in ppO @};
+            for i in [1..#pp] do
+                Q:=pp[i];
+                Q`IsPrime:=true;
+            end for;
+            //pp:=PrimesAbove(T!!P);
+            for Q in pp do
+                pot_new join:=MinimalOverOrdersAtPrime(T,Q);
+            end for;
+        end for;
         output join:=pot_new;
         done join:=queue;
         queue := pot_new diff done;
     end while;
-    output:={@ T : T in output | Index(MaximalOrder(A),T) ne 1 @} join {@ MaximalOrder(A) @};
+    for iS in [1..#output] do
+        S:=output[iS];
+        IsKnownOrder(~S);
+        ZBasisLLL(S);
+    end for;
+    assert2 forall{S : S in output | S eq R or PrimesAbove(ColonIdeal(R,R!!OneIdeal(S))) eq [ P ]};
     return output;
-  /*OLD
-  A := Algebra(R);
-  singular_primes := PrimesAbove(MaximalOrder(A)!!Conductor(R));
-  queue := {@ R @};
-  done := {@  @};
-  output := {@ @};
-  while #queue gt 0 do
-    output join:=  queue;
-    done join:= queue;
-    for elt in queue do
-      output join:= MinimalOverOrders(elt : singular_primes := singular_primes, orders := output);
-    end for;
-    queue := output diff done;
-  end while;
-  // remove and add the maximal order to avoid creating it twice.
-  output:={@ T : T in output | Index(MaximalOrder(A),T) ne 1 @} join {@ MaximalOrder(A) @};
-  return output;
-  */
 end intrinsic;
 
-
-intrinsic FindOverOrders(E::AlgEtQOrd:  populateoo_in_oo := false) -> SetIndx[AlgEtQOrd]
-{Returns all the overorders of E. The boolean VarArg populateoo_in_oo determines whether to populate the attribute OverOrders of each overorder of E.}
-  if not assigned E`OverOrders then
-      E`OverOrders := FindOverOrders_Minimal(E);
-  end if;
-
-  // there might be a better way to do this
-  // like looping over MaximalUnderOrders
-  if populateoo_in_oo then
-    for i in [1..#E`OverOrders] do
-      S := E`OverOrders[i];
-      if not assigned S`OverOrders then
-        S`OverOrders := {@ T : T in E`OverOrders | S subset T @};
-      end if;
-    end for;
-  end if;
-  return E`OverOrders;
-end intrinsic;
-
-/*
-// for this one, I need Driscriminant and AritmeticRadical
-
-intrinsic pMaximalOrder(O::AlgEtQOrd, p::RngIntElt) -> AlgEtQOrd
-{given O, retuns the maximal p over order}
-  if (Abs(Integers() ! Discriminant(O)) mod p^2) ne 0 then
-    return O;
-  end if;
-
-  OO := O;
-  // Theorem 6.1.3 Cohen
-  while true do
-    I := ArithmeticRadical(OO, BaseRing(OO)*p);
-    OO := MultiplicatorRing(I);
-    if OO eq Order(I) then
-      return OO;
+intrinsic OverOrders(R::AlgEtQOrd : populateoo_in_oo:=false) -> SetIndx[AlgEtQOrd]
+{We compute all the overorders of R. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana. The Vararg "populateoo_inoo" (default false) determines whether we should fill the attribute T`OverOrders for every overorder T of R.}
+    if not assigned R`OverOrders then
+        pp:=SingularPrimes(R);
+        vtime OverOrders,2 : oo_at_Ps:=[ OverOrdersAtPrime(R,P) : P in pp ];
+        vprintf OverOrders,2 : "P-overorders for each P %o\n",[#x : x in oo_at_Ps];
+        vprintf OverOrders,2 : "total number of overorders %o\n",&*[#x : x in oo_at_Ps];
+        output:={@ @};
+        assert forall{x : x in oo_at_Ps | x[1] eq R};
+        cc:=CartesianProduct([[1..#x] : x in oo_at_Ps]);
+        for c in cc do
+            S:=[ c[j] : j in [1..#c] ]; //R is contained in all of them
+            if forall{x : x in S | x eq 1 } then
+                S:=R;
+            elif #[x : x in S | x ne 1] eq 1 then
+                // this case happens only for the minimal overorders of R
+                _,j:=Max(S); // the position of the non-1 entry
+                S:=oo_at_Ps[j][S[j]]; // the only order in the tuple bigger than R
+            else
+                gens:=&cat[ZBasis(oo_at_Ps[j][S[j]]) : j in [1..#S] | S[j] ne 1];
+                S:=Order(gens);
+            end if;
+            Include(~output,S);
+        end for;
+        O:=MaximalOrder(Algebra(R));
+        output:={@ T : T in output | Index(O,T) ne 1 @} join {@ O @}; // maximal order : last of list
+        R`OverOrders:=output;
+        assert #cc eq #output;
     end if;
-  end while;
+    // there might be a better way to do this
+    if populateoo_in_oo then
+      for i in [1..#R`OverOrders] do
+        S := R`OverOrders[i];
+        if not assigned S`OverOrders then
+          S`OverOrders := {@ T : T in R`OverOrders | S subset T @};
+        end if;
+      end for;
+    end if;
+    return R`OverOrders;
 end intrinsic;
-*/
+
+intrinsic FindOverOrders(R::AlgEtQOrd : populateoo_in_oo:=false) -> SetIndx[AlgEtQOrd]
+{We compute all the overorders of R. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana. The Vararg "populateoo_inoo" (default false) determines whether we should fill the attribute T`OverOrders for every overorder T of R.}
+    return OverOrders(R : populateoo_in_oo:=populateoo_in_oo);
+end intrinsic;
 
 /* TESTS
 
     printf "### OverOrders:";
-	  AttachSpec("~/packages_github/AlgEt/spec");
+	AttachSpec("~/packages_github/AlgEt/spec");
 
     SetVerbose("OverOrders",1);
     SetAssertions(1);
@@ -193,6 +237,7 @@ end intrinsic;
     A:=EtaleAlgebra(f);
     E:=EquationOrder(A);
     oo:=FindOverOrders(E);
+    assert #oo eq 11;
 
     printf " all good!\n"; 
  

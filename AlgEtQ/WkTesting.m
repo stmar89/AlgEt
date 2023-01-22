@@ -66,7 +66,7 @@ end intrinsic
 
 /* TESTS
 
-    printf "### Testing WKICM:";
+    printf "### Testing WKEq:";
 	AttachSpec("~/packages_github/AlgEt/spec");
 	SetAssertions(2);
 	_<x>:=PolynomialRing(Integers());

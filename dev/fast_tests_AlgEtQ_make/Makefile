@@ -20,7 +20,7 @@ magma_script:
 	@echo "...Done"
 	@echo "-------------------------------------------------------------"
 	@echo "-------------------------------------------------------------"
-	@echo "We now run the fast tests. It should take only a 3/4 minutes."
+	@echo "We now run the fast tests. It should take only a 5/6 minutes."
 	@echo "-------------------------------------------------------------"
 	@echo "-------------------------------------------------------------"
 	magma -b ../fast_tests_AlgEtQ.m

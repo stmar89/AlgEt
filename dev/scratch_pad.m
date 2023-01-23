@@ -133,30 +133,6 @@ end intrinsic;
     // slow tests from remote
     screen -S slow_tests;
     screen -r slow_tests;
-
-    quit;
-    cd ~/packages_github/AlgEt/dev/
-    git pull; sleep 1;
-    magma -b slow_tests_AlgEtQ.m
-
-    // examples AlgEtQ
-    screen -r examples_papers_AlgEtQ;
-
-    quit;
-    cd ~/packages_github/AlgEt/examples/
-    git pull; sleep 1;
-    magma -b ideal_class_monoid.txt
-
-    // examples Modules
-    screen -S examples_Modules;
-    screen -r examples_Modules;
-
-    quit;
-    cd ~/packages_github/AlgEt/
-    git pull; sleep 1;
-    magma -b ~/packages_github/AlgEt/examples/modules_conjugacy_AVs.txt
-    magma -b ~/packages_github/AlgEt/dev/all_tests_AlgEtQMod.m
-
     ////////////////////////////////////
     // Graph of inclusions of overorders
     ////////////////////////////////////
@@ -180,6 +156,30 @@ end intrinsic;
     for d in [0..Distance(vv.Index(oo,MaximalOrder(A)),vv.Index(oo,E))] do
         #Sphere(vv.Index(oo,MaximalOrder(A)),d);
     end for;
+
+
+    quit;
+    cd ~/packages_github/AlgEt/dev/
+    git pull; sleep 1;
+    magma -b slow_tests_AlgEtQ.m
+
+    // examples AlgEtQ
+    screen -r examples_papers_AlgEtQ;
+
+    quit;
+    cd ~/packages_github/AlgEt/examples/
+    git pull; sleep 1;
+    magma -b ideal_class_monoid.txt
+
+    // examples Modules
+    screen -S examples_Modules;
+    screen -r examples_Modules;
+
+    quit;
+    cd ~/packages_github/AlgEt/
+    git pull; sleep 1;
+    magma -b ~/packages_github/AlgEt/examples/modules_conjugacy_AVs.txt
+    magma -b ~/packages_github/AlgEt/dev/all_tests_AlgEtQMod.m
 
 
 /* TEST

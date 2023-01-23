@@ -556,7 +556,29 @@
 --
 
 <pre>
-<b>Print</b>(A::AlgEtQOrd)
+<b>s: 
+                                        // ComplexConjugate, MultiplicatorRing, EquationOrder, ProductOfEquationOrders, 
+                                        //   MaximalOrder, FindOverOrders, MinimalOverOrders, LoadWKICM
+
+declare attributes AlgEtQOrd : IsMaximal,
+                              IsProductOfOrders,
+                              Index,
+                              ZBasis,
+                              Generators,
+                              OneIdeal,
+                              Algebra,
+                              TraceDualIdeal,
+                              Conductor,
+                              IsGorenstein,
+                              IsBass,
+                              Hash,
+                              inclusion_matrix;
+
+//----------
+// Basics
+//----------
+
+intrinsic Print</b>(A::AlgEtQOrd)
 </pre>
 
 *Print the order.*
@@ -662,6 +684,12 @@
 </pre>
 
 *Returns a random (small coefficient) element of O. The range of the random coefficients can be increased by giving the optional argument CoeffRange. One can allow zero-divisors using the optional argument "ZeroDivisorsAllowed", which by default is set to false.*
+
+<pre>
+<b>IsKnownOrder</b>(~R::AlgEtQOrd)
+</pre>
+
+*This procedure checks wheter the order R is already in the list of known orders of the algebra A of definition of R. If so then it replaces R with the copy stored in the attribute KnownOrders. If not it adds it to KnownOrders. This is done to avoid creating multiple copies of the same order.*
 
 <pre>
 <b>EquationOrder</b>(A::AlgEtQ) -> AlgEtQOrd
@@ -819,28 +847,50 @@
 --
 
 <pre>
-<b>MinimalOverOrders</b>(R::AlgEtQOrd : singular_primes := [], orders := {@ @}) -> SetIndx[AlgEtQOrd]
+<b>IsMaximalAtPrime</b>(R::AlgEtQOrd, P::AlgEtQIdl) -> BoolElt
 </pre>
 
-*@ @*
+*Returns whether R is maximal at the prime P, that is, if (R:O) is not contained in P, where O is the maximal order.*
 
 <pre>
-<b>FindOverOrders_Minimal</b>(R::AlgEtQOrd) -> SetIndx[AlgEtQOrd]
+<b>MinimalOverOrdersAtPrime</b>(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQOrd]
 </pre>
 
-*Given an order R returns all the over orders by a recursive search of the minimal overordes. Based on "On the computations of overorders" by TommyHofmann and Carlo Sircana.*
+*Given an order R and prime P of R, it returns the minimal overorders S of R with conductor (R:S) which is P-primary. The minimality assumption forces the conductor (R:S) to be exactly P. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.*
 
 <pre>
-<b>FindOverOrders</b>(E::AlgEtQOrd:  populateoo_in_oo := false) -> SetIndx[AlgEtQOrd]
+<b>MinimalOverOrders</b>(R::AlgEtQOrd) -> SetIndx[AlgEtQOrd]
 </pre>
 
-*Returns all the overorders of E. The boolean VarArg populateoo_in_oo determines whether to populate the attribute OverOrders of each overorder of E.*
+*Computes the minimal overorders of R.*
 
 <pre>
-<b>pMaximalOrder</b>(O::AlgEtQOrd, p::RngIntElt) -> AlgEtQOrd
+<b>OverOrdersAtPrime</b>(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQOrd]
 </pre>
 
-*given O, retuns the maximal p over order*
+*Given an order R and prime P of R, it returns R and the overorders S of R with conductor (R:S) which is P-primary. We recursively produce the minimal PP-overorders where PP are primes above P. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.*
+
+<pre>
+<b>OverOrders</b>(R::AlgEtQOrd : populateoo_in_oo:=false) -> SetIndx[AlgEtQOrd]
+</pre>
+
+*We compute all the overorders of R. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana. The Vararg "populateoo_inoo" (default false) determines whether we should fill the attribute T`OverOrders for every overorder T of R.*
+
+<pre>
+<b>FindOverOrders</b>(R::AlgEtQOrd : populateoo_in_oo:=false) -> SetIndx[AlgEtQOrd]
+</pre>
+
+*We compute all the overorders of R. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana. The Vararg "populateoo_inoo" (default false) determines whether we should fill the attribute T`OverOrders for every overorder T of R.*
+
+
+# List of instrinsics in AlgEtQ/GraphOverOrders.m:
+--
+
+<pre>
+<b>GraphOverOrders</b>(R:AlgEtQOrd) -> GrphDir
+</pre>
+
+*Given an order R returns the graph G of minimal inclusions of the overorders of R. More precisely, the vertices of G are integers between 1 and the number of OverOrders(R), and there is an edge [i,j] if and only if OverOrder(R)[j] is a minimal overorder of OverOrders(R)[i].*
 
 
 # List of instrinsics in AlgEtQ/Idl.m:
@@ -1198,7 +1248,7 @@
 <b>CoprimeRepresentative</b>(I::AlgEtQIdl,J::AlgEtQIdl) -> AlgEtQElt,AlgEtQIdl
 </pre>
 
-*Return an element x such that x*I is an integral ideal coprime with J, togheter with the product x*I. The first ideal must be invertible and the second should be integral.*
+*Returns an element x such that x*I is an integral ideal coprime with J, togheter with the product x*I. The first ideal must be invertible and the second should be integral.*
 
 
 # List of instrinsics in AlgEtQ/ZBasisLLL.m:
@@ -1411,16 +1461,16 @@
 --
 
 <pre>
-<b>ShortestElement</b>(I::AlgEtQIdl) ->AlgEtQElt
+<b>ShortElement</b>(I::AlgEtQIdl) ->AlgEtQElt
 </pre>
 
-*Given an ideal I returns a non-zerodivisor in I with small coefficients (in the LLL sense). This is achieved by enumerating short vectors in I, and pick the first one which is a non-zerodivisor.*
+*Given an ideal I returns a non-zerodivisor in I with small coefficients (in the LLL sense). This is achieved by picking an element with small coefficients in a LLL-reduced basis (wrt the T2 norm as a Z-lattice).*
 
 <pre>
 <b>SmallRepresentative</b>(I::AlgEtQIdl) ->AlgEtQIdl,AlgEtQElt
 </pre>
 
-*Given a fractional R-ideal I, it returns an isomorphic ideal a*I, and the element a, such that a*I is a subset of R, and the cardinality of R/aI is small. This is achieved by computing the ShortestElement a of (R:I). Note that if I is invertible R/aI is isomorphic to (R:I)/aR.*
+*Given a fractional R-ideal I, it returns an isomorphic ideal a*I, and the element a, such that a*I is a subset of R, and the cardinality of R/aI is small. This is achieved by computing the ShortElement a of (R:I). Note that if I is invertible R/aI is isomorphic to (R:I)/aR.*
 
 
 # List of instrinsics in AlgEtQ/MinimalGenerators.m:
@@ -1497,6 +1547,18 @@
 </pre>
 
 *Given an integral S-ideal, returns the sequence of maximal ideals P of S above I.*
+
+<pre>
+<b>SingularPrimes</b>(R::AlgEtQOrd) -> SetIndx
+</pre>
+
+*Returns the non-invertible primes of the order.*
+
+<pre>
+<b>NonInvertiblePrimes</b>(R::AlgEtQOrd) -> SetIndx
+</pre>
+
+*Returns the non-invertible primes of the order.*
 
 <pre>
 <b>IsPrime</b>(I::AlgEtQIdl) -> BoolElt

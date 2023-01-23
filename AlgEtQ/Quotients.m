@@ -242,7 +242,7 @@ end intrinsic;
 	A:=EtaleAlgebra(f);
 	E:=EquationOrder(A);
     icm:=ICM(E);
-    pp:=PrimesAbove(Conductor(E));
+    pp:=SingularPrimes(E);
     for P in pp do
         r:=ResidueField(P);
         _:=PrimitiveElementResidueField(P);

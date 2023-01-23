@@ -182,16 +182,12 @@ intrinsic WKICM(E::AlgEtQOrd : Method:="Auto")->SeqEnum
             // we need to have WKICM_bar(T) computed for T=(P:P) for all P singular prime of S.
             // Hence we proceed recursively starting from O, and then filling it for the Maximal SubOrders.
             O:=MaximalOrder(Algebra(E));
-            edges:=[];
-            for j in [1..#oo] do
-                for i in [Index(oo,T) : T in MinimalOverOrders(oo[j])] do
-                // oo[j] subset oo[i] 
-                    Append(~edges,[i,j]); //the edge is a reversed inclusion
-                end for;
-            end for;
-            // D is the directed graph of (reverse) inclusion of overorders of R.
+            edges:=Edges(GraphOverOrders(E));
+            edges:=[ [TerminalVertex(e),InitialVertex(e)] : e in edges ]; // we reverse all the inclusion
+            // D is the directed graph of (reverse) minimal inclusion of overorders of R.
             D:=Digraph<#oo|edges>;
             vprint new_wk_icm_bar,2 : "We have computed the directed graph of (reverse) inclusion of overorders of R.";
+
             vv:=VertexSet(D);
             max_dist:=Distance(vv.Index(oo,O),vv.Index(oo,E));
             for d in [0..max_dist] do
@@ -275,9 +271,6 @@ end intrinsic;
     "Computing overorders ...";
     time oo:=FindOverOrders(R); //14824 seconds, 16320 overorders
     #oo, "overorders found.";
-    for S in oo do if not IsMaximal(S) then
-        assert assigned S`MinimalOverOrders;
-    end if; end for;
     wk:=WKICM(R);
 
 
@@ -294,9 +287,6 @@ end intrinsic;
     "Computing overorders ...";
     time oo:=FindOverOrders(R);
     #oo, "overorders found.";
-    for S in oo do if not IsMaximal(S) then
-        assert assigned S`MinimalOverOrders;
-    end if; end for;
     wk:=WKICM(R);
 
 */

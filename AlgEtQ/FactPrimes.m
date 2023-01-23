@@ -175,8 +175,7 @@ intrinsic IsBass(S::AlgEtQOrd) -> BoolElt
             S`IsBass:=true;
         else
             O:=MaximalOrder(Algebra(S));
-            ff:=Conductor(S);
-            sing:=PrimesAbove(ff);
+            sing:=SingularPrimes(S);
             S`IsBass:=forall{P:P in sing | IsBassAtPrime(S,P)};
         end if;
     end if;
@@ -219,6 +218,7 @@ end intrinsic;
 
     f:=x^6 + 8*x^5 + 50*x^4 + 200*x^3 + 1250*x^2 + 5000*x + 15625;
     A:=EtaleAlgebra(f);
+    assert #SingularPrimes(MaximalOrder(A)) eq 0;
     R:=EquationOrder(A);
     assert #SingularPrimes(R) eq 5;
     assert #NonInvertiblePrimes(R) eq 5;

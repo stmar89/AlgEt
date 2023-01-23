@@ -45,7 +45,7 @@ end intrinsic;
   f:=x^4-100*x^3-100*x^2-100*x-100;
   K:=EtaleAlgebra(f);
   E:=EquationOrder(K);
-  pp:=PrimesAbove(Conductor(E));
+  pp:=SingularPrimes(E);
   I:=&*(pp);
   J:=&*(pp);
   ZBasisLLL(I);

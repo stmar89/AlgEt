@@ -161,6 +161,10 @@ intrinsic OverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQOrd]
         return {@ R @} join {@ S : S in R`OverOrders | PrimesAbove(ColonIdeal(R,R!!OneIdeal(S))) eq [ P ] @};
     end if;
 
+    if IsMaximalAtPrime(R,P) then
+        return {@ R @};
+    end if;
+
     ppO:=PrimesAbove(MaximalOrder(Algebra(R))!!P);
     queue := {@ R @};
     output:={@ R @};
@@ -199,7 +203,7 @@ end intrinsic;
 intrinsic OverOrders(R::AlgEtQOrd : populateoo_in_oo:=false) -> SetIndx[AlgEtQOrd]
 {We compute all the overorders of R. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana. The Vararg "populateoo_inoo" (default false) determines whether we should fill the attribute T`OverOrders for every overorder T of R.}
     if not assigned R`OverOrders then
-        output:={@ @};
+        output:={@ R  @};
         if not IsMaximal(R) then
             pp:=SingularPrimes(R);
             vtime OverOrders,2 : oo_at_Ps:=[ OverOrdersAtPrime(R,P) : P in pp ];
@@ -208,23 +212,29 @@ intrinsic OverOrders(R::AlgEtQOrd : populateoo_in_oo:=false) -> SetIndx[AlgEtQOr
             assert forall{x : x in oo_at_Ps | x[1] eq R};
             cc:=CartesianProduct([[1..#x] : x in oo_at_Ps]);
             for c in cc do
-                S:=[ c[j] : j in [1..#c] ]; //R is contained in all of them
+                S:=[ c[j] : j in [1..#c] ];
+                // R is contained in all the orders. 
+                // Using this info we can make the generation process a bit faster.
                 if forall{x : x in S | x eq 1 } then
                     S:=R;
                 elif #[x : x in S | x ne 1] eq 1 then
-                    // this case happens only for the minimal overorders of R
+                    // this case happens for the minimal overorders of R, 
+                    // and when there is only one singular prime of R
                     _,j:=Max(S); // the position of the non-1 entry
                     S:=oo_at_Ps[j][S[j]]; // the only order in the tuple bigger than R
                 else
                     gens:=&cat[ZBasis(oo_at_Ps[j][S[j]]) : j in [1..#S] | S[j] ne 1];
                     S:=Order(gens);
                 end if;
+                IsKnownOrder(~S);
+                ZBasisLLL(S);
                 Include(~output,S);
             end for;
             assert #cc eq #output;
         end if;
         O:=MaximalOrder(Algebra(R));
-        output:={@ T : T in output | Index(O,T) ne 1 @} join {@ O @}; // maximal order : last of list
+        assert output[#output] eq O;
+        //output:={@ T : T in output | Index(O,T) ne 1 @} join {@ O @}; // maximal order : last of list
         R`OverOrders:=output;
     end if;
     // there might be a better way to do this

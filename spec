@@ -8,6 +8,7 @@ TraceNorm.m
 Ord.m
 Quotients.m
 OverOrders.m
+GraphOverOrders.m
 Idl.m
 ZBasisLLL.m
 Completion.m

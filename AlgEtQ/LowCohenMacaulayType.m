@@ -131,7 +131,7 @@ end function;
     oo:=FindOverOrders(E); // ~13 secs
     assert #oo eq 297;
     for S in oo do
-        pp:=PrimesAbove(Conductor(S));
+        pp:=SingularPrimes(S);
         for P in pp do        
             _:=CohenMacaulayTypeAtPrime(S,P);
         end for;

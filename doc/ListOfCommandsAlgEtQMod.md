@@ -11,7 +11,7 @@
 <b>IntermediateModules</b>(I::AlgEtQMod,J::AlgEtQMod)->SetIndx[AlgEtQMod]
 </pre>
 
-*Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that J subset K subset I. They are produced recursively using from the minimal ones*
+*Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that J subset K subset I. They are produced recursively using from the minimal ones.*
 
 <pre>
 <b>MaximalIntermediateModules</b>(I::AlgEtQMod,J::AlgEtQMod)->SetIndx[AlgEtQMod]
@@ -23,8 +23,7 @@
 <b>IntermediateModulesWithTrivialExtension</b>(I::AlgEtQMod,J::AlgEtQMod,O::AlgEtQOrd)->SetIndx[AlgEtQMod]
 </pre>
 
-*Given S-modules J subset I, and overorder O of S, it returns all the S-modules N such that J subset N subset I and NO=I. Note: we need O!!I eq I.
-  They are produced recursively using from the maximal ones*
+*Given S-modules J subset I, and overorder O of S, it returns all the S-modules N such that J subset N subset I and NO=I. Note: we need O!!I eq I. They are produced recursively using from the maximal ones*
 
 
 # List of instrinsics in AlgEtQMod/IsomModules.m:

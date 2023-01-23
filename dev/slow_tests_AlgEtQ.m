@@ -75,7 +75,7 @@
         _:=#PicardGroup(T);
     t1:=Cputime(t0);
     printf "Current running time = %o \n",t1;
-    tprevbest:=13.7; //on diophantus
+    tprevbest:=1; //on diophantus
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "PicardGroup for %o got faster. Update the previous best known time\n",f;
@@ -87,7 +87,7 @@
 	
     "-------------------------------------------------------------";
     "-------------------------------------------------------------";
-    "--------------------------OverOrders-------------------------";
+    "-----------------OverOrders and GraphOverOrders--------------";
     "-------------------------------------------------------------";
     "-------------------------------------------------------------";
     "A quick one.";
@@ -112,6 +112,19 @@
     end if;
     assert #ooet eq 297;
 
+    t0:=Cputime();
+        ooet:=GraphOverOrders(Eet);
+    t1:=Cputime(t0);
+    printf "Current running time = %o \n",t1;
+    tprevbest:=0.3; //on diophantus
+    if Abs(t1 - tprevbest) gt 1*tprevbest then
+        if t1 lt tprevbest then
+            printf "GraphOverOrders for %o got faster. Update the previous best known time\n",f;
+        elif t1 gt tprevbest then
+            printf "GraphOverOrders for %o got slower. The previous code was better.\n",f;
+        end if;
+    end if;
+
     // Aet:=EtaleAlgebra(f);
     // Eet:=EquationOrder(Aet);
     // SetProfile(true);
@@ -133,7 +146,7 @@
         ooet:=FindOverOrders(Eet);
     t1:=Cputime(t0);
     printf "Current running time = %o \n",t1;
-    tprevbest:=122; // on diophantus
+    tprevbest:=132; // on diophantus
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "FindOverOrders for %o got faster. Update the previous best known time\n",f;
@@ -143,6 +156,19 @@
     end if;
     assert #ooet eq 3312; 
 
+    t0:=Cputime();
+        ooet:=GraphOverOrders(Eet);
+    t1:=Cputime(t0);
+    printf "Current running time = %o \n",t1;
+    tprevbest:=37; //on diophantus
+    if Abs(t1 - tprevbest) gt 0.1*tprevbest then
+        if t1 lt tprevbest then
+            printf "GraphOverOrders for %o got faster. Update the previous best known time\n",f;
+        elif t1 gt tprevbest then
+            printf "GraphOverOrders for %o got slower. The previous code was better.\n",f;
+        end if;
+    end if;
+    
     /*
     // with profiler
     Aet:=EtaleAlgebra(f);
@@ -156,25 +182,35 @@
 
     "-------------------------------------------------------------";
     "A big example.";
-    quit;
-    magma 
+
     AttachSpec("~/packages_github/AlgEt/spec");
-    Attach("~/packages_github/AlgEt/dev/OverOrders_new.m");
     P<x>:=PolynomialRing(Integers());
     f:=x^6 + 8*x^5 + 50*x^4 + 200*x^3 + 1250*x^2 + 5000*x + 15625;
     A:=EtaleAlgebra(f);
-    R:=EquationOrder(A); 
+    Eet:=EquationOrder(A); 
     t0:=Cputime();
-        ooet:=FindOverOrders(R);
+        ooet:=FindOverOrders(Eet);
     t1:=Cputime(t0);
-    assert #oo eq 3200;
+    assert #ooet eq 3200;
     printf "Current running time = %o \n",t1;
-    tprevbest:=114; // on diophantus
+    tprevbest:=133; // on diophantus
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "FindOverOrders for %o got faster. Update the previous best known time\n",f;
         elif t1 gt tprevbest then
             printf "FindOverOrders for %o got slower. The previous code was better.\n",f;
+        end if;
+    end if;
+    t0:=Cputime();
+        ooet:=GraphOverOrders(Eet);
+    t1:=Cputime(t0);
+    printf "Current running time = %o \n",t1;
+    tprevbest:=46; //on diophantus
+    if Abs(t1 - tprevbest) gt 0.1*tprevbest then
+        if t1 lt tprevbest then
+            printf "GraphOverOrders for %o got faster. Update the previous best known time\n",f;
+        elif t1 gt tprevbest then
+            printf "GraphOverOrders for %o got slower. The previous code was better.\n",f;
         end if;
     end if;
         

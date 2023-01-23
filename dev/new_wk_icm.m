@@ -259,20 +259,58 @@ end intrinsic;
         printf "i=%o f=%o #wk=%o seconds=%o\n",i,f,#WKICM(R),Cputime(t0);
     end for;
 
-// ISSUE with the next: there is a bug
+    // freakking big
     AttachSpec("~/packages_github/AlgEt/spec");
     Attach("~/packages_github/AlgEt/dev/new_wk_icm.m");
     SetVerbose("new_wk_icm_bar",2);
     P<x>:=PolynomialRing(Integers());
     f:=x^8 - 2*x^7 + 7*x^6 - 14*x^5 + 40*x^4 - 56*x^3 + 112*x^2 - 128*x + 256;
     A:=EtaleAlgebra(f);
-    F:=PrimitiveElement(A);
     R:=EquationOrder(A);
     "Computing overorders ...";
     time oo:=FindOverOrders(R); //14824 seconds, 16320 overorders
     #oo, "overorders found.";
-    wk:=WKICM(R);
+    wk:=WKICM(R); // 114492
 
+    AttachSpec("~/packages_github/AlgEt/spec");
+    Attach("~/packages_github/AlgEt/dev/new_wk_icm.m");
+    //SetVerbose("new_wk_icm_bar",2);
+    P<x>:=PolynomialRing(Integers());
+    f:=x^8 - 2*x^7 + 7*x^6 - 14*x^5 + 40*x^4 - 56*x^3 + 112*x^2 - 128*x + 256;
+    A:=EtaleAlgebra(f);
+    R:=EquationOrder(A);
+    wks:=[];
+    O:=MaximalOrder(A);
+    fac:=Factorization(Index(O,R));
+    for ff in fac do
+        // Rp:=[ S : S in oo | Index(O,S) eq ff[1]^ff[2] ];
+        // assert #Rp eq 1;
+        // Rp:=Rp[1];
+        Rp:=Order(ZBasis(R) cat ZBasis(ff[1]^ff[2]*O));
+        time wkp:=WKICM(Rp);
+        Append(~wks,#wkp);    
+    end for;
+    assert &*wks eq 114492;
+
+    AttachSpec("~/packages_github/AlgEt/spec");
+    Attach("~/packages_github/AlgEt/dev/new_wk_icm.m");
+    //SetVerbose("new_wk_icm_bar",2);
+    P<x>:=PolynomialRing(Integers());
+    f:=x^4+30^3*x^3+30^3*x^2+30^3*x+30^3;
+    A:=EtaleAlgebra(f);
+    R:=EquationOrder(A);
+    wks:=[];
+    O:=MaximalOrder(A);
+    fac:=Factorization(Index(O,R));
+    for ff in fac do
+        // Rp:=[ S : S in oo | Index(O,S) eq ff[1]^ff[2] ];
+        // assert #Rp eq 1;
+        // Rp:=Rp[1];
+        Rp:=Order(ZBasis(R) cat ZBasis(ff[1]^ff[2]*O));
+        time wkp:=WKICM(Rp);
+        Append(~wks,#wkp);    
+    end for;
+    assert &*wks eq 114492;
 
 // ISSUE with the next: Segmentation fault for the Equation Order. Maybe there are just too many subscpaces
     AttachSpec("~/packages_github/AlgEt/spec");

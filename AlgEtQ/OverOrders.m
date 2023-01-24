@@ -12,13 +12,6 @@ declare verbose OverOrders,3;
 // with a preliminary version of this code
 /////////////////////////////////////////////////////
 
-/*TODO
-     When I form the cartesian product, I can construct all minimal inclusions as follows: 
-     given an entry S=<S1, ... ,Sn>, then T=<T1,...,Tn> is a minimal overoder of S 
-     if and only if Ti=Si for all i's except one, say j, for which Tj is a minimal overorder of Sj
-*/
-
-
 import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQtoA , meet_zbasis , inclusion_matrix;
 
 declare attributes AlgEtQOrd : MinimalOverOrders, // a sequence of tuples <P,{@ T1,...,Tn @}>, where

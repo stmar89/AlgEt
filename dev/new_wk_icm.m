@@ -310,21 +310,30 @@ end intrinsic;
         time wkp:=WKICM(Rp);
         Append(~wks,#wkp);    
     end for;
-    assert &*wks eq 114492;
+    time #WKICM(R);
+    assert &*wks eq #WKICM(R);
 
-// ISSUE with the next: Segmentation fault for the Equation Order. Maybe there are just too many subscpaces
     AttachSpec("~/packages_github/AlgEt/spec");
     Attach("~/packages_github/AlgEt/dev/new_wk_icm.m");
-    SetVerbose("new_wk_icm_bar",2);
+    //SetVerbose("new_wk_icm_bar",2);
     P<x>:=PolynomialRing(Integers());
     f:=x^6 + 8*x^5 + 50*x^4 + 200*x^3 + 1250*x^2 + 5000*x + 15625;
     A:=EtaleAlgebra(f);
     F:=PrimitiveElement(A);
-    // R:=Order([F,25/F]);
+    O:=MaximalOrder(A);
     R:=EquationOrder(A); //3200 overorders
-    "Computing overorders ...";
-    time oo:=FindOverOrders(R);
-    #oo, "overorders found.";
-    wk:=WKICM(R);
+    fac:=Factorization(Index(O,R));
+    #fac;
+    wks:=[];
+    for ff in fac do
+        // Rp:=[ S : S in oo | Index(O,S) eq ff[1]^ff[2] ];
+        // assert #Rp eq 1;
+        // Rp:=Rp[1];
+        Rp:=Order(ZBasis(R) cat ZBasis(ff[1]^ff[2]*O));
+        time wkp:=WKICM(Rp);
+        Append(~wks,#wkp);    
+    end for;
+    time #WKICM(R);
+    assert &*wks eq #WKICM(R);
 
 */

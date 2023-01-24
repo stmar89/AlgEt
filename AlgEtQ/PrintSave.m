@@ -37,20 +37,8 @@ intrinsic PrintWKICM(R::AlgEtQOrd) -> MonStgElt
     nf_poly:=[ Coefficients((DefiningPolynomial(K))) : K in nf ];
     str cat:=RemoveBlanks(Sprint(nf_poly)) cat ",\n";
     oo:=FindOverOrders(R);
-    // we make sure that R is oo[1] and the max order O is in the last position
-    iR:=Index(oo,R);
-    if iR ne 1 then
-        temp:=oo[1];
-        oo[1]:=R;
-        oo[iR]:=temp;
-    end if;
-    O:=MaximalOrder(A);
-    iO:=Index(oo,O);
-    if iO ne #oo then
-        temp:=oo[#oo];
-        oo[#oo]:=O;
-        oo[iO]:=temp;
-    end if;
+    // we make sure that R is oo[1]
+    assert R eq oo[1];
     // init the string
     str cat:="<\n";
     for iS->S in oo do
@@ -89,7 +77,12 @@ intrinsic LoadWKICM(str::MonStgElt) -> AlgEtQOrd
     ff:=[ PP!f : f in data[1]];
     A:=EtaleAlgebra([NumberField(f) : f in ff ]);
     wk:=data[2];
-    O:=Order([ A ! s : s in wk[#wk][1]]); // the last one is maximal
+
+    ooR:={@ Order([ A ! s : s in wk[j][1]]) : j in [1..#wk] @};
+    indices:=[ Index(S,ooR[1]) : S in ooR ];
+    max,indO:=Max(indices);
+    assert #[ i : i in indices | i eq max ] eq 1; //sanity check
+    O:=ooR[indO]; // this is the maximal order of A
     O`IsMaximal:=true;
     test,OasProd:=IsProductOfOrders(O);
     assert test;
@@ -101,22 +94,15 @@ intrinsic LoadWKICM(str::MonStgElt) -> AlgEtQOrd
     O`IsGorenstein:=true;
     A`MaximalOrder:=O;
     if #wk gt 1 then
-        R:=Order([ A! s : s in wk[1][1]]); // the first one is R
+        R:=ooR[1]; // the first one is R
     else 
         R:=O; //to save attributes
+        assert indO eq 1; //sanity check
     end if;
-    ooR:={@ @};
     wkR:=[];
     for iS->dataS in wk do
-        if iS eq 1 then
-            S:=R;
-        elif iS eq #wk then
-            S:=O;
-        else
-            S:=Order([ A ! s : s in dataS[1]]);
-        end if;
-        S`IsGorenstein:=#dataS eq 1;
-        Include(~ooR,S);
+        S:=ooR[iS];
+        S`IsGorenstein:=#dataS eq 1; //only one weak equivalence class
         wkS:=[];
         for iI->I in dataS do
             zbI:=[A!s : s in I];
@@ -133,7 +119,7 @@ intrinsic LoadWKICM(str::MonStgElt) -> AlgEtQOrd
     // we populate the attribute A`KnownOrders
     for iS in [1..#ooR] do
         S:=ooR[iS];
-       IsKnownOrder(~S); 
+        IsKnownOrder(~S); 
     end for;
     R`OverOrders:=ooR;
     R`WKICM:=wkR;

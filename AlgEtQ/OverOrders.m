@@ -225,9 +225,6 @@ intrinsic OverOrders(R::AlgEtQOrd : populateoo_in_oo:=false) -> SetIndx[AlgEtQOr
             end for;
             assert #cc eq #output;
         end if;
-        O:=MaximalOrder(Algebra(R));
-        assert output[#output] eq O;
-        //output:={@ T : T in output | Index(O,T) ne 1 @} join {@ O @}; // maximal order : last of list
         R`OverOrders:=output;
     end if;
     // there might be a better way to do this
@@ -267,5 +264,30 @@ end intrinsic;
     assert #oo eq 11;
 
     printf " all good!\n"; 
+
+
+    // this triggers a bug 20230124
+	AttachSpec("~/packages_github/AlgEt/spec");
+    P<x>:=PolynomialRing(Integers());
+    str:=Split(Read("~/263_wk_icm_sqfree_poly_with_new_wk_icm/issue_wkicm.txt"));
+    //for s in str do
+    s:=str[8];
+        f:=P ! eval(s);
+        A:=EtaleAlgebra(f);
+        q:=Truncate(ConstantCoefficient(f)^(2/Degree(f)));
+        F:=PrimitiveElement(A);
+        O:=MaximalOrder(A);
+        R:=Order([F,q/F]);
+        Factorization(Index(O,R));
+        //oo:=OverOrders(R);
+        ooP:=[];
+        for P in SingularPrimes(R) do
+            Append(~ooP,OverOrdersAtPrime(R,P));
+        end for;
+        oo:=ooP[1];
+        _,i:=Max( [Valuation( Index(S,R),2) : S in oo] );
+        #oo;
+    //end for;
+
  
 */

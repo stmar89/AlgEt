@@ -116,7 +116,7 @@ intrinsic PrimesAbove(I::AlgEtQIdl) -> SeqEnum[AlgAssEtOrdIdl]
     return I`PrimesAbove;
 end intrinsic;
 
-intrinsic SingularPrimes(R::AlgEtQOrd) -> SetIndx
+intrinsic SingularPrimes(R::AlgEtQOrd) -> SeqEnum[AlgAssEtOrdIdl]
 {Returns the non-invertible primes of the order.}
     if not assigned R`SingularPrimes then
         R`SingularPrimes:=PrimesAbove(Conductor(R));

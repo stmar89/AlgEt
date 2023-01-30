@@ -1549,7 +1549,7 @@ intrinsic Print</b>(A::AlgEtQOrd)
 *Given an integral S-ideal, returns the sequence of maximal ideals P of S above I.*
 
 <pre>
-<b>SingularPrimes</b>(R::AlgEtQOrd) -> SetIndx
+<b>SingularPrimes</b>(R::AlgEtQOrd) -> SeqEnum[AlgAssEtOrdIdl]
 </pre>
 
 *Returns the non-invertible primes of the order.*

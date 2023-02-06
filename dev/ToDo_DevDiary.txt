@@ -11,6 +11,7 @@
 
     TODO:
     ### Priority ###
+    ... none at the moment
 
     ### Modules ###
     - In IsomorphismClasses and IsIsomorphic, I should first order/test whether M and N have the same multiplicator ring S in K and with #M/PM = #N/PN for every singular prime of S, since these are necessary conditions of being isomorphic.
@@ -30,7 +31,7 @@
         end for;
 
     ### Various ###
-    - Improve saving and printing with LLL or MinimalGenerator (that is after CRT) to get smaller output.
+    - Improve saving and printing MinimalGenerator (that is after CRT) to get smaller output.
     - add MaxCMTypeOverOrders
 
     #### CRT ####
@@ -57,6 +58,8 @@
     ...
 
     ### FIXED/DONE: kept for the record. ###
+    - The current implementation of PrimesAbove goes through a Factorization over the maximal order.
+      The same can be obtained using MaximalIntermediateIdeals, but it is slower. Discarded.
     - I have implemented the prime-per-prime computation of OverOrders. The computation of the P-overorders of R for each P c R takes a small percentage of the time of the whole procedure. This means that most of the time is spent on taking products of the various P-parts. See the verbose timing. I don't think that there is much I can do about it.
     - After fiddling with SmallRepresentative I have achieved consistency in timings of PicardGroup. It seems that a lot of time was lost in CoprimeRepresentative.
     - Added ZBasisLLL. It is used only when one stores ideals/orders, and when one really wants a small representative.

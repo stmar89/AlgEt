@@ -18,6 +18,22 @@ declare verbose ?????, 1;
 // What do we do here?
 //------------
 
+// PrimesAbove vs MaximalIntermediateIdeals
+
+	AttachSpec("~/packages_github/AlgEt/spec");
+    _<x>:=PolynomialRing(Integers());
+    f:=(x^8+16)*(x^8+81)*(x^8+125);
+    A:=EtaleAlgebra(f);
+    E:=EquationOrder(A);
+    time pp:=SingularPrimes(E);
+    #pp;
+
+    f:=(x^8+16)*(x^8+81)*(x^8+125);
+    A:=EtaleAlgebra(f);
+    E:=EquationOrder(A);
+    time pp:=MaximalIntermediateIdeals(OneIdeal(E),Conductor(E));
+    #pp;
+
 // NEW idea. it is slower.
 quo_frac_idl:=function(I,J)
 // I->I/J

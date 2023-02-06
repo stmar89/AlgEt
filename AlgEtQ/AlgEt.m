@@ -43,7 +43,9 @@ end intrinsic;
 intrinsic EtaleAlgebra(f::RngUPolElt[RngInt]) -> AlgEtQ
 {Given a squarefree polynomial over the integers returns the product of the number fields defined by the irreducible factors.}
     require IsSquarefree(f) : "The polynomial must be squarefree.";
-    A:=EtaleAlgebra([NumberField(g[1]) : g in Factorization(f)]);
+    A:=EtaleAlgebra([NumberField(g[1]: DoLinearExtension) : g in Factorization(f)]); 
+    // DoLinearExtension is to avoid issues with g's of degree 1.
+    // This can occur while computing TotallyRealSubAlgebra's, for example
     A`DefiningPolynomial:=f;
     return A;
 end intrinsic;
@@ -51,7 +53,9 @@ end intrinsic;
 intrinsic EtaleAlgebra(f::RngUPolElt[FldRat]) -> AlgEtQ
 {Given a squarefree polynomial over the rationals returns the product of the number fields defined by the irreducible factors.}
     require IsSquarefree(f) : "The polynomial must be squarefree.";
-    A:=EtaleAlgebra([NumberField(g[1]) : g in Factorization(f)]);
+    A:=EtaleAlgebra([NumberField(g[1] : DoLinearExtension) : g in Factorization(f)]);
+    // DoLinearExtension is to avoid issues with g's of degree 1.
+    // This can occur while computing TotallyRealSubAlgebra's, for example
     A`DefiningPolynomial:=f;
     return A;
 end intrinsic;
@@ -71,6 +75,11 @@ end intrinsic;
     seq:=[NumberField(f) : f in seq];
     A:=EtaleAlgebra(seq);
     printf ".";
+
+    seq:=[x-1,x-20];
+    A:=EtaleAlgebra(&*seq);
+    printf ".";
+
     SetAssertions(1);
     printf " all good!\n";
 

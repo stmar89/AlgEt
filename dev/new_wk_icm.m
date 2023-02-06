@@ -411,7 +411,7 @@ end intrinsic;
 
 /*
     // before implementing the prime-per-prime:
-    // testing WKICM_LESS_OLD (trivial extenesion with sub-vector-spaces) vs WKICM_OLDD (trivial extension with lifts)
+    // testing WKICM_LESS_OLD (trivial extenesion with sub-vector-spaces) vs WKICM_OLD (trivial extension with lifts)
     
     quit;
     magma;
@@ -436,7 +436,7 @@ end intrinsic;
     quit;
     magma;
 
-    // WKICM_LESS_OLD
+    // WKICM_OLD
     AttachSpec("~/packages_github/AlgEt/spec");
     Attach("~/packages_github/AlgEt/dev/new_wk_icm.m");
     P<x>:=PolynomialRing(Integers());
@@ -450,7 +450,7 @@ end intrinsic;
         _,p,_:=IsPrimePower(Index(R,P));
         k:=Valuation(Index(O,R),p);
         RP:=Order(ZBasis(R) cat ZBasis(O!!P^k));
-        time Append(~wks,#WKICM_LESS_OLD(RP));
+        time Append(~wks,#WKICM_OLD(RP));
     end for;
     assert &*wks eq 114492;
 

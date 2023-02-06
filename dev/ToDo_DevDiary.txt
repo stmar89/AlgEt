@@ -1,7 +1,7 @@
    
     .m files from AbVarFq to 'translate':
 
---> - IdealsOfIndex.m
+--> - IdealsOfIndex.m (work in progress, see below)
     - IntegralMatrices.m
     - RepsZConjugacy.m
 --> - PowerBass.m
@@ -11,7 +11,7 @@
 
     TODO:
     ### Priority ###
-    ... none at the moment
+    - dev/IdealsOfIndex.m add tests and timings to complete
 
     ### Modules ###
     - In IsomorphismClasses and IsIsomorphic, I should first order/test whether M and N have the same multiplicator ring S in K and with #M/PM = #N/PN for every singular prime of S, since these are necessary conditions of being isomorphic.

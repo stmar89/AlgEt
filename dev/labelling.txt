@@ -1,0 +1,88 @@
+/* vim: set syntax=magma :*/
+
+    
+    AttachSpec("~/packages_github/AlgEt/spec");
+    Attach("~/packages_github/AlgEt/dev/new_wk_icm.m");
+    // to load the huge example:
+    time R:=LoadWKICM(Read("~/packages_github/AlgEt/dev/114492_wk_classes_example.txt")); // 3400 secs to load :-)
+    // check screen new_wkicm where it is loaded
+    #WKICM(R);
+
+    // random stuff to test labelling
+    dim_at_P:=function(I,P)
+        S:=Order(P);
+        k:=Index(S,P);
+        dim:=Ilog(k,Index(I,P*I));
+        return dim;
+    end function;
+
+    label1:=function(I,S)
+    // broken for iS=19
+        pp:=NonGorensteinPrimes(S);
+        return [dim_at_P(I,P) : P in pp]; 
+    end function;
+
+    label2:=function(I0)
+        // Order(I0) eq MultiplicatorRing(I0)
+        output:=[];
+        I:=I0;
+        S:=MultiplicatorRing(I);
+        repeat
+            pp:=NonGorensteinPrimes(S);
+            Append(~output,[ Index(oo,S) ] cat [dim_at_P(I,P) : P in pp]); 
+            I *:=I;
+            S:=MultiplicatorRing(I);
+            I:=S!!I;
+        until IsInvertible(I);
+        // we do not append the last dimensions since they will all be 1's
+        return output;
+    end function;
+
+    /*
+    compare:=function(I,J)
+    // WORK in Progress
+        S:=Order(I);
+        O:=MaximalOrder(Algebra(S));
+        ff:=Conductor(S);
+        Q,q:=Quotient(S!!OneIdeal(O),ff);
+        #Subgroups;
+        // loop over all Smit normal forms matrices 'out of Q' until you find I or J (up-to-weak-eq).
+        // if I comes up first I<J then return -1, otherwise +1.
+
+    end for;
+    */
+
+    oo:=OverOrders(R);
+
+    for iS->S in oo do
+        if not IsGorenstein(S) then
+            iS; 
+            wkS:=WKICM_bar(S);
+            //assert #{ label1(I,S) : I in wkS } eq #wkS; // broken at iS=19
+            assert #{ label2(I) : I in wkS } eq #wkS; // broken at iS=19, as well
+        end if;
+    end for;
+
+    // to be moved in compare()
+    S:=oo[19];
+    O:=MaximalOrder(Algebra(S));
+    ff:=Conductor(S);
+    Q,q:=Quotient(S!!OneIdeal(O),ff);
+    // see Proposition 4.1.6 in Cohen's Advanced ....
+
+    for d in Divisors(#Q) do
+        // we want to generate all subgroups of Q of index d
+        // need to generate all matrices in HNF form of determinant d
+        // recall a matrix is in hnf form if 
+        // - it is upper triangular
+        // - all entries are positive, and non-zero on the diagonal
+        // - in each row, the diagonal entry is strictly bigger than all other entries
+        
+
+    end for;
+
+    //#Subgroups(Q);
+
+    
+    
+

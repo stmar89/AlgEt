@@ -75,7 +75,7 @@
         _:=#PicardGroup(T);
     t1:=Cputime(t0);
     printf "Current running time = %o \n",t1;
-    tprevbest:=1; //on diophantus
+    tprevbest:=0.7; //on diophantus
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "PicardGroup for %o got faster. Update the previous best known time\n",f;
@@ -102,7 +102,7 @@
         ooet:=FindOverOrders(Eet);
     t1:=Cputime(t0);
     printf "Current running time = %o \n",t1;
-    tprevbest:=2; //on diophantus
+    tprevbest:=1.3; //on diophantus
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "FindOverOrders for %o got faster. Update the previous best known time\n",f;
@@ -146,7 +146,7 @@
         ooet:=FindOverOrders(Eet);
     t1:=Cputime(t0);
     printf "Current running time = %o \n",t1;
-    tprevbest:=132; // on diophantus
+    tprevbest:=54; // on diophantus
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "FindOverOrders for %o got faster. Update the previous best known time\n",f;
@@ -193,7 +193,7 @@
     t1:=Cputime(t0);
     assert #ooet eq 3200;
     printf "Current running time = %o \n",t1;
-    tprevbest:=133; // on diophantus
+    tprevbest:=62; // on diophantus
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "FindOverOrders for %o got faster. Update the previous best known time\n",f;
@@ -235,7 +235,7 @@
         _:=#WKICM(R);
     t1:=Cputime(t0);
     printf "Current running time = %o \n",t1;
-    tprevbest:=4.5; // diophantus
+    tprevbest:=5.8; // diophantus
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "WKICM for %o got faster. Update the previous best known time\n",f;

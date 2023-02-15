@@ -19,12 +19,14 @@ declare type AlgEtQOrd;
 declare attributes AlgEtQ : MaximalOrder,
                            ProductOfEquationOrders,
                            EquationOrder,
-                           KnownOrders; // This is a SetIndx containing orders in the algebra that are cached for some reason.
+                           KnownOrders; // This is a AssociativeArray indexed by rational numbers q:
+                                        // in the key q we store all orders S in the algebra such that q=Index(S),
+                                        // which is the index with respect to the fixed basis of A.
                                         // We store them, because to avoid creating multiple copies of the same order.
                                         // In particular, this is more efficient for the attributes.
                                         // The attribute is populated by the following intrinsics: 
                                         // ComplexConjugate, MultiplicatorRing, EquationOrder, ProductOfEquationOrders, 
-                                        //   MaximalOrder, FindOverOrders, MinimalOverOrders, LoadWKICM
+                                        // MaximalOrder, FindOverOrders, MinimalOverOrders, LoadWKICM
 
 declare attributes AlgEtQOrd : IsMaximal,
                               IsProductOfOrders,
@@ -357,6 +359,7 @@ end intrinsic;
 intrinsic IsKnownOrder(~R::AlgEtQOrd)
 {This procedure checks wheter the order R is already in the list of known orders of the algebra A of definition of R. If so then it replaces R with the copy stored in the attribute KnownOrders. If not it adds it to KnownOrders. This is done to avoid creating multiple copies of the same order.}
     A:=Algebra(R);
+    /* OLD
     if not assigned A`KnownOrders then
         A`KnownOrders:={@ @};
     end if;
@@ -364,6 +367,24 @@ intrinsic IsKnownOrder(~R::AlgEtQOrd)
         R:=S;
     else
         Include(~A`KnownOrders,R);
+    end if;
+    */
+    // new with AssociativeArray. Sorting the orders, should make it faster.
+    if not assigned A`KnownOrders then
+        A`KnownOrders:=AssociativeArray();
+        A`KnownOrders[Index(R)]:={@ R @};
+    else
+        ind:=Index(R);
+        if not IsDefined(A`KnownOrders,ind) then
+            A`KnownOrders[ind]:={@ R @};
+        else
+            if exists(S){ T : T in A`KnownOrders[ind] | R eq T } then // this equality is done on the Hash level,
+                                                                      // which means that 
+                R:=S;
+            else
+                Include(~A`KnownOrders[ind],R);
+            end if;
+        end if;
     end if;
 end intrinsic;
 
@@ -599,7 +620,7 @@ end intrinsic;
 
     ff:=Conductor(EquationOrder(A));
     T:=MultiplicatorRing(ff);
-    assert T in A`KnownOrders;
+    assert T in A`KnownOrders[Index(T)];
     assert assigned T`IsMaximal and assigned T`IsProductOfOrders; //these two attributes are assigned when we created OA above.
                                                                   // hence T points to the same memory spot of OA
     printf ".";

@@ -249,6 +249,7 @@ end intrinsic;
         assert #r eq #Quotient(OneIdeal(E),P);
         assert #r eq #ResidueRing(E,P);
         assert #r eq #QuotientVS(OneIdeal(E),P,P);
+        printf ".";
     end for;
 
     for I in icm do
@@ -257,6 +258,7 @@ end intrinsic;
             PI:=P*I;
             n:=#Quotient(I,PI);
             assert n eq #QuotientVS(I,PI,P);
+            printf ".";
         end for;
     end for;
 

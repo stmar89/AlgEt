@@ -8,8 +8,8 @@
 // http://www.staff.science.uu.nl/~marse004/
 /////////////////////////////////////////////////////
 
-declare attributes AlgEtQOrd:ICM,
-                            ICM_bar;
+declare attributes AlgEtQOrd:   ICM,
+                                ICM_bar;
 
 intrinsic ICM_bar(S::AlgEtQOrd : GRH:=false ) -> SeqEnum
 {returns the ideal classes of the order S having S as MultiplicatorRing, that is the orbits of the action of PicardGroup(S) on WKICM_bar(S).}

@@ -20,6 +20,7 @@ declare attributes AlgEtQIdl : Index, //stores the index
                               MultiplicatorRing,
                               Generators,
                               ZBasis,
+                              KnownPowers, //an associative array storing the known powers of an ideal
                               IsPrime,
                               IsInvertible,
                               Inverse,
@@ -69,6 +70,7 @@ CreateAlgEtQIdl:=function(S,gens)
         I`IsInvertible:=true;
         I`MultiplicatorRing:=S; 
     end if;
+    I`KnownPowers:=AssociativeArray();
     return I;
 end function;
 
@@ -509,7 +511,6 @@ intrinsic '^'(I::AlgEtQIdl, n::RngIntElt) -> AlgEtQIdl
     //
     // Remark: this trick does not work for product of invertible ideals I and J. 
     // One can have I_P1=(a) J_P1=(c) but I_P2=(a), J_P2=(d) so one cannot avoid the mixed products.
-    
         TwoGeneratingSet(I);
         gg:=Generators(I);
         assert #gg le 2;
@@ -528,41 +529,58 @@ intrinsic '^'(I::AlgEtQIdl, n::RngIntElt) -> AlgEtQIdl
     end function;
     power_positive:=function(I, n)
         id := I;
+        n0:=0;
         output := OneIdeal(S);
         bin_exp:=IntegerToSequence(n,2);
         for i in [1..#bin_exp] do
             if bin_exp[i] eq 1 then
-                output *:= id;
+                n0 +:=2^(i-1);
+                is_def,In0:=IsDefined(I`KnownPowers,n0);
+                if is_def then 
+                    output := In0;
+                else
+                    output *:= id;
+                    I`KnownPowers[n0]:=output;
+                end if;
             end if;
             if i lt #bin_exp then
-                id := id*id;
+                ni:=2^i;
+                is_def,Ini:=IsDefined(I`KnownPowers,ni);
+                if is_def then 
+                    id:=Ini;
+                else
+                    id := id*id; // I^(2^i)
+                    I`KnownPowers[ni]:=id;
+                end if;
             end if;
         end for;
         return output;
     end function;
-    if n eq 0 then
-        return OneIdeal(S);
-    elif n eq 1 then
-        return I;
-    //elif n eq 2 then
-    //    return I * I;
-    else
-        if n gt 0 then
-           if assigned I`IsInvertible and IsInvertible(I) then
-               return power_invertible(I,n);
-           else
-                return power_positive(I,n);
-           end if;
-        end if;
-        if n lt 0 then
-            invI:=Inverse(I);
-            if n eq -1 then
-                return invI;
-            else
-                return power_invertible(invI,-n);
+    if not IsDefined(I`KnownPowers,n) then 
+        if n eq 0 then
+            output:=OneIdeal(S);
+        elif n eq 1 then
+            output:=I;
+        else
+            if n gt 0 then
+                if assigned I`IsInvertible and IsInvertible(I) then
+                    output:=power_invertible(I,n);
+                else
+                    output:=power_positive(I,n);
+                end if;
+            end if;
+            if n lt 0 then
+                invI:=Inverse(I);
+                if n eq -1 then
+                    output:=invI;
+                else
+                    output:=power_invertible(invI,-n);
+                end if;
             end if;
         end if;
+        I`KnownPowers[n]:=output;
     end if;
+    return I`KnownPowers[n];
 end intrinsic;
  
 intrinsic 'meet'(I::AlgEtQIdl, S::AlgEtQOrd) -> AlgEtQIdl
@@ -900,6 +918,22 @@ end intrinsic;
     cc:=[ ColonIdeal(I,J) : I,J in ids  ];
     assert cc eq cc2;
     printf ".";
+
+    // testing KnownPowers 
+    _<x>:=PolynomialRing(Integers());
+    f:=(x^8+16)*(x^8+81);
+    A:=EtaleAlgebra(f);
+    E1:=EquationOrder(A);
+    I:=Conductor(E1);
+    assert not IsInvertible(I);
+    _:=I^2;
+    is_def,I2:=IsDefined(I`KnownPowers,2);
+    assert is_def and I2 eq I*I;
+    _:=I^5;
+    is_def,I4:=IsDefined(I`KnownPowers,4);
+    assert is_def and I4 eq (I*I)*(I*I);
+    is_def,I5:=IsDefined(I`KnownPowers,5);
+    assert is_def and I5 eq (I*I)*(I*I)*I;
 
     SetAssertions(1);
     printf " all good!\n";

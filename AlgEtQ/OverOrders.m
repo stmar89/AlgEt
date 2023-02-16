@@ -80,7 +80,7 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQ
                 wT:=W.1@@mTV;
                 if q eq 2 or mTV(wT^2) in W then
                     // for p eq 2 being a subspace of the eigenspace garantees that it is mult closed
-                    S:=Order([wT] cat zbR);
+                    S:=Order([wT] cat zbR : CheckIsKnownOrder:=false );
                     Include(~pot_min_oo,S);
                     Include(~output,S);// necessarly minimal, because it has dim 1
                 end if;
@@ -91,7 +91,7 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQ
             subs_2 := [W : W in subs_2 | Dimension(W)+1 in dims]; // the +1 is there because we are 
                                                                   // working in T/R instead of T/P
             for W in subs_2 do //dim at least 2
-                S := Order([(w@@mTV) : w in Basis(W)] cat zbR);
+                S := Order([(w@@mTV) : w in Basis(W)] cat zbR : CheckIsKnownOrder:=false );
                 Include(~pot_min_oo,S);
                 Include(~pot_min_oo_2,S);
             end for;
@@ -106,6 +106,7 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQ
         assert2 forall{S : S in output | ColonIdeal(R,R!!OneIdeal(S)) eq P};
         for i in [1..#output] do
             S:=output[i];
+            IsKnownOrder(~S);
             ZBasisLLL(S);
         end for;
         if not assigned R`MinimalOverOrders then
@@ -137,7 +138,7 @@ intrinsic MinimalOverOrders(R::AlgEtQOrd) -> SetIndx[AlgEtQOrd]
     return output; 
 end intrinsic;
 
-intrinsic OverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQOrd]
+intrinsic OverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SeqEnum[AlgEtQOrd]
 {Given an order R and prime P of R, it returns R and the overorders S of R with conductor (R:S) which is P-primary. We recursively produce the minimal PP-overorders where PP are primes above P. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.}
     require IsPrime(P) : "The ideal P must be prime.";
     require Order(P) eq R : "P must be an ideal of R";
@@ -150,11 +151,11 @@ intrinsic OverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQOrd]
 
     if assigned R`OverOrders then
     // early exit if already computed. This is useful when Loading the data using LoadWKICM
-        return {@ R @} join {@ S : S in R`OverOrders | PrimesAbove(ColonIdeal(R,R!!OneIdeal(S))) eq [ P ] @};
+        return [ R ] cat [ S : S in R`OverOrders | PrimesAbove(ColonIdeal(R,R!!OneIdeal(S))) eq [ P ] ];
     end if;
 
     if IsMaximalAtPrime(R,P) then
-        return {@ R @};
+        return [ R ];
     end if;
 
     ppO:=PrimesAbove(MaximalOrder(Algebra(R))!!P);
@@ -182,6 +183,7 @@ intrinsic OverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQOrd]
         S:=output[iS];
         ZBasisLLL(S);
     end for;
+    output:=Setseq(output);
     assert2 forall{S : S in output | S eq R or PrimesAbove(ColonIdeal(R,R!!OneIdeal(S))) eq [ P ]};
     if not assigned R`OverOrdersAtPrimes then
         R`OverOrdersAtPrimes:=[<P,output>];
@@ -191,11 +193,13 @@ intrinsic OverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQOrd]
     return output;
 end intrinsic;
 
-intrinsic OverOrders(R::AlgEtQOrd : populateoo_in_oo:=false) -> SetIndx[AlgEtQOrd]
+intrinsic OverOrders(R::AlgEtQOrd : populateoo_in_oo:=false) -> SeqEnum[AlgEtQOrd]
 {We compute all the overorders of R. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana. The Vararg "populateoo_inoo" (default false) determines whether we should fill the attribute T`OverOrders for every overorder T of R.}
     if not assigned R`OverOrders then
-        output:={@ R  @};
-        if not IsMaximal(R) then
+        if IsMaximal(R) then
+            output:=[R];
+        else
+            output:=[];
             pp:=SingularPrimes(R);
             vtime OverOrders,2 : oo_at_Ps:=[ OverOrdersAtPrime(R,P) : P in pp ];
             vprintf OverOrders,2 : "P-overorders for each P %o\n",[#x : x in oo_at_Ps];
@@ -218,20 +222,21 @@ intrinsic OverOrders(R::AlgEtQOrd : populateoo_in_oo:=false) -> SetIndx[AlgEtQOr
                     S:=Order(gens);
                 end if;
                 ZBasisLLL(S);
-                Include(~output,S);
+                Append(~output,S);
             end for;
-            assert #cc eq #output;
+            assert2 R in output;
+            assert2 MaximalOrder(Algebra(R)) in output;
         end if;
         R`OverOrders:=output;
     end if;
     // there might be a better way to do this
     if populateoo_in_oo then
-      for i in [1..#R`OverOrders] do
-        S := R`OverOrders[i];
-        if not assigned S`OverOrders then
-          S`OverOrders := {@ T : T in R`OverOrders | S subset T @};
-        end if;
-      end for;
+        for i in [1..#R`OverOrders] do
+            S := R`OverOrders[i];
+            if not assigned S`OverOrders then
+                S`OverOrders := [ T : T in R`OverOrders | S subset T ];
+            end if;
+        end for;
     end if;
     return R`OverOrders;
 end intrinsic;

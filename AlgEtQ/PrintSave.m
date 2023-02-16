@@ -78,7 +78,7 @@ intrinsic LoadWKICM(str::MonStgElt) -> AlgEtQOrd
     A:=EtaleAlgebra([NumberField(f) : f in ff ]);
     wk:=data[2];
 
-    ooR:={@ Order([ A ! s : s in wk[j][1]]) : j in [1..#wk] @};
+    ooR:=[ Order([ A ! s : s in wk[j][1]]) : j in [1..#wk] ];
     indices:=[ Index(S,ooR[1]) : S in ooR ];
     max,indO:=Max(indices);
     assert #[ i : i in indices | i eq max ] eq 1; //sanity check

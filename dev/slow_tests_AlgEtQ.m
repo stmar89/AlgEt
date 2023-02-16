@@ -102,7 +102,7 @@
         ooet:=FindOverOrders(Eet);
     t1:=Cputime(t0);
     printf "Current running time = %o \n",t1;
-    tprevbest:=1.3; //on diophantus
+    tprevbest:=1.1; //on diophantus
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "FindOverOrders for %o got faster. Update the previous best known time\n",f;
@@ -146,7 +146,7 @@
         ooet:=FindOverOrders(Eet);
     t1:=Cputime(t0);
     printf "Current running time = %o \n",t1;
-    tprevbest:=54; // on diophantus
+    tprevbest:=15; // on diophantus
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "FindOverOrders for %o got faster. Update the previous best known time\n",f;
@@ -193,7 +193,7 @@
     t1:=Cputime(t0);
     assert #ooet eq 3200;
     printf "Current running time = %o \n",t1;
-    tprevbest:=62; // on diophantus
+    tprevbest:=24; // on diophantus
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "FindOverOrders for %o got faster. Update the previous best known time\n",f;
@@ -273,7 +273,7 @@
     oo:={@ @};
     for x in data do
         S:=Order([ A!z:z in x[1]]);
-        S`OverOrders:={@ T :T in ooR | S subset T @};
+        S`OverOrders:=[ T :T in ooR | S subset T ];
         Include(~oo,S);
     end for;
     // "IntermediateIdeals";

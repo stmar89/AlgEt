@@ -68,7 +68,7 @@ intrinsic IntermediateIdealsVSWithTrivialExtensionAndPrescribedMultiplicatorRing
     return output;
 end intrinsic;
 
-intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum
+intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum[AlgEtQIdl]
 {Returns all the weak eq classes I, such that (I:I)=S. The VarArg Method (default "Auto") determines if we should use the "IntermediateIdeals" routine or the "LowIndexProcess", which is potentially much slower but more memory efficient.}
     if not assigned S`WKICM_bar then
         if IsGorenstein(S) then
@@ -176,12 +176,12 @@ intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum
     return S`WKICM_bar;
 end intrinsic;
 
-intrinsic WeakEquivalenceClassesWithPrescribedMultiplicatorRing(S::AlgEtQOrd : Method:="Auto") -> SeqEnum
+intrinsic WeakEquivalenceClassesWithPrescribedMultiplicatorRing(S::AlgEtQOrd : Method:="Auto") -> SeqEnum[AlgEtQIdl]
 {}
     return WKICM_bar(S : Method:=Method);
 end intrinsic;
 
-intrinsic WKICM_not_prime_per_prime(E::AlgEtQOrd : Method:="Auto")->SeqEnum
+intrinsic WKICM_not_prime_per_prime(E::AlgEtQOrd : Method:="Auto")->SeqEnum[AlgEtQIdl]
 { }
     require Method in {"Auto","LowIndexProcess","IntermediateIdeals","IntermediateIdealsVSWithTrivialExtensionAndPrescribedMultiplicatorRing"} : "The VarArg parameter Method is assigned to a not available value";
     if not assigned E`WKICM then
@@ -222,7 +222,7 @@ intrinsic WKICM_not_prime_per_prime(E::AlgEtQOrd : Method:="Auto")->SeqEnum
     return E`WKICM;
 end intrinsic;
 
-intrinsic WKICM(E::AlgEtQOrd : Method:="Auto" , populate_OverOrder_and_WKICM_bar:=true )->SeqEnum
+intrinsic WKICM(E::AlgEtQOrd : Method:="Auto" , populate_OverOrder_and_WKICM_bar:=true )->SeqEnum[AlgEtQIdl]
 {TODO prime per prime version.
 The VarArg populate_OverOrder_and_WKICM_bar assignes the attributes OverOrder of E and the atrribute WKICM_bar of each overorder S of E, which contains the weak equivalence classes with multiplicator ring S. This requires to compute multiplicator rings. The default value is true.}
     require Method in {"Auto","LowIndexProcess","IntermediateIdeals","IntermediateIdealsVSWithTrivialExtensionAndPrescribedMultiplicatorRing"} : "The VarArg parameter Method is assigned to a not available value";
@@ -438,20 +438,17 @@ The VarArg populate_OverOrder_and_WKICM_bar assignes the attributes OverOrder of
         vprintf WKICM,2 : "We start populating the varargs OverOrders.\n";
         wk:=E`WKICM;
         if not assigned E`OverOrders then
-            /* //if I change OverOrders in a Sequence
             oo:=AssociativeArray();
             for I in wk do
                 S:=MultiplicatorRing(I);
                 ind:=Index(S);
                 if not IsDefined(oo,ind) then
                     oo[ind]:={@ S @};
-                elif
+                else
                     Include(~oo[ind],S);
                 end if;
             end for;
             E`OverOrders:=&cat[ [ S : S in oo[k] ] : k in Keys(oo)];
-            */
-            E`OverOrders:={@ MultiplicatorRing(I) : I in wk @};
         end if;
         vprintf WKICM,2 : "\t...Done in %o secs.\n",Cputime(t0);
         vprintf WKICM,2 : "We start populating the varargs WKICM_bar for each OverOrder.\n";
@@ -470,7 +467,7 @@ The VarArg populate_OverOrder_and_WKICM_bar assignes the attributes OverOrder of
             end if;
         end for;
         vprintf WKICM,2 : "\t...Done in %o secs.\n",Cputime(t0);
-        assert2 &+[ #S`WKICM_bar : S in E`OverOrders ] eq #wk;
+        assert2 &+[ #S`WKICM_bar : S in OverOrders(E) ] eq #wk;
     end if;
 
     return E`WKICM;
@@ -657,9 +654,15 @@ end intrinsic;
     A:=EtaleAlgebra(f);
     R:=EquationOrder(A);
     // only one singular prime
-    //time _:=FindOverOrders(R); // <4 secs
-    time assert #WKICM(R) eq 173; // ~40 secs
-    "the size of the output, 173 classes, has been computed using the OLD method below, in 189000 seconds";
+    t0:=Cputime()
+        assert #WKICM(R) eq 173;
+    t_curr:=Cputime(t0);
+    t_prev_best:=32.7;
+    "Current running time: ",t_curr;
+    if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
+        print "The current timing is different from the previous best known one. UPDATE!"; 
+    end if;
+    "the size of the output, 173 classes, has been computed using the OLD method, in 189000 seconds";
 
     // OLD method
     // A:=EtaleAlgebra(f);
@@ -668,7 +671,6 @@ end intrinsic;
 
     // these tests have more than one singular prime. each takes <1 min
     // SetAssertions(2);
-    // Here: R has 2 singular primes, whose local parts require <10 secs, the patching is <5 secs.
     AttachSpec("~/packages_github/AlgEt/spec");
     Attach("~/packages_github/AlgEt/dev/new_wk_icm.m");
     SetVerbose("WKICM",2);
@@ -678,7 +680,14 @@ end intrinsic;
     F:=PrimitiveElement(A);
     q:=Integers() ! Round(ConstantCoefficient(f)^(2/Degree(f)));
     R:=Order([F,q/F]);
-    time wk:=WKICM(R);
+    t0:=Cputime()
+        wk:=WKICM(R);
+    t_curr:=Cputime(t0);
+    "Current running time: ",t_curr;
+    t_prev_best:=12.7;
+    if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
+        print "The current timing is different from the previous best known one. UPDATE!"; 
+    end if;
 
     // Here: R has 3 singular primes, whose local parts require ~60 secs, the patching is <5 secs.
     AttachSpec("~/packages_github/AlgEt/spec");
@@ -690,7 +699,14 @@ end intrinsic;
     F:=PrimitiveElement(A);
     q:=Integers() ! Round(ConstantCoefficient(f)^(2/Degree(f)));
     R:=Order([F,q/F]);
-    time wk:=WKICM(R);
+    t0:=Cputime()
+        wk:=WKICM(R);
+    t_curr:=Cputime(t0);
+    "Current running time: ",t_curr;
+    t_prev_best:=57;
+    if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
+        print "The current timing is different from the previous best known one. UPDATE!"; 
+    end if;
 
     // Here: R has 5 singular primes, whose local parts require <60 secs, while the patching requires <5 secs.
     AttachSpec("~/packages_github/AlgEt/spec");
@@ -701,7 +717,14 @@ end intrinsic;
     A:=EtaleAlgebra(f);
     F:=PrimitiveElement(A);
     R:=Order([F,25/F]);
-    time wk:=#WKICM(R);
+    t0:=Cputime()
+        wk:=WKICM(R);
+    t_curr:=Cputime(t0);
+    "Current running time: ",t_curr;
+    t_prev_best:=53;
+    if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
+        print "The current timing is different from the previous best known one. UPDATE!"; 
+    end if;
 
     // VERY big it should not be in this test suit
     // I have improved a lot KnownOrders. I expect that populating OverORders should be much faster now

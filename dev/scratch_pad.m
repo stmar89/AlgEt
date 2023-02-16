@@ -197,6 +197,29 @@ end intrinsic;
     magma -b ~/packages_github/AlgEt/examples/modules_conjugacy_AVs.txt
     magma -b ~/packages_github/AlgEt/dev/all_tests_AlgEtQMod.m
 
+    // minimal over orders
+    AttachSpec("~/packages_github/AlgEt/spec");
+    //Attach("~/packages_github/AlgEt/dev/new_wk_icm.m");
+    //SetVerbose("WKICM",2);
+    P<x>:=PolynomialRing(Integers());
+    f:=x^8+16;
+    A:=EtaleAlgebra(f);
+    R:=EquationOrder(A);
+    oo:=OverOrders(R);
+    for S in oo do
+        pp:=SingularPrimes(S);
+        assert #pp eq 1;
+        P:=pp[1];
+        T:=MultiplicatorRing(P);
+        min:=MinimalOverOrders(S);
+        for R in min do
+            wkR:=WKICM_bar(R);
+            assert forall{I : I in wkR | MultiplicatorRing(T!!I) eq T};
+        end for;
+    end for;
+
+
+
 
 /* TEST
 

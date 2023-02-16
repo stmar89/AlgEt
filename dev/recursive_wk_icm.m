@@ -9,8 +9,7 @@
 
 
 //------------
-// TODO:
-// - IMPORTANT: once this is done I will have to update also the ICM!!!!
+// TODO: 
 // - in the end we will need ideals up to isomorphism. I think that in the recursion we can skip the 1-dimensional vector spaces (which are probably the wast majority) since they will all give rise to the invertible weak equivalence class. Need to think about it more.
 // - In WKICM_bar, when Q is a p-group, is the LowIndexProcess still faster?
 // - change the verbose variable when incorporating in package
@@ -70,6 +69,9 @@ end intrinsic;
 
 intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum
 {Returns all the weak eq classes I, such that (I:I)=S. The VarArg Method (default "Auto") determines if we should use the "IntermediateIdeals" routine or the "LowIndexProcess", which is potentially much slower but more memory efficient.}
+print "WKICM_bar\t",Index(MaximalOrder(Algebra(S)),S),assigned S`WKICM_bar,assigned S`WKICM;
+time_tot:=Cputime();
+    IsKnownOrder(~S);
     if not assigned S`WKICM_bar then
         if IsGorenstein(S) then
             vprintf WKICM_bar,2 : " Gorenstein case\n";
@@ -85,16 +87,23 @@ intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum
             if Method in {"Auto","IntermediateIdealsVSWithTrivialExtensionAndPrescribedMultiplicatorRing"} then
                 vprint WKICM_bar,2 : "Using new method";
                 pp:=PrimesAbove(Conductor(S));
-                oo:=FindOverOrders(S);
-                mult_pp:=[ oo[Index(oo,MultiplicatorRing(P))] : P in pp ];
-                assert forall{T : T in mult_pp | assigned T`WKICM_bar};
+                //oo:=FindOverOrders(S);
+                //mult_pp:=[ oo[Index(oo,MultiplicatorRing(P))] : P in pp ];
+    for P in pp do
+        T:=MultiplicatorRing(P);
+        IsKnownOrder(~T);
+    end for;
+                mult_pp:=[ MultiplicatorRing(P) : P in pp ];
+        //assert forall{T : T in mult_pp | assigned T`WKICM_bar};
                 num_sub_vect_sp:=function(n,q)
                 // q a prime power. Returns the number of F_q-subvector spaces of F_q^n
                     return &+[ GaussianBinomial(n,k,q) : k in [0..n]];
                 end function;
                 sub_vs_T:=[];
                 for iP->P in pp do
-                  wkT:=WKICM_bar(mult_pp[iP]);
+                  T:=mult_pp[iP];
+                  _:=WKICM(T); //to split the computation if necessary
+                  wkT:=$$(T);
                   q:=Index(S,P);
                   dimsT:=[ Ilog(q,Index(J,(mult_pp[iP]!!P)*J)) : J in wkT ];
                   Append(~sub_vs_T,&+[num_sub_vect_sp(d,q) : d in dimsT]);
@@ -104,26 +113,13 @@ intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum
                 T:=mult_pp[iP];
                 wkT:=WKICM_bar(mult_pp[iP]);
                 vprintf WKICM_bar,2 : " cands using IntermediateIdealsVSWithTrivialExtensionAndPrescribedMultiplicatorRing (new version with tests in in the finite field\n";
-                // vtime WKICM_bar,2 : cands:=&join[ IntermediateIdealsVSWithTrivialExtensionAndPrescribedMultiplicatorRing(J,P) : J in wkT ];
-                // for I in cands do
-                //   if not exists{J : J in seqWk_bar | IsWeakEquivalent(I,J)} then
-                //     ZBasisLLL(I);
-                //     Append(~seqWk_bar,I);
-                //   end if;
-                // end for;
-                for J in wkT do
-                    seqWk_bar_J:=[];
-                    cands_J:=IntermediateIdealsVSWithTrivialExtensionAndPrescribedMultiplicatorRing(J,P);
-                    for I in cands_J do
-                        if not exists{K : K in seqWk_bar_J | IsWeakEquivalent(I,K)} then
-                            ZBasisLLL(I);
-                            Append(~seqWk_bar_J,I);
-                        end if;
-                    end for;
-                    Append(~seqWk_bar,seqWk_bar_J);
+                vtime WKICM_bar,2 : cands:=&join[ IntermediateIdealsVSWithTrivialExtensionAndPrescribedMultiplicatorRing(J,P) : J in wkT ];
+                for I in cands do
+                  if not exists{J : J in seqWk_bar | IsWeakEquivalent(I,J)} then
+                    ZBasisLLL(I);
+                    Append(~seqWk_bar,I);
+                  end if;
                 end for;
-                vprintf WKICM_bar,2 : "sizes of seqWk_bar_J = %o\n",[#x : x in seqWk_bar];
-                seqWk_bar:=&cat(seqWk_bar);
             else
               St:=TraceDualIdeal(S);
               T:=&meet([ T : T in FindOverOrders(S) | IsInvertible(T !! St) ]);
@@ -166,13 +162,7 @@ intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum
             S`WKICM_bar:=seqWk_bar;
         end if;
     end if;
-    // populate MultiplicatorRing, if not done before
-    for i in [1..#S`WKICM_bar] do
-        I:=S`WKICM_bar[i];
-        if not assigned I`MultiplicatorRing then
-            I`MultiplicatorRing:=S;
-        end if;
-    end for;
+print "WKICM_bar\t",Index(MaximalOrder(Algebra(S)),S),assigned S`WKICM_bar,assigned S`WKICM,Cputime(time_tot);
     return S`WKICM_bar;
 end intrinsic;
 
@@ -226,253 +216,233 @@ intrinsic WKICM(E::AlgEtQOrd : Method:="Auto" , populate_OverOrder_and_WKICM_bar
 {TODO prime per prime version.
 The VarArg populate_OverOrder_and_WKICM_bar assignes the attributes OverOrder of E and the atrribute WKICM_bar of each overorder S of E, which contains the weak equivalence classes with multiplicator ring S. This requires to compute multiplicator rings. The default value is true.}
     require Method in {"Auto","LowIndexProcess","IntermediateIdeals","IntermediateIdealsVSWithTrivialExtensionAndPrescribedMultiplicatorRing"} : "The VarArg parameter Method is assigned to a not available value";
+// removing Method
+// recursive approach
+// if E has more than one singular prime then split the computation
+// if E has one singular prime then: W(E) = \cup_S W(S) \sqcup \bar W(E) where S runs over the minimal overorders.
+print "WKICM\t\t",Index(MaximalOrder(Algebra(E)),E),assigned E`WKICM_bar,assigned E`WKICM;
+time_tot:=Cputime();
+    IsKnownOrder(~E);
     if not assigned E`WKICM then
-        pp:=SingularPrimes(E);
-        O:=MaximalOrder(Algebra(E));
-        wk_pp:=[];
-        // We have W(E) = \prod_P W_P(E), where:
-        //     -  P runs over the singular primes of E, 
-        //     - W(E) is the monoid of weak equivalence classes, and 
-        //     - W_P(E) is monoid of local P-equivalence classes.
-        // We also have W_P(E) = W(E+P^kO), for any k big enough (eg. k ge v_p([O:E]),
-        //       where p is the rational prime of P).
-        ps:=[]; // rational primes of the pps
-        for iP->P in pp do
-            t0:=Cputime();
-            vprintf WKICM,2 : "We start the local computation at the %o-th singular prime.\n",iP;
-            wk_P:=[];
-            _,p:=IsPrimePower(Index(E,P));
-            Append(~ps,p);
-            k:=Valuation(Index(O,E),p);
-            if #pp gt 1 then
-                EP:=Order(ZBasis(E) cat ZBasis(O!!P^k));
-            else
-                EP:=E;
-            end if;
-            vprintf WKICM,2 : "\tWe compute the overorders";
-            oo:=FindOverOrders(EP : populateoo_in_oo:=true);
-            vprintf WKICM,2 : "...Done in %o secs.\n",Cputime(t0);
-            if Method in {"Auto","IntermediateIdealsVSWithTrivialExtensionAndPrescribedMultiplicatorRing"} then
-                // We want to compute WKICM_bar/(S) for S running from top to bottom 
-                // of the lattice of overorder of R.
-                // The reason is that when we want to compute it for S, if S is not Gorenstein or of CMType 2, then
-                // we need to have WKICM_bar(T) computed for T=(P:P) for all P singular prime of S.
-                // Hence we proceed recursively starting from O, and then filling it for the Maximal SubOrders.
-                vprintf WKICM,2 : "\tWe compute the directed graph of (reverse) inclusion of overorders";
-                edges:=Edges(GraphOverOrders(EP));
-                edges:=[ [TerminalVertex(e),InitialVertex(e)] : e in edges ]; // we reverse all the inclusion
-                // D is the directed graph of (reverse) minimal inclusion of overorders of R.
-                D:=Digraph<#oo|edges>;
-                vprintf WKICM,2 : "...Done in %o secs.\n",Cputime(t0);
-
-                vv:=VertexSet(D);
-                max_dist:=Distance(vv.Index(oo,O),vv.Index(oo,EP));
-                for d in [0..max_dist] do
-                    vprintf WKICM,3 : "\tDealing now with orders of distance %o from the maximal order.\n",d;
-                    oo_d:=Sphere(vv.Index(oo,O),d);
-                    for v in oo_d do
-                        vprintf WKICM,3 : "\tComputing WKICM_bar for the %o-th order ... \n",v;
-                        T:=oo[Index(v)];
-                        vtime WKICM,3 :wk_P cat:=[(EP!!I) : I in WKICM_bar(T : Method:=Method)];
+        if IsMaximal(E) then
+            E`WKICM:=[ OneIdeal(E) ];
+        elif assigned E`OverOrders and forall{ S : S in OverOrders(E) | assigned S`WKICM_bar } then
+            E`WKICM:=&cat[ [ E !! I : I in WKICM(S) ] : S in OverOrders(E) ];
+        else
+            pp:=SingularPrimes(E);
+            //////////////////////////////////////
+            if #pp eq 1 then //only one sigular prime
+                min:=MinimalOverOrders(E);
+                wk_E:=[];
+                for R in min do
+                    wk_R:=$$(R); //recursive call
+                    wk_R:=[ E !! I : I in wk_R ];
+                    for I in wk_R do
+                        if not exists{ J : J in wk_E | IsWeakEquivalent(I,J) } then
+                            Append(~wk_E,I);
+                        end if;
                     end for;
                 end for;
-            else
-                wk_P:=&cat[[(EP!!I) : I in WKICM_bar(S : Method:=Method)] : S in oo ];
-            end if;
-            // wk_P = W_P(E) = W(E+P^k0O) in the notation above
-            wk_P:=[ E !! I : I in wk_P];
-            vprintf WKICM,2 : "\t...Done in %o secs.\n",Cputime(t0);
-            Append(~wk_pp,wk_P);
-        end for;
-
-        ///////////////////////////////
-        // We now reconstruct W(E) using the P-local parts W_P(E) = W(E+P^kO)
-        //////////////////////////////
-        if #pp eq 1 then //if there is only one singular prime, we have already everything we need
-            wk:=wk_pp[1];
-        else
-            // version 0: 
-            // f:=x^6 + 8*x^5 + 50*x^4 + 200*x^3 + 1250*x^2 + 5000*x + 15625;
-            // takes >10000 secs
-            //
-            //wk_pp_exps:=[];
-            //t1:=Cputime();
-            //vprintf WKICM,2 : "We make all the local parts integral";
-            //for ip->wk in wk_pp do
-            //    wk_exps:=[];
-            //    for i in [1..#wk] do
-            //        I:=wk[i];
-            //        if not IsIntegral(I) then
-            //            I:=SmallRepresentative(I); // I c R with small norm
-            //        end if;
-            //        k:=Valuation(Index(E,I),ps[ip]);
-            //        Append(~wk_exps,<I+pp[ip]^k,k>); // in pp[ip^k] we record a power P^k of the 
-            //                                         // ip-th prime P such that P^k.R_P c I_P
-            //    end for;
-            //    Append(~wk_pp_exps,wk_exps);
-            //end for;
-            //vprintf WKICM,2 : "...Done in %o secs.\n",Cputime(t1);
-
-            //t0:=Cputime();
-            //wk_pp_exps:=CartesianProduct(wk_pp_exps);
-            //vprintf WKICM,2 : "The sizes of the local parts are: %o.\n",[#Wp : Wp in Components(wk_pp_exps)];
-            //vprintf WKICM,2 : "We start patching together the local parts\n";
-            //n:=#pp;
-            //wk:=[];
-            //products_of_primes:=AssociativeArray(); // Will store here prod_{j ne i}(P_j^k_j) 
-            //                                        // indexed by the exponents. We put k_i=0
-            //tot:=&*[#Wp : Wp in wk_pp_exps]; perc_old:=0; ivec:=0;
-            //for vec in wk_pp_exps do
-            //    if GetVerbose("WKICM") ge 2 then
-            //        ivec +:=100; perc:=Truncate(ivec/tot); 
-            //        if perc gt perc_old then perc_old:=perc; printf "%o%% in %o secs\n",perc,Cputime(t0); end if;
-            //    end if;
-            //    exps:=[ v[2] : v in vec ];
-            //    prod_j_ne_i:=[ ];
-            //    for i in [1..n] do
-            //        exps_j_ne_i:=[ j ne i select exps[j] else 0 : j in [1..n] ];
-            //        is_def,prod:=IsDefined(products_of_primes,exps_j_ne_i);
-            //        if not is_def then
-            //            prod:=&*[pp[j]^exps_j_ne_i[j] : j in [1..n]];
-            //            products_of_primes[exps_j_ne_i]:=prod;
-            //        end if;
-            //        Append(~prod_j_ne_i,prod);
-            //    end for;
-            //    J:=&+[ vec[i][1]*prod_j_ne_i[i] : i in [1..n] ];
-            //    // J satisfies: J_P = I_P where P=pp[1] and I=vec[i][1].
-            //    Append(~wk,J);
-            //end for;
-            //vprintf WKICM,2 : "\tIn the end, products_of_primes has %o Keys.\n",#Keys(products_of_primes);
-            //vprintf WKICM,2 : "\t...Done in %o secs.\n",Cputime(t0);
-
-            //version 1: 
-            //f:=x^6 + 8*x^5 + 50*x^4 + 200*x^3 + 1250*x^2 + 5000*x + 15625;
-            //takes 1400 secs
-            
-            wk_pp_idls:=[];
-            pp_pows:=[];
-            t1:=Cputime();
-            vprintf WKICM,2 : "We make all the local parts integral\n";
-            for ip->wk in wk_pp do
-                wk_exps:=[];
-                wk_idls:=[];
-                for i in [1..#wk] do
-                    I:=wk[i];
-                    if not IsIntegral(I) then
-                        //I:=MakeIntegral(I);
-                        I:=SmallRepresentative(I); // I c E with small norm
-                    end if;
-                    k:=Valuation(Index(E,I),ps[ip]);
-                    Append(~wk_exps,k);
-                    Append(~wk_idls,I);
+                // we add WKICM_bar of E
+                wk_E cat:= WKICM_bar(E);
+                E`WKICM:=wk_E;
+            /////////////////////////////////////
+            else //more than one singular prime
+                O:=MaximalOrder(Algebra(E));
+                wk_pp:=[];
+                // We have W(E) = \prod_P W_P(E), where:
+                //     -  P runs over the singular primes of E, 
+                //     - W(E) is the monoid of weak equivalence classes, and 
+                //     - W_P(E) is monoid of local P-equivalence classes.
+                // We also have W_P(E) = W(E+P^kO), for any k big enough (eg. k ge v_p([O:E]),
+                //       where p is the rational prime of P).
+                ps:=[]; // rational primes of the pps
+                for iP->P in pp do
+                    wk_P:=[];
+                    _,p:=IsPrimePower(Index(E,P));
+                    Append(~ps,p);
+                    k:=Valuation(Index(O,E),p);
+                    EP:=Order(ZBasis(E) cat ZBasis(O!!P^k));
+                    wk_P:=$$(EP); //recursive call
+                    wk_P:=[ E !! I : I in wk_P];
+                    Append(~wk_pp,wk_P);
                 end for;
-                k_ip:=Max(wk_exps);
-                Pk_ip:=pp[ip]^k_ip; // for every local representative I at pp[ip] we have that Pk_ip c I (locally)
-                ZBasisLLL(Pk_ip);
-                Append(~pp_pows,Pk_ip);
-                Append(~wk_pp_idls,wk_idls);
-            end for;
-            vprintf WKICM,2 : "...Done in %o secs.\n",Cputime(t1);
-                
-            n:=#pp;
-            t0:=Cputime();
-            vprintf WKICM,2 : "We compute the \prod_{j \\ne i} P_j^k_j\n";
-            prod_j_ne_i:=[ ];
-            for i in [1..n] do
-                prod:=&*[ pp_pows[j] : j in [1..n] | j ne i ];
-                ZBasisLLL(prod);
-                Append(~prod_j_ne_i,prod);
-            end for;
-            vprintf WKICM,2 : "\t...Done in %o secs.\n",Cputime(t0);
 
-            t0:=Cputime();
-            vprintf WKICM,2 : "We modify each entry of the cartesian product\n";
-            for ip in [1..n] do
-                for i in [1..#wk_pp_idls[ip]] do
-                    I:=(wk_pp_idls[ip][i]+pp_pows[ip])*prod_j_ne_i[ip];
-                    ZBasisLLL(I);
-                    wk_pp_idls[ip][i]:=I;
-                end for;
-            end for;
-            vprintf WKICM,2 : "\t...Done in %o secs.\n",Cputime(t0);
+                ///////////////////////////////
+                // We now reconstruct W(E) using the P-local parts W_P(E) = W(E+P^kO)
+                //////////////////////////////
+                if #pp eq 1 then //if there is only one singular prime, we have already everything we need
+                    wk:=wk_pp[1];
+                else
+                    // version 0: 
+                    // f:=x^6 + 8*x^5 + 50*x^4 + 200*x^3 + 1250*x^2 + 5000*x + 15625;
+                    // takes >10000 secs
+                    //
+                    //wk_pp_exps:=[];
+                    //t1:=Cputime();
+                    //vprintf WKICM,2 : "We make all the local parts integral";
+                    //for ip->wk in wk_pp do
+                    //    wk_exps:=[];
+                    //    for i in [1..#wk] do
+                    //        I:=wk[i];
+                    //        if not IsIntegral(I) then
+                    //            I:=SmallRepresentative(I); // I c R with small norm
+                    //        end if;
+                    //        k:=Valuation(Index(E,I),ps[ip]);
+                    //        Append(~wk_exps,<I+pp[ip]^k,k>); // in pp[ip^k] we record a power P^k of the 
+                    //                                         // ip-th prime P such that P^k.R_P c I_P
+                    //    end for;
+                    //    Append(~wk_pp_exps,wk_exps);
+                    //end for;
+                    //vprintf WKICM,2 : "...Done in %o secs.\n",Cputime(t1);
 
-            t0:=Cputime();
-            tot:=&*[#x : x in wk_pp_idls]; perc_old:=0; iI:=0;
-            wk_pp_idls:=CartesianProduct(wk_pp_idls);
-            vprintf WKICM,2 : "We start patching together the local parts\n";
-            wk:=[];
-            for I_Ps in wk_pp_idls do
-                if GetVerbose("WKICM") ge 3 then
-                    iI +:=100; perc:=Truncate(iI/tot); 
-                    if perc gt perc_old then perc_old:=perc; printf "\t%o%% in %o secs\n",perc,Cputime(t0); end if;
+                    //t0:=Cputime();
+                    //wk_pp_exps:=CartesianProduct(wk_pp_exps);
+                    //vprintf WKICM,2 : "The sizes of the local parts are: %o.\n",[#Wp : Wp in Components(wk_pp_exps)];
+                    //vprintf WKICM,2 : "We start patching together the local parts\n";
+                    //n:=#pp;
+                    //wk:=[];
+                    //products_of_primes:=AssociativeArray(); // Will store here prod_{j ne i}(P_j^k_j) 
+                    //                                        // indexed by the exponents. We put k_i=0
+                    //tot:=&*[#Wp : Wp in wk_pp_exps]; perc_old:=0; ivec:=0;
+                    //for vec in wk_pp_exps do
+                    //    if GetVerbose("WKICM") ge 2 then
+                    //        ivec +:=100; perc:=Truncate(ivec/tot); 
+                    //        if perc gt perc_old then perc_old:=perc; printf "%o%% in %o secs\n",perc,Cputime(t0); end if;
+                    //    end if;
+                    //    exps:=[ v[2] : v in vec ];
+                    //    prod_j_ne_i:=[ ];
+                    //    for i in [1..n] do
+                    //        exps_j_ne_i:=[ j ne i select exps[j] else 0 : j in [1..n] ];
+                    //        is_def,prod:=IsDefined(products_of_primes,exps_j_ne_i);
+                    //        if not is_def then
+                    //            prod:=&*[pp[j]^exps_j_ne_i[j] : j in [1..n]];
+                    //            products_of_primes[exps_j_ne_i]:=prod;
+                    //        end if;
+                    //        Append(~prod_j_ne_i,prod);
+                    //    end for;
+                    //    J:=&+[ vec[i][1]*prod_j_ne_i[i] : i in [1..n] ];
+                    //    // J satisfies: J_P = I_P where P=pp[1] and I=vec[i][1].
+                    //    Append(~wk,J);
+                    //end for;
+                    //vprintf WKICM,2 : "\tIn the end, products_of_primes has %o Keys.\n",#Keys(products_of_primes);
+                    //vprintf WKICM,2 : "\t...Done in %o secs.\n",Cputime(t0);
+
+                    //version 1: 
+                    //f:=x^6 + 8*x^5 + 50*x^4 + 200*x^3 + 1250*x^2 + 5000*x + 15625;
+                    //takes 1400 secs
+                    
+                    wk_pp_idls:=[];
+                    pp_pows:=[];
+                    t1:=Cputime();
+                    vprintf WKICM,2 : "We make all the local parts integral\n";
+                    for ip->wk in wk_pp do
+                        wk_exps:=[];
+                        wk_idls:=[];
+                        for i in [1..#wk] do
+                            I:=wk[i];
+                            if not IsIntegral(I) then
+                                //I:=MakeIntegral(I);
+                                I:=SmallRepresentative(I); // I c E with small norm
+                            end if;
+                            k:=Valuation(Index(E,I),ps[ip]);
+                            Append(~wk_exps,k);
+                            Append(~wk_idls,I);
+                        end for;
+                        k_ip:=Max(wk_exps);
+                        Pk_ip:=pp[ip]^k_ip; // for every local representative I at pp[ip] we have that Pk_ip c I (locally)
+                        ZBasisLLL(Pk_ip);
+                        Append(~pp_pows,Pk_ip);
+                        Append(~wk_pp_idls,wk_idls);
+                    end for;
+                    vprintf WKICM,2 : "...Done in %o secs.\n",Cputime(t1);
+                        
+                    n:=#pp;
+                    t0:=Cputime();
+                    vprintf WKICM,2 : "We compute the \prod_{j \\ne i} P_j^k_j\n";
+                    prod_j_ne_i:=[ ];
+                    for i in [1..n] do
+                        prod:=&*[ pp_pows[j] : j in [1..n] | j ne i ];
+                        ZBasisLLL(prod);
+                        Append(~prod_j_ne_i,prod);
+                    end for;
+                    vprintf WKICM,2 : "\t...Done in %o secs.\n",Cputime(t0);
+
+                    t0:=Cputime();
+                    vprintf WKICM,2 : "We modify each entry of the cartesian product\n";
+                    for ip in [1..n] do
+                        for i in [1..#wk_pp_idls[ip]] do
+                            I:=(wk_pp_idls[ip][i]+pp_pows[ip])*prod_j_ne_i[ip];
+                            ZBasisLLL(I);
+                            wk_pp_idls[ip][i]:=I;
+                        end for;
+                    end for;
+                    vprintf WKICM,2 : "\t...Done in %o secs.\n",Cputime(t0);
+
+                    t0:=Cputime();
+                    tot:=&*[#x : x in wk_pp_idls]; perc_old:=0; iI:=0;
+                    wk_pp_idls:=CartesianProduct(wk_pp_idls);
+                    vprintf WKICM,2 : "We start patching together the local parts\n";
+                    wk:=[];
+                    for I_Ps in wk_pp_idls do
+                        if GetVerbose("WKICM") ge 3 then
+                            iI +:=100; perc:=Truncate(iI/tot); 
+                            if perc gt perc_old then perc_old:=perc; printf "\t%o%% in %o secs\n",perc,Cputime(t0); end if;
+                        end if;
+                        J:=&+[ I_Ps[ip] : ip in [1..n] ];
+                        // J satisfies: J = I_Ps[ip] locally at pp[ip] for every ip.
+                        assert2 forall{ ip : ip in [1..n] | 
+                                                        (J+I_Ps[ip]) eq I_Ps[ip]+pp[ip]*(J+I_Ps[ip]) and 
+                                                        (J+I_Ps[ip]) eq J+pp[ip]*(J+I_Ps[ip])};
+                        Append(~wk,J);
+                    end for;
+                    vprintf WKICM,2 : "\t...Done in %o secs.\n",Cputime(t0);
+
+                    t0:=Cputime();
+                    vprintf WKICM,2 : "We LLL all the ZBasis\n";
+                    for I in wk do
+                        ZBasisLLL(I);
+                    end for;
+                    vprintf WKICM,2 : "\t...Done in %o secs\n",Cputime(t0);
                 end if;
-                J:=&+[ I_Ps[ip] : ip in [1..n] ];
-                // J satisfies: J = I_Ps[ip] locally at pp[ip] for every ip.
-                assert2 forall{ ip : ip in [1..n] | 
-                                                (J+I_Ps[ip]) eq I_Ps[ip]+pp[ip]*(J+I_Ps[ip]) and 
-                                                (J+I_Ps[ip]) eq J+pp[ip]*(J+I_Ps[ip])};
-                Append(~wk,J);
-            end for;
-            vprintf WKICM,2 : "\t...Done in %o secs.\n",Cputime(t0);
 
-            t0:=Cputime();
-            vprintf WKICM,2 : "We LLL all the ZBasis\n";
-            for I in wk do
-                ZBasisLLL(I);
-            end for;
-            vprintf WKICM,2 : "\t...Done in %o secs\n",Cputime(t0);
+                t0:=Cputime();
+                vprintf WKICM,2 : "Checking assert2 ...\n";
+                // asserts
+                assert2 forall{ J : J in wk | Order(J) eq E };
+                assert2 forall{ J : J in wk | not exists{I : I in wk | I ne J and IsWeakEquivalent(I,J) }  };
+                vprintf WKICM,2 : "\t...Done in %o secs\n",Cputime(t0);
+
+                E`WKICM:=wk;
+            end if;
         end if;
-
-        t0:=Cputime();
-        vprintf WKICM,2 : "Checking assert2 ...\n";
-        // asserts
-        assert2 forall{ J : J in wk | Order(J) eq E };
-        assert2 forall{ J : J in wk | not exists{I : I in wk | I ne J and IsWeakEquivalent(I,J) }  };
-        vprintf WKICM,2 : "\t...Done in %o secs\n",Cputime(t0);
-
-        E`WKICM:=wk;
     end if;
 
     if populate_OverOrder_and_WKICM_bar then
         t0:=Cputime();
-        vprintf WKICM,2 : "We start populating the varargs OverOrders.\n";
+        vprintf WKICM,2 : "We start populating the varargs OverOrders and WKICM_bars.\n";
         wk:=E`WKICM;
         if not assigned E`OverOrders then
-            /* //if I change OverOrders in a Sequence
-            oo:=AssociativeArray();
-            for I in wk do
-                S:=MultiplicatorRing(I);
-                ind:=Index(S);
-                if not IsDefined(oo,ind) then
-                    oo[ind]:={@ S @};
-                elif
-                    Include(~oo[ind],S);
-                end if;
-            end for;
-            E`OverOrders:=&cat[ [ S : S in oo[k] ] : k in Keys(oo)];
-            */
             E`OverOrders:={@ MultiplicatorRing(I) : I in wk @};
         end if;
-        vprintf WKICM,2 : "\t...Done in %o secs.\n",Cputime(t0);
-        vprintf WKICM,2 : "We start populating the varargs WKICM_bar for each OverOrder.\n";
-
-        t0:=Cputime();
-        //  the next one should be faster because #oo <<< #wk
-        for i in [1..#wk] do
-            I:=wk[i];
-            S:=MultiplicatorRing(I);
-            assert2 S in Algebra(E)`KnownOrders;
-            I:=S!!I;
+        oo:=OverOrders(E);
+        for i in [1..#oo] do
+            S:=oo[i];
+            IsKnownOrder(~S);
+            if not assigned S`OverOrders then
+                S`OverOrders:={@ T : T in oo | S subset T @};
+            end if;
             if not assigned S`WKICM_bar then
-                S`WKICM_bar:=[ I ];
-            elif not I in S`WKICM_bar then
-                Append(~S`WKICM_bar,I);
+                S`WKICM_bar:=[ I : I in wk | MultiplicatorRing(I) eq S ];
+            end if;
+            if not assigned S`WKICM then
+                S`WKICM:={@ S!!I : I in wk | S subset MultiplicatorRing(I) @};
             end if;
         end for;
+print "populating",Cputime(t0);
         vprintf WKICM,2 : "\t...Done in %o secs.\n",Cputime(t0);
-        assert2 &+[ #S`WKICM_bar : S in E`OverOrders ] eq #wk;
     end if;
-
+print "WKICM\t\t",Index(MaximalOrder(Algebra(E)),E),assigned E`WKICM_bar,assigned E`WKICM,Cputime(time_tot);
     return E`WKICM;
 end intrinsic;
 
@@ -650,8 +620,21 @@ end intrinsic;
 /* TESTS
  
     AttachSpec("~/packages_github/AlgEt/spec");
-    Attach("~/packages_github/AlgEt/dev/new_wk_icm.m");
-    SetVerbose("WKICM",2);
+    Attach("~/packages_github/AlgEt/dev/recursive_wk_icm.m");
+    //Attach("~/packages_github/AlgEt/dev/new_wk_icm.m");
+    //SetVerbose("WKICM",2);
+    P<x>:=PolynomialRing(Integers());
+    f:=x^8+16;
+    A:=EtaleAlgebra(f);
+    F:=PrimitiveElement(A);
+    // only one singular prime
+    R:=Order([F,2/F]);
+    [ Index(MaximalOrder(A),S) : S in OverOrders(R) ];
+    time #WKICM(R);
+
+    AttachSpec("~/packages_github/AlgEt/spec");
+    Attach("~/packages_github/AlgEt/dev/recursive_wk_icm.m");
+    //SetVerbose("WKICM",2);
     P<x>:=PolynomialRing(Integers());
     f:=x^8+16;
     A:=EtaleAlgebra(f);
@@ -670,7 +653,7 @@ end intrinsic;
     // SetAssertions(2);
     // Here: R has 2 singular primes, whose local parts require <10 secs, the patching is <5 secs.
     AttachSpec("~/packages_github/AlgEt/spec");
-    Attach("~/packages_github/AlgEt/dev/new_wk_icm.m");
+    Attach("~/packages_github/AlgEt/dev/recursive_wk_icm.m");
     SetVerbose("WKICM",2);
     P<x>:=PolynomialRing(Integers());
     f:=x^10 - x^9 + 4*x^8 - 6*x^7 + 8*x^6 - 16*x^5 + 16*x^4 - 24*x^3 + 32*x^2 - 16*x + 32;
@@ -682,7 +665,7 @@ end intrinsic;
 
     // Here: R has 3 singular primes, whose local parts require ~60 secs, the patching is <5 secs.
     AttachSpec("~/packages_github/AlgEt/spec");
-    Attach("~/packages_github/AlgEt/dev/new_wk_icm.m");
+    Attach("~/packages_github/AlgEt/dev/recursive_wk_icm.m");
     SetVerbose("WKICM",2);
     P<x>:=PolynomialRing(Integers());
     f:=x^6 - 3*x^5 + 30*x^4 - 175*x^3 + 750*x^2 - 1875*x + 15625;
@@ -692,10 +675,11 @@ end intrinsic;
     R:=Order([F,q/F]);
     time wk:=WKICM(R);
 
-    // Here: R has 5 singular primes, whose local parts require <60 secs, while the patching requires <5 secs.
+    // Here: R has 5 singular primes, whose local parts require <60 secs, while the patching requires <500 secs.
+    // (before it was >10000 secs)
     AttachSpec("~/packages_github/AlgEt/spec");
-    Attach("~/packages_github/AlgEt/dev/new_wk_icm.m");
-    SetVerbose("WKICM",2);
+    Attach("~/packages_github/AlgEt/dev/recursive_wk_icm.m");
+    SetVerbose("WKICM",3);
     P<x>:=PolynomialRing(Integers());
     f:=x^6 + 8*x^5 + 50*x^4 + 200*x^3 + 1250*x^2 + 5000*x + 15625;
     A:=EtaleAlgebra(f);
@@ -703,73 +687,6 @@ end intrinsic;
     R:=Order([F,25/F]);
     time wk:=#WKICM(R);
 
-    // VERY big it should not be in this test suit
-    // I have improved a lot KnownOrders. I expect that populating OverORders should be much faster now
-    AttachSpec("~/packages_github/AlgEt/spec");
-    Attach("~/packages_github/AlgEt/dev/new_wk_icm.m");
-    SetVerbose("WKICM",2);
-    P<x>:=PolynomialRing(Integers());
-    f:=x^8 - 2*x^7 + 7*x^6 - 14*x^5 + 40*x^4 - 56*x^3 + 112*x^2 - 128*x + 256;
-    A:=EtaleAlgebra(f);
-    R:=EquationOrder(A);
-    time assert #WKICM(R) eq 114492; // 114492 in ~519000 second ~ 144h with the old method
-    // Detailed timings, before improvin IsKnownOrder
-    // NOTE: the computation of the overorders for EP was outside the time count :-(
-    // We start the local computation at the 1-th singular prime.
-    //     We compute the directed graph of (reverse) inclusion of overorders...Done in 0.050 secs.
-    //     ...Done in 0.630 secs.
-    //     We start the local computation at the 2-th singular prime.
-    //             We compute the directed graph of (reverse) inclusion of overorders...Done in 5.770 secs.
-    //         ...Done in 8940.880 secs.
-    //     We start the local computation at the 3-th singular prime.
-    //             We compute the directed graph of (reverse) inclusion of overorders...Done in 0.010 secs.
-    //             ...Done in 0.020 secs.
-    //     We make all the local parts integral
-    //     ...Done in 18.880 secs.
-    //     We compute the prod_{j \ne i} P_j^k_j
-    //             ...Done in 0.070 secs.
-    //     We modify each entry of the cartesian product
-    //             ...Done in 97.160 secs.
-    //     We start patching together the local parts
-    //             ...Done in 950.150 secs.
-    //     We LLL all the ZBasis
-    //             ...Done in 102.250 secs
-    //     Checking assert2 ...
-    //             ...Done in 0.000 secs
-    //     We start populating the varargs OverOrders.
-    //             ...Done in 16688.260 secs.
-    //     We start populating the varargs WKICM_bar for each OverOrder.
-    //             ...Done in 391.510 secs.
-    //     Time: 27333.920
-    //
-    // Detailed timings, after improving IsKnownOrder 20230215, before populating MultiplicatorRing in WKICM_bar
-    // NOTE: the computation of the overorders for EP was outside the time count :-(
-    // We start the local computation at the 1-th singular prime.
-    //         We compute the directed graph of (reverse) inclusion of overorders...Done in 0.040 secs.
-    //         ...Done in 0.510 secs.
-    // We start the local computation at the 2-th singular prime.
-    //         We compute the directed graph of (reverse) inclusion of overorders...Done in 5.470 secs.
-    //         ...Done in 8237.400 secs.
-    // We start the local computation at the 3-th singular prime.
-    //         We compute the directed graph of (reverse) inclusion of overorders...Done in 0.000 secs.
-    //         ...Done in 0.020 secs.
-    // We make all the local parts integral
-    // ...Done in 18.120 secs.
-    // We compute the prod_{j \ne i} P_j^k_j
-    //         ...Done in 0.050 secs.
-    // We modify each entry of the cartesian product
-    //         ...Done in 96.060 secs.
-    // We start patching together the local parts
-    //         ...Done in 902.310 secs.
-    // We LLL all the ZBasis
-    //         ...Done in 100.200 secs
-    // Checking assert2 ...
-    //         ...Done in 0.000 secs
-    // We start populating the varargs OverOrders.
-    //         ...Done in 8276.250 secs.
-    // We start populating the varargs WKICM_bar for each OverOrder.
-    //         ...Done in 381.610 secs.
-    // Time: 18140.970
 */
 
 /*
@@ -778,7 +695,7 @@ end intrinsic;
 
     // this seems to be quite big. I don't know how long it takes
     AttachSpec("~/packages_github/AlgEt/spec");
-    Attach("~/packages_github/AlgEt/dev/new_wk_icm.m");
+    Attach("~/packages_github/AlgEt/dev/recursive_wk_icm.m");
     //SetVerbose("new_wk_icm_bar",2);
     P<x>:=PolynomialRing(Integers());
     f:=x^6 + 8*x^5 + 50*x^4 + 200*x^3 + 1250*x^2 + 5000*x + 15625;
@@ -803,8 +720,8 @@ end intrinsic;
 
     // VERY big
     AttachSpec("~/packages_github/AlgEt/spec");
-    Attach("~/packages_github/AlgEt/dev/new_wk_icm.m");
-    SetVerbose("WKICM",2);
+    Attach("~/packages_github/AlgEt/dev/recursive_wk_icm.m");
+    SetVerbose("WKICM",3);
     P<x>:=PolynomialRing(Integers());
     f:=x^8 - 2*x^7 + 7*x^6 - 14*x^5 + 40*x^4 - 56*x^3 + 112*x^2 - 128*x + 256;
     A:=EtaleAlgebra(f);
@@ -813,7 +730,7 @@ end intrinsic;
     // Computing the local parts takes <8000 secs. But putting them together might take a long time.
     
     AttachSpec("~/packages_github/AlgEt/spec");
-    Attach("~/packages_github/AlgEt/dev/new_wk_icm.m");
+    Attach("~/packages_github/AlgEt/dev/recursive_wk_icm.m");
     // to load the huge example:
     time R:=LoadWKICM(Read("~/packages_github/AlgEt/dev/114492_wk_classes_example.txt")); // 3400 secs to load :-)
     #WKICM(R);
@@ -821,7 +738,7 @@ end intrinsic;
 
     // looping over slow input
     AttachSpec("~/packages_github/AlgEt/spec");
-    Attach("~/packages_github/AlgEt/dev/new_wk_icm.m");
+    Attach("~/packages_github/AlgEt/dev/recursive_wk_icm.m");
     //SetVerbose("WKICM",2);
     P<x>:=PolynomialRing(Integers());
     str:=Split(Read("~/packages_github/AlgEt/dev/input_slow_sorted.txt"));
@@ -841,7 +758,7 @@ end intrinsic;
 
     // freakking big
     AttachSpec("~/packages_github/AlgEt/spec");
-    Attach("~/packages_github/AlgEt/dev/new_wk_icm.m");
+    Attach("~/packages_github/AlgEt/dev/recursive_wk_icm.m");
     //SetVerbose("new_wk_icm_bar",2);
     P<x>:=PolynomialRing(Integers());
     f:=x^8 - 2*x^7 + 7*x^6 - 14*x^5 + 40*x^4 - 56*x^3 + 112*x^2 - 128*x + 256;
@@ -853,7 +770,7 @@ end intrinsic;
     time wk:=WKICM(R); // 114492i in ~519000 second ~ 144h
     
     AttachSpec("~/packages_github/AlgEt/spec");
-    Attach("~/packages_github/AlgEt/dev/new_wk_icm.m");
+    Attach("~/packages_github/AlgEt/dev/recursive_wk_icm.m");
     // to load the huge example:
     time R:=LoadWKICM(Read("~/packages_github/AlgEt/dev/114492_wk_classes_example.txt")); // 3400 secs to load :-)
     #WKICM(R);
@@ -878,7 +795,7 @@ end intrinsic;
     // let's see if it is faster. Yes! the first and third primes have trivial running time
     // the second is around 7000 secs
     AttachSpec("~/packages_github/AlgEt/spec");
-    Attach("~/packages_github/AlgEt/dev/new_wk_icm.m");
+    Attach("~/packages_github/AlgEt/dev/recursive_wk_icm.m");
     P<x>:=PolynomialRing(Integers());
     f:=x^8 - 2*x^7 + 7*x^6 - 14*x^5 + 40*x^4 - 56*x^3 + 112*x^2 - 128*x + 256;
     A:=EtaleAlgebra(f);
@@ -897,7 +814,7 @@ end intrinsic;
     assert &*wks eq 114492;
 
     AttachSpec("~/packages_github/AlgEt/spec");
-    Attach("~/packages_github/AlgEt/dev/new_wk_icm.m");
+    Attach("~/packages_github/AlgEt/dev/recursive_wk_icm.m");
     //SetVerbose("new_wk_icm_bar",2);
     P<x>:=PolynomialRing(Integers());
     f:=x^4+30^3*x^3+30^3*x^2+30^3*x+30^3;
@@ -918,7 +835,7 @@ end intrinsic;
     assert &*wks eq #WKICM(R);
 
     AttachSpec("~/packages_github/AlgEt/spec");
-    Attach("~/packages_github/AlgEt/dev/new_wk_icm.m");
+    Attach("~/packages_github/AlgEt/dev/recursive_wk_icm.m");
     //SetVerbose("new_wk_icm_bar",2);
     P<x>:=PolynomialRing(Integers());
     f:=x^6 + 8*x^5 + 50*x^4 + 200*x^3 + 1250*x^2 + 5000*x + 15625;
@@ -951,7 +868,7 @@ end intrinsic;
     magma;
     // WKICM_LESS_OLD
     AttachSpec("~/packages_github/AlgEt/spec");
-    Attach("~/packages_github/AlgEt/dev/new_wk_icm.m");
+    Attach("~/packages_github/AlgEt/dev/recursive_wk_icm.m");
     P<x>:=PolynomialRing(Integers());
     f:=x^8 - 2*x^7 + 7*x^6 - 14*x^5 + 40*x^4 - 56*x^3 + 112*x^2 - 128*x + 256;
     A:=EtaleAlgebra(f);
@@ -972,7 +889,7 @@ end intrinsic;
 
     // WKICM_OLD
     AttachSpec("~/packages_github/AlgEt/spec");
-    Attach("~/packages_github/AlgEt/dev/new_wk_icm.m");
+    Attach("~/packages_github/AlgEt/dev/recursive_wk_icm.m");
     P<x>:=PolynomialRing(Integers());
     f:=x^8 - 2*x^7 + 7*x^6 - 14*x^5 + 40*x^4 - 56*x^3 + 112*x^2 - 128*x + 256;
     A:=EtaleAlgebra(f);

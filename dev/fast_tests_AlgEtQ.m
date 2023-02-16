@@ -14,6 +14,11 @@ time_start:=Cputime();
     seq:=[NumberField(f) : f in seq];
     A:=EtaleAlgebra(seq);
     printf ".";
+
+    seq:=[x-1,x-20];
+    A:=EtaleAlgebra(&*seq);
+    printf ".";
+
     SetAssertions(1);
     printf " all good!\n";
 
@@ -202,7 +207,7 @@ time_start:=Cputime();
 
     ff:=Conductor(EquationOrder(A));
     T:=MultiplicatorRing(ff);
-    assert T in A`KnownOrders;
+    assert T in A`KnownOrders[Index(T)];
     assert assigned T`IsMaximal and assigned T`IsProductOfOrders; //these two attributes are assigned when we created OA above.
                                                                   // hence T points to the same memory spot of OA
     printf ".";
@@ -278,6 +283,7 @@ time_start:=Cputime();
         assert #r eq #Quotient(OneIdeal(E),P);
         assert #r eq #ResidueRing(E,P);
         assert #r eq #QuotientVS(OneIdeal(E),P,P);
+        printf ".";
     end for;
 
     for I in icm do
@@ -286,6 +292,7 @@ time_start:=Cputime();
             PI:=P*I;
             n:=#Quotient(I,PI);
             assert n eq #QuotientVS(I,PI,P);
+            printf ".";
         end for;
     end for;
 
@@ -314,7 +321,7 @@ time_start:=Cputime();
     assert #oo eq 11;
 
     printf " all good!\n"; 
- 
+
 
 
 
@@ -404,6 +411,22 @@ time_start:=Cputime();
     cc:=[ ColonIdeal(I,J) : I,J in ids  ];
     assert cc eq cc2;
     printf ".";
+
+    // testing KnownPowers 
+    _<x>:=PolynomialRing(Integers());
+    f:=(x^8+16)*(x^8+81);
+    A:=EtaleAlgebra(f);
+    E1:=EquationOrder(A);
+    I:=Conductor(E1);
+    assert not IsInvertible(I);
+    _:=I^2;
+    is_def,I2:=IsDefined(I`KnownPowers,2);
+    assert is_def and I2 eq I*I;
+    _:=I^5;
+    is_def,I4:=IsDefined(I`KnownPowers,4);
+    assert is_def and I4 eq (I*I)*(I*I);
+    is_def,I5:=IsDefined(I`KnownPowers,5);
+    assert is_def and I5 eq (I*I)*(I*I)*I;
 
     SetAssertions(1);
     printf " all good!\n";

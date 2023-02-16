@@ -12,6 +12,16 @@
     TODO:
     ### Priority ###
     - dev/IdealsOfIndex.m add tests and timings to complete
+    - I should move the check IsKnownOrder in the creation function, with the possibility to skip it.
+      This would make the code of many other functions a lot cleaner.
+
+    #### OverOrders ####
+    - In OverOrdersAtPrime, storing the overorders in an AssociativeArray indexd by Index(S) should make 
+      the 'join' and 'Include()' operations faster.
+      In OverOrders, when I take the cartesian product, I am producing always locally distinct orders.
+      So using [..] instead of {@ @} should be faster.
+      In new_wk_icm.m when I populate the VarArg OverOrders I should use an associative array as well (and then 
+      possibly convert it to a Sequence [..]).
 
     ### Modules ###
     - In IsomorphismClasses and IsIsomorphic, I should first order/test whether M and N have the same multiplicator ring S in K and with #M/PM = #N/PN for every singular prime of S, since these are necessary conditions of being isomorphic.
@@ -37,9 +47,6 @@
     #### CRT ####
     - Make a CRT for modules : I/P1*...*Ps*I -> \prod_i (I/Pi*I)
       This is needed for finding a minimal set of generators of non-necessarly invertible ideals.
-
-    #### OverOrders ####
-    - I think that implementing equality testing for orders on a lower level would improve the situation a lot.
 
     ### WKICM ###
     - Possible improvement to WKICM(S).

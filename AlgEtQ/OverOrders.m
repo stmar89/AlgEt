@@ -106,7 +106,6 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQ
         assert2 forall{S : S in output | ColonIdeal(R,R!!OneIdeal(S)) eq P};
         for i in [1..#output] do
             S:=output[i];
-            IsKnownOrder(~S);
             ZBasisLLL(S);
         end for;
         if not assigned R`MinimalOverOrders then
@@ -181,7 +180,6 @@ intrinsic OverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQOrd]
     end while;
     for iS in [1..#output] do
         S:=output[iS];
-        IsKnownOrder(~S);
         ZBasisLLL(S);
     end for;
     assert2 forall{S : S in output | S eq R or PrimesAbove(ColonIdeal(R,R!!OneIdeal(S))) eq [ P ]};
@@ -219,7 +217,6 @@ intrinsic OverOrders(R::AlgEtQOrd : populateoo_in_oo:=false) -> SetIndx[AlgEtQOr
                     gens:=&cat[ZBasis(oo_at_Ps[j][S[j]]) : j in [1..#S] | S[j] ne 1];
                     S:=Order(gens);
                 end if;
-                IsKnownOrder(~S);
                 ZBasisLLL(S);
                 Include(~output,S);
             end for;

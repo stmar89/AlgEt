@@ -116,11 +116,6 @@ intrinsic LoadWKICM(str::MonStgElt) -> AlgEtQOrd
         end for;
         S`WKICM_bar:=wkS;
     end for;
-    // we populate the attribute A`KnownOrders
-    for iS in [1..#ooR] do
-        S:=ooR[iS];
-        IsKnownOrder(~S); 
-    end for;
     R`OverOrders:=ooR;
     R`WKICM:=wkR;
     return R;

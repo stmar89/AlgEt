@@ -198,11 +198,8 @@ time_start:=Cputime();
     // we test KnownOrders
     OA:=MaximalOrder(A);
     O:=Order(ZBasis(OA));
-    assert not assigned O`IsMaximal;
+    assert assigned O`IsMaximal; //at creation O<-OA since we call IsKnownOrder
     assert O eq OA;
-    assert not assigned O`IsMaximal; //not passing attributes at equality checks
-    IsKnownOrder(~O); //now we known that O eq OA
-    assert assigned O`IsMaximal;
     printf ".";
 
     ff:=Conductor(EquationOrder(A));

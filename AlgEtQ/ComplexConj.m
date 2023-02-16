@@ -33,7 +33,7 @@ intrinsic IsConjugateStable(O::AlgEtQOrd) -> BoolElt,AlgEtQOrd
 {Returns wheter O is conjugate stable and the complex conjugate.}
     if not assigned O`IsConjugateStable then
         A:=Algebra(O);
-        Ob:=Order([ ComplexConjugate(x) : x in ZBasis(O) ]);
+        Ob:=Order([ ComplexConjugate(x) : x in ZBasis(O) ] : CheckIsKnownOrder:=false);
         is_stable:=Ob eq O;
         if is_stable then
             O`IsConjugateStable:=<true,O>;

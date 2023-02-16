@@ -71,7 +71,6 @@ intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum
 {Returns all the weak eq classes I, such that (I:I)=S. The VarArg Method (default "Auto") determines if we should use the "IntermediateIdeals" routine or the "LowIndexProcess", which is potentially much slower but more memory efficient.}
 print "WKICM_bar\t",Index(MaximalOrder(Algebra(S)),S),assigned S`WKICM_bar,assigned S`WKICM;
 time_tot:=Cputime();
-    IsKnownOrder(~S);
     if not assigned S`WKICM_bar then
         if IsGorenstein(S) then
             vprintf WKICM_bar,2 : " Gorenstein case\n";
@@ -89,10 +88,6 @@ time_tot:=Cputime();
                 pp:=PrimesAbove(Conductor(S));
                 //oo:=FindOverOrders(S);
                 //mult_pp:=[ oo[Index(oo,MultiplicatorRing(P))] : P in pp ];
-    for P in pp do
-        T:=MultiplicatorRing(P);
-        IsKnownOrder(~T);
-    end for;
                 mult_pp:=[ MultiplicatorRing(P) : P in pp ];
         //assert forall{T : T in mult_pp | assigned T`WKICM_bar};
                 num_sub_vect_sp:=function(n,q)
@@ -222,7 +217,6 @@ The VarArg populate_OverOrder_and_WKICM_bar assignes the attributes OverOrder of
 // if E has one singular prime then: W(E) = \cup_S W(S) \sqcup \bar W(E) where S runs over the minimal overorders.
 print "WKICM\t\t",Index(MaximalOrder(Algebra(E)),E),assigned E`WKICM_bar,assigned E`WKICM;
 time_tot:=Cputime();
-    IsKnownOrder(~E);
     if not assigned E`WKICM then
         if IsMaximal(E) then
             E`WKICM:=[ OneIdeal(E) ];
@@ -428,7 +422,6 @@ time_tot:=Cputime();
         oo:=OverOrders(E);
         for i in [1..#oo] do
             S:=oo[i];
-            IsKnownOrder(~S);
             if not assigned S`OverOrders then
                 S`OverOrders:={@ T : T in oo | S subset T @};
             end if;

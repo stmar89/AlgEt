@@ -75,8 +75,8 @@
         _:=#PicardGroup(T);
     t1:=Cputime(t0);
     printf "Current running time = %o \n",t1;
-    tprevbest:=0.7; //on diophantus
-    if Abs(t1 - tprevbest) gt 0.1*tprevbest then
+    tprevbest:=0.5; //on diophantus
+    if Abs(t1 - tprevbest) gt tprevbest then //so fast than the small random component in SmallRepresentative triggers the warning
         if t1 lt tprevbest then
             printf "PicardGroup for %o got faster. Update the previous best known time\n",f;
         elif t1 gt tprevbest then

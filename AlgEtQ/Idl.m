@@ -728,7 +728,6 @@ intrinsic MultiplicatorRing(I::AlgEtQIdl) -> AlgEtQOrd
             A:=Algebra(I);
             zbS:=ZBasis(ColonIdeal(I,I));
             S:=Order(zbS : Check:=0 );
-            IsKnownOrder(~S); //has S already created?
             I`MultiplicatorRing:=S;
         end if;
     end if;

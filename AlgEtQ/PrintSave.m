@@ -38,7 +38,13 @@ intrinsic PrintWKICM(R::AlgEtQOrd) -> MonStgElt
     str cat:=RemoveBlanks(Sprint(nf_poly)) cat ",\n";
     oo:=FindOverOrders(R);
     // we make sure that R is oo[1]
-    assert R eq oo[1];
+    if R ne oo[1] then
+        ind:=Index(oo,R);
+        assert ind ne 0;
+        S:=oo[1];
+        oo[ind]:=S;
+        oo[1]:=R;
+    end if;
     // init the string
     str cat:="<\n";
     for iS->S in oo do

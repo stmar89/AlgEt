@@ -83,10 +83,8 @@ intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum[AlgEtQIdl]
             // general case
             seqWk_bar:=[];
             if Method in {"Auto","IntermediateIdealsVSWithTrivialExtensionAndPrescribedMultiplicatorRing"} then
-                vprint WKICM_bar,2 : "Using new method";
                 pp:=PrimesAbove(Conductor(S));
-                oo:=FindOverOrders(S);
-                mult_pp:=[ oo[Index(oo,MultiplicatorRing(P))] : P in pp ];
+                mult_pp:=[ MultiplicatorRing(P) : P in pp ];
                 assert forall{T : T in mult_pp | assigned T`WKICM_bar};
                 num_sub_vect_sp:=function(n,q)
                 // q a prime power. Returns the number of F_q-subvector spaces of F_q^n
@@ -104,13 +102,6 @@ intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum[AlgEtQIdl]
                 T:=mult_pp[iP];
                 wkT:=WKICM_bar(mult_pp[iP]);
                 vprintf WKICM_bar,2 : " cands using IntermediateIdealsVSWithTrivialExtensionAndPrescribedMultiplicatorRing (new version with tests in in the finite field\n";
-                // vtime WKICM_bar,2 : cands:=&join[ IntermediateIdealsVSWithTrivialExtensionAndPrescribedMultiplicatorRing(J,P) : J in wkT ];
-                // for I in cands do
-                //   if not exists{J : J in seqWk_bar | IsWeakEquivalent(I,J)} then
-                //     ZBasisLLL(I);
-                //     Append(~seqWk_bar,I);
-                //   end if;
-                // end for;
                 for J in wkT do
                     seqWk_bar_J:=[];
                     cands_J:=IntermediateIdealsVSWithTrivialExtensionAndPrescribedMultiplicatorRing(J,P);
@@ -250,7 +241,8 @@ The VarArg populate_OverOrder_and_WKICM_bar assignes the attributes OverOrder of
                 EP:=E;
             end if;
             vprintf WKICM,2 : "\tWe compute the overorders";
-            oo:=FindOverOrders(EP : populateoo_in_oo:=true);
+            //oo:=FindOverOrders(EP : populateoo_in_oo:=true);
+            oo:=FindOverOrders(EP);
             vprintf WKICM,2 : "...Done in %o secs.\n",Cputime(t0);
             if Method in {"Auto","IntermediateIdealsVSWithTrivialExtensionAndPrescribedMultiplicatorRing"} then
                 // We want to compute WKICM_bar/(S) for S running from top to bottom 
@@ -431,45 +423,55 @@ The VarArg populate_OverOrder_and_WKICM_bar assignes the attributes OverOrder of
         vprintf WKICM,2 : "\t...Done in %o secs\n",Cputime(t0);
 
         E`WKICM:=wk;
-    end if;
 
-    if populate_OverOrder_and_WKICM_bar then
-        t0:=Cputime();
-        vprintf WKICM,2 : "We start populating the varargs OverOrders.\n";
-        wk:=E`WKICM;
-        if not assigned E`OverOrders then
-            oo:=AssociativeArray();
-            for I in wk do
-                S:=MultiplicatorRing(I);
-                ind:=Index(S);
-                if not IsDefined(oo,ind) then
-                    oo[ind]:={@ S @};
-                else
-                    Include(~oo[ind],S);
-                end if;
-            end for;
-            E`OverOrders:=&cat[ [ S : S in oo[k] ] : k in Keys(oo)];
-        end if;
-        vprintf WKICM,2 : "\t...Done in %o secs.\n",Cputime(t0);
-        vprintf WKICM,2 : "We start populating the varargs WKICM_bar for each OverOrder.\n";
-
-        t0:=Cputime();
-        //  the next one should be faster because #oo <<< #wk
-        for i in [1..#wk] do
-            I:=wk[i];
-            S:=MultiplicatorRing(I);
-            assert2 S in Algebra(E)`KnownOrders;
-            I:=S!!I;
-            if not assigned S`WKICM_bar then
-                S`WKICM_bar:=[ I ];
-            elif not I in S`WKICM_bar then
-                Append(~S`WKICM_bar,I);
+        if populate_OverOrder_and_WKICM_bar then
+            // We populate the attributes E`OverOrders and S`WKICM_bar for each overorder.
+            // This is needed for the recursion step.
+            // Note that some of the overorders have already the vararg WKICM_bar populated, because, for 
+            // example, there were coming from the recursive-1-single-singular-prime part of the code.
+            // In this case, we don't want to add it a second time. Hence we need to keep track of this info.
+            // We do it by using nested AossicativeArrays
+            t0:=Cputime();
+            vprintf WKICM,2 : "We start populating the varargs OverOrders and WKICM_bar.\n";
+            if not assigned E`OverOrders then
+                oo:=AssociativeArray();
+                for I in wk do
+                    S:=MultiplicatorRing(I);
+                    ind:=Index(S);
+                    if not IsDefined(oo,ind) then
+                        oo[ind]:=AssociativeArray();
+                        oo[ind][true]:={@ @};
+                        oo[ind][false]:=AssociativeArray();
+                        oo[ind][false]["orders"]:=[];
+                        oo[ind][false]["wkicm_bars"]:=[];
+                    end if;
+                    if assigned S`WKICM_bar then
+                        Include(~oo[ind][true],S);
+                    else
+                        indS:=Index(oo[ind][false]["orders"],S);
+                        if indS eq 0 then //this is the first time we see S.
+                            Append(~oo[ind][false]["orders"],S);
+                            Append(~oo[ind][false]["wkicm_bars"],[S!!I]);
+                        else
+                            Append(~oo[ind][false]["wkicm_bars"][indS],S!!I);
+                        end if;
+                    end if;
+                end for;
+                oo_E:=[];
+                for ind in Keys(oo) do
+                    oo_E cat:=Setseq(oo[ind][true]);
+                    for iS in [1..#oo[ind][false]["orders"]] do
+                        S:=oo[ind][false]["orders"][iS];
+                        S`WKICM_bar:=oo[ind][false]["wkicm_bars"][iS];
+                        Append(~oo_E,S);
+                    end for;
+                end for;
+                E`OverOrders:=oo_E;
             end if;
-        end for;
-        vprintf WKICM,2 : "\t...Done in %o secs.\n",Cputime(t0);
-        assert2 &+[ #S`WKICM_bar : S in OverOrders(E) ] eq #wk;
+            vprintf WKICM,2 : "\t...Done in %o secs.\n",Cputime(t0);
+            assert &+[ #S`WKICM_bar : S in OverOrders(E) ] eq #wk;
+        end if;
     end if;
-
     return E`WKICM;
 end intrinsic;
 
@@ -654,7 +656,7 @@ end intrinsic;
     A:=EtaleAlgebra(f);
     R:=EquationOrder(A);
     // only one singular prime
-    t0:=Cputime()
+    t0:=Cputime();
         assert #WKICM(R) eq 173;
     t_curr:=Cputime(t0);
     t_prev_best:=32.7;
@@ -680,7 +682,7 @@ end intrinsic;
     F:=PrimitiveElement(A);
     q:=Integers() ! Round(ConstantCoefficient(f)^(2/Degree(f)));
     R:=Order([F,q/F]);
-    t0:=Cputime()
+    t0:=Cputime();
         wk:=WKICM(R);
     t_curr:=Cputime(t0);
     "Current running time: ",t_curr;
@@ -699,8 +701,8 @@ end intrinsic;
     F:=PrimitiveElement(A);
     q:=Integers() ! Round(ConstantCoefficient(f)^(2/Degree(f)));
     R:=Order([F,q/F]);
-    t0:=Cputime()
-        wk:=WKICM(R);
+    t0:=Cputime();
+        #WKICM(R);
     t_curr:=Cputime(t0);
     "Current running time: ",t_curr;
     t_prev_best:=57;
@@ -717,7 +719,7 @@ end intrinsic;
     A:=EtaleAlgebra(f);
     F:=PrimitiveElement(A);
     R:=Order([F,25/F]);
-    t0:=Cputime()
+    t0:=Cputime();
         wk:=WKICM(R);
     t_curr:=Cputime(t0);
     "Current running time: ",t_curr;
@@ -735,64 +737,8 @@ end intrinsic;
     f:=x^8 - 2*x^7 + 7*x^6 - 14*x^5 + 40*x^4 - 56*x^3 + 112*x^2 - 128*x + 256;
     A:=EtaleAlgebra(f);
     R:=EquationOrder(A);
-    time assert #WKICM(R) eq 114492; // 114492 in ~519000 second ~ 144h with the old method
-    // Detailed timings, before improvin IsKnownOrder
-    // NOTE: the computation of the overorders for EP was outside the time count :-(
-    // We start the local computation at the 1-th singular prime.
-    //     We compute the directed graph of (reverse) inclusion of overorders...Done in 0.050 secs.
-    //     ...Done in 0.630 secs.
-    //     We start the local computation at the 2-th singular prime.
-    //             We compute the directed graph of (reverse) inclusion of overorders...Done in 5.770 secs.
-    //         ...Done in 8940.880 secs.
-    //     We start the local computation at the 3-th singular prime.
-    //             We compute the directed graph of (reverse) inclusion of overorders...Done in 0.010 secs.
-    //             ...Done in 0.020 secs.
-    //     We make all the local parts integral
-    //     ...Done in 18.880 secs.
-    //     We compute the prod_{j \ne i} P_j^k_j
-    //             ...Done in 0.070 secs.
-    //     We modify each entry of the cartesian product
-    //             ...Done in 97.160 secs.
-    //     We start patching together the local parts
-    //             ...Done in 950.150 secs.
-    //     We LLL all the ZBasis
-    //             ...Done in 102.250 secs
-    //     Checking assert2 ...
-    //             ...Done in 0.000 secs
-    //     We start populating the varargs OverOrders.
-    //             ...Done in 16688.260 secs.
-    //     We start populating the varargs WKICM_bar for each OverOrder.
-    //             ...Done in 391.510 secs.
-    //     Time: 27333.920
-    //
-    // Detailed timings, after improving IsKnownOrder 20230215, before populating MultiplicatorRing in WKICM_bar
-    // NOTE: the computation of the overorders for EP was outside the time count :-(
-    // We start the local computation at the 1-th singular prime.
-    //         We compute the directed graph of (reverse) inclusion of overorders...Done in 0.040 secs.
-    //         ...Done in 0.510 secs.
-    // We start the local computation at the 2-th singular prime.
-    //         We compute the directed graph of (reverse) inclusion of overorders...Done in 5.470 secs.
-    //         ...Done in 8237.400 secs.
-    // We start the local computation at the 3-th singular prime.
-    //         We compute the directed graph of (reverse) inclusion of overorders...Done in 0.000 secs.
-    //         ...Done in 0.020 secs.
-    // We make all the local parts integral
-    // ...Done in 18.120 secs.
-    // We compute the prod_{j \ne i} P_j^k_j
-    //         ...Done in 0.050 secs.
-    // We modify each entry of the cartesian product
-    //         ...Done in 96.060 secs.
-    // We start patching together the local parts
-    //         ...Done in 902.310 secs.
-    // We LLL all the ZBasis
-    //         ...Done in 100.200 secs
-    // Checking assert2 ...
-    //         ...Done in 0.000 secs
-    // We start populating the varargs OverOrders.
-    //         ...Done in 8276.250 secs.
-    // We start populating the varargs WKICM_bar for each OverOrder.
-    //         ...Done in 381.610 secs.
-    // Time: 18140.970
+    time assert #WKICM(R) eq 114492; // 114492 in ~519000 second ~ 144h with the OLD method
+                                     // now 2.7hours.
 */
 
 /*

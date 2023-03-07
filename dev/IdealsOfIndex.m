@@ -8,7 +8,7 @@ freeze;
 // Edgar Costa, MIT
 /////////////////////////////////////////////////////
 
-declare verbose IdealOfIndex, 2;
+declare verbose IdealsOfIndex, 2;
 
 intrinsic IdealsOfIndex(O::RngOrd, N::RngIntElt) -> SeqEnum[RngOrdIdl]
 {Given an Order, retuns all the ideals of index N in that order}
@@ -32,13 +32,13 @@ end intrinsic;
 intrinsic IdealsOfIndex(I::RngOrdIdl, N::RngIntElt) -> SeqEnum[RngOrdIdl]
 {Given an ideal I in an order O in a number field and a positive integer N, with N coprime with the conductor, returns all the ideals J contained in I with index [I:J]=N.}
     vprintf IdealsOfIndex : "IdealsOfIndex RngOrdIdl\n";
-    require N gt 0 and GCD(index_OK_O, N) eq 1 : "N is not coprime with the conductor of Order(I)";
     if N eq 1 then
         return [I];
     end if;
     O := Order(I);
     OK := MaximalOrder(NumberField(O));
     index_OK_O := Index(OK, O);
+    require N gt 0 and GCD(index_OK_O, N) eq 1 : "N is not coprime with the conductor of Order(I)";
     Js := IdealsOfIndex(OK, N);
     ff:=OK !! Conductor(O);
     assert forall{J : J in Js | J+ff eq 1*OK};
@@ -93,7 +93,7 @@ intrinsic IdealsOfIndex(I::AlgEtQIdl, N::RngIntElt : Method := "Default") -> Seq
     if Method eq "Naive" then
         test := false;
     else
-        test, dec := IsProductOfIdeals(I);
+        test, dec := IsProductOfIdeals(MultiplicatorRing(I)!!I);
         for J in dec do
             O := Order(J);
             OK := MaximalOrder(NumberField(O));
@@ -114,10 +114,10 @@ intrinsic IdealsOfIndex(I::AlgEtQIdl, N::RngIntElt : Method := "Default") -> Seq
             assert #J eq #Components(A);
             gen_inA := [];
             for i := 1 to #J do
-                L := Components(A)[i];
-                gen_inA := gen_inA cat [L[2](y) : y in Basis(J[i], L[1])];
+                comps,embs := Components(A);
+                gen_inA := gen_inA cat [embs[i](y) : y in Basis(J[i], comps[i])];
             end for;
-            JA:= ideal<Order(I) | gen_inA>;
+            JA:= Ideal(Order(I) , gen_inA);
             assert Index(I,JA) eq N;
             Append(~result,JA);
         end for;
@@ -139,7 +139,7 @@ intrinsic IntermediateIdealsOfIndex(I::AlgEtQIdl,J::AlgEtQIdl,N::RngIntElt)->Set
     // early exits
     if Index(I,J) eq N then
         return {@ J @};
-    elif (Index(I,J) mod N) ne 0
+    elif (Index(I,J) mod N) ne 0 then
         output:={@ Universe({@ I @}) | @}; //empty set
         return output;
     end if;
@@ -151,7 +151,7 @@ intrinsic IntermediateIdealsOfIndex(I::AlgEtQIdl,J::AlgEtQIdl,N::RngIntElt)->Set
         pot_new:=&join[MaximalIntermediateIdeals(elt,J) : elt in queue ];
         output join:={@ K : K in pot_new | Index(I,K) eq N @};
         done join:=queue;
-        queue := {@ M : M in pot_new diff done | Index(I,M) lt N}; // if [I:M] ge N then for all K c M 
+        queue := {@ M : M in pot_new diff done | Index(I,M) lt N @}; // if [I:M] ge N then for all K c M 
                                                                    // we have that [I:K]>N. We don't want such M's 
                                                                    // in the queue.
     end while;

@@ -61,7 +61,7 @@ intrinsic IsConjugateStable(I::AlgEtQIdl) -> BoolElt,AlgEtQIdl
         is_stableO,Ob:=IsConjugateStable(O);
         Ib:=Ideal(Ob,[ ComplexConjugate(x) : x in ZBasis(I)]);
         if not is_stableO then
-            is_stableI:=false; //can't compare I and Ib sicne they are defined over different orders
+            is_stable:=false; //can't compare I and Ib sicne they are defined over different orders
         else
             is_stable:=I eq Ib;
         end if;

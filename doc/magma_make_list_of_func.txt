@@ -63,6 +63,9 @@
         desc_out:=find_next(inp,desc_in,"}")-2;
         desc:=clean(inp[desc_in..desc_out]);
         desc:=SubstituteString(desc,"*","\\*");
+        if desc eq "." then
+            desc:="";
+        end if;
         end_int:=find_next(inp,desc_out+1,"intrinsic");
         return name,name_2,desc,end_int; 
     end function;

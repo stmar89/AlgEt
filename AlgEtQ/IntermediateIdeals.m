@@ -9,11 +9,6 @@ freeze;
 
 declare verbose IntermediateIdeals, 2;
 
-/*TODO:
-
-*/
-
-
 intrinsic MinimalIntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]
 {Given fractional S-ideals J subset I, returns the minimal (with respect to inclusion) fractional S-ideals K such that J subset K subset I.}
     assert2 J subset I; // "the ideal J needs to be inside I";
@@ -184,6 +179,34 @@ intrinsic IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing(I
         // Note: if O!!K is not IO, then all the submodules of K will also not have trivial extension IO.
         // Hence we don't need to continue the recursion on K.
         queue := pot_new diff done; 
+    end while;
+    return output;
+end intrinsic;
+
+intrinsic IntermediateIdealsOfIndex(I::AlgEtQIdl,J::AlgEtQIdl,N::RngIntElt)->SetIndx[AlgEtQIdl]
+{Given ideals J subset I over the same order, and a positive integer N, it returns all the ideals K such that J subset K subset I and [I:K]=N. These are produced by recursively searching for maximal submodules.}
+    require J subset I : "The ideal J needs to be inside I";
+    require N gt 0 : "N must be a strictly positive integer";
+    S:=Order(I);
+    require S eq Order(J) : "The ideals must be over the same order";
+    // early exits
+    if Index(I,J) eq N then
+        return {@ J @};
+    elif (Index(I,J) mod N) ne 0 then
+        output:={@ Universe({@ I @}) | @}; //empty set
+        return output;
+    end if;
+    // we start the recursion
+    queue:={@ I @};
+    output:={@ @};
+    done:={@ @};
+    while #queue gt 0 do
+        pot_new:=&join[MaximalIntermediateIdeals(elt,J) : elt in queue ];
+        output join:={@ K : K in pot_new | Index(I,K) eq N @};
+        done join:=queue;
+        queue := {@ M : M in pot_new diff done | Index(I,M) lt N @}; // If [I:M] ge N then for all K c M we have 
+                                                                     // that [I:K]>N. Hence we don't want such M's 
+                                                                     // in the queue.
     end while;
     return output;
 end intrinsic;

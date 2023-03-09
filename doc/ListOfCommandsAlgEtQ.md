@@ -7,7 +7,7 @@
 *Given a squarefree polynomial over the integers returns the product of the number fields defined by the irreducible factors.*
 
 > <pre><b>EtaleAlgebra</b>(f::RngUPolElt[FldRat]) -> AlgEtQ</pre>
-**
+*.*
 
 
 ## List of instrinsics in AlgEtQ/AlgEtAttributes.m:

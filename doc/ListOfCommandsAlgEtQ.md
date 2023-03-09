@@ -205,19 +205,19 @@
 *Given a sequence of AlgEtQElt returns the product of the entries.*
 
 > <pre><b>SumOfProducts</b>(as::SeqEnum[AlgEtQElt],bs::SeqEnum[AlgEtQElt]) -> AlgEtQElt</pre>
-*Given sequences as and bs, such that #as eq #bs, returns `&+[as[i]\*bs[i] : i in [1..#as]]`. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.*
+*Given sequences as and bs, such that #as eq #bs, returns &+[as[i]\*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.*
 
 > <pre><b>SumOfProducts</b>(as::SeqEnum[RngIntElt],bs::SeqEnum[AlgEtQElt]) -> AlgEtQElt</pre>
-*Given sequences as and bs, such that #as eq #bs, returns `&+[as[i]\*bs[i] : i in [1..#as]]`. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.*
+*Given sequences as and bs, such that #as eq #bs, returns &+[as[i]\*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.*
 
 > <pre><b>SumOfProducts</b>(as::SeqEnum[FldRatElt],bs::SeqEnum[AlgEtQElt]) -> AlgEtQElt</pre>
-*Given sequences as and bs, such that #as eq #bs, returns `&+[as[i]\*bs[i] : i in [1..#as]]`. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.*
+*Given sequences as and bs, such that #as eq #bs, returns &+[as[i]\*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.*
 
 > <pre><b>SumOfProducts</b>(as::SeqEnum[AlgEtQElt],bs::SeqEnum[RngIntElt]) -> AlgEtQElt</pre>
-*Given sequences as and bs, such that #as eq #bs, returns `&+[as[i]\*bs[i] : i in [1..#as]]`. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.*
+*Given sequences as and bs, such that #as eq #bs, returns &+[as[i]\*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.*
 
 > <pre><b>SumOfProducts</b>(as::SeqEnum[AlgEtQElt],bs::SeqEnum[FldRatElt]) -> AlgEtQElt</pre>
-*Given sequences as and bs, such that #as eq #bs, returns `&+[as[i]\*bs[i] : i in [1..#as]]`. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.*
+*Given sequences as and bs, such that #as eq #bs, returns &+[as[i]\*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.*
 
 > <pre><b>MinimalPolynomial</b>(x::AlgEtQElt) -> RngUPolElt</pre>
 *Returns the minimal polynommial over the common base ring of the number fields defining A of the element x.*
@@ -254,27 +254,6 @@
 
 > <pre><b>Idempotents</b>(A::AlgEtQ) -> SeqEnum</pre>
 *Returns the ideampotent element of the étale algebra A.*
-
-
-## List of instrinsics in AlgEtQ/TraceNorm.m:
-
-> <pre><b>Trace</b>(x::AlgEtQElt) -> Any</pre>
-*Returns the trace of the element x of an étale algebra.*
-
-> <pre><b>Norm</b>(x::AlgEtQElt) -> Any</pre>
-*Returns the norm of the element x of an étale algebra.*
-
-> <pre><b>AbsoluteTrace</b>(x::AlgEtQElt) -> Any</pre>
-*Returns the absolute trace of the element x of an étale algebra.*
-
-> <pre><b>AbsoluteNorm</b>(x::AlgEtQElt) -> Any</pre>
-*Returns the absolute norm of the element x of an étale algebra.*
-
-> <pre><b>TraceDualIdeal</b>(I::AlgEtQIdl) -> AlgEtQIdl</pre>
-*Returns the trace dual ideal of an ideal in an order in an etale algebra.*
-
-> <pre><b>TraceDualIdeal</b>(O::AlgEtQOrd) -> AlgEtQIdl</pre>
-*Returns the trace dual ideal of an order in an etale algebra.*
 
 
 ## List of instrinsics in AlgEtQ/Ord.m:
@@ -626,6 +605,27 @@
 
 > <pre><b>ZBasisLLL</b>(S::AlgEtQIdl)</pre>
 *A procedure that replaces the ZBasis with an LLL-reduced one.*
+
+
+## List of instrinsics in AlgEtQ/TraceNorm.m:
+
+> <pre><b>Trace</b>(x::AlgEtQElt) -> Any</pre>
+*Returns the trace of the element x of an étale algebra.*
+
+> <pre><b>Norm</b>(x::AlgEtQElt) -> Any</pre>
+*Returns the norm of the element x of an étale algebra.*
+
+> <pre><b>AbsoluteTrace</b>(x::AlgEtQElt) -> Any</pre>
+*Returns the absolute trace of the element x of an étale algebra.*
+
+> <pre><b>AbsoluteNorm</b>(x::AlgEtQElt) -> Any</pre>
+*Returns the absolute norm of the element x of an étale algebra.*
+
+> <pre><b>TraceDualIdeal</b>(I::AlgEtQIdl) -> AlgEtQIdl</pre>
+*Returns the trace dual ideal of an ideal in an order in an etale algebra.*
+
+> <pre><b>TraceDualIdeal</b>(O::AlgEtQOrd) -> AlgEtQIdl</pre>
+*Returns the trace dual ideal of an order in an etale algebra.*
 
 
 ## List of instrinsics in AlgEtQ/Completion.m:

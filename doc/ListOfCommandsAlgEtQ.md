@@ -208,16 +208,16 @@
 *Given sequences as and bs, such that #as eq #bs, returns `&+[as[i]\*bs[i] : i in [1..#as]]`. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.*
 
 > <pre><b>SumOfProducts</b>(as::SeqEnum[RngIntElt],bs::SeqEnum[AlgEtQElt]) -> AlgEtQElt</pre>
-*Given sequences as and bs, such that #as eq #bs, returns &+[as[i]\*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.*
+*Given sequences as and bs, such that #as eq #bs, returns `&+[as[i]\*bs[i] : i in [1..#as]]`. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.*
 
 > <pre><b>SumOfProducts</b>(as::SeqEnum[FldRatElt],bs::SeqEnum[AlgEtQElt]) -> AlgEtQElt</pre>
-*Given sequences as and bs, such that #as eq #bs, returns &+[as[i]\*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.*
+*Given sequences as and bs, such that #as eq #bs, returns `&+[as[i]\*bs[i] : i in [1..#as]]`. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.*
 
 > <pre><b>SumOfProducts</b>(as::SeqEnum[AlgEtQElt],bs::SeqEnum[RngIntElt]) -> AlgEtQElt</pre>
-*Given sequences as and bs, such that #as eq #bs, returns &+[as[i]\*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.*
+*Given sequences as and bs, such that #as eq #bs, returns `&+[as[i]\*bs[i] : i in [1..#as]]`. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.*
 
 > <pre><b>SumOfProducts</b>(as::SeqEnum[AlgEtQElt],bs::SeqEnum[FldRatElt]) -> AlgEtQElt</pre>
-*Given sequences as and bs, such that #as eq #bs, returns &+[as[i]\*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.*
+*Given sequences as and bs, such that #as eq #bs, returns `&+[as[i]\*bs[i] : i in [1..#as]]`. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.*
 
 > <pre><b>MinimalPolynomial</b>(x::AlgEtQElt) -> RngUPolElt</pre>
 *Returns the minimal polynommial over the common base ring of the number fields defining A of the element x.*

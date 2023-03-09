@@ -13,6 +13,7 @@
 
     clean:=function(str0)
     // removes "\n" and " " from the beginning and the end of the string;
+    // replace * with \*
         str:=str0;
         for i in [1,2] do
             while str[#str] in {"\n"," "} do
@@ -20,6 +21,7 @@
             end while;
             str:=Reverse(str);
         end for;
+        str:=SubstituteString(str,"*","\\*");
         return str;
     end function;
 

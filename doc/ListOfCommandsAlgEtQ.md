@@ -1,5 +1,4 @@
 ## List of instrinsics in AlgEtQ/AlgEt.m:
---
 
 <pre>
 <b>EtaleAlgebra</b>(seq::SeqEnum[FldNum]) -> AlgEtQ
@@ -18,7 +17,6 @@
 
 
 ## List of instrinsics in AlgEtQ/AlgEtAttributes.m:
---
 
 <pre>
 <b>Print</b>(A::AlgEtQ)
@@ -67,7 +65,6 @@
 
 
 ## List of instrinsics in AlgEtQ/Homs.m:
---
 
 <pre>
 <b>HomsToC</b>(A::AlgEtQ : Precision:=30)->SeqEnum[Map]
@@ -76,7 +73,6 @@
 
 
 ## List of instrinsics in AlgEtQ/Elt.m:
---
 
 <pre>
 <b>Print</b>(x::AlgEtQElt)
@@ -430,7 +426,6 @@
 
 
 ## List of instrinsics in AlgEtQ/TraceNorm.m:
---
 
 <pre>
 <b>Trace</b>(x::AlgEtQElt) -> Any
@@ -464,7 +459,6 @@
 
 
 ## List of instrinsics in AlgEtQ/Ord.m:
---
 
 <pre>
 <b>Print</b>(A::AlgEtQOrd)
@@ -613,7 +607,6 @@
 
 
 ## List of instrinsics in AlgEtQ/Quotients.m:
---
 
 <pre>
 <b>Quotient</b>(I::AlgEtQIdl, zbJ::SeqEnum[AlgEtQElt]) -> GrpAb, Map
@@ -679,7 +672,6 @@
 
 
 ## List of instrinsics in AlgEtQ/OverOrders.m:
---
 
 <pre>
 <b>IsMaximalAtPrime</b>(R::AlgEtQOrd, P::AlgEtQIdl) -> BoolElt
@@ -713,7 +705,6 @@
 
 
 ## List of instrinsics in AlgEtQ/GraphOverOrders.m:
---
 
 <pre>
 <b>GraphOverOrders</b>(R:AlgEtQOrd) -> GrphDir
@@ -722,7 +713,6 @@
 
 
 ## List of instrinsics in AlgEtQ/Idl.m:
---
 
 <pre>
 <b>Ideal</b>(S::AlgEtQOrd, gens::SeqEnum) -> AlgEtQIdl
@@ -1021,7 +1011,6 @@
 
 
 ## List of instrinsics in AlgEtQ/ZBasisLLL.m:
---
 
 <pre>
 <b>ZBasisLLL</b>(S::AlgEtQOrd)
@@ -1035,7 +1024,6 @@
 
 
 ## List of instrinsics in AlgEtQ/Completion.m:
---
 
 <pre>
 <b>Completion</b>(P::AlgEtQIdl : MinPrecision:=20) -> FldPad,Map
@@ -1044,7 +1032,6 @@
 
 
 ## List of instrinsics in AlgEtQ/ComplexConj.m:
---
 
 <pre>
 <b>HasComplexConjugate</b>(A::AlgEtQ) -> BoolElt
@@ -1078,7 +1065,6 @@
 
 
 ## List of instrinsics in AlgEtQ/ComplexMult.m:
---
 
 <pre>
 <b>CMType</b>(seq::SeqEnum[Map]) -> AlgEtQCMType
@@ -1147,7 +1133,6 @@
 
 
 ## List of instrinsics in AlgEtQ/IntermediateIdeals.m:
---
 
 <pre>
 <b>MinimalIntermediateIdeals</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]
@@ -1201,7 +1186,6 @@
 
 
 ## List of instrinsics in AlgEtQ/IdealsOfIndex.m:
---
 
 <pre>
 <b>IdealsOfIndex</b>(O::RngOrd, N::RngIntElt) -> SeqEnum[RngOrdIdl]
@@ -1230,7 +1214,6 @@
 
 
 ## List of instrinsics in AlgEtQ/ShortEltSmallRep.m:
---
 
 <pre>
 <b>ShortElement</b>(I::AlgEtQIdl) ->AlgEtQElt
@@ -1244,7 +1227,6 @@
 
 
 ## List of instrinsics in AlgEtQ/MinimalGenerators.m:
---
 
 <pre>
 <b>TwoGeneratingSet</b>(I::AlgEtQIdl)
@@ -1253,7 +1235,6 @@
 
 
 ## List of instrinsics in AlgEtQ/CRT.m:
---
 
 <pre>
 <b>ChineseRemainderTheorem</b>(Is::SeqEnum[AlgEtQIdl],as::SeqEnum[AlgEtQElt])-> AlgEtQElt
@@ -1267,7 +1248,6 @@
 
 
 ## List of instrinsics in AlgEtQ/PicardGroup.m:
---
 
 <pre>
 <b>ResidueRingUnits</b>(S::AlgEtQOrd,I::AlgEtQIdl) -> GrpAb,Map
@@ -1296,7 +1276,6 @@
 
 
 ## List of instrinsics in AlgEtQ/FactPrimes.m:
---
 
 <pre>
 <b>Factorization</b>(I::AlgEtQIdl) -> Tup
@@ -1340,7 +1319,6 @@
 
 
 ## List of instrinsics in AlgEtQ/TotRealTotPos.m:
---
 
 <pre>
 <b>IsTotallyReal</b>(a::AlgEtQElt) -> BoolElt
@@ -1369,7 +1347,6 @@
 
 
 ## List of instrinsics in AlgEtQ/PrintSave.m:
---
 
 <pre>
 <b>PrintSeqAlgEtQElt</b>(seq::SeqEnum[AlgEtQElt]) -> SeqEnum,MonStgElt
@@ -1388,7 +1365,6 @@
 
 
 ## List of instrinsics in AlgEtQ/LowCohenMacaulayType.m:
---
 
 <pre>
 <b>NonGorensteinPrimes</b>(S::AlgEtQOrd)->SeqEnum,SeqEnum
@@ -1407,7 +1383,6 @@
 
 
 ## List of instrinsics in AlgEtQ/WkClasses.m:
---
 
 <pre>
 <b>WKICM_bar</b>(S::AlgEtQOrd : Method:="Auto") -> SeqEnum
@@ -1421,7 +1396,6 @@
 
 
 ## List of instrinsics in AlgEtQ/WkTesting.m:
---
 
 <pre>
 <b>IsWeakEquivalent</b>(I::AlgEtQIdl,J::AlgEtQIdl)->BoolElt
@@ -1450,7 +1424,6 @@
 
 
 ## List of instrinsics in AlgEtQ/IdealClassMonoid.m:
---
 
 <pre>
 <b>ICM_bar</b>(S::AlgEtQOrd : GRH:=false ) -> SeqEnum

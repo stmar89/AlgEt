@@ -32,12 +32,12 @@ intrinsic Norm(x::AlgEtQElt) -> Any
 end intrinsic;
 
 intrinsic AbsoluteTrace(x::AlgEtQElt) -> Any
-{Returns the absolute trace of the element x of an étale algebra.}
+{Returns the absolute trace of the element x of an étale algebra. Since the étale algebra is over the rationals this is the same as Trace.}
     return &+[AbsoluteTrace(y) : y in Components(x)];
 end intrinsic;
 
 intrinsic AbsoluteNorm(x::AlgEtQElt) -> Any
-{Returns the absolute norm of the element x of an étale algebra.}
+{Returns the absolute norm of the element x of an étale algebra. Since the étale algebra is over the rationals this is the same as Norm.}
     return &*[AbsoluteNorm(y) : y in Components(x)];
 end intrinsic;
 
@@ -47,7 +47,7 @@ end intrinsic;
 //------------
 
 intrinsic TraceDualIdeal(I::AlgEtQIdl) -> AlgEtQIdl
-{Returns the trace dual ideal of an ideal in an order in an etale algebra.}
+{Returns the trace dual ideal of the ideal I, that is, the set of elements x of the algebra such that Trace(x*I) is integer-valued.}
     if not assigned I`TraceDualIdeal then
         A:=Algebra(I);
         require PrimeField(A) eq BaseField(A) : "implementend only for algebras over the prime field";
@@ -75,7 +75,7 @@ intrinsic TraceDualIdeal(I::AlgEtQIdl) -> AlgEtQIdl
 end intrinsic;
 
 intrinsic TraceDualIdeal(O::AlgEtQOrd) -> AlgEtQIdl
-{Returns the trace dual ideal of an order in an etale algebra.}
+{Returns the trace dual ideal of an order in an etale algebra, that is, the set of elements x of the algebra such that Trace(x*O) is integer-valued.}
     if not assigned O`TraceDualIdeal then
         Ot:=TraceDualIdeal(OneIdeal(O));
         O`TraceDualIdeal := Ot;

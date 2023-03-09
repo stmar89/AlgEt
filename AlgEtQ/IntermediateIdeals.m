@@ -52,7 +52,7 @@ intrinsic MinimalIntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQId
 end intrinsic;
 
 intrinsic IntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]
-{Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that J subset K subset I. They are produced recursively using from the minimal ones.}
+{Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that J subset K subset I. They are produced recursively from the minimal ones.}
     require J subset I : "The ideal J needs to be inside I";
     require Order(I) eq Order(J) : "The ideals must be over the same order";
     queue:={@ J @};
@@ -68,7 +68,7 @@ intrinsic IntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]
 end intrinsic;
 
 intrinsic IntermediateIdealsWithPrescribedMultiplicatorRing(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]
-{Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that (K:K)=S and  J subset K subset I. They are produced recursively using from the minimal ones.}
+{Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that (K:K)=S and  J subset K subset I. They are produced recursively from the minimal ones.}
     require J subset I : "The ideal J needs to be inside I";
     S:=Order(I);
     require S eq Order(J) : "The ideals must be over the same order";
@@ -121,24 +121,11 @@ intrinsic MaximalIntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQId
     end if;
 end intrinsic;
 
-// // Using TraceDualIdeal. Slightly slower 
-// intrinsic MaximalIntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]
-// { Given fractional S-ideals J subset I, returns the maximal (with respect to inclusion) fractional S-ideals K such that J subset K subset I. }
-//     assert2 J subset I; // "the ideal J needs to be inside I";
-//     S:=Order(I);
-//     assert2 S eq Order(J); // "The ideals must be over the same order";
-//     if J eq I then 
-//         return {@ @};
-//     else
-//         // I c K c J is a maximal intermediate module iff K^t is a minimal intermediate module J^t c K^t c I^t.
-//         min_duals:=MinimalIntermediateIdeals(TraceDualIdeal(J), TraceDualIdeal(I));
-//         max:={@ TraceDualIdeal(K) : K in min_duals @};
-//         return max;
-//     end if;
-// end intrinsic;
-
 intrinsic IntermediateIdealsWithTrivialExtension(I::AlgEtQIdl,J::AlgEtQIdl, O::AlgEtQOrd)->SetIndx[AlgEtQIdl]
-{Given fractional S-ideals J subset I, returns all the fractional S-ideals K J subset K subset I, and O!!K = I. Note that we need O subset (J:J). They are produced recursively using from the maximal ones.}
+{Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that
+- J subset K subset I, and 
+- O!!K = I. 
+Note that we need O subset (J:J). They are produced recursively using from the maximal ones.}
     require J subset I : "The ideal J needs to be inside I";
     S:=Order(I);
     require S eq Order(J) : "The ideals must be over the same order";
@@ -161,7 +148,11 @@ intrinsic IntermediateIdealsWithTrivialExtension(I::AlgEtQIdl,J::AlgEtQIdl, O::A
 end intrinsic;
 
 intrinsic IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing(I::AlgEtQIdl,J::AlgEtQIdl, O::AlgEtQOrd)->SetIndx[AlgEtQIdl]
-{Given fractional S-ideals J subset I, returns all the fractional S-ideals K J subset K subset I, O!!K = I, and (K:K) eq S. Note that we need O subset (J:J). They are produced recursively using from the maximal ones.}
+{Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that 
+- J subset K subset I, 
+- O!!K = I, and 
+- (K:K) eq S. 
+Note that we need O subset (J:J). They are produced recursively using from the maximal ones.}
     require J subset I : "The ideal J needs to be inside I";
     S:=Order(I);
     require S eq Order(J) : "The ideals must be over the same order";
@@ -184,7 +175,10 @@ intrinsic IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing(I
 end intrinsic;
 
 intrinsic IntermediateIdealsOfIndex(I::AlgEtQIdl,J::AlgEtQIdl,N::RngIntElt)->SetIndx[AlgEtQIdl]
-{Given ideals J subset I over the same order, and a positive integer N, it returns all the ideals K such that J subset K subset I and [I:K]=N. These are produced by recursively searching for maximal submodules.}
+{Given ideals J subset I over the same order, and a positive integer N, it returns all the ideals K such that 
+- J subset K subset I, and 
+- [I:K]=N. 
+These are produced by recursively searching for maximal submodules.}
     require J subset I : "The ideal J needs to be inside I";
     require N gt 0 : "N must be a strictly positive integer";
     S:=Order(I);
@@ -210,61 +204,6 @@ intrinsic IntermediateIdealsOfIndex(I::AlgEtQIdl,J::AlgEtQIdl,N::RngIntElt)->Set
     end while;
     return output;
 end intrinsic;
-
-/* // this version of the code seems to be a tiny bit slower
-
-intrinsic MinimalIntermediateIdealsVS(I::AlgEtQIdl,J::AlgEtQIdl : primes:=[])->SetIndx[AlgEtQIdl]
-{ Given fractional S-ideals J subset I, returns the minimal with respect to inclusion fractional S-ideals K such that J subset K subset I. }
-    assert2 J subset I; // "the ideal J needs to be inside I";
-    S:=Order(I);
-    assert2 S eq Order(J); // "The ideals must be over the same order";
-    if J eq I then 
-        return {@ @};
-    else
-        gens_J_over_S:=Generators(J);
-        min_ideals:={@ @};
-        // Following code is based on the following Lemma.
-        // LEMMA: Let M be a finite S-module (eg I/J). Let N be a minimal submodule of M. 
-        // Then there exists a maximal ideal P of S such that PN=0;
-        // In particular, N is a submodule of the S/P vector space M[P]={ m in M | Pm=0 }.
-        // PROOF: PN is a submodule of N. Since N is minimal PN=N or PN=0. 
-        // The second case occurs iff P contains Ann_S(N).
-        // QED
-        ccJImeetS:=ColonIdeal(J,I) meet OneIdeal(S);
-        if #primes eq 0 then
-            pp:=PrimesAbove(ccJImeetS); 
-        else
-            pp:=[ P : P in primes | ccJImeetS subset P ];
-        end if;
-        for P in pp do
-            V,v:=QuotientVS(I meet ColonIdeal(J,P),J,P);
-            min_Rmod:=MinimalSubmodules(V); //1-dimensional vector spaces
-            min_ideals join:={@ Ideal(S, gens_J_over_S cat [ (V!w)@@v : w in Basis(W)]) : W in min_Rmod @};
-        end for;
-        return min_ideals;
-    end if;
-end intrinsic;
-
-intrinsic IntermediateIdealsVS(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]
-{ Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that J subset K subset I. They are produced recursively using from the minimal ones }
-    S:=Order(I);
-    require J subset I : "The ideal J needs to be inside I";
-    // require S eq Order(J) : "The ideals must be over the same order"; //done in ColonIdeal
-    primes:=PrimesAbove(ColonIdeal(J,I) meet OneIdeal(S)); 
-    queue:={@ J @};
-    output:={@ J @};
-    done:={@ @};
-    while #queue gt 0 do
-        //output join:=queue; //I think this is redundant
-        pot_new:=&join[MinimalIntermediateIdealsVS(I,elt : primes:=primes ) : elt in queue ];
-        output join:=pot_new;
-        done join:=queue;
-        queue := pot_new diff done;
-    end while;
-    return output;
-end intrinsic;
-*/
-
 
 /* TESTS
 

@@ -25,7 +25,7 @@ declare attributes AlgEtQCMType : Homs, // homs from Q(Frob) of the isogeny clas
 /////////////////////////////////////////////////////
 
 intrinsic CMType(seq::SeqEnum[Map]) -> AlgEtQCMType
-{Given a sequence seq of homomorphisms from a CM-algebra to CC, one per conjugate pair, it returns the corresponding CMType.}
+{Given a sequence seq of homomorphisms from a CM-algebra to CC, one per conjugate pair, it returns the corresponding CMType}
     A:=Domain(seq[1]);
     assert &and[Domain(s) eq A : s in seq[2..#seq]];
     g:=Dimension(A) div 2;
@@ -44,7 +44,7 @@ intrinsic CreateCMType(seq::SeqEnum[Map]) -> AlgEtQCMType
 end intrinsic;
 
 intrinsic CMType( b::AlgEtQElt  ) -> AlgEtQCMType
-{Given a totally imginary element b, it returns the CMType PHI for which b is PHI-positive.}
+{Given a totally imginary element b, it returns the CMType PHI for which b is PHI-positive, that is, Im(phi(b))>0 for every phi in PHI.}
     assert not IsZeroDivisor(b) and (b eq -ComplexConjugate(b));
     PHI:=New(AlgEtQCMType);
     PHI`CMPositiveElement:=b;
@@ -101,7 +101,7 @@ intrinsic CMPosElt( PHI::AlgEtQCMType )->AlgEtQElt
 end intrinsic;
 
 intrinsic Homs( PHI::AlgEtQCMType : prec:=30 )->SeqEnum[Map]
-{Given a AlgEtQCMType PHI returns the sequence of maps to CC defining it.}
+{Given a AlgEtQCMType PHI returns the sequence of maps to the complex field. The vararg prec (default value 30) determines the precision of the codomains of the maps.}
     if not assigned PHI`Homs then
         b:=CMPositiveElement(PHI);
         A:=Parent(b); 
@@ -114,7 +114,7 @@ intrinsic Homs( PHI::AlgEtQCMType : prec:=30 )->SeqEnum[Map]
 end intrinsic;
 
 intrinsic 'eq'(PHI1 :: AlgEtQCMType, PHI2::AlgEtQCMType : prec:=30)->BoolElt
-{Returns whether two cm types are equal. This happens if and only if the ration of (any) two CMPositiveElements is totally real and totally positive.}
+{Returns whether two cm types are equal. This happens if and only if the quotient of (any) two CMPositiveElements is totally real and totally positive.}
     A:=Domain(Homs(PHI1)[1]);
     assert forall{ phi : phi in Homs(PHI1) cat Homs(PHI2) | Domain(phi) eq A };
     homs:=HomsToC(A : Precision:=prec);
@@ -203,7 +203,7 @@ end intrinsic;
 /////////////////////////////////////////////////////
 
 intrinsic AllCMTypes(A::AlgEtQ : Precision := 30 ) -> SeqEnum[AlgEtQCMType]
-{Returns all the AlgEtQCMTypes of A.}
+{Returns all the AlgEtQCMTypes of A. The vararg Precision determined the precision of the codomain of the maps defining the CMTypes.}
     if not assigned A`AllCMTypes then
         // this uses the fact that if A HasComplexConjugation then HomsToC come in conjugate pairs
         cc:=CartesianProduct(Partition([ h: h in HomsToC(A : Precision:=Precision )],2));

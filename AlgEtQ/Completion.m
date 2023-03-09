@@ -9,7 +9,7 @@ freeze;
 /////////////////////////////////////////////////////
 
 intrinsic Completion(P::AlgEtQIdl : MinPrecision:=20) -> FldPad,Map
-{Given a prime ideal of the maximal order of an etale algebra L it returns the p-adic field corresponding to the completion LP and a homormophism map:L->LP. The vararg MinPrecision is passed to Completion. map has preimage (it acts a bit weird).}
+{Given a prime ideal of the maximal order of an etale algebra L it returns the p-adic field corresponding to the completion LP and a homormophism map:L->LP. The vararg MinPrecision is passed to Completion. map has preimage.}
     L:=Algebra(P);
     require IsMaximal(Order(P)) and IsPrime(P) : "the ideal must be a prime ideal of the maximal order";
     nfs,embs:=Components(L);

@@ -559,25 +559,25 @@
 <em>Let I, J be orders, P a fractional R-ideals such that:
  - P is prime of of some order R, with residue field K;
  - J in I and I/J is a vector space V over K, say of dimension d.
- The function returns the KModule K^d=V and the natural surjection I->V (with pre-image).</em>
+ The function returns the KModule K^d=V and the natural surjection I->V (with preimages).</em>
 
 > <pre><b>QuotientVS</b>(I::AlgEtQOrd, J::AlgEtQIdl, P::AlgEtQIdl) -> ModRng, Map</pre>
 <em>Let I be an order, J and  P be fractional R-ideals such that:
  - P is prime of of some order R, with residue field K;
  - J in I and I/J is a vector space V over K, say of dimension d.
- The function returns the KModule K^d=V and the natural surjection I->V (with pre-image).</em>
+ The function returns the KModule K^d=V and the natural surjection I->V (with preimages).</em>
 
 > <pre><b>QuotientVS</b>(I::AlgEtQIdl, J::AlgEtQOrd, P::AlgEtQIdl) -> ModRng, Map</pre>
 <em>Let J be an order, I and  P be fractional R-ideals such that:
  - P is prime of of some order R, with residue field K;
  - J in I and I/J is a vector space V over K, say of dimension d.
- The function returns the KModule K^d=V and the natural surjection I->V (with pre-image).</em>
+ The function returns the KModule K^d=V and the natural surjection I->V (with preimages).</em>
 
 > <pre><b>QuotientVS</b>(I::AlgEtQIdl, J::AlgEtQIdl, P::AlgEtQIdl) -> ModRng, Map</pre>
 <em>Let I, J, P be fractional R-ideals such that:
  - P is prime of of some order R;
  - J in I and I/J is a vector space over R/P, say of dimension d;
- the function returns the KModule K^d=V and the natural surjection I->V (with pre-image).</em>
+ the function returns the KModule K^d=V and the natural surjection I->V (with preimages).</em>
 
 
 ## List of instrinsics in AlgEtQ/OverOrders.m:
@@ -595,10 +595,10 @@
 <em>Given an order R and prime P of R, it returns R and the overorders S of R with conductor (R:S) which is P-primary. We recursively produce the minimal PP-overorders where PP are primes above P. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.</em>
 
 > <pre><b>OverOrders</b>(R::AlgEtQOrd : populateoo_in_oo:=false) -> SeqEnum[AlgEtQOrd]</pre>
-<em>We compute all the overorders of R. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana. The Vararg "populateoo_inoo" (default false) determines whether we should fill the attribute T`OverOrders for every overorder T of R.</em>
+<em>We compute all the overorders of R. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana. The Vararg "populateoo_in_oo" (default false) determines whether we should fill the attribute T`OverOrders for every overorder T of R.</em>
 
 > <pre><b>FindOverOrders</b>(R::AlgEtQOrd : populateoo_in_oo:=false) -> SetIndx[AlgEtQOrd]</pre>
-<em>We compute all the overorders of R. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana. The Vararg "populateoo_inoo" (default false) determines whether we should fill the attribute T`OverOrders for every overorder T of R.</em>
+<em>We compute all the overorders of R. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana. The Vararg "populateoo_in_oo" (default false) determines whether we should fill the attribute T`OverOrders for every overorder T of R.</em>
 
 
 ## List of instrinsics in AlgEtQ/GraphOverOrders.m:
@@ -616,22 +616,22 @@
 <em>Returns the norm of the element x of an étale algebra.</em>
 
 > <pre><b>AbsoluteTrace</b>(x::AlgEtQElt) -> Any</pre>
-<em>Returns the absolute trace of the element x of an étale algebra.</em>
+<em>Returns the absolute trace of the element x of an étale algebra. Since the étale algebra is over the rationals this is the same as Trace.</em>
 
 > <pre><b>AbsoluteNorm</b>(x::AlgEtQElt) -> Any</pre>
-<em>Returns the absolute norm of the element x of an étale algebra.</em>
+<em>Returns the absolute norm of the element x of an étale algebra. Since the étale algebra is over the rationals this is the same as Norm.</em>
 
 > <pre><b>TraceDualIdeal</b>(I::AlgEtQIdl) -> AlgEtQIdl</pre>
-<em>Returns the trace dual ideal of an ideal in an order in an etale algebra.</em>
+<em>Returns the trace dual ideal of the ideal I, that is, the set of elements x of the algebra such that Trace(x\*I) is integer-valued.</em>
 
 > <pre><b>TraceDualIdeal</b>(O::AlgEtQOrd) -> AlgEtQIdl</pre>
-<em>Returns the trace dual ideal of an order in an etale algebra.</em>
+<em>Returns the trace dual ideal of an order in an etale algebra, that is, the set of elements x of the algebra such that Trace(x\*O) is integer-valued.</em>
 
 
 ## List of instrinsics in AlgEtQ/Completion.m:
 
 > <pre><b>Completion</b>(P::AlgEtQIdl : MinPrecision:=20) -> FldPad,Map</pre>
-<em>Given a prime ideal of the maximal order of an etale algebra L it returns the p-adic field corresponding to the completion LP and a homormophism map:L->LP. The vararg MinPrecision is passed to Completion. map has preimage (it acts a bit weird).</em>
+<em>Given a prime ideal of the maximal order of an etale algebra L it returns the p-adic field corresponding to the completion LP and a homormophism map:L->LP. The vararg MinPrecision is passed to Completion. map has preimage.</em>
 
 
 ## List of instrinsics in AlgEtQ/ComplexConj.m:
@@ -643,28 +643,28 @@
 <em>If A is a product of CM fields, it returns the complex conjugate of the argument.</em>
 
 > <pre><b>IsConjugateStable</b>(O::AlgEtQOrd) -> BoolElt,AlgEtQOrd</pre>
-<em>Returns wheter O is conjugate stable and the complex conjugate.</em>
+<em>Given an order O in a CM-étale algebra, it returns wheter O is conjugate stable and the complex conjugate.</em>
 
 > <pre><b>ComplexConjugate</b>(O::AlgEtQOrd) -> AlgEtQOrd</pre>
-<em>It returns the complex conjugate of the argument.</em>
+<em>Given an order O in a CM-étale algebra, it returns the complex conjugate of the argument.</em>
 
 > <pre><b>IsConjugateStable</b>(I::AlgEtQIdl) -> BoolElt,AlgEtQIdl</pre>
-<em>Returns wheter O is conjugate stable and the complex conjugate.</em>
+<em>Given a fractional ideal I in a CM-étale algebra, it returns wheter I is conjugate stable and the complex conjugate. Note: if the order of I is not conjugate stable, then the second output will be defined over the complex conjugate of the order.</em>
 
 > <pre><b>ComplexConjugate</b>(I::AlgEtQIdl) -> AlgEtQIdl</pre>
-<em>If A is a product of CM fields, it returns the complex conjugate of the argument.</em>
+<em>If A is a product of CM fields, it returns the complex conjugate of the fractional ideal I. Note: if the order of I is not conjugate stable, then the output will be defined over the complex conjugate of the order.</em>
 
 
 ## List of instrinsics in AlgEtQ/ComplexMult.m:
 
 > <pre><b>CMType</b>(seq::SeqEnum[Map]) -> AlgEtQCMType</pre>
-<em>Given a sequence seq of homomorphisms from a CM-algebra to CC, one per conjugate pair, it returns the corresponding CMType.</em>
+<em>Given a sequence seq of homomorphisms from a CM-algebra to CC, one per conjugate pair, it returns the corresponding CMType</em>
 
 > <pre><b>CreateCMType</b>(seq::SeqEnum[Map]) -> AlgEtQCMType</pre>
 <em>Given a sequence seq of homomorphisms from a CM-algebra to CC, one per conjugate pair, it returns the corresponding CMType.</em>
 
 > <pre><b>CMType</b>( b::AlgEtQElt  ) -> AlgEtQCMType</pre>
-<em>Given a totally imginary element b, it returns the CMType PHI for which b is PHI-positive.</em>
+<em>Given a totally imginary element b, it returns the CMType PHI for which b is PHI-positive, that is, Im(phi(b))>0 for every phi in PHI.</em>
 
 > <pre><b>CreateCMType</b>( b::AlgEtQElt  ) -> AlgEtQCMType</pre>
 <em>Given a totally imginary element b, it returns the CMType PHI for which b is PHI-positive.</em>
@@ -679,10 +679,10 @@
 <em>Given a CMType PHI returns a totally imaginary PHI-positive element (which uniquely determines PHI).</em>
 
 > <pre><b>Homs</b>( PHI::AlgEtQCMType : prec:=30 )->SeqEnum[Map]</pre>
-<em>Given a AlgEtQCMType PHI returns the sequence of maps to CC defining it.</em>
+<em>Given a AlgEtQCMType PHI returns the sequence of maps to the complex field. The vararg prec (default value 30) determines the precision of the codomains of the maps.</em>
 
 > <pre><b>'eq'</b>(PHI1 :: AlgEtQCMType, PHI2::AlgEtQCMType : prec:=30)->BoolElt</pre>
-<em>Returns whether two cm types are equal. This happens if and only if the ration of (any) two CMPositiveElements is totally real and totally positive.</em>
+<em>Returns whether two cm types are equal. This happens if and only if the quotient of (any) two CMPositiveElements is totally real and totally positive.</em>
 
 > <pre><b>Precision</b>(PHI :: AlgEtQCMType)->RngIntElt</pre>
 <em>Returns the precision of the given CM-type, that is, the codomain of each homomorphism will be ComplexField(Precision).</em>
@@ -694,7 +694,7 @@
 <em>Changes the precision of the given CM-type, that is, the codomain of each homomorphism will be ComplexField(Precision).</em>
 
 > <pre><b>AllCMTypes</b>(A::AlgEtQ : Precision := 30 ) -> SeqEnum[AlgEtQCMType]</pre>
-<em>Returns all the AlgEtQCMTypes of A.</em>
+<em>Returns all the AlgEtQCMTypes of A. The vararg Precision determined the precision of the codomain of the maps defining the CMTypes.</em>
 
 
 ## List of instrinsics in AlgEtQ/IntermediateIdeals.m:
@@ -703,31 +703,32 @@
 <em>Given fractional S-ideals J subset I, returns the minimal (with respect to inclusion) fractional S-ideals K such that J subset K subset I.</em>
 
 > <pre><b>IntermediateIdeals</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]</pre>
-<em>Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that J subset K subset I. They are produced recursively using from the minimal ones.</em>
+<em>Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that J subset K subset I. They are produced recursively from the minimal ones.</em>
 
 > <pre><b>IntermediateIdealsWithPrescribedMultiplicatorRing</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]</pre>
-<em>Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that (K:K)=S and  J subset K subset I. They are produced recursively using from the minimal ones.</em>
-
-> <pre><b>MaximalIntermediateIdeals</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]</pre>
-<em>Given fractional S-ideals J subset I, returns the maximal (with respect to inclusion) fractional S-ideals K such that J subset K subset I.</em>
+<em>Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that (K:K)=S and  J subset K subset I. They are produced recursively from the minimal ones.</em>
 
 > <pre><b>MaximalIntermediateIdeals</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]</pre>
 <em>Given fractional S-ideals J subset I, returns the maximal (with respect to inclusion) fractional S-ideals K such that J subset K subset I.</em>
 
 > <pre><b>IntermediateIdealsWithTrivialExtension</b>(I::AlgEtQIdl,J::AlgEtQIdl, O::AlgEtQOrd)->SetIndx[AlgEtQIdl]</pre>
-<em>Given fractional S-ideals J subset I, returns all the fractional S-ideals K J subset K subset I, and O!!K = I. Note that we need O subset (J:J). They are produced recursively using from the maximal ones.</em>
+<em>Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that
+- J subset K subset I, and 
+- O!!K = I. 
+Note that we need O subset (J:J). They are produced recursively using from the maximal ones.</em>
 
 > <pre><b>IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing</b>(I::AlgEtQIdl,J::AlgEtQIdl, O::AlgEtQOrd)->SetIndx[AlgEtQIdl]</pre>
-<em>Given fractional S-ideals J subset I, returns all the fractional S-ideals K J subset K subset I, O!!K = I, and (K:K) eq S. Note that we need O subset (J:J). They are produced recursively using from the maximal ones.</em>
+<em>Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that 
+- J subset K subset I, 
+- O!!K = I, and 
+- (K:K) eq S. 
+Note that we need O subset (J:J). They are produced recursively using from the maximal ones.</em>
 
 > <pre><b>IntermediateIdealsOfIndex</b>(I::AlgEtQIdl,J::AlgEtQIdl,N::RngIntElt)->SetIndx[AlgEtQIdl]</pre>
-<em>Given ideals J subset I over the same order, and a positive integer N, it returns all the ideals K such that J subset K subset I and [I:K]=N. These are produced by recursively searching for maximal submodules.</em>
-
-> <pre><b>MinimalIntermediateIdealsVS</b>(I::AlgEtQIdl,J::AlgEtQIdl : primes:=[])->SetIndx[AlgEtQIdl]</pre>
-<em>Given fractional S-ideals J subset I, returns the minimal with respect to inclusion fractional S-ideals K such that J subset K subset I.</em>
-
-> <pre><b>IntermediateIdealsVS</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]</pre>
-<em>Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that J subset K subset I. They are produced recursively using from the minimal ones</em>
+<em>Given ideals J subset I over the same order, and a positive integer N, it returns all the ideals K such that 
+- J subset K subset I, and 
+- [I:K]=N. 
+These are produced by recursively searching for maximal submodules.</em>
 
 
 ## List of instrinsics in AlgEtQ/IdealsOfIndex.m:

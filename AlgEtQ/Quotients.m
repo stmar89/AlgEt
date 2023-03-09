@@ -100,7 +100,7 @@ intrinsic QuotientVS(I::AlgEtQOrd, J::AlgEtQOrd, P::AlgEtQIdl) -> ModRng, Map
 {Let I, J be orders, P a fractional R-ideals such that:
  - P is prime of of some order R, with residue field K;
  - J in I and I/J is a vector space V over K, say of dimension d.
- The function returns the KModule K^d=V and the natural surjection I->V (with pre-image).}
+ The function returns the KModule K^d=V and the natural surjection I->V (with preimages).}
 	S := Order(P);
     return QuotientVS(S!!OneIdeal(I),S!!OneIdeal(J),P);
 end intrinsic;
@@ -109,7 +109,7 @@ intrinsic QuotientVS(I::AlgEtQOrd, J::AlgEtQIdl, P::AlgEtQIdl) -> ModRng, Map
 {Let I be an order, J and  P be fractional R-ideals such that:
  - P is prime of of some order R, with residue field K;
  - J in I and I/J is a vector space V over K, say of dimension d.
- The function returns the KModule K^d=V and the natural surjection I->V (with pre-image).}
+ The function returns the KModule K^d=V and the natural surjection I->V (with preimages).}
 	S := Order(P);
     return QuotientVS(S!!OneIdeal(I),S!!J,P);
 end intrinsic;
@@ -118,7 +118,7 @@ intrinsic QuotientVS(I::AlgEtQIdl, J::AlgEtQOrd, P::AlgEtQIdl) -> ModRng, Map
 {Let J be an order, I and  P be fractional R-ideals such that:
  - P is prime of of some order R, with residue field K;
  - J in I and I/J is a vector space V over K, say of dimension d.
- The function returns the KModule K^d=V and the natural surjection I->V (with pre-image).}
+ The function returns the KModule K^d=V and the natural surjection I->V (with preimages).}
 	S := Order(P);
     return QuotientVS(S!!I,S!!OneIdeal(J),P);
 end intrinsic;
@@ -127,7 +127,7 @@ intrinsic QuotientVS(I::AlgEtQIdl, J::AlgEtQIdl, P::AlgEtQIdl) -> ModRng, Map
 {Let I, J, P be fractional R-ideals such that:
  - P is prime of of some order R;
  - J in I and I/J is a vector space over R/P, say of dimension d;
- the function returns the KModule K^d=V and the natural surjection I->V (with pre-image).}
+ the function returns the KModule K^d=V and the natural surjection I->V (with preimages).}
 	S := Order(P);
     require Order(I) eq S and Order(J) eq S : "the ideals must be over the same order ";
     require J subset I : "Teh second argument should be a subset of the first.";

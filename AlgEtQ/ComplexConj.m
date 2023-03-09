@@ -30,7 +30,7 @@ intrinsic ComplexConjugate(x::AlgEtQElt) -> AlgEtQElt
 end intrinsic;
 
 intrinsic IsConjugateStable(O::AlgEtQOrd) -> BoolElt,AlgEtQOrd
-{Returns wheter O is conjugate stable and the complex conjugate.}
+{Given an order O in a CM-étale algebra, it returns wheter O is conjugate stable and the complex conjugate.}
     if not assigned O`IsConjugateStable then
         A:=Algebra(O);
         Ob:=Order([ ComplexConjugate(x) : x in ZBasis(O) ] : CheckIsKnownOrder:=false);
@@ -47,14 +47,14 @@ intrinsic IsConjugateStable(O::AlgEtQOrd) -> BoolElt,AlgEtQOrd
 end intrinsic;
 
 intrinsic ComplexConjugate(O::AlgEtQOrd) -> AlgEtQOrd
-{It returns the complex conjugate of the argument.}
+{Given an order O in a CM-étale algebra, it returns the complex conjugate of the argument.}
 	A:=Algebra(O);
     _,Ob:=IsConjugateStable(O); //if stable Ob = O, to preserve atttributes!
 	return Ob;
 end intrinsic;
 
 intrinsic IsConjugateStable(I::AlgEtQIdl) -> BoolElt,AlgEtQIdl
-{Returns wheter O is conjugate stable and the complex conjugate.}
+{Given a fractional ideal I in a CM-étale algebra, it returns wheter I is conjugate stable and the complex conjugate. Note: if the order of I is not conjugate stable, then the second output will be defined over the complex conjugate of the order.}
     if not assigned I`IsConjugateStable then
         O:=Order(I);
         A:=Algebra(O);
@@ -75,8 +75,8 @@ intrinsic IsConjugateStable(I::AlgEtQIdl) -> BoolElt,AlgEtQIdl
 end intrinsic;
 
 intrinsic ComplexConjugate(I::AlgEtQIdl) -> AlgEtQIdl
-{If A is a product of CM fields, it returns the complex conjugate of the argument.}
-    _,Ib:=IsConjugateStable(I); //if stable Ib = I, to preserve atttributes!
+{If A is a product of CM fields, it returns the complex conjugate of the fractional ideal I. Note: if the order of I is not conjugate stable, then the output will be defined over the complex conjugate of the order.}
+    _,Ib:=IsConjugateStable(I); //if stable Ib = I, to preserve attributes!
 	return Ib;
 end intrinsic;
 

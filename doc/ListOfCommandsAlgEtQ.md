@@ -1,1008 +1,900 @@
 ## List of instrinsics in AlgEtQ/AlgEt.m:
 
+> <pre><b>EtaleAlgebra</b>(seq::SeqEnum[FldNum]) -> AlgEtQ</pre>
+*Given a sequence of number fields returns the étale algebra corresponding to the direct product.*
 
-<dl>
-> <dt>`<b>EtaleAlgebra</b>(seq::SeqEnum[FldNum]) -> AlgEtQ`</dt>
-<dd>*Given a sequence of number fields returns the étale algebra corresponding to the direct product.</dd>*
+> <pre><b>EtaleAlgebra</b>(f::RngUPolElt[RngInt]) -> AlgEtQ</pre>
+*Given a squarefree polynomial over the integers returns the product of the number fields defined by the irreducible factors.*
 
-> <dt>`<b>EtaleAlgebra</b>(f::RngUPolElt[RngInt]) -> AlgEtQ`</dt>
-<dd>*Given a squarefree polynomial over the integers returns the product of the number fields defined by the irreducible factors.</dd>*
+> <pre><b>EtaleAlgebra</b>(f::RngUPolElt[FldRat]) -> AlgEtQ</pre>
+*Given a squarefree polynomial over the rationals returns the product of the number fields defined by the irreducible factors.*
 
-> <dt>`<b>EtaleAlgebra</b>(f::RngUPolElt[FldRat]) -> AlgEtQ`</dt>
-<dd>*Given a squarefree polynomial over the rationals returns the product of the number fields defined by the irreducible factors.</dd>*
-
-
-</dl>
 
 ## List of instrinsics in AlgEtQ/AlgEtAttributes.m:
 
+> <pre><b>Print</b>(A::AlgEtQ)</pre>
+*Prints the defining polynomial or the components defining A.*
 
-<dl>
-> <dt>`<b>Print</b>(A::AlgEtQ)`</dt>
-<dd>*Prints the defining polynomial or the components defining A.</dd>*
+> <pre><b>DefiningPolynomial</b>(A::AlgEtQ) -> RngUPolElt</pre>
+*Returns the defining polynomial of A, if the corresponding number fields are distinct.*
 
-> <dt>`<b>DefiningPolynomial</b>(A::AlgEtQ) -> RngUPolElt`</dt>
-<dd>*Returns the defining polynomial of A, if the corresponding number fields are distinct.</dd>*
+> <pre><b>Components</b>(A::AlgEtQ) -> SeqEnum</pre>
+*Returns the number fields of which A is a product of,together with embeddings and projections.*
 
-> <dt>`<b>Components</b>(A::AlgEtQ) -> SeqEnum`</dt>
-<dd>*Returns the number fields of which A is a product of,together with embeddings and projections.</dd>*
+> <pre><b>Dimension</b>(A::AlgEtQ)->RngInt</pre>
+*Dimension of A.*
 
-> <dt>`<b>Dimension</b>(A::AlgEtQ)->RngInt`</dt>
-<dd>*Dimension of A.</dd>*
+> <pre><b>AbsoluteDimension</b>(A::AlgEtQ)->RngInt</pre>
+*Dimension of A over the prime field.*
 
-> <dt>`<b>AbsoluteDimension</b>(A::AlgEtQ)->RngInt`</dt>
-<dd>*Dimension of A over the prime field.</dd>*
+> <pre><b>HasBaseField</b>(A::AlgEtQ) -> BoolElt,FldNum</pre>
+*Returns whether A has common base field. If this is the case it returns it.*
 
-> <dt>`<b>HasBaseField</b>(A::AlgEtQ) -> BoolElt,FldNum`</dt>
-<dd>*Returns whether A has common base field. If this is the case it returns it.</dd>*
+> <pre><b>BaseField</b>(A::AlgEtQ) -> FldNum</pre>
+*Returns the common base field of the Algebra, if it exists.*
 
-> <dt>`<b>BaseField</b>(A::AlgEtQ) -> FldNum`</dt>
-<dd>*Returns the common base field of the Algebra, if it exists.</dd>*
+> <pre><b>PrimeField</b>(A::AlgEtQ) -> FldNum</pre>
+*Returns the prime field of the Algebra.*
 
-> <dt>`<b>PrimeField</b>(A::AlgEtQ) -> FldNum`</dt>
-<dd>*Returns the prime field of the Algebra.</dd>*
+> <pre><b>'eq'</b>(A1::AlgEtQ,A2::AlgEtQ) -> BoolElt</pre>
+*A1 eq A2.*
 
-> <dt>`<b>'eq'</b>(A1::AlgEtQ,A2::AlgEtQ) -> BoolElt`</dt>
-<dd>*A1 eq A2.</dd>*
-
-
-</dl>
 
 ## List of instrinsics in AlgEtQ/Homs.m:
 
+> <pre><b>HomsToC</b>(A::AlgEtQ : Precision:=30)->SeqEnum[Map]</pre>
+*returns Hom(A,\C) as a sequence of maps. The precision of \C is given by the optional parameter "Precision". Default value is 30*
 
-<dl>
-> <dt>`<b>HomsToC</b>(A::AlgEtQ : Precision:=30)->SeqEnum[Map]`</dt>
-<dd>*returns Hom(A,\C) as a sequence of maps. The precision of \C is given by the optional parameter "Precision". Default value is 30</dd>*
-
-
-</dl>
 
 ## List of instrinsics in AlgEtQ/Elt.m:
 
+> <pre><b>Print</b>(x::AlgEtQElt)</pre>
+*Print the AlgEtQElt.*
 
-<dl>
-> <dt>`<b>Print</b>(x::AlgEtQElt)`</dt>
-<dd>*Print the AlgEtQElt.</dd>*
+> <pre><b>Parent</b>(x::AlgEtQElt) -> AlgEtQ</pre>
+*Returns the algebra to which the elemenet belongs to.*
 
-> <dt>`<b>Parent</b>(x::AlgEtQElt) -> AlgEtQ`</dt>
-<dd>*Returns the algebra to which the elemenet belongs to.</dd>*
+> <pre><b>Algebra</b>(x::AlgEtQElt) -> AlgEtQ</pre>
+*Returns the algebra to which the elemenet belongs to.*
 
-> <dt>`<b>Algebra</b>(x::AlgEtQElt) -> AlgEtQ`</dt>
-<dd>*Returns the algebra to which the elemenet belongs to.</dd>*
+> <pre><b>Components</b>(x::AlgEtQElt) -> SeqEnum</pre>
+*Given an element x returns its components, which are elements of number fields.*
 
-> <dt>`<b>Components</b>(x::AlgEtQElt) -> SeqEnum`</dt>
-<dd>*Given an element x returns its components, which are elements of number fields.</dd>*
+> <pre><b>AbsoluteCoordinates</b>(x::AlgEtQElt) -> SeqEnum</pre>
+*Given an element x returns the coordinates relative to the absolute basis, which are elements of the prime field.*
 
-> <dt>`<b>AbsoluteCoordinates</b>(x::AlgEtQElt) -> SeqEnum`</dt>
-<dd>*Given an element x returns the coordinates relative to the absolute basis, which are elements of the prime field.</dd>*
+> <pre><b>IsCoercible</b>(A::AlgEtQ, x::.) -> BoolElt, .</pre>
+*Return whether x is coercible into A and the result of the coercion if so.*
 
-> <dt>`<b>IsCoercible</b>(A::AlgEtQ, x::.) -> BoolElt, .`</dt>
-<dd>*Return whether x is coercible into A and the result of the coercion if so.</dd>*
+> <pre><b>'!'</b>(A::AlgEtQ, x::.) -> AlgEtQElt</pre>
+*Coerce x into A.*
 
-> <dt>`<b>'!'</b>(A::AlgEtQ, x::.) -> AlgEtQElt`</dt>
-<dd>*Coerce x into A.</dd>*
+> <pre><b>One</b>(A::AlgEtQ) -> AlgEtQElt</pre>
+*The multiplicative neutral element of A.*
 
-> <dt>`<b>One</b>(A::AlgEtQ) -> AlgEtQElt`</dt>
-<dd>*The multiplicative neutral element of A.</dd>*
+> <pre><b>Zero</b>(A::AlgEtQ) -> AlgEtQElt</pre>
+*The additive neutral element of A.*
 
-> <dt>`<b>Zero</b>(A::AlgEtQ) -> AlgEtQElt`</dt>
-<dd>*The additive neutral element of A.</dd>*
+> <pre><b>IsUnit</b>(x::AlgEtQElt) -> BoolElt</pre>
+*Returns wheter x is a unit in A.*
 
-> <dt>`<b>IsUnit</b>(x::AlgEtQElt) -> BoolElt`</dt>
-<dd>*Returns wheter x is a unit in A.</dd>*
+> <pre><b>IsZeroDivisor</b>(x::AlgEtQElt) -> BoolElt</pre>
+*Returns wheter x is a not unit in A.*
 
-> <dt>`<b>IsZeroDivisor</b>(x::AlgEtQElt) -> BoolElt`</dt>
-<dd>*Returns wheter x is a not unit in A.</dd>*
+> <pre><b>IsZeroDivisor2</b>(x::AlgEtQElt) -> BoolElt</pre>
+*Returns wheter x is a not unit in A.*
 
-> <dt>`<b>IsZeroDivisor2</b>(x::AlgEtQElt) -> BoolElt`</dt>
-<dd>*Returns wheter x is a not unit in A.</dd>*
+> <pre><b>Random</b>(A::AlgEtQ , bd::RngIntElt) -> AlgEtQElt</pre>
+*Random element of A. The Coefficients are bounded by the positive integer bd.*
 
-> <dt>`<b>Random</b>(A::AlgEtQ , bd::RngIntElt) -> AlgEtQElt`</dt>
-<dd>*Random element of A. The Coefficients are bounded by the positive integer bd.</dd>*
+> <pre><b>Random</b>(A::AlgEtQ : bd:=3) -> AlgEtQElt</pre>
+*Random element of A. The Coefficients are bounded by VarArg bd (default 3).*
 
-> <dt>`<b>Random</b>(A::AlgEtQ : bd:=3) -> AlgEtQElt`</dt>
-<dd>*Random element of A. The Coefficients are bounded by VarArg bd (default 3).</dd>*
+> <pre><b>RandomUnit</b>(A::AlgEtQ , bd::RngIntElt) -> AlgEtQElt</pre>
+*Random unit of A. The Coefficients are bounded by the positive integer bd.*
 
-> <dt>`<b>RandomUnit</b>(A::AlgEtQ , bd::RngIntElt) -> AlgEtQElt`</dt>
-<dd>*Random unit of A. The Coefficients are bounded by the positive integer bd.</dd>*
+> <pre><b>'eq'</b>(x1::AlgEtQElt,x2::AlgEtQElt) -> BoolElt</pre>
+*Is x1=x2 ?*
 
-> <dt>`<b>'eq'</b>(x1::AlgEtQElt,x2::AlgEtQElt) -> BoolElt`</dt>
-<dd>*Is x1=x2 ?</dd>*
+> <pre><b>'eq'</b>(x1::RngIntElt,x2::AlgEtQElt) -> BoolElt</pre>
+*Is x1=x2 ?*
 
-> <dt>`<b>'eq'</b>(x1::RngIntElt,x2::AlgEtQElt) -> BoolElt`</dt>
-<dd>*Is x1=x2 ?</dd>*
+> <pre><b>'eq'</b>(x1::FldRatElt,x2::AlgEtQElt) -> BoolElt</pre>
+*Is x1=x2 ?*
 
-> <dt>`<b>'eq'</b>(x1::FldRatElt,x2::AlgEtQElt) -> BoolElt`</dt>
-<dd>*Is x1=x2 ?</dd>*
+> <pre><b>'eq'</b>(x1::AlgEtQElt,x2::RngIntElt) -> BoolElt</pre>
+*Is x1=x2 ?*
 
-> <dt>`<b>'eq'</b>(x1::AlgEtQElt,x2::RngIntElt) -> BoolElt`</dt>
-<dd>*Is x1=x2 ?</dd>*
+> <pre><b>'eq'</b>(x1::AlgEtQElt,x2::FldRatElt) -> BoolElt</pre>
+*Is x1=x2 ?*
 
-> <dt>`<b>'eq'</b>(x1::AlgEtQElt,x2::FldRatElt) -> BoolElt`</dt>
-<dd>*Is x1=x2 ?</dd>*
+> <pre><b>'+'</b>(x1::AlgEtQElt,x2::AlgEtQElt) -> AlgEtQElt</pre>
+*x1+x2.*
 
-> <dt>`<b>'+'</b>(x1::AlgEtQElt,x2::AlgEtQElt) -> AlgEtQElt`</dt>
-<dd>*x1+x2.</dd>*
+> <pre><b>'+'</b>(x1::.,x2::AlgEtQElt) -> AlgEtQElt</pre>
+*x1+x2.*
 
-> <dt>`<b>'+'</b>(x1::.,x2::AlgEtQElt) -> AlgEtQElt`</dt>
-<dd>*x1+x2.</dd>*
+> <pre><b>'+'</b>(x1::AlgEtQElt,x2::.) -> AlgEtQElt</pre>
+*x1+x2.*
 
-> <dt>`<b>'+'</b>(x1::AlgEtQElt,x2::.) -> AlgEtQElt`</dt>
-<dd>*x1+x2.</dd>*
+> <pre><b>'+'</b>(x1::RngIntElt,x2::AlgEtQElt) -> AlgEtQElt</pre>
+*x1+x2.*
 
-> <dt>`<b>'+'</b>(x1::RngIntElt,x2::AlgEtQElt) -> AlgEtQElt`</dt>
-<dd>*x1+x2.</dd>*
+> <pre><b>'+'</b>(x1::FldRatElt,x2::AlgEtQElt) -> AlgEtQElt</pre>
+*x1+x2.*
 
-> <dt>`<b>'+'</b>(x1::FldRatElt,x2::AlgEtQElt) -> AlgEtQElt`</dt>
-<dd>*x1+x2.</dd>*
+> <pre><b>'+'</b>(x1::AlgEtQElt,x2::RngIntElt) -> AlgEtQElt</pre>
+*x1+x2.*
 
-> <dt>`<b>'+'</b>(x1::AlgEtQElt,x2::RngIntElt) -> AlgEtQElt`</dt>
-<dd>*x1+x2.</dd>*
+> <pre><b>'+'</b>(x1::AlgEtQElt,x2::FldRatElt) -> AlgEtQElt</pre>
+*x1+x2.*
 
-> <dt>`<b>'+'</b>(x1::AlgEtQElt,x2::FldRatElt) -> AlgEtQElt`</dt>
-<dd>*x1+x2.</dd>*
+> <pre><b>'-'</b>(x::AlgEtQElt) -> AlgEtQElt</pre>
+*-x.*
 
-> <dt>`<b>'-'</b>(x::AlgEtQElt) -> AlgEtQElt`</dt>
-<dd>*-x.</dd>*
+> <pre><b>'-'</b>(x1::AlgEtQElt,x2::AlgEtQElt) -> AlgEtQElt</pre>
+*x1-x2.*
 
-> <dt>`<b>'-'</b>(x1::AlgEtQElt,x2::AlgEtQElt) -> AlgEtQElt`</dt>
-<dd>*x1-x2.</dd>*
+> <pre><b>'-'</b>(x1::.,x2::AlgEtQElt) -> AlgEtQElt</pre>
+*x1-x2.*
 
-> <dt>`<b>'-'</b>(x1::.,x2::AlgEtQElt) -> AlgEtQElt`</dt>
-<dd>*x1-x2.</dd>*
+> <pre><b>'-'</b>(x1::AlgEtQElt,x2::.) -> AlgEtQElt</pre>
+*x1-x2.*
 
-> <dt>`<b>'-'</b>(x1::AlgEtQElt,x2::.) -> AlgEtQElt`</dt>
-<dd>*x1-x2.</dd>*
+> <pre><b>'-'</b>(x1::RngIntElt,x2::AlgEtQElt) -> AlgEtQElt</pre>
+*x1-x2.*
 
-> <dt>`<b>'-'</b>(x1::RngIntElt,x2::AlgEtQElt) -> AlgEtQElt`</dt>
-<dd>*x1-x2.</dd>*
+> <pre><b>'-'</b>(x1::FldRatElt,x2::AlgEtQElt) -> AlgEtQElt</pre>
+*x1-x2.*
 
-> <dt>`<b>'-'</b>(x1::FldRatElt,x2::AlgEtQElt) -> AlgEtQElt`</dt>
-<dd>*x1-x2.</dd>*
+> <pre><b>'-'</b>(x1::AlgEtQElt,x2::RngIntElt) -> AlgEtQElt</pre>
+*x1-x2.*
 
-> <dt>`<b>'-'</b>(x1::AlgEtQElt,x2::RngIntElt) -> AlgEtQElt`</dt>
-<dd>*x1-x2.</dd>*
+> <pre><b>'-'</b>(x1::AlgEtQElt,x2::FldRatElt) -> AlgEtQElt</pre>
+*x1-x2.*
 
-> <dt>`<b>'-'</b>(x1::AlgEtQElt,x2::FldRatElt) -> AlgEtQElt`</dt>
-<dd>*x1-x2.</dd>*
+> <pre><b>'*'</b>(x1::AlgEtQElt,x2::AlgEtQElt) -> AlgEtQElt</pre>
+*x1\*x2.*
 
-> <dt>`<b>'*'</b>(x1::AlgEtQElt,x2::AlgEtQElt) -> AlgEtQElt`</dt>
-<dd>*x1\*x2.</dd>*
+> <pre><b>'*'</b>(x1::.,x2::AlgEtQElt) -> AlgEtQElt</pre>
+*x1\*x2.*
 
-> <dt>`<b>'*'</b>(x1::.,x2::AlgEtQElt) -> AlgEtQElt`</dt>
-<dd>*x1\*x2.</dd>*
+> <pre><b>'*'</b>(x1::AlgEtQElt,x2::.) -> AlgEtQElt</pre>
+*x1\*x2.*
 
-> <dt>`<b>'*'</b>(x1::AlgEtQElt,x2::.) -> AlgEtQElt`</dt>
-<dd>*x1\*x2.</dd>*
+> <pre><b>'*'</b>(x1::RngIntElt,x2::AlgEtQElt) -> AlgEtQElt</pre>
+*x1\*x2.*
 
-> <dt>`<b>'*'</b>(x1::RngIntElt,x2::AlgEtQElt) -> AlgEtQElt`</dt>
-<dd>*x1\*x2.</dd>*
+> <pre><b>'*'</b>(x1::FldRatElt,x2::AlgEtQElt) -> AlgEtQElt</pre>
+*x1\*x2.*
 
-> <dt>`<b>'*'</b>(x1::FldRatElt,x2::AlgEtQElt) -> AlgEtQElt`</dt>
-<dd>*x1\*x2.</dd>*
+> <pre><b>'*'</b>(x1::AlgEtQElt,x2::RngIntElt) -> AlgEtQElt</pre>
+*x1\*x2.*
 
-> <dt>`<b>'*'</b>(x1::AlgEtQElt,x2::RngIntElt) -> AlgEtQElt`</dt>
-<dd>*x1\*x2.</dd>*
+> <pre><b>'*'</b>(x1::AlgEtQElt,x2::FldRatElt) -> AlgEtQElt</pre>
+*x1\*x2.*
 
-> <dt>`<b>'*'</b>(x1::AlgEtQElt,x2::FldRatElt) -> AlgEtQElt`</dt>
-<dd>*x1\*x2.</dd>*
+> <pre><b>Inverse</b>(x::AlgEtQElt) -> AlgEtQElt</pre>
+*1/x.*
 
-> <dt>`<b>Inverse</b>(x::AlgEtQElt) -> AlgEtQElt`</dt>
-<dd>*1/x.</dd>*
+> <pre><b>'^'</b>(x::AlgEtQElt,n::RngIntElt) -> AlgEtQElt</pre>
+*x^n.*
 
-> <dt>`<b>'^'</b>(x::AlgEtQElt,n::RngIntElt) -> AlgEtQElt`</dt>
-<dd>*x^n.</dd>*
+> <pre><b>'/'</b>(x1::AlgEtQElt,x2::AlgEtQElt) -> AlgEtQElt</pre>
+*x1/x2.*
 
-> <dt>`<b>'/'</b>(x1::AlgEtQElt,x2::AlgEtQElt) -> AlgEtQElt`</dt>
-<dd>*x1/x2.</dd>*
+> <pre><b>'/'</b>(x1::.,x2::AlgEtQElt) -> AlgEtQElt</pre>
+*x1/x2.*
 
-> <dt>`<b>'/'</b>(x1::.,x2::AlgEtQElt) -> AlgEtQElt`</dt>
-<dd>*x1/x2.</dd>*
+> <pre><b>'/'</b>(x1::AlgEtQElt,x2::.) -> AlgEtQElt</pre>
+*x1/x2.*
 
-> <dt>`<b>'/'</b>(x1::AlgEtQElt,x2::.) -> AlgEtQElt`</dt>
-<dd>*x1/x2.</dd>*
+> <pre><b>'/'</b>(x1::RngIntElt,x2::AlgEtQElt) -> AlgEtQElt</pre>
+*x1/x2.*
 
-> <dt>`<b>'/'</b>(x1::RngIntElt,x2::AlgEtQElt) -> AlgEtQElt`</dt>
-<dd>*x1/x2.</dd>*
+> <pre><b>'/'</b>(x1::FldRatElt,x2::AlgEtQElt) -> AlgEtQElt</pre>
+*x1/x2.*
 
-> <dt>`<b>'/'</b>(x1::FldRatElt,x2::AlgEtQElt) -> AlgEtQElt`</dt>
-<dd>*x1/x2.</dd>*
+> <pre><b>'/'</b>(x1::AlgEtQElt,x2::RngIntElt) -> AlgEtQElt</pre>
+*x1/x2.*
 
-> <dt>`<b>'/'</b>(x1::AlgEtQElt,x2::RngIntElt) -> AlgEtQElt`</dt>
-<dd>*x1/x2.</dd>*
+> <pre><b>'/'</b>(x1::AlgEtQElt,x2::FldRatElt) -> AlgEtQElt</pre>
+*x1/x2.*
 
-> <dt>`<b>'/'</b>(x1::AlgEtQElt,x2::FldRatElt) -> AlgEtQElt`</dt>
-<dd>*x1/x2.</dd>*
+> <pre><b>'&+'</b>(seq::SeqEnum[AlgEtQElt]) -> AlgEtQElt</pre>
+*Given a sequence of AlgEtQElt returns the sum of the entries.*
 
-> <dt>`<b>'&+'</b>(seq::SeqEnum[AlgEtQElt]) -> AlgEtQElt`</dt>
-<dd>*Given a sequence of AlgEtQElt returns the sum of the entries.</dd>*
+> <pre><b>'&*'</b>(seq::SeqEnum[AlgEtQElt]) -> AlgEtQElt</pre>
+*Given a sequence of AlgEtQElt returns the product of the entries.*
 
-> <dt>`<b>'&*'</b>(seq::SeqEnum[AlgEtQElt]) -> AlgEtQElt`</dt>
-<dd>*Given a sequence of AlgEtQElt returns the product of the entries.</dd>*
+> <pre><b>SumOfProducts</b>(as::SeqEnum[AlgEtQElt],bs::SeqEnum[AlgEtQElt]) -> AlgEtQElt</pre>
+*Given sequences as and bs, such that #as eq #bs, returns &+[as[i]\*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.*
 
-> <dt>`<b>SumOfProducts</b>(as::SeqEnum[AlgEtQElt],bs::SeqEnum[AlgEtQElt]) -> AlgEtQElt`</dt>
-<dd>*Given sequences as and bs, such that #as eq #bs, returns &+[as[i]\*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.</dd>*
+> <pre><b>SumOfProducts</b>(as::SeqEnum[RngIntElt],bs::SeqEnum[AlgEtQElt]) -> AlgEtQElt</pre>
+*Given sequences as and bs, such that #as eq #bs, returns &+[as[i]\*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.*
 
-> <dt>`<b>SumOfProducts</b>(as::SeqEnum[RngIntElt],bs::SeqEnum[AlgEtQElt]) -> AlgEtQElt`</dt>
-<dd>*Given sequences as and bs, such that #as eq #bs, returns &+[as[i]\*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.</dd>*
+> <pre><b>SumOfProducts</b>(as::SeqEnum[FldRatElt],bs::SeqEnum[AlgEtQElt]) -> AlgEtQElt</pre>
+*Given sequences as and bs, such that #as eq #bs, returns &+[as[i]\*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.*
 
-> <dt>`<b>SumOfProducts</b>(as::SeqEnum[FldRatElt],bs::SeqEnum[AlgEtQElt]) -> AlgEtQElt`</dt>
-<dd>*Given sequences as and bs, such that #as eq #bs, returns &+[as[i]\*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.</dd>*
+> <pre><b>SumOfProducts</b>(as::SeqEnum[AlgEtQElt],bs::SeqEnum[RngIntElt]) -> AlgEtQElt</pre>
+*Given sequences as and bs, such that #as eq #bs, returns &+[as[i]\*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.*
 
-> <dt>`<b>SumOfProducts</b>(as::SeqEnum[AlgEtQElt],bs::SeqEnum[RngIntElt]) -> AlgEtQElt`</dt>
-<dd>*Given sequences as and bs, such that #as eq #bs, returns &+[as[i]\*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.</dd>*
+> <pre><b>SumOfProducts</b>(as::SeqEnum[AlgEtQElt],bs::SeqEnum[FldRatElt]) -> AlgEtQElt</pre>
+*Given sequences as and bs, such that #as eq #bs, returns &+[as[i]\*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.*
 
-> <dt>`<b>SumOfProducts</b>(as::SeqEnum[AlgEtQElt],bs::SeqEnum[FldRatElt]) -> AlgEtQElt`</dt>
-<dd>*Given sequences as and bs, such that #as eq #bs, returns &+[as[i]\*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.</dd>*
+> <pre><b>MinimalPolynomial</b>(x::AlgEtQElt) -> RngUPolElt</pre>
+*Returns the minimal polynommial over the common base ring of the number fields defining A of the element x.*
 
-> <dt>`<b>MinimalPolynomial</b>(x::AlgEtQElt) -> RngUPolElt`</dt>
-<dd>*Returns the minimal polynommial over the common base ring of the number fields defining A of the element x.</dd>*
+> <pre><b>MinimalPolynomial</b>(x::AlgEtQElt, F::Rng) -> RngUPolElt</pre>
+*Returns the minimal polynommial over the ring F of the element x.*
 
-> <dt>`<b>MinimalPolynomial</b>(x::AlgEtQElt, F::Rng) -> RngUPolElt`</dt>
-<dd>*Returns the minimal polynommial over the ring F of the element x.</dd>*
+> <pre><b>AbsoluteMinimalPolynomial</b>(x::AlgEtQElt) -> RngUPolElt</pre>
+*Returns the minimal polynommial over the prime field of the element x.*
 
-> <dt>`<b>AbsoluteMinimalPolynomial</b>(x::AlgEtQElt) -> RngUPolElt`</dt>
-<dd>*Returns the minimal polynommial over the prime field of the element x.</dd>*
+> <pre><b>IsIntegral</b>(x::AlgEtQElt) -> BoolElt</pre>
+*Returns whether the element x is integral (over the integers).*
 
-> <dt>`<b>IsIntegral</b>(x::AlgEtQElt) -> BoolElt`</dt>
-<dd>*Returns whether the element x is integral (over the integers).</dd>*
+> <pre><b>Evaluate</b>(f::RngUPolElt,a::AlgEtQElt) -> AlgEtQElt</pre>
+*Evaluate the polynomial f at the element a.*
 
-> <dt>`<b>Evaluate</b>(f::RngUPolElt,a::AlgEtQElt) -> AlgEtQElt`</dt>
-<dd>*Evaluate the polynomial f at the element a.</dd>*
+> <pre><b>PrimitiveElement</b>(A::AlgEtQ) -> AlgEtQElt</pre>
+*Returns the primitive element of the étale algebra A. Note that A has a primitive element only if it is the product of distinct number fields.*
 
-> <dt>`<b>PrimitiveElement</b>(A::AlgEtQ) -> AlgEtQElt`</dt>
-<dd>*Returns the primitive element of the étale algebra A. Note that A has a primitive element only if it is the product of distinct number fields.</dd>*
+> <pre><b>PowerBasis</b>(A::AlgEtQ) -> SeqEnum[AlgEtQElt]</pre>
+*Returns the power basis of the étale algebra A, consisting of powers of the PrimitiveElement of A.*
 
-> <dt>`<b>PowerBasis</b>(A::AlgEtQ) -> SeqEnum[AlgEtQElt]`</dt>
-<dd>*Returns the power basis of the étale algebra A, consisting of powers of the PrimitiveElement of A.</dd>*
+> <pre><b>Basis</b>(A::AlgEtQ) -> SeqEnum</pre>
+*Returns a basis of the algebra over the common base field.*
 
-> <dt>`<b>Basis</b>(A::AlgEtQ) -> SeqEnum`</dt>
-<dd>*Returns a basis of the algebra over the common base field.</dd>*
+> <pre><b>AbsoluteBasis</b>(A::AlgEtQ) -> SeqEnum</pre>
+*Returns a basis of the algebra over the prime field.*
 
-> <dt>`<b>AbsoluteBasis</b>(A::AlgEtQ) -> SeqEnum`</dt>
-<dd>*Returns a basis of the algebra over the prime field.</dd>*
+> <pre><b>AbsoluteCoordinates</b>(seq::SeqEnum[AlgEtQElt] , basis::SeqEnum[AlgEtQElt]) -> SeqEnum</pre>
+*Given a sequence of elements and a basis over the PrimeField returns a sequence whose entries are the coordinates in the PrimeField with respect to the given basis.*
 
-> <dt>`<b>AbsoluteCoordinates</b>(seq::SeqEnum[AlgEtQElt] , basis::SeqEnum[AlgEtQElt]) -> SeqEnum`</dt>
-<dd>*Given a sequence of elements and a basis over the PrimeField returns a sequence whose entries are the coordinates in the PrimeField with respect to the given basis.</dd>*
+> <pre><b>OrthogonalIdempotents</b>(A::AlgEtQ) -> SeqEnum</pre>
+*Returns the orthogonal ideampotent element of the étale algebra A.*
 
-> <dt>`<b>OrthogonalIdempotents</b>(A::AlgEtQ) -> SeqEnum`</dt>
-<dd>*Returns the orthogonal ideampotent element of the étale algebra A.</dd>*
+> <pre><b>Idempotents</b>(A::AlgEtQ) -> SeqEnum</pre>
+*Returns the ideampotent element of the étale algebra A.*
 
-> <dt>`<b>Idempotents</b>(A::AlgEtQ) -> SeqEnum`</dt>
-<dd>*Returns the ideampotent element of the étale algebra A.</dd>*
-
-
-</dl>
 
 ## List of instrinsics in AlgEtQ/TraceNorm.m:
 
+> <pre><b>Trace</b>(x::AlgEtQElt) -> Any</pre>
+*Returns the trace of the element x of an étale algebra.*
 
-<dl>
-> <dt>`<b>Trace</b>(x::AlgEtQElt) -> Any`</dt>
-<dd>*Returns the trace of the element x of an étale algebra.</dd>*
+> <pre><b>Norm</b>(x::AlgEtQElt) -> Any</pre>
+*Returns the norm of the element x of an étale algebra.*
 
-> <dt>`<b>Norm</b>(x::AlgEtQElt) -> Any`</dt>
-<dd>*Returns the norm of the element x of an étale algebra.</dd>*
+> <pre><b>AbsoluteTrace</b>(x::AlgEtQElt) -> Any</pre>
+*Returns the absolute trace of the element x of an étale algebra.*
 
-> <dt>`<b>AbsoluteTrace</b>(x::AlgEtQElt) -> Any`</dt>
-<dd>*Returns the absolute trace of the element x of an étale algebra.</dd>*
+> <pre><b>AbsoluteNorm</b>(x::AlgEtQElt) -> Any</pre>
+*Returns the absolute norm of the element x of an étale algebra.*
 
-> <dt>`<b>AbsoluteNorm</b>(x::AlgEtQElt) -> Any`</dt>
-<dd>*Returns the absolute norm of the element x of an étale algebra.</dd>*
+> <pre><b>TraceDualIdeal</b>(I::AlgEtQIdl) -> AlgEtQIdl</pre>
+*Returns the trace dual ideal of an ideal in an order in an etale algebra.*
 
-> <dt>`<b>TraceDualIdeal</b>(I::AlgEtQIdl) -> AlgEtQIdl`</dt>
-<dd>*Returns the trace dual ideal of an ideal in an order in an etale algebra.</dd>*
+> <pre><b>TraceDualIdeal</b>(O::AlgEtQOrd) -> AlgEtQIdl</pre>
+*Returns the trace dual ideal of an order in an etale algebra.*
 
-> <dt>`<b>TraceDualIdeal</b>(O::AlgEtQOrd) -> AlgEtQIdl`</dt>
-<dd>*Returns the trace dual ideal of an order in an etale algebra.</dd>*
-
-
-</dl>
 
 ## List of instrinsics in AlgEtQ/Ord.m:
 
+> <pre><b>Print</b>(A::AlgEtQOrd)</pre>
+*Print the order.*
 
-<dl>
-> <dt>`<b>Print</b>(A::AlgEtQOrd)`</dt>
-<dd>*Print the order.</dd>*
+> <pre><b>IsCoercible</b>(S::AlgEtQOrd, x::.) -> BoolElt, Any</pre>
+*Return whether x is coercible into S and the result if so.*
 
-> <dt>`<b>IsCoercible</b>(S::AlgEtQOrd, x::.) -> BoolElt, Any`</dt>
-<dd>*Return whether x is coercible into S and the result if so.</dd>*
+> <pre><b>Order</b>( gens::SeqEnum[AlgEtQElt] : Check:=100 , CheckIsKnownOrder:=true ) -> AlgEtQOrd</pre>
+*Construnct the order generated by gens over the rationals. The parameter Check (default 100) determines how many times the program tries to obtain a multiplicatively closed lattice by adding the product of the generators. If Check 0 then this step is skipped. The vararg CheckIsKnownOrder determines if we check if the order is already known, i.e. in the attribute Algebra`KnownOrders. The default value is true.*
 
-> <dt>`<b>Order</b>( gens::SeqEnum[AlgEtQElt] : Check:=100 , CheckIsKnownOrder:=true ) -> AlgEtQOrd`</dt>
-<dd>*Construnct the order generated by gens over the rationals. The parameter Check (default 100) determines how many times the program tries to obtain a multiplicatively closed lattice by adding the product of the generators. If Check 0 then this step is skipped. The vararg CheckIsKnownOrder determines if we check if the order is already known, i.e. in the attribute Algebra`KnownOrders. The default value is true.</dd>*
+> <pre><b>Order</b>(A::AlgEtQ , orders::Tup) -> AlgEtQOrd</pre>
+*Given a sequence of order in the number fiedls defining the etale algebra A, generates the product order.*
 
-> <dt>`<b>Order</b>(A::AlgEtQ , orders::Tup) -> AlgEtQOrd`</dt>
-<dd>*Given a sequence of order in the number fiedls defining the etale algebra A, generates the product order.</dd>*
+> <pre><b>Algebra</b>(S::AlgEtQOrd) -> AlgEtQ</pre>
+*Returns the algebra of the order.*
 
-> <dt>`<b>Algebra</b>(S::AlgEtQOrd) -> AlgEtQ`</dt>
-<dd>*Returns the algebra of the order.</dd>*
+> <pre><b>myHash</b>(S::AlgEtQOrd)->SeqEnum[RngInt]</pre>
+*Hash function for AlgEtQOrd.*
 
-> <dt>`<b>myHash</b>(S::AlgEtQOrd)->SeqEnum[RngInt]`</dt>
-<dd>*Hash function for AlgEtQOrd.</dd>*
+> <pre><b>ZBasis</b>(S::AlgEtQOrd)->SeqEnum[AlgEtQElt]</pre>
+*Return a Z-basis of the order.*
 
-> <dt>`<b>ZBasis</b>(S::AlgEtQOrd)->SeqEnum[AlgEtQElt]`</dt>
-<dd>*Return a Z-basis of the order.</dd>*
+> <pre><b>Generators</b>(S::AlgEtQOrd)->SeqEnum[AlgEtQElt]</pre>
+*Return a set of generators of the order.*
 
-> <dt>`<b>Generators</b>(S::AlgEtQOrd)->SeqEnum[AlgEtQElt]`</dt>
-<dd>*Return a set of generators of the order.</dd>*
+> <pre><b>'eq'</b>(O1::AlgEtQOrd,O2::AlgEtQOrd)->BoolElt</pre>
+*Checks equality of orders in an etale Algebra.*
 
-> <dt>`<b>'eq'</b>(O1::AlgEtQOrd,O2::AlgEtQOrd)->BoolElt`</dt>
-<dd>*Checks equality of orders in an etale Algebra.</dd>*
+> <pre><b>'in'</b>(x::AlgEtQElt,O::AlgEtQOrd) -> BoolElt</pre>
+*Inclusion of elements.*
 
-> <dt>`<b>'in'</b>(x::AlgEtQElt,O::AlgEtQOrd) -> BoolElt`</dt>
-<dd>*Inclusion of elements.</dd>*
+> <pre><b>AbsoluteCoordinates</b>(seq::SeqEnum[AlgEtQElt],O::AlgEtQOrd) -> SeqEnum</pre>
+*AbsoluteCoordinates with respect to the ZBasis.*
 
-> <dt>`<b>AbsoluteCoordinates</b>(seq::SeqEnum[AlgEtQElt],O::AlgEtQOrd) -> SeqEnum`</dt>
-<dd>*AbsoluteCoordinates with respect to the ZBasis.</dd>*
+> <pre><b>'in'</b>(x::RngIntElt,O::AlgEtQOrd) -> BoolElt</pre>
+*Inclusion of elements.*
 
-> <dt>`<b>'in'</b>(x::RngIntElt,O::AlgEtQOrd) -> BoolElt`</dt>
-<dd>*Inclusion of elements.</dd>*
+> <pre><b>'in'</b>(x::FldRatElt,O::AlgEtQOrd) -> BoolElt</pre>
+*Inclusion of elements.*
 
-> <dt>`<b>'in'</b>(x::FldRatElt,O::AlgEtQOrd) -> BoolElt`</dt>
-<dd>*Inclusion of elements.</dd>*
+> <pre><b>One</b>(S::AlgEtQOrd)->AlgEtQElt</pre>
+*Unit element of S.*
 
-> <dt>`<b>One</b>(S::AlgEtQOrd)->AlgEtQElt`</dt>
-<dd>*Unit element of S.</dd>*
+> <pre><b>Zero</b>(S::AlgEtQOrd)->AlgEtQElt</pre>
+*Zero element of S.*
 
-> <dt>`<b>Zero</b>(S::AlgEtQOrd)->AlgEtQElt`</dt>
-<dd>*Zero element of S.</dd>*
+> <pre><b>Random</b>(O::AlgEtQOrd , bd::RngIntElt : ZeroDivisorsAllowed:=false ) -> AlgEtQElt</pre>
+*Random element of O. The Coefficients are bounded by the positive integer bd. One can allow zero-divisors using the optional argument "ZeroDivisorsAllowed", which by default is set to false.*
 
-> <dt>`<b>Random</b>(O::AlgEtQOrd , bd::RngIntElt : ZeroDivisorsAllowed:=false ) -> AlgEtQElt`</dt>
-<dd>*Random element of O. The Coefficients are bounded by the positive integer bd. One can allow zero-divisors using the optional argument "ZeroDivisorsAllowed", which by default is set to false.</dd>*
+> <pre><b>Random</b>(O::AlgEtQOrd : CoeffRange:=3, ZeroDivisorsAllowed:=false ) -> AlgEtQElt</pre>
+*Returns a random (small coefficient) element of O. The range of the random coefficients can be increased by giving the optional argument CoeffRange. One can allow zero-divisors using the optional argument "ZeroDivisorsAllowed", which by default is set to false.*
 
-> <dt>`<b>Random</b>(O::AlgEtQOrd : CoeffRange:=3, ZeroDivisorsAllowed:=false ) -> AlgEtQElt`</dt>
-<dd>*Returns a random (small coefficient) element of O. The range of the random coefficients can be increased by giving the optional argument CoeffRange. One can allow zero-divisors using the optional argument "ZeroDivisorsAllowed", which by default is set to false.</dd>*
+> <pre><b>IsKnownOrder</b>(~R::AlgEtQOrd)</pre>
+*This procedure checks wheter the order R is already in the list of known orders of the algebra A of definition of R. If so then it replaces R with the copy stored in the attribute KnownOrders. If not it adds it to KnownOrders. This is done to avoid creating multiple copies of the same order.*
 
-> <dt>`<b>IsKnownOrder</b>(~R::AlgEtQOrd)`</dt>
-<dd>*This procedure checks wheter the order R is already in the list of known orders of the algebra A of definition of R. If so then it replaces R with the copy stored in the attribute KnownOrders. If not it adds it to KnownOrders. This is done to avoid creating multiple copies of the same order.</dd>*
+> <pre><b>EquationOrder</b>(A::AlgEtQ) -> AlgEtQOrd</pre>
+*Given an étale algebra defined by a polynomial, returns the monogenic order defined by the same polynomial.*
 
-> <dt>`<b>EquationOrder</b>(A::AlgEtQ) -> AlgEtQOrd`</dt>
-<dd>*Given an étale algebra defined by a polynomial, returns the monogenic order defined by the same polynomial.</dd>*
+> <pre><b>ProductOfEquationOrders</b>(A::AlgEtQ)->AlgEtQOrd</pre>
+*Given a product of number field A, returns the order consisting of the product of the equation orders of the number fields.*
 
-> <dt>`<b>ProductOfEquationOrders</b>(A::AlgEtQ)->AlgEtQOrd`</dt>
-<dd>*Given a product of number field A, returns the order consisting of the product of the equation orders of the number fields.</dd>*
+> <pre><b>MaximalOrder</b>(A::AlgEtQ)->AlgEtQOrd</pre>
+*Returns the maximal order of the étale algebra A.*
 
-> <dt>`<b>MaximalOrder</b>(A::AlgEtQ)->AlgEtQOrd`</dt>
-<dd>*Returns the maximal order of the étale algebra A.</dd>*
+> <pre><b>IsMaximal</b>(S::AlgEtQOrd) -> BoolElt</pre>
+*Returns wheter the given order is the maximal order of the étale algebra.*
 
-> <dt>`<b>IsMaximal</b>(S::AlgEtQOrd) -> BoolElt`</dt>
-<dd>*Returns wheter the given order is the maximal order of the étale algebra.</dd>*
+> <pre><b>IsProductOfOrders</b>(O::AlgEtQOrd)->BoolElt, Tup</pre>
+*Return if the argument is a product of orders in number fields, and if so return also the sequence of these orders.*
 
-> <dt>`<b>IsProductOfOrders</b>(O::AlgEtQOrd)->BoolElt, Tup`</dt>
-<dd>*Return if the argument is a product of orders in number fields, and if so return also the sequence of these orders.</dd>*
+> <pre><b>Index</b>(T::AlgEtQOrd) -> FldRatElt</pre>
+*Given an order T computes its index with respect to the basis of the algebra of T as a free Z-module.*
 
-> <dt>`<b>Index</b>(T::AlgEtQOrd) -> FldRatElt`</dt>
-<dd>*Given an order T computes its index with respect to the basis of the algebra of T as a free Z-module.</dd>*
+> <pre><b>Index</b>(S::AlgEtQOrd, T::AlgEtQOrd) -> Any</pre>
+*Given two orders T \subset S, returns [S:T] = #S/T.*
 
-> <dt>`<b>Index</b>(S::AlgEtQOrd, T::AlgEtQOrd) -> Any`</dt>
-<dd>*Given two orders T \subset S, returns [S:T] = #S/T.</dd>*
+> <pre><b>'subset'</b>(O1 :: AlgEtQOrd, O2 :: AlgEtQOrd) -> BoolElt</pre>
+*Checks if the first argument is inside the second.*
 
-> <dt>`<b>'subset'</b>(O1 :: AlgEtQOrd, O2 :: AlgEtQOrd) -> BoolElt`</dt>
-<dd>*Checks if the first argument is inside the second.</dd>*
+> <pre><b>'*'</b>(O1::AlgEtQOrd,O2::AlgEtQOrd)->AlgEtQOrd</pre>
+*Returns the order generated by the orders O1 and O2.*
 
-> <dt>`<b>'*'</b>(O1::AlgEtQOrd,O2::AlgEtQOrd)->AlgEtQOrd`</dt>
-<dd>*Returns the order generated by the orders O1 and O2.</dd>*
+> <pre><b>'meet'</b>(O1::AlgEtQOrd,O2::AlgEtQOrd)->AlgEtQOrd</pre>
+*Intersection of orders.*
 
-> <dt>`<b>'meet'</b>(O1::AlgEtQOrd,O2::AlgEtQOrd)->AlgEtQOrd`</dt>
-<dd>*Intersection of orders.</dd>*
+> <pre><b>MultiplicatorRing</b>(R::AlgEtQOrd) -> AlgEtQOrd</pre>
+*Returns the multiplicator ring of an order R, that is R itself.*
 
-> <dt>`<b>MultiplicatorRing</b>(R::AlgEtQOrd) -> AlgEtQOrd`</dt>
-<dd>*Returns the multiplicator ring of an order R, that is R itself.</dd>*
-
-
-</dl>
 
 ## List of instrinsics in AlgEtQ/Quotients.m:
 
+> <pre><b>Quotient</b>(I::AlgEtQIdl, zbJ::SeqEnum[AlgEtQElt]) -> GrpAb, Map</pre>
+*Given an ideal I and the ZBasis of an ideal J such that  J subset I, returns the abelian group Q=I/J together with the quotient map q:I->J. J can also be an order.*
 
-<dl>
-> <dt>`<b>Quotient</b>(I::AlgEtQIdl, zbJ::SeqEnum[AlgEtQElt]) -> GrpAb, Map`</dt>
-<dd>*Given an ideal I and the ZBasis of an ideal J such that  J subset I, returns the abelian group Q=I/J together with the quotient map q:I->J. J can also be an order.</dd>*
+> <pre><b>Quotient</b>(I::AlgEtQIdl, J::AlgEtQIdl) -> GrpAb, Map</pre>
+*Given fractional ideals J subset I, returns the abelian group Q=I/J together with the quotient map q:I->J.*
 
-> <dt>`<b>Quotient</b>(I::AlgEtQIdl, J::AlgEtQIdl) -> GrpAb, Map`</dt>
-<dd>*Given fractional ideals J subset I, returns the abelian group Q=I/J together with the quotient map q:I->J.</dd>*
+> <pre><b>Quotient</b>(S::AlgEtQOrd, zbJ::SeqEnum[AlgEtQElt]) -> GrpAb, Map</pre>
+*Given an order S and the ZBasis of an ideal J such that  J subset S, returns the abelian group Q=S/J together with the quotient map q:S->J. J can also be an order.*
 
-> <dt>`<b>Quotient</b>(S::AlgEtQOrd, zbJ::SeqEnum[AlgEtQElt]) -> GrpAb, Map`</dt>
-<dd>*Given an order S and the ZBasis of an ideal J such that  J subset S, returns the abelian group Q=S/J together with the quotient map q:S->J. J can also be an order.</dd>*
+> <pre><b>ResidueRing</b>(S::AlgEtQOrd,I::AlgEtQIdl) -> GrpAb , Map</pre>
+*Given an integral ideal I of S, returns the abelian group S/I and the epimorphism pi:S -> S/I (with inverse map). Important: the domain of pi is the Algebra of S, since the elements of S are usually expressed al elements of A. For eg Parent(Random(S)) = Algebra(S). We stress that the output is a group and does not have a multiplication. This can be obtained by first taking preimages, doing the multiplication, and then applying the projection.*
 
-> <dt>`<b>ResidueRing</b>(S::AlgEtQOrd,I::AlgEtQIdl) -> GrpAb , Map`</dt>
-<dd>*Given an integral ideal I of S, returns the abelian group S/I and the epimorphism pi:S -> S/I (with inverse map). Important: the domain of pi is the Algebra of S, since the elements of S are usually expressed al elements of A. For eg Parent(Random(S)) = Algebra(S). We stress that the output is a group and does not have a multiplication. This can be obtained by first taking preimages, doing the multiplication, and then applying the projection.</dd>*
+> <pre><b>ResidueField</b>(P::AlgEtQIdl) -> FldFin, Map</pre>
+*Given P a prime of S, returns a finite field F isomorphic to S/P and a surjection (with inverse) S->F.*
 
-> <dt>`<b>ResidueField</b>(P::AlgEtQIdl) -> FldFin, Map`</dt>
-<dd>*Given P a prime of S, returns a finite field F isomorphic to S/P and a surjection (with inverse) S->F.</dd>*
+> <pre><b>PrimitiveElementResidueField</b>(P::AlgEtQIdl)->AlgEtQElt</pre>
+*Returns an element of P that maps to the primitive element of the residue field S/P, that is a multiplicative generator of (S/P)^\*.*
 
-> <dt>`<b>PrimitiveElementResidueField</b>(P::AlgEtQIdl)->AlgEtQElt`</dt>
-<dd>*Returns an element of P that maps to the primitive element of the residue field S/P, that is a multiplicative generator of (S/P)^\*.</dd>*
-
-> <dt>`<b>QuotientVS</b>(I::AlgEtQOrd, J::AlgEtQOrd, P::AlgEtQIdl) -> ModRng, Map`</dt>
-<dd>*Let I, J be orders, P a fractional R-ideals such that:
+> <pre><b>QuotientVS</b>(I::AlgEtQOrd, J::AlgEtQOrd, P::AlgEtQIdl) -> ModRng, Map</pre>
+*Let I, J be orders, P a fractional R-ideals such that:
  - P is prime of of some order R, with residue field K;
  - J in I and I/J is a vector space V over K, say of dimension d.
- The function returns the KModule K^d=V and the natural surjection I->V (with pre-image).</dd>*
+ The function returns the KModule K^d=V and the natural surjection I->V (with pre-image).*
 
-> <dt>`<b>QuotientVS</b>(I::AlgEtQOrd, J::AlgEtQIdl, P::AlgEtQIdl) -> ModRng, Map`</dt>
-<dd>*Let I be an order, J and  P be fractional R-ideals such that:
+> <pre><b>QuotientVS</b>(I::AlgEtQOrd, J::AlgEtQIdl, P::AlgEtQIdl) -> ModRng, Map</pre>
+*Let I be an order, J and  P be fractional R-ideals such that:
  - P is prime of of some order R, with residue field K;
  - J in I and I/J is a vector space V over K, say of dimension d.
- The function returns the KModule K^d=V and the natural surjection I->V (with pre-image).</dd>*
+ The function returns the KModule K^d=V and the natural surjection I->V (with pre-image).*
 
-> <dt>`<b>QuotientVS</b>(I::AlgEtQIdl, J::AlgEtQOrd, P::AlgEtQIdl) -> ModRng, Map`</dt>
-<dd>*Let J be an order, I and  P be fractional R-ideals such that:
+> <pre><b>QuotientVS</b>(I::AlgEtQIdl, J::AlgEtQOrd, P::AlgEtQIdl) -> ModRng, Map</pre>
+*Let J be an order, I and  P be fractional R-ideals such that:
  - P is prime of of some order R, with residue field K;
  - J in I and I/J is a vector space V over K, say of dimension d.
- The function returns the KModule K^d=V and the natural surjection I->V (with pre-image).</dd>*
+ The function returns the KModule K^d=V and the natural surjection I->V (with pre-image).*
 
-> <dt>`<b>QuotientVS</b>(I::AlgEtQIdl, J::AlgEtQIdl, P::AlgEtQIdl) -> ModRng, Map`</dt>
-<dd>*Let I, J, P be fractional R-ideals such that:
+> <pre><b>QuotientVS</b>(I::AlgEtQIdl, J::AlgEtQIdl, P::AlgEtQIdl) -> ModRng, Map</pre>
+*Let I, J, P be fractional R-ideals such that:
  - P is prime of of some order R;
  - J in I and I/J is a vector space over R/P, say of dimension d;
- the function returns the KModule K^d=V and the natural surjection I->V (with pre-image).</dd>*
+ the function returns the KModule K^d=V and the natural surjection I->V (with pre-image).*
 
-
-</dl>
 
 ## List of instrinsics in AlgEtQ/OverOrders.m:
 
+> <pre><b>IsMaximalAtPrime</b>(R::AlgEtQOrd, P::AlgEtQIdl) -> BoolElt</pre>
+*Returns whether R is maximal at the prime P, that is, if (R:O) is not contained in P, where O is the maximal order.*
 
-<dl>
-> <dt>`<b>IsMaximalAtPrime</b>(R::AlgEtQOrd, P::AlgEtQIdl) -> BoolElt`</dt>
-<dd>*Returns whether R is maximal at the prime P, that is, if (R:O) is not contained in P, where O is the maximal order.</dd>*
+> <pre><b>MinimalOverOrdersAtPrime</b>(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQOrd]</pre>
+*Given an order R and prime P of R, it returns the minimal overorders S of R with conductor (R:S) which is P-primary. The minimality assumption forces the conductor (R:S) to be exactly P. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.*
 
-> <dt>`<b>MinimalOverOrdersAtPrime</b>(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQOrd]`</dt>
-<dd>*Given an order R and prime P of R, it returns the minimal overorders S of R with conductor (R:S) which is P-primary. The minimality assumption forces the conductor (R:S) to be exactly P. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.</dd>*
+> <pre><b>MinimalOverOrders</b>(R::AlgEtQOrd) -> SetIndx[AlgEtQOrd]</pre>
+*Computes the minimal overorders of R.*
 
-> <dt>`<b>MinimalOverOrders</b>(R::AlgEtQOrd) -> SetIndx[AlgEtQOrd]`</dt>
-<dd>*Computes the minimal overorders of R.</dd>*
+> <pre><b>OverOrdersAtPrime</b>(R::AlgEtQOrd, P::AlgEtQIdl) -> SeqEnum[AlgEtQOrd]</pre>
+*Given an order R and prime P of R, it returns R and the overorders S of R with conductor (R:S) which is P-primary. We recursively produce the minimal PP-overorders where PP are primes above P. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.*
 
-> <dt>`<b>OverOrdersAtPrime</b>(R::AlgEtQOrd, P::AlgEtQIdl) -> SeqEnum[AlgEtQOrd]`</dt>
-<dd>*Given an order R and prime P of R, it returns R and the overorders S of R with conductor (R:S) which is P-primary. We recursively produce the minimal PP-overorders where PP are primes above P. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.</dd>*
+> <pre><b>OverOrders</b>(R::AlgEtQOrd : populateoo_in_oo:=false) -> SeqEnum[AlgEtQOrd]</pre>
+*We compute all the overorders of R. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana. The Vararg "populateoo_inoo" (default false) determines whether we should fill the attribute T`OverOrders for every overorder T of R.*
 
-> <dt>`<b>OverOrders</b>(R::AlgEtQOrd : populateoo_in_oo:=false) -> SeqEnum[AlgEtQOrd]`</dt>
-<dd>*We compute all the overorders of R. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana. The Vararg "populateoo_inoo" (default false) determines whether we should fill the attribute T`OverOrders for every overorder T of R.</dd>*
+> <pre><b>FindOverOrders</b>(R::AlgEtQOrd : populateoo_in_oo:=false) -> SetIndx[AlgEtQOrd]</pre>
+*We compute all the overorders of R. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana. The Vararg "populateoo_inoo" (default false) determines whether we should fill the attribute T`OverOrders for every overorder T of R.*
 
-> <dt>`<b>FindOverOrders</b>(R::AlgEtQOrd : populateoo_in_oo:=false) -> SetIndx[AlgEtQOrd]`</dt>
-<dd>*We compute all the overorders of R. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana. The Vararg "populateoo_inoo" (default false) determines whether we should fill the attribute T`OverOrders for every overorder T of R.</dd>*
-
-
-</dl>
 
 ## List of instrinsics in AlgEtQ/GraphOverOrders.m:
 
+> <pre><b>GraphOverOrders</b>(R:AlgEtQOrd) -> GrphDir</pre>
+*Given an order R returns the graph G of minimal inclusions of the overorders of R. More precisely, the vertices of G are integers between 1 and the number of OverOrders(R), and there is an edge [i,j] if and only if OverOrder(R)[j] is a minimal overorder of OverOrders(R)[i].*
 
-<dl>
-> <dt>`<b>GraphOverOrders</b>(R:AlgEtQOrd) -> GrphDir`</dt>
-<dd>*Given an order R returns the graph G of minimal inclusions of the overorders of R. More precisely, the vertices of G are integers between 1 and the number of OverOrders(R), and there is an edge [i,j] if and only if OverOrder(R)[j] is a minimal overorder of OverOrders(R)[i].</dd>*
-
-
-</dl>
 
 ## List of instrinsics in AlgEtQ/Idl.m:
 
+> <pre><b>Ideal</b>(S::AlgEtQOrd, gens::SeqEnum) -> AlgEtQIdl</pre>
+*Creates an ideal of S, generated by gens.*
 
-<dl>
-> <dt>`<b>Ideal</b>(S::AlgEtQOrd, gens::SeqEnum) -> AlgEtQIdl`</dt>
-<dd>*Creates an ideal of S, generated by gens.</dd>*
+> <pre><b>Ideal</b>(S::AlgEtQOrd, idls::Tup) -> AlgEtQIdl</pre>
+*Given an order S which is a product of orders S_i in the number fiedls generting the Algebra(S), and a Tup of ideals I_i of S_i, returns the S-ideal direct product of the I_i.*
 
-> <dt>`<b>Ideal</b>(S::AlgEtQOrd, idls::Tup) -> AlgEtQIdl`</dt>
-<dd>*Given an order S which is a product of orders S_i in the number fiedls generting the Algebra(S), and a Tup of ideals I_i of S_i, returns the S-ideal direct product of the I_i.</dd>*
+> <pre><b>Ideal</b>(S::AlgEtQOrd, gen::Any) -> AlgEtQIdl</pre>
+*Creates an ideal of S, generated by gen.*
 
-> <dt>`<b>Ideal</b>(S::AlgEtQOrd, gen::Any) -> AlgEtQIdl`</dt>
-<dd>*Creates an ideal of S, generated by gen.</dd>*
+> <pre><b>'*'</b>(S::AlgEtQOrd, gen::AlgEtQElt) -> AlgEtQIdl</pre>
+*Creates an ideal of S, generated by gen.*
 
-> <dt>`<b>'*'</b>(S::AlgEtQOrd, gen::AlgEtQElt) -> AlgEtQIdl`</dt>
-<dd>*Creates an ideal of S, generated by gen.</dd>*
+> <pre><b>'*'</b>(gen::AlgEtQElt, S::AlgEtQOrd) -> AlgEtQIdl</pre>
+*Creates an ideal of S, generated by gen.*
 
-> <dt>`<b>'*'</b>(gen::AlgEtQElt, S::AlgEtQOrd) -> AlgEtQIdl`</dt>
-<dd>*Creates an ideal of S, generated by gen.</dd>*
+> <pre><b>'*'</b>(S::AlgEtQOrd, gen::RngIntElt) -> AlgEtQIdl</pre>
+*Creates an ideal of S, generated by gen.*
 
-> <dt>`<b>'*'</b>(S::AlgEtQOrd, gen::RngIntElt) -> AlgEtQIdl`</dt>
-<dd>*Creates an ideal of S, generated by gen.</dd>*
+> <pre><b>'*'</b>(gen::RngIntElt, S::AlgEtQOrd) -> AlgEtQIdl</pre>
+*Creates an ideal of S, generated by gen.*
 
-> <dt>`<b>'*'</b>(gen::RngIntElt, S::AlgEtQOrd) -> AlgEtQIdl`</dt>
-<dd>*Creates an ideal of S, generated by gen.</dd>*
+> <pre><b>'*'</b>(S::AlgEtQOrd, gen::FldRatElt) -> AlgEtQIdl</pre>
+*Creates an ideal of S, generated by gen.*
 
-> <dt>`<b>'*'</b>(S::AlgEtQOrd, gen::FldRatElt) -> AlgEtQIdl`</dt>
-<dd>*Creates an ideal of S, generated by gen.</dd>*
+> <pre><b>'*'</b>(gen::FldRatElt, S::AlgEtQOrd) -> AlgEtQIdl</pre>
+*Creates an ideal of S, generated by gen.*
 
-> <dt>`<b>'*'</b>(gen::FldRatElt, S::AlgEtQOrd) -> AlgEtQIdl`</dt>
-<dd>*Creates an ideal of S, generated by gen.</dd>*
+> <pre><b>Print</b>(I::AlgEtQIdl)</pre>
+*Prints the ideal.*
 
-> <dt>`<b>Print</b>(I::AlgEtQIdl)`</dt>
-<dd>*Prints the ideal.</dd>*
+> <pre><b>'!!'</b>(T::AlgEtQOrd,I::AlgEtQIdl) -> AlgEtQIdl</pre>
+*Given an S-ideal I and an order T, returns the extension IT as a T-ideal. Note that if T is in S, then IT=I.*
 
-> <dt>`<b>'!!'</b>(T::AlgEtQOrd,I::AlgEtQIdl) -> AlgEtQIdl`</dt>
-<dd>*Given an S-ideal I and an order T, returns the extension IT as a T-ideal. Note that if T is in S, then IT=I.</dd>*
+> <pre><b>Algebra</b>(I::AlgEtQIdl) -> AlgEtQ</pre>
+*Returns the étale algebra in which the ideal lives.*
 
-> <dt>`<b>Algebra</b>(I::AlgEtQIdl) -> AlgEtQ`</dt>
-<dd>*Returns the étale algebra in which the ideal lives.</dd>*
+> <pre><b>Order</b>(I::AlgEtQIdl) -> AlgEtQOrd</pre>
+*Returns the order of definition of the ideal.*
 
-> <dt>`<b>Order</b>(I::AlgEtQIdl) -> AlgEtQOrd`</dt>
-<dd>*Returns the order of definition of the ideal.</dd>*
+> <pre><b>ZBasis</b>(I::AlgEtQIdl)->SeqEnum[AlgEtQElt]</pre>
+*Returns a Z-basis of the ideal.*
 
-> <dt>`<b>ZBasis</b>(I::AlgEtQIdl)->SeqEnum[AlgEtQElt]`</dt>
-<dd>*Returns a Z-basis of the ideal.</dd>*
+> <pre><b>Generators</b>(I::AlgEtQIdl) -> SeqEnum[AlgEtQElt]</pre>
+*Returns the generators of the ideal.*
 
-> <dt>`<b>Generators</b>(I::AlgEtQIdl) -> SeqEnum[AlgEtQElt]`</dt>
-<dd>*Returns the generators of the ideal.</dd>*
+> <pre><b>myHash</b>(I::AlgEtQIdl)->RngInt</pre>
+*Hash function.*
 
-> <dt>`<b>myHash</b>(I::AlgEtQIdl)->RngInt`</dt>
-<dd>*Hash function.</dd>*
+> <pre><b>'eq'</b>(I::AlgEtQIdl , J::AlgEtQIdl ) -> BoolElt</pre>
+*Equality testing.*
 
-> <dt>`<b>'eq'</b>(I::AlgEtQIdl , J::AlgEtQIdl ) -> BoolElt`</dt>
-<dd>*Equality testing.</dd>*
+> <pre><b>'ne'</b>(I::AlgEtQIdl , J::AlgEtQIdl ) -> BoolElt</pre>
+*Equality testing.*
 
-> <dt>`<b>'ne'</b>(I::AlgEtQIdl , J::AlgEtQIdl ) -> BoolElt`</dt>
-<dd>*Equality testing.</dd>*
+> <pre><b>'eq'</b>(I::AlgEtQIdl, S::AlgEtQOrd) -> BoolElt</pre>
+*Return if I eq S. I needs to be an ideal of S.*
 
-> <dt>`<b>'eq'</b>(I::AlgEtQIdl, S::AlgEtQOrd) -> BoolElt`</dt>
-<dd>*Return if I eq S. I needs to be an ideal of S.</dd>*
+> <pre><b>'eq'</b>(S::AlgEtQOrd,I::AlgEtQIdl) -> BoolElt</pre>
+*Return if I eq S. I needs to be an ideal of S.*
 
-> <dt>`<b>'eq'</b>(S::AlgEtQOrd,I::AlgEtQIdl) -> BoolElt`</dt>
-<dd>*Return if I eq S. I needs to be an ideal of S.</dd>*
+> <pre><b>AbsoluteCoordinates</b>(seq::SeqEnum[AlgEtQElt],I::AlgEtQIdl) -> SeqEnum</pre>
+*AbsoluteCoordiantes with respect to the ZBasis.*
 
-> <dt>`<b>AbsoluteCoordinates</b>(seq::SeqEnum[AlgEtQElt],I::AlgEtQIdl) -> SeqEnum`</dt>
-<dd>*AbsoluteCoordiantes with respect to the ZBasis.</dd>*
+> <pre><b>'in'</b>(x::AlgEtQElt , I::AlgEtQIdl ) -> BoolElt</pre>
+*Returns if x is in I.*
 
-> <dt>`<b>'in'</b>(x::AlgEtQElt , I::AlgEtQIdl ) -> BoolElt`</dt>
-<dd>*Returns if x is in I.</dd>*
+> <pre><b>'in'</b>(x::RngIntElt , I::AlgEtQIdl ) -> BoolElt</pre>
+*Returns if x is in I.*
 
-> <dt>`<b>'in'</b>(x::RngIntElt , I::AlgEtQIdl ) -> BoolElt`</dt>
-<dd>*Returns if x is in I.</dd>*
+> <pre><b>'in'</b>(x::FldRatElt , I::AlgEtQIdl ) -> BoolElt</pre>
+*Returns if x is in I.*
 
-> <dt>`<b>'in'</b>(x::FldRatElt , I::AlgEtQIdl ) -> BoolElt`</dt>
-<dd>*Returns if x is in I.</dd>*
+> <pre><b>'subset'</b>(S::AlgEtQOrd,I::AlgEtQIdl) -> BoolElt</pre>
+*Given an ideal I of S, return if S subseteq I.*
 
-> <dt>`<b>'subset'</b>(S::AlgEtQOrd,I::AlgEtQIdl) -> BoolElt`</dt>
-<dd>*Given an ideal I of S, return if S subseteq I.</dd>*
+> <pre><b>'subset'</b>(I::AlgEtQIdl,S::AlgEtQOrd) -> BoolElt</pre>
+*Given an ideal I of S, return if I subseteq S.*
 
-> <dt>`<b>'subset'</b>(I::AlgEtQIdl,S::AlgEtQOrd) -> BoolElt`</dt>
-<dd>*Given an ideal I of S, return if I subseteq S.</dd>*
+> <pre><b>'subset'</b>(I1 :: AlgEtQIdl, I2 :: AlgEtQIdl) -> BoolElt</pre>
+*Checks if the first argument is inside the second. The ideals need to be fractional.*
 
-> <dt>`<b>'subset'</b>(I1 :: AlgEtQIdl, I2 :: AlgEtQIdl) -> BoolElt`</dt>
-<dd>*Checks if the first argument is inside the second. The ideals need to be fractional.</dd>*
+> <pre><b>Index</b>(T::AlgEtQIdl) -> FldRatElt</pre>
+*Given an ideal T computes its index with respect to the basis of the algebra of T as a free Z-module.*
 
-> <dt>`<b>Index</b>(T::AlgEtQIdl) -> FldRatElt`</dt>
-<dd>*Given an ideal T computes its index with respect to the basis of the algebra of T as a free Z-module.</dd>*
+> <pre><b>Index</b>(J::AlgEtQIdl, I::AlgEtQIdl) -> Any</pre>
+*Given fractional ideals J and I defined over the same order returns [J:I] = [J:J cap I]/[I : J cap I].*
 
-> <dt>`<b>Index</b>(J::AlgEtQIdl, I::AlgEtQIdl) -> Any`</dt>
-<dd>*Given fractional ideals J and I defined over the same order returns [J:I] = [J:J cap I]/[I : J cap I].</dd>*
+> <pre><b>Index</b>(S::AlgEtQOrd, I::AlgEtQIdl) -> Any</pre>
+*Given and ideal I of an order S returns [S:I] = [S:S cap I]/[I : S cap I].*
 
-> <dt>`<b>Index</b>(S::AlgEtQOrd, I::AlgEtQIdl) -> Any`</dt>
-<dd>*Given and ideal I of an order S returns [S:I] = [S:S cap I]/[I : S cap I].</dd>*
+> <pre><b>OneIdeal</b>(S::AlgEtQOrd) -> AlgEtQIdl</pre>
+*Given an order S returns the ideal 1\*S which will be cached.*
 
-> <dt>`<b>OneIdeal</b>(S::AlgEtQOrd) -> AlgEtQIdl`</dt>
-<dd>*Given an order S returns the ideal 1\*S which will be cached.</dd>*
+> <pre><b>Conductor</b>(O::AlgEtQOrd) ->AlgEtQOrdIdl</pre>
+*Computes the conductor of an order, defined as he colon ideal (O:OK), where OK is the maximal order of the algebra.*
 
-> <dt>`<b>Conductor</b>(O::AlgEtQOrd) ->AlgEtQOrdIdl`</dt>
-<dd>*Computes the conductor of an order, defined as he colon ideal (O:OK), where OK is the maximal order of the algebra.</dd>*
+> <pre><b>'+'</b>(I::AlgEtQIdl , J::AlgEtQIdl ) -> AlgEtQIdl</pre>
+*Returns the sum of two ideals.*
 
-> <dt>`<b>'+'</b>(I::AlgEtQIdl , J::AlgEtQIdl ) -> AlgEtQIdl`</dt>
-<dd>*Returns the sum of two ideals.</dd>*
+> <pre><b>'*'</b>(I::AlgEtQIdl , J::AlgEtQIdl ) -> AlgEtQIdl</pre>
+*Product of two ideals.*
 
-> <dt>`<b>'*'</b>(I::AlgEtQIdl , J::AlgEtQIdl ) -> AlgEtQIdl`</dt>
-<dd>*Product of two ideals.</dd>*
+> <pre><b>'*'</b>(I::AlgEtQIdl , x::AlgEtQElt ) -> AlgEtQIdl</pre>
+*Returns x\*I.*
 
-> <dt>`<b>'*'</b>(I::AlgEtQIdl , x::AlgEtQElt ) -> AlgEtQIdl`</dt>
-<dd>*Returns x\*I.</dd>*
+> <pre><b>'*'</b>(x::AlgEtQElt, I::AlgEtQIdl) -> AlgEtQIdl</pre>
+*Returns x\*I.*
 
-> <dt>`<b>'*'</b>(x::AlgEtQElt, I::AlgEtQIdl) -> AlgEtQIdl`</dt>
-<dd>*Returns x\*I.</dd>*
+> <pre><b>'*'</b>(x::RngIntElt, I::AlgEtQIdl) -> AlgEtQIdl</pre>
+*Returns x\*I.*
 
-> <dt>`<b>'*'</b>(x::RngIntElt, I::AlgEtQIdl) -> AlgEtQIdl`</dt>
-<dd>*Returns x\*I.</dd>*
+> <pre><b>'*'</b>(I::AlgEtQIdl, x::RngIntElt) -> AlgEtQIdl</pre>
+*Returns x\*I.*
 
-> <dt>`<b>'*'</b>(I::AlgEtQIdl, x::RngIntElt) -> AlgEtQIdl`</dt>
-<dd>*Returns x\*I.</dd>*
+> <pre><b>'*'</b>(x::FldRatElt, I::AlgEtQIdl) -> AlgEtQIdl</pre>
+*Returns x\*I.*
 
-> <dt>`<b>'*'</b>(x::FldRatElt, I::AlgEtQIdl) -> AlgEtQIdl`</dt>
-<dd>*Returns x\*I.</dd>*
+> <pre><b>'*'</b>(I::AlgEtQIdl, x::FldRatElt) -> AlgEtQIdl</pre>
+*Returns x\*I.*
 
-> <dt>`<b>'*'</b>(I::AlgEtQIdl, x::FldRatElt) -> AlgEtQIdl`</dt>
-<dd>*Returns x\*I.</dd>*
+> <pre><b>'^'</b>(I::AlgEtQIdl, n::RngIntElt) -> AlgEtQIdl</pre>
+*nth power of an ideal.*
 
-> <dt>`<b>'^'</b>(I::AlgEtQIdl, n::RngIntElt) -> AlgEtQIdl`</dt>
-<dd>*nth power of an ideal.</dd>*
+> <pre><b>'meet'</b>(I::AlgEtQIdl, S::AlgEtQOrd) -> AlgEtQIdl</pre>
+*Given an ideal I of S, return S cap I.*
 
-> <dt>`<b>'meet'</b>(I::AlgEtQIdl, S::AlgEtQOrd) -> AlgEtQIdl`</dt>
-<dd>*Given an ideal I of S, return S cap I.</dd>*
+> <pre><b>'meet'</b>(S::AlgEtQOrd,I::AlgEtQIdl) -> AlgEtQIdl</pre>
+*Given an ideal I of S, return S cap I.*
 
-> <dt>`<b>'meet'</b>(S::AlgEtQOrd,I::AlgEtQIdl) -> AlgEtQIdl`</dt>
-<dd>*Given an ideal I of S, return S cap I.</dd>*
+> <pre><b>'meet'</b>(I::AlgEtQIdl, J::AlgEtQIdl) -> AlgEtQIdl</pre>
+*Given ideals I and J, return J cap I.*
 
-> <dt>`<b>'meet'</b>(I::AlgEtQIdl, J::AlgEtQIdl) -> AlgEtQIdl`</dt>
-<dd>*Given ideals I and J, return J cap I.</dd>*
+> <pre><b>'&+'</b>(seq::SeqEnum[AlgEtQIdl])->AlgEtQIdl</pre>
+*Returns the sum of the fractional ideals in the sequence.*
 
-> <dt>`<b>'&+'</b>(seq::SeqEnum[AlgEtQIdl])->AlgEtQIdl`</dt>
-<dd>*Returns the sum of the fractional ideals in the sequence.</dd>*
+> <pre><b>ColonIdeal</b>(I::AlgEtQIdl,J::AlgEtQIdl)->AlgEtQIdl</pre>
+*Computes the colon ideal (I:J) (as an O-ideal) of two O-idealsi.*
 
-> <dt>`<b>ColonIdeal</b>(I::AlgEtQIdl,J::AlgEtQIdl)->AlgEtQIdl`</dt>
-<dd>*Computes the colon ideal (I:J) (as an O-ideal) of two O-idealsi.</dd>*
+> <pre><b>ColonIdeal</b>(O::AlgEtQOrd,J::AlgEtQIdl)->AlgEtQIdl</pre>
+*Computes the colon ideal (1\*O:J) (as an O-ideal).*
 
-> <dt>`<b>ColonIdeal</b>(O::AlgEtQOrd,J::AlgEtQIdl)->AlgEtQIdl`</dt>
-<dd>*Computes the colon ideal (1\*O:J) (as an O-ideal).</dd>*
+> <pre><b>ColonIdeal</b>(I::AlgEtQIdl,O::AlgEtQOrd)->AlgEtQIdl</pre>
+*Computes the colon ideal (I:1\*O) (as an O-ideal).*
 
-> <dt>`<b>ColonIdeal</b>(I::AlgEtQIdl,O::AlgEtQOrd)->AlgEtQIdl`</dt>
-<dd>*Computes the colon ideal (I:1\*O) (as an O-ideal).</dd>*
+> <pre><b>IsInvertible</b>(I::AlgEtQIdl) ->BoolElt</pre>
+*Checks if the ideal I is invertible in its order of definition O.*
 
-> <dt>`<b>IsInvertible</b>(I::AlgEtQIdl) ->BoolElt`</dt>
-<dd>*Checks if the ideal I is invertible in its order of definition O.</dd>*
+> <pre><b>Inverse</b>(I::AlgEtQIdl) ->AlgEtQIdl</pre>
+*Computes the inverse of an ideal of a maximal order.*
 
-> <dt>`<b>Inverse</b>(I::AlgEtQIdl) ->AlgEtQIdl`</dt>
-<dd>*Computes the inverse of an ideal of a maximal order.</dd>*
+> <pre><b>MultiplicatorRing</b>(I::AlgEtQIdl) -> AlgEtQOrd</pre>
+*Given a fractional R-ideal I computes its multiplicator ring (I:I). If the overorders of R are known the corresponding overorder is returned, in order to preserve the known attributes.*
 
-> <dt>`<b>MultiplicatorRing</b>(I::AlgEtQIdl) -> AlgEtQOrd`</dt>
-<dd>*Given a fractional R-ideal I computes its multiplicator ring (I:I). If the overorders of R are known the corresponding overorder is returned, in order to preserve the known attributes.</dd>*
+> <pre><b>IsProductOfIdeals</b>(I::AlgEtQIdl) -> BoolElt, Tup</pre>
+*Return if the argument is a product of ideals in number fields, and if so return also the sequence of these ideals (in the appropriate orders). Note: we require the Order(I) to be the MultiplicatorRing(I).*
 
-> <dt>`<b>IsProductOfIdeals</b>(I::AlgEtQIdl) -> BoolElt, Tup`</dt>
-<dd>*Return if the argument is a product of ideals in number fields, and if so return also the sequence of these ideals (in the appropriate orders). Note: we require the Order(I) to be the MultiplicatorRing(I).</dd>*
+> <pre><b>Random</b>(I::AlgEtQIdl , bd::RngIntElt : ZeroDivisorsAllowed:=false ) -> AlgEtQElt</pre>
+*Random element of I. The Coefficients are bounded by the positive integer bd. One can allow zero-divisors using the optional argument "ZeroDivisorsAllowed", which by default is set to false.*
 
-> <dt>`<b>Random</b>(I::AlgEtQIdl , bd::RngIntElt : ZeroDivisorsAllowed:=false ) -> AlgEtQElt`</dt>
-<dd>*Random element of I. The Coefficients are bounded by the positive integer bd. One can allow zero-divisors using the optional argument "ZeroDivisorsAllowed", which by default is set to false.</dd>*
+> <pre><b>Random</b>(I::AlgEtQIdl : CoeffRange:=3, ZeroDivisorsAllowed:=false ) -> AlgEtQElt</pre>
+*Returns a random (small coefficient) element of I. The range of the random coefficients can be increased by giving the optional argument CoeffRange. One can allow zero-divisors using the optional argument "ZeroDivisorsAllowed", which by default is set to false.*
 
-> <dt>`<b>Random</b>(I::AlgEtQIdl : CoeffRange:=3, ZeroDivisorsAllowed:=false ) -> AlgEtQElt`</dt>
-<dd>*Returns a random (small coefficient) element of I. The range of the random coefficients can be increased by giving the optional argument CoeffRange. One can allow zero-divisors using the optional argument "ZeroDivisorsAllowed", which by default is set to false.</dd>*
+> <pre><b>IsCoprime</b>(I::AlgEtQIdl,J::AlgEtQIdl) -> BoolElt</pre>
+*Given two integral ideals I and J of an order S, returns whether I+J=R.*
 
-> <dt>`<b>IsCoprime</b>(I::AlgEtQIdl,J::AlgEtQIdl) -> BoolElt`</dt>
-<dd>*Given two integral ideals I and J of an order S, returns whether I+J=R.</dd>*
+> <pre><b>IsIntegral</b>(I::AlgEtQIdl) -> BoolElt</pre>
+*Returns wheter the ideal I of S is integral, that is I \subseteq S.*
 
-> <dt>`<b>IsIntegral</b>(I::AlgEtQIdl) -> BoolElt`</dt>
-<dd>*Returns wheter the ideal I of S is integral, that is I \subseteq S.</dd>*
+> <pre><b>MakeIntegral</b>(I::AlgEtQIdl) -> AlgEtQIdl,RngIntElt</pre>
+*Given a fractional S ideal I, returns the ideal d\*I,d when d is the smallest integer such that d\*I is integral in S.*
 
-> <dt>`<b>MakeIntegral</b>(I::AlgEtQIdl) -> AlgEtQIdl,RngIntElt`</dt>
-<dd>*Given a fractional S ideal I, returns the ideal d\*I,d when d is the smallest integer such that d\*I is integral in S.</dd>*
+> <pre><b>MinimalInteger</b>(I::AlgEtQIdl) -> RngIntElt</pre>
+*Returns the smallest integer contained in the ideal I.*
 
-> <dt>`<b>MinimalInteger</b>(I::AlgEtQIdl) -> RngIntElt`</dt>
-<dd>*Returns the smallest integer contained in the ideal I.</dd>*
+> <pre><b>CoprimeRepresentative</b>(I::AlgEtQIdl,J::AlgEtQIdl) -> AlgEtQElt,AlgEtQIdl</pre>
+*Returns an element x such that x\*I is an integral ideal coprime with J, togheter with the product x\*I. The first ideal must be invertible and the second should be integral.*
 
-> <dt>`<b>CoprimeRepresentative</b>(I::AlgEtQIdl,J::AlgEtQIdl) -> AlgEtQElt,AlgEtQIdl`</dt>
-<dd>*Returns an element x such that x\*I is an integral ideal coprime with J, togheter with the product x\*I. The first ideal must be invertible and the second should be integral.</dd>*
-
-
-</dl>
 
 ## List of instrinsics in AlgEtQ/ZBasisLLL.m:
 
+> <pre><b>ZBasisLLL</b>(S::AlgEtQOrd)</pre>
+*A procedure that replaces the ZBasis with an LLL-reduced one.*
 
-<dl>
-> <dt>`<b>ZBasisLLL</b>(S::AlgEtQOrd)`</dt>
-<dd>*A procedure that replaces the ZBasis with an LLL-reduced one.</dd>*
+> <pre><b>ZBasisLLL</b>(S::AlgEtQIdl)</pre>
+*A procedure that replaces the ZBasis with an LLL-reduced one.*
 
-> <dt>`<b>ZBasisLLL</b>(S::AlgEtQIdl)`</dt>
-<dd>*A procedure that replaces the ZBasis with an LLL-reduced one.</dd>*
-
-
-</dl>
 
 ## List of instrinsics in AlgEtQ/Completion.m:
 
+> <pre><b>Completion</b>(P::AlgEtQIdl : MinPrecision:=20) -> FldPad,Map</pre>
+*Given a prime ideal of the maximal order of an etale algebra L it returns the p-adic field corresponding to the completion LP and a homormophism map:L->LP. The vararg MinPrecision is passed to Completion. map has preimage (it acts a bit weird).*
 
-<dl>
-> <dt>`<b>Completion</b>(P::AlgEtQIdl : MinPrecision:=20) -> FldPad,Map`</dt>
-<dd>*Given a prime ideal of the maximal order of an etale algebra L it returns the p-adic field corresponding to the completion LP and a homormophism map:L->LP. The vararg MinPrecision is passed to Completion. map has preimage (it acts a bit weird).</dd>*
-
-
-</dl>
 
 ## List of instrinsics in AlgEtQ/ComplexConj.m:
 
+> <pre><b>HasComplexConjugate</b>(A::AlgEtQ) -> BoolElt</pre>
+*Returns if the algebra is the product of CM fields.*
 
-<dl>
-> <dt>`<b>HasComplexConjugate</b>(A::AlgEtQ) -> BoolElt`</dt>
-<dd>*Returns if the algebra is the product of CM fields.</dd>*
+> <pre><b>ComplexConjugate</b>(x::AlgEtQElt) -> AlgEtQElt</pre>
+*If A is a product of CM fields, it returns the complex conjugate of the argument.*
 
-> <dt>`<b>ComplexConjugate</b>(x::AlgEtQElt) -> AlgEtQElt`</dt>
-<dd>*If A is a product of CM fields, it returns the complex conjugate of the argument.</dd>*
+> <pre><b>IsConjugateStable</b>(O::AlgEtQOrd) -> BoolElt,AlgEtQOrd</pre>
+*Returns wheter O is conjugate stable and the complex conjugate.*
 
-> <dt>`<b>IsConjugateStable</b>(O::AlgEtQOrd) -> BoolElt,AlgEtQOrd`</dt>
-<dd>*Returns wheter O is conjugate stable and the complex conjugate.</dd>*
+> <pre><b>ComplexConjugate</b>(O::AlgEtQOrd) -> AlgEtQOrd</pre>
+*It returns the complex conjugate of the argument.*
 
-> <dt>`<b>ComplexConjugate</b>(O::AlgEtQOrd) -> AlgEtQOrd`</dt>
-<dd>*It returns the complex conjugate of the argument.</dd>*
+> <pre><b>IsConjugateStable</b>(I::AlgEtQIdl) -> BoolElt,AlgEtQIdl</pre>
+*Returns wheter O is conjugate stable and the complex conjugate.*
 
-> <dt>`<b>IsConjugateStable</b>(I::AlgEtQIdl) -> BoolElt,AlgEtQIdl`</dt>
-<dd>*Returns wheter O is conjugate stable and the complex conjugate.</dd>*
+> <pre><b>ComplexConjugate</b>(I::AlgEtQIdl) -> AlgEtQIdl</pre>
+*If A is a product of CM fields, it returns the complex conjugate of the argument.*
 
-> <dt>`<b>ComplexConjugate</b>(I::AlgEtQIdl) -> AlgEtQIdl`</dt>
-<dd>*If A is a product of CM fields, it returns the complex conjugate of the argument.</dd>*
-
-
-</dl>
 
 ## List of instrinsics in AlgEtQ/ComplexMult.m:
 
+> <pre><b>CMType</b>(seq::SeqEnum[Map]) -> AlgEtQCMType</pre>
+*Given a sequence seq of homomorphisms from a CM-algebra to CC, one per conjugate pair, it returns the corresponding CMType.*
 
-<dl>
-> <dt>`<b>CMType</b>(seq::SeqEnum[Map]) -> AlgEtQCMType`</dt>
-<dd>*Given a sequence seq of homomorphisms from a CM-algebra to CC, one per conjugate pair, it returns the corresponding CMType.</dd>*
+> <pre><b>CreateCMType</b>(seq::SeqEnum[Map]) -> AlgEtQCMType</pre>
+*Given a sequence seq of homomorphisms from a CM-algebra to CC, one per conjugate pair, it returns the corresponding CMType.*
 
-> <dt>`<b>CreateCMType</b>(seq::SeqEnum[Map]) -> AlgEtQCMType`</dt>
-<dd>*Given a sequence seq of homomorphisms from a CM-algebra to CC, one per conjugate pair, it returns the corresponding CMType.</dd>*
+> <pre><b>CMType</b>( b::AlgEtQElt  ) -> AlgEtQCMType</pre>
+*Given a totally imginary element b, it returns the CMType PHI for which b is PHI-positive.*
 
-> <dt>`<b>CMType</b>( b::AlgEtQElt  ) -> AlgEtQCMType`</dt>
-<dd>*Given a totally imginary element b, it returns the CMType PHI for which b is PHI-positive.</dd>*
+> <pre><b>CreateCMType</b>( b::AlgEtQElt  ) -> AlgEtQCMType</pre>
+*Given a totally imginary element b, it returns the CMType PHI for which b is PHI-positive.*
 
-> <dt>`<b>CreateCMType</b>( b::AlgEtQElt  ) -> AlgEtQCMType`</dt>
-<dd>*Given a totally imginary element b, it returns the CMType PHI for which b is PHI-positive.</dd>*
+> <pre><b>Print</b>( PHI :: AlgEtQCMType)</pre>
+*Print the AlgEtQCMType.*
 
-> <dt>`<b>Print</b>( PHI :: AlgEtQCMType)`</dt>
-<dd>*Print the AlgEtQCMType.</dd>*
+> <pre><b>CMPositiveElement</b>( PHI::AlgEtQCMType )->AlgEtQElt</pre>
+*Given a CMType PHI returns a totally imaginary PHI-positive element (which uniquely determines PHI).*
 
-> <dt>`<b>CMPositiveElement</b>( PHI::AlgEtQCMType )->AlgEtQElt`</dt>
-<dd>*Given a CMType PHI returns a totally imaginary PHI-positive element (which uniquely determines PHI).</dd>*
+> <pre><b>CMPosElt</b>( PHI::AlgEtQCMType )->AlgEtQElt</pre>
+*Given a CMType PHI returns a totally imaginary PHI-positive element (which uniquely determines PHI).*
 
-> <dt>`<b>CMPosElt</b>( PHI::AlgEtQCMType )->AlgEtQElt`</dt>
-<dd>*Given a CMType PHI returns a totally imaginary PHI-positive element (which uniquely determines PHI).</dd>*
+> <pre><b>Homs</b>( PHI::AlgEtQCMType : prec:=30 )->SeqEnum[Map]</pre>
+*Given a AlgEtQCMType PHI returns the sequence of maps to CC defining it.*
 
-> <dt>`<b>Homs</b>( PHI::AlgEtQCMType : prec:=30 )->SeqEnum[Map]`</dt>
-<dd>*Given a AlgEtQCMType PHI returns the sequence of maps to CC defining it.</dd>*
+> <pre><b>'eq'</b>(PHI1 :: AlgEtQCMType, PHI2::AlgEtQCMType : prec:=30)->BoolElt</pre>
+*Returns whether two cm types are equal. This happens if and only if the ration of (any) two CMPositiveElements is totally real and totally positive.*
 
-> <dt>`<b>'eq'</b>(PHI1 :: AlgEtQCMType, PHI2::AlgEtQCMType : prec:=30)->BoolElt`</dt>
-<dd>*Returns whether two cm types are equal. This happens if and only if the ration of (any) two CMPositiveElements is totally real and totally positive.</dd>*
+> <pre><b>Precision</b>(PHI :: AlgEtQCMType)->RngIntElt</pre>
+*Returns the precision of the given CM-type, that is, the codomain of each homomorphism will be ComplexField(Precision).*
 
-> <dt>`<b>Precision</b>(PHI :: AlgEtQCMType)->RngIntElt`</dt>
-<dd>*Returns the precision of the given CM-type, that is, the codomain of each homomorphism will be ComplexField(Precision).</dd>*
+> <pre><b>ChangePrecision</b>(PHI0 :: AlgEtQCMType, prec::RngIntElt )->AlgEtQCMType</pre>
+*Changes the precision of the given CM-type, that is, the codomain of each homomorphism will be ComplexField(Precision).*
 
-> <dt>`<b>ChangePrecision</b>(PHI0 :: AlgEtQCMType, prec::RngIntElt )->AlgEtQCMType`</dt>
-<dd>*Changes the precision of the given CM-type, that is, the codomain of each homomorphism will be ComplexField(Precision).</dd>*
+> <pre><b>ChangePrecision</b>(~PHI :: AlgEtQCMType, prec::RngIntElt )</pre>
+*Changes the precision of the given CM-type, that is, the codomain of each homomorphism will be ComplexField(Precision).*
 
-> <dt>`<b>ChangePrecision</b>(~PHI :: AlgEtQCMType, prec::RngIntElt )`</dt>
-<dd>*Changes the precision of the given CM-type, that is, the codomain of each homomorphism will be ComplexField(Precision).</dd>*
+> <pre><b>AllCMTypes</b>(A::AlgEtQ : Precision := 30 ) -> SeqEnum[AlgEtQCMType]</pre>
+*Returns all the AlgEtQCMTypes of A.*
 
-> <dt>`<b>AllCMTypes</b>(A::AlgEtQ : Precision := 30 ) -> SeqEnum[AlgEtQCMType]`</dt>
-<dd>*Returns all the AlgEtQCMTypes of A.</dd>*
-
-
-</dl>
 
 ## List of instrinsics in AlgEtQ/IntermediateIdeals.m:
 
+> <pre><b>MinimalIntermediateIdeals</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]</pre>
+*Given fractional S-ideals J subset I, returns the minimal (with respect to inclusion) fractional S-ideals K such that J subset K subset I.*
 
-<dl>
-> <dt>`<b>MinimalIntermediateIdeals</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]`</dt>
-<dd>*Given fractional S-ideals J subset I, returns the minimal (with respect to inclusion) fractional S-ideals K such that J subset K subset I.</dd>*
+> <pre><b>IntermediateIdeals</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]</pre>
+*Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that J subset K subset I. They are produced recursively using from the minimal ones.*
 
-> <dt>`<b>IntermediateIdeals</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]`</dt>
-<dd>*Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that J subset K subset I. They are produced recursively using from the minimal ones.</dd>*
+> <pre><b>IntermediateIdealsWithPrescribedMultiplicatorRing</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]</pre>
+*Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that (K:K)=S and  J subset K subset I. They are produced recursively using from the minimal ones.*
 
-> <dt>`<b>IntermediateIdealsWithPrescribedMultiplicatorRing</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]`</dt>
-<dd>*Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that (K:K)=S and  J subset K subset I. They are produced recursively using from the minimal ones.</dd>*
+> <pre><b>MaximalIntermediateIdeals</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]</pre>
+*Given fractional S-ideals J subset I, returns the maximal (with respect to inclusion) fractional S-ideals K such that J subset K subset I.*
 
-> <dt>`<b>MaximalIntermediateIdeals</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]`</dt>
-<dd>*Given fractional S-ideals J subset I, returns the maximal (with respect to inclusion) fractional S-ideals K such that J subset K subset I.</dd>*
+> <pre><b>MaximalIntermediateIdeals</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]</pre>
+*Given fractional S-ideals J subset I, returns the maximal (with respect to inclusion) fractional S-ideals K such that J subset K subset I.*
 
-> <dt>`<b>MaximalIntermediateIdeals</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]`</dt>
-<dd>*Given fractional S-ideals J subset I, returns the maximal (with respect to inclusion) fractional S-ideals K such that J subset K subset I.</dd>*
+> <pre><b>IntermediateIdealsWithTrivialExtension</b>(I::AlgEtQIdl,J::AlgEtQIdl, O::AlgEtQOrd)->SetIndx[AlgEtQIdl]</pre>
+*Given fractional S-ideals J subset I, returns all the fractional S-ideals K J subset K subset I, and O!!K = I. Note that we need O subset (J:J). They are produced recursively using from the maximal ones.*
 
-> <dt>`<b>IntermediateIdealsWithTrivialExtension</b>(I::AlgEtQIdl,J::AlgEtQIdl, O::AlgEtQOrd)->SetIndx[AlgEtQIdl]`</dt>
-<dd>*Given fractional S-ideals J subset I, returns all the fractional S-ideals K J subset K subset I, and O!!K = I. Note that we need O subset (J:J). They are produced recursively using from the maximal ones.</dd>*
+> <pre><b>IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing</b>(I::AlgEtQIdl,J::AlgEtQIdl, O::AlgEtQOrd)->SetIndx[AlgEtQIdl]</pre>
+*Given fractional S-ideals J subset I, returns all the fractional S-ideals K J subset K subset I, O!!K = I, and (K:K) eq S. Note that we need O subset (J:J). They are produced recursively using from the maximal ones.*
 
-> <dt>`<b>IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing</b>(I::AlgEtQIdl,J::AlgEtQIdl, O::AlgEtQOrd)->SetIndx[AlgEtQIdl]`</dt>
-<dd>*Given fractional S-ideals J subset I, returns all the fractional S-ideals K J subset K subset I, O!!K = I, and (K:K) eq S. Note that we need O subset (J:J). They are produced recursively using from the maximal ones.</dd>*
+> <pre><b>IntermediateIdealsOfIndex</b>(I::AlgEtQIdl,J::AlgEtQIdl,N::RngIntElt)->SetIndx[AlgEtQIdl]</pre>
+*Given ideals J subset I over the same order, and a positive integer N, it returns all the ideals K such that J subset K subset I and [I:K]=N. These are produced by recursively searching for maximal submodules.*
 
-> <dt>`<b>IntermediateIdealsOfIndex</b>(I::AlgEtQIdl,J::AlgEtQIdl,N::RngIntElt)->SetIndx[AlgEtQIdl]`</dt>
-<dd>*Given ideals J subset I over the same order, and a positive integer N, it returns all the ideals K such that J subset K subset I and [I:K]=N. These are produced by recursively searching for maximal submodules.</dd>*
+> <pre><b>MinimalIntermediateIdealsVS</b>(I::AlgEtQIdl,J::AlgEtQIdl : primes:=[])->SetIndx[AlgEtQIdl]</pre>
+*Given fractional S-ideals J subset I, returns the minimal with respect to inclusion fractional S-ideals K such that J subset K subset I.*
 
-> <dt>`<b>MinimalIntermediateIdealsVS</b>(I::AlgEtQIdl,J::AlgEtQIdl : primes:=[])->SetIndx[AlgEtQIdl]`</dt>
-<dd>*Given fractional S-ideals J subset I, returns the minimal with respect to inclusion fractional S-ideals K such that J subset K subset I.</dd>*
+> <pre><b>IntermediateIdealsVS</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]</pre>
+*Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that J subset K subset I. They are produced recursively using from the minimal ones*
 
-> <dt>`<b>IntermediateIdealsVS</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]`</dt>
-<dd>*Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that J subset K subset I. They are produced recursively using from the minimal ones</dd>*
-
-
-</dl>
 
 ## List of instrinsics in AlgEtQ/IdealsOfIndex.m:
 
+> <pre><b>IdealsOfIndex</b>(O::RngOrd, N::RngIntElt) -> SeqEnum[RngOrdIdl]</pre>
+*Given an order O in a number field and a positive integer N, returns all the ideals I of index [O:I]=N.*
 
-<dl>
-> <dt>`<b>IdealsOfIndex</b>(O::RngOrd, N::RngIntElt) -> SeqEnum[RngOrdIdl]`</dt>
-<dd>*Given an order O in a number field and a positive integer N, returns all the ideals I of index [O:I]=N.</dd>*
+> <pre><b>IdealsOfIndex</b>(I::RngOrdIdl, N::RngIntElt) -> SeqEnum[RngOrdIdl]</pre>
+*Given an ideal I in an order O in a number field and a positive integer N, with N coprime with the conductor, returns all the ideals J contained in I with index [I:J]=N.*
 
-> <dt>`<b>IdealsOfIndex</b>(I::RngOrdIdl, N::RngIntElt) -> SeqEnum[RngOrdIdl]`</dt>
-<dd>*Given an ideal I in an order O in a number field and a positive integer N, with N coprime with the conductor, returns all the ideals J contained in I with index [I:J]=N.</dd>*
+> <pre><b>IdealsOfIndex</b>(I::RngOrdFracIdl, N::RngIntElt) -> SeqEnum[RngOrdFracIdl]</pre>
+*Given an ideal I in an order O in a number field and a positive integer N, with N coprime with the conductor, returns all the ideals J contained in I with index [I:J]=N.*
 
-> <dt>`<b>IdealsOfIndex</b>(I::RngOrdFracIdl, N::RngIntElt) -> SeqEnum[RngOrdFracIdl]`</dt>
-<dd>*Given an ideal I in an order O in a number field and a positive integer N, with N coprime with the conductor, returns all the ideals J contained in I with index [I:J]=N.</dd>*
+> <pre><b>IdealsOfIndex</b>(I::AlgEtQIdl, N::RngIntElt : Method := "Default") -> SeqEnum[AlgEtQIdl]</pre>
+*Given an O-ideal I in O and a positive integer N, returns all the subideals J of I with index [I:J]=N. The function is very fast if N is coprime to the conductor of O. If this conditions are not satisfied a slow algorithm is used which doesn't require additional hypothesis. One can force the slow by setting the vararg Method:="Slow".*
 
-> <dt>`<b>IdealsOfIndex</b>(I::AlgEtQIdl, N::RngIntElt : Method := "Default") -> SeqEnum[AlgEtQIdl]`</dt>
-<dd>*Given an O-ideal I in O and a positive integer N, returns all the subideals J of I with index [I:J]=N. The function is very fast if N is coprime to the conductor of O. If this conditions are not satisfied a slow algorithm is used which doesn't require additional hypothesis. One can force the slow by setting the vararg Method:="Slow".</dd>*
+> <pre><b>IdealsOfIndex</b>(O::AlgEtQOrd, N::RngIntElt : Method := "Default") -> SeqEnum[AlgEtQIdl]</pre>
+*Given an order O and a positive integer N, returns all the O-ideals J with index [O:J]=N. The function is very fast if N is coprime to the conductor of O. If this conditions are not satisfied a slow algorithm is used which doesn't require additional hypothesis. One can force the slow-naive by setting the vararg Method:="Slow".*
 
-> <dt>`<b>IdealsOfIndex</b>(O::AlgEtQOrd, N::RngIntElt : Method := "Default") -> SeqEnum[AlgEtQIdl]`</dt>
-<dd>*Given an order O and a positive integer N, returns all the O-ideals J with index [O:J]=N. The function is very fast if N is coprime to the conductor of O. If this conditions are not satisfied a slow algorithm is used which doesn't require additional hypothesis. One can force the slow-naive by setting the vararg Method:="Slow".</dd>*
-
-
-</dl>
 
 ## List of instrinsics in AlgEtQ/ShortEltSmallRep.m:
 
+> <pre><b>ShortElement</b>(I::AlgEtQIdl) ->AlgEtQElt</pre>
+*Given an ideal I returns a non-zerodivisor in I with small coefficients (in the LLL sense). This is achieved by picking an element with small coefficients in a LLL-reduced basis (wrt the T2 norm as a Z-lattice).*
 
-<dl>
-> <dt>`<b>ShortElement</b>(I::AlgEtQIdl) ->AlgEtQElt`</dt>
-<dd>*Given an ideal I returns a non-zerodivisor in I with small coefficients (in the LLL sense). This is achieved by picking an element with small coefficients in a LLL-reduced basis (wrt the T2 norm as a Z-lattice).</dd>*
+> <pre><b>SmallRepresentative</b>(I::AlgEtQIdl) ->AlgEtQIdl,AlgEtQElt</pre>
+*Given a fractional R-ideal I, it returns an isomorphic ideal a\*I, and the element a, such that a\*I is a subset of R, and the cardinality of R/aI is small. This is achieved by computing the ShortElement a of (R:I). Note that if I is invertible R/aI is isomorphic to (R:I)/aR.*
 
-> <dt>`<b>SmallRepresentative</b>(I::AlgEtQIdl) ->AlgEtQIdl,AlgEtQElt`</dt>
-<dd>*Given a fractional R-ideal I, it returns an isomorphic ideal a\*I, and the element a, such that a\*I is a subset of R, and the cardinality of R/aI is small. This is achieved by computing the ShortElement a of (R:I). Note that if I is invertible R/aI is isomorphic to (R:I)/aR.</dd>*
-
-
-</dl>
 
 ## List of instrinsics in AlgEtQ/MinimalGenerators.m:
 
+> <pre><b>TwoGeneratingSet</b>(I::AlgEtQIdl)</pre>
+*A procedure that given an invertible ideal I put in the attibute I`Generators two non-zerodivisors in I that generate I. If I is known to be principal, that is I`Generators consists of one single element, nothing is done.*
 
-<dl>
-> <dt>`<b>TwoGeneratingSet</b>(I::AlgEtQIdl)`</dt>
-<dd>*A procedure that given an invertible ideal I put in the attibute I`Generators two non-zerodivisors in I that generate I. If I is known to be principal, that is I`Generators consists of one single element, nothing is done.</dd>*
-
-
-</dl>
 
 ## List of instrinsics in AlgEtQ/CRT.m:
 
+> <pre><b>ChineseRemainderTheorem</b>(Is::SeqEnum[AlgEtQIdl],as::SeqEnum[AlgEtQElt])-> AlgEtQElt</pre>
+*Given a sequence Is of coprime ideals of S, and a sequence as of elements of S, it returns an element e such that e-as[i] in Is[i] for every i.*
 
-<dl>
-> <dt>`<b>ChineseRemainderTheorem</b>(Is::SeqEnum[AlgEtQIdl],as::SeqEnum[AlgEtQElt])-> AlgEtQElt`</dt>
-<dd>*Given a sequence Is of coprime ideals of S, and a sequence as of elements of S, it returns an element e such that e-as[i] in Is[i] for every i.</dd>*
+> <pre><b>ChineseRemainderTheorem</b>(I::AlgEtQIdl,J::AlgEtQIdl,a::AlgEtQElt,b::AlgEtQElt)-> AlgEtQElt</pre>
+*Given two coprime ideals I and J of S, two elements a,b in S, finds e such that (e-a) in I and (e-b) in J.*
 
-> <dt>`<b>ChineseRemainderTheorem</b>(I::AlgEtQIdl,J::AlgEtQIdl,a::AlgEtQElt,b::AlgEtQElt)-> AlgEtQElt`</dt>
-<dd>*Given two coprime ideals I and J of S, two elements a,b in S, finds e such that (e-a) in I and (e-b) in J.</dd>*
-
-
-</dl>
 
 ## List of instrinsics in AlgEtQ/PicardGroup.m:
 
+> <pre><b>ResidueRingUnits</b>(S::AlgEtQOrd,I::AlgEtQIdl) -> GrpAb,Map</pre>
+*Returns the group (S/I)^\* and a map (S/I)^\* -> S. It is required S to be maximal.*
 
-<dl>
-> <dt>`<b>ResidueRingUnits</b>(S::AlgEtQOrd,I::AlgEtQIdl) -> GrpAb,Map`</dt>
-<dd>*Returns the group (S/I)^\* and a map (S/I)^\* -> S. It is required S to be maximal.</dd>*
+> <pre><b>IsPrincipal</b>(I1::AlgEtQIdl : GRH:=false )->BoolElt, AlgAssElt</pre>
+*Return if the argument is a principal ideal; if so the function returns also the generator. The optional argument "GRH" decides wheter the bound for the IsPrincipal test should be conditional. The default value is "false".*
 
-> <dt>`<b>IsPrincipal</b>(I1::AlgEtQIdl : GRH:=false )->BoolElt, AlgAssElt`</dt>
-<dd>*Return if the argument is a principal ideal; if so the function returns also the generator. The optional argument "GRH" decides wheter the bound for the IsPrincipal test should be conditional. The default value is "false".</dd>*
+> <pre><b>PicardGroup</b>( S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map</pre>
+*Return the PicardGroup of the order S, which is not required to be maximal, and a map from the PicardGroup to a set of representatives of the ideal classes. The optional argument "GRH" decides the bound for the computations of the ClassGroup and UnitGroup of the maximal order. The default value is "false".*
 
-> <dt>`<b>PicardGroup</b>( S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map`</dt>
-<dd>*Return the PicardGroup of the order S, which is not required to be maximal, and a map from the PicardGroup to a set of representatives of the ideal classes. The optional argument "GRH" decides the bound for the computations of the ClassGroup and UnitGroup of the maximal order. The default value is "false".</dd>*
+> <pre><b>UnitGroup</b>(S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map</pre>
+*Return the unit group of a order in a etale algebra. The optional argument "GRH" decides the bound for the computation of the unit group of the maximal order. The default value is "false".*
 
-> <dt>`<b>UnitGroup</b>(S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map`</dt>
-<dd>*Return the unit group of a order in a etale algebra. The optional argument "GRH" decides the bound for the computation of the unit group of the maximal order. The default value is "false".</dd>*
+> <pre><b>IsIsomorphic</b>(I::AlgEtQIdl, J::AlgEtQIdl : GRH:=false ) -> BoolElt, AlgAssElt</pre>
+*Checks if I=x\*J, for some x. If so, also x is returned. The optional argument "GRH" decides wheter the bound for the IsPrincipal test should be conditional. The default value is "false".*
 
-> <dt>`<b>IsIsomorphic</b>(I::AlgEtQIdl, J::AlgEtQIdl : GRH:=false ) -> BoolElt, AlgAssElt`</dt>
-<dd>*Checks if I=x\*J, for some x. If so, also x is returned. The optional argument "GRH" decides wheter the bound for the IsPrincipal test should be conditional. The default value is "false".</dd>*
-
-
-</dl>
 
 ## List of instrinsics in AlgEtQ/FactPrimes.m:
 
+> <pre><b>Factorization</b>(I::AlgEtQIdl) -> Tup</pre>
+*Given an integral S-ideal I coprime with the conductor of S (hence invertible in S), returns its factorization into a product of primes of S.*
 
-<dl>
-> <dt>`<b>Factorization</b>(I::AlgEtQIdl) -> Tup`</dt>
-<dd>*Given an integral S-ideal I coprime with the conductor of S (hence invertible in S), returns its factorization into a product of primes of S.</dd>*
+> <pre><b>PrimesAbove</b>(I::AlgEtQIdl) -> SeqEnum[AlgAssEtOrdIdl]</pre>
+*Given an integral S-ideal, returns the sequence of maximal ideals P of S above I.*
 
-> <dt>`<b>PrimesAbove</b>(I::AlgEtQIdl) -> SeqEnum[AlgAssEtOrdIdl]`</dt>
-<dd>*Given an integral S-ideal, returns the sequence of maximal ideals P of S above I.</dd>*
+> <pre><b>SingularPrimes</b>(R::AlgEtQOrd) -> SeqEnum[AlgAssEtOrdIdl]</pre>
+*Returns the non-invertible primes of the order.*
 
-> <dt>`<b>SingularPrimes</b>(R::AlgEtQOrd) -> SeqEnum[AlgAssEtOrdIdl]`</dt>
-<dd>*Returns the non-invertible primes of the order.</dd>*
+> <pre><b>NonInvertiblePrimes</b>(R::AlgEtQOrd) -> SetIndx</pre>
+*Returns the non-invertible primes of the order.*
 
-> <dt>`<b>NonInvertiblePrimes</b>(R::AlgEtQOrd) -> SetIndx`</dt>
-<dd>*Returns the non-invertible primes of the order.</dd>*
+> <pre><b>IsPrime</b>(I::AlgEtQIdl) -> BoolElt</pre>
+*Given an integral S-ideal, returns if the ideal is a prime fractional ideal of S, that is a maximal S ideal.*
 
-> <dt>`<b>IsPrime</b>(I::AlgEtQIdl) -> BoolElt`</dt>
-<dd>*Given an integral S-ideal, returns if the ideal is a prime fractional ideal of S, that is a maximal S ideal.</dd>*
+> <pre><b>IsBassAtPrime</b>(S::AlgEtQOrd,P::AlgEtQIdl) -> BoolElt</pre>
+*Check if the order is Bass at the prime ideal P.*
 
-> <dt>`<b>IsBassAtPrime</b>(S::AlgEtQOrd,P::AlgEtQIdl) -> BoolElt`</dt>
-<dd>*Check if the order is Bass at the prime ideal P.</dd>*
+> <pre><b>IsBass</b>(S::AlgEtQOrd) -> BoolElt</pre>
+*Check if the order is Bass.*
 
-> <dt>`<b>IsBass</b>(S::AlgEtQOrd) -> BoolElt`</dt>
-<dd>*Check if the order is Bass.</dd>*
+> <pre><b>IsGorensteinAtPrime</b>(S::AlgEtQOrd,P::AlgEtQIdl) -> BoolElt</pre>
+*Check if the order is Gorenstein at the prime ideal P.*
 
-> <dt>`<b>IsGorensteinAtPrime</b>(S::AlgEtQOrd,P::AlgEtQIdl) -> BoolElt`</dt>
-<dd>*Check if the order is Gorenstein at the prime ideal P.</dd>*
-
-
-</dl>
 
 ## List of instrinsics in AlgEtQ/TotRealTotPos.m:
 
+> <pre><b>IsTotallyReal</b>(a::AlgEtQElt) -> BoolElt</pre>
+*Returns whther a is totally real.*
 
-<dl>
-> <dt>`<b>IsTotallyReal</b>(a::AlgEtQElt) -> BoolElt`</dt>
-<dd>*Returns whther a is totally real.</dd>*
+> <pre><b>IsTotallyRealPositive</b>(a::AlgEtQElt) -> BoolElt</pre>
+*Returns whether a is totally positive, that is, totally real and with positive image in C.*
 
-> <dt>`<b>IsTotallyRealPositive</b>(a::AlgEtQElt) -> BoolElt`</dt>
-<dd>*Returns whether a is totally positive, that is, totally real and with positive image in C.</dd>*
+> <pre><b>TotallyRealSubAlgebra</b>(K::AlgEtQ) -> AlgEtQ,Map</pre>
+*Given a CM algebra K returns the unique totally real subalgebra, and an embedding.*
 
-> <dt>`<b>TotallyRealSubAlgebra</b>(K::AlgEtQ) -> AlgEtQ,Map`</dt>
-<dd>*Given a CM algebra K returns the unique totally real subalgebra, and an embedding.</dd>*
+> <pre><b>TotallyRealUnitGroup</b>(S::AlgEtQOrd) -> Grp</pre>
+*Given an order S in a CM étale algebra A returns the groups of totally real units of S, as a subgroup of S^\*.*
 
-> <dt>`<b>TotallyRealUnitGroup</b>(S::AlgEtQOrd) -> Grp`</dt>
-<dd>*Given an order S in a CM étale algebra A returns the groups of totally real units of S, as a subgroup of S^\*.</dd>*
+> <pre><b>TotallyRealPositiveUnitGroup</b>(S::AlgEtQOrd) -> Grp</pre>
+*Given an order S in a CM étale algebra A. Returns the groups of totally positive units of S, as a subgroup of S^\*.*
 
-> <dt>`<b>TotallyRealPositiveUnitGroup</b>(S::AlgEtQOrd) -> Grp`</dt>
-<dd>*Given an order S in a CM étale algebra A. Returns the groups of totally positive units of S, as a subgroup of S^\*.</dd>*
-
-
-</dl>
 
 ## List of instrinsics in AlgEtQ/PrintSave.m:
 
+> <pre><b>PrintSeqAlgEtQElt</b>(seq::SeqEnum[AlgEtQElt]) -> SeqEnum,MonStgElt</pre>
+*Given a sequence of elements of an AlgEtQ, returns a sequence of tuples of sequence of integers that can be coerced into the original algebra to obtain the input sequece. As a second output it reuturns a string that can be printed to file.*
 
-<dl>
-> <dt>`<b>PrintSeqAlgEtQElt</b>(seq::SeqEnum[AlgEtQElt]) -> SeqEnum,MonStgElt`</dt>
-<dd>*Given a sequence of elements of an AlgEtQ, returns a sequence of tuples of sequence of integers that can be coerced into the original algebra to obtain the input sequece. As a second output it reuturns a string that can be printed to file.</dd>*
+> <pre><b>PrintWKICM</b>(R::AlgEtQOrd) -> MonStgElt</pre>
+*Given an order R in an AlgEtQ, it returns a string that contains the weak equivalence classes of R, sorted by multiplicator ring. In particular, the overorders of R can be recovered fro this string. Such string can be easily printed to file. To load the string, after using Read() on the file, use the intrinsic LoadWKICM.*
 
-> <dt>`<b>PrintWKICM</b>(R::AlgEtQOrd) -> MonStgElt`</dt>
-<dd>*Given an order R in an AlgEtQ, it returns a string that contains the weak equivalence classes of R, sorted by multiplicator ring. In particular, the overorders of R can be recovered fro this string. Such string can be easily printed to file. To load the string, after using Read() on the file, use the intrinsic LoadWKICM.</dd>*
+> <pre><b>LoadWKICM</b>(str::MonStgElt) -> AlgEtQOrd</pre>
+*Given a string produced with PrintWKICM it returns the corresponding order R. In the attributes of R, its algebra and its overorders one can find the weak equivalence classes. This can be recovered with the approriate intrinsics.*
 
-> <dt>`<b>LoadWKICM</b>(str::MonStgElt) -> AlgEtQOrd`</dt>
-<dd>*Given a string produced with PrintWKICM it returns the corresponding order R. In the attributes of R, its algebra and its overorders one can find the weak equivalence classes. This can be recovered with the approriate intrinsics.</dd>*
-
-
-</dl>
 
 ## List of instrinsics in AlgEtQ/LowCohenMacaulayType.m:
 
+> <pre><b>NonGorensteinPrimes</b>(S::AlgEtQOrd)->SeqEnum,SeqEnum</pre>
+*Given an order S it returns two sequences the first containing the primes at which S is locally not Gorenstein and the second containing the CohenMacaulay types of S at this primes, that is, the dimension of S^t/PS^t over S/P, where S^t is the TraceDualIdeal of S.*
 
-<dl>
-> <dt>`<b>NonGorensteinPrimes</b>(S::AlgEtQOrd)->SeqEnum,SeqEnum`</dt>
-<dd>*Given an order S it returns two sequences the first containing the primes at which S is locally not Gorenstein and the second containing the CohenMacaulay types of S at this primes, that is, the dimension of S^t/PS^t over S/P, where S^t is the TraceDualIdeal of S.</dd>*
+> <pre><b>CohenMacaulayTypeAtPrime</b>(S::AlgEtQOrd,P::AlgEtQIdl)->RngIntElt</pre>
+*Given an order S and a prime ideal P, it returns its Cohen-Macaulay Type at P. This integer equals the dimension of S^t/P\*S^t where S^t is the trace dual of S.*
 
-> <dt>`<b>CohenMacaulayTypeAtPrime</b>(S::AlgEtQOrd,P::AlgEtQIdl)->RngIntElt`</dt>
-<dd>*Given an order S and a prime ideal P, it returns its Cohen-Macaulay Type at P. This integer equals the dimension of S^t/P\*S^t where S^t is the trace dual of S.</dd>*
+> <pre><b>CohenMacaulayType</b>(S::AlgEtQOrd)->RngIntElt</pre>
+*Given an order S returns its Cohen-Macaulay Type. This integer equals the max dimension of S^t/P\*S^t where S^t is the trace dual of S and P runs over all (non-Gorenstein) primes of S.*
 
-> <dt>`<b>CohenMacaulayType</b>(S::AlgEtQOrd)->RngIntElt`</dt>
-<dd>*Given an order S returns its Cohen-Macaulay Type. This integer equals the max dimension of S^t/P\*S^t where S^t is the trace dual of S and P runs over all (non-Gorenstein) primes of S.</dd>*
-
-
-</dl>
 
 ## List of instrinsics in AlgEtQ/WkClasses.m:
 
+> <pre><b>WKICM_bar</b>(S::AlgEtQOrd : Method:="Auto") -> SeqEnum</pre>
+*Returns all the weak eq classes I, such that (I:I)=S. The VarArg Method (default "Auto") determines if we should use the "IntermediateIdeals" routine or the "LowIndexProcess", which is potentially much slower but more memory efficient.*
 
-<dl>
-> <dt>`<b>WKICM_bar</b>(S::AlgEtQOrd : Method:="Auto") -> SeqEnum`</dt>
-<dd>*Returns all the weak eq classes I, such that (I:I)=S. The VarArg Method (default "Auto") determines if we should use the "IntermediateIdeals" routine or the "LowIndexProcess", which is potentially much slower but more memory efficient.</dd>*
+> <pre><b>WKICM</b>(E::AlgEtQOrd : Method:="Auto")->SeqEnum</pre>
+*Computes the Weak equivalence class monoid of E. The VarArg Method (default "Auto") determines if we should use the "IntermediateIdeals" routine or the "LowIndexProcess", which is potentially much slower but more memory efficient.*
 
-> <dt>`<b>WKICM</b>(E::AlgEtQOrd : Method:="Auto")->SeqEnum`</dt>
-<dd>*Computes the Weak equivalence class monoid of E. The VarArg Method (default "Auto") determines if we should use the "IntermediateIdeals" routine or the "LowIndexProcess", which is potentially much slower but more memory efficient.</dd>*
-
-
-</dl>
 
 ## List of instrinsics in AlgEtQ/WkTesting.m:
 
+> <pre><b>IsWeakEquivalent</b>(I::AlgEtQIdl,J::AlgEtQIdl)->BoolElt</pre>
+*Checks if I and J are weakly equivalent 1 \in (I:J)\*(J:I). This function does not require that the ideals are defined over the same order.*
 
-<dl>
-> <dt>`<b>IsWeakEquivalent</b>(I::AlgEtQIdl,J::AlgEtQIdl)->BoolElt`</dt>
-<dd>*Checks if I and J are weakly equivalent 1 \in (I:J)\*(J:I). This function does not require that the ideals are defined over the same order.</dd>*
+> <pre><b>IsWeakEquivalent</b>(O1::AlgEtQOrd,O2::AlgEtQOrd)->BoolElt</pre>
+*Check if the two orders are weakly equivalent, that is equal.*
 
-> <dt>`<b>IsWeakEquivalent</b>(O1::AlgEtQOrd,O2::AlgEtQOrd)->BoolElt`</dt>
-<dd>*Check if the two orders are weakly equivalent, that is equal.</dd>*
+> <pre><b>IsWeakEquivalent</b>(O::AlgEtQOrd,J::AlgEtQIdl)->BoolElt</pre>
+*Checks if the second argument is weakly equivalent to the first argument.*
 
-> <dt>`<b>IsWeakEquivalent</b>(O::AlgEtQOrd,J::AlgEtQIdl)->BoolElt`</dt>
-<dd>*Checks if the second argument is weakly equivalent to the first argument.</dd>*
+> <pre><b>IsWeakEquivalent</b>(J::AlgEtQIdl,O::AlgEtQOrd)->BoolElt</pre>
+*Checks if the second argument is weakly equivalent to the first argument.*
 
-> <dt>`<b>IsWeakEquivalent</b>(J::AlgEtQIdl,O::AlgEtQOrd)->BoolElt`</dt>
-<dd>*Checks if the second argument is weakly equivalent to the first argument.</dd>*
+> <pre><b>IsGorenstein</b>(O::AlgEtQOrd)->BoolElt</pre>
+*Checks if the order O is Gorenstein.*
 
-> <dt>`<b>IsGorenstein</b>(O::AlgEtQOrd)->BoolElt`</dt>
-<dd>*Checks if the order O is Gorenstein.</dd>*
-
-
-</dl>
 
 ## List of instrinsics in AlgEtQ/IdealClassMonoid.m:
 
+> <pre><b>ICM_bar</b>(S::AlgEtQOrd : GRH:=false ) -> SeqEnum</pre>
+*returns the ideal classes of the order S having S as MultiplicatorRing, that is the orbits of the action of PicardGroup(S) on WKICM_bar(S).*
 
-<dl>
-> <dt>`<b>ICM_bar</b>(S::AlgEtQOrd : GRH:=false ) -> SeqEnum`</dt>
-<dd>*returns the ideal classes of the order S having S as MultiplicatorRing, that is the orbits of the action of PicardGroup(S) on WKICM_bar(S).</dd>*
+> <pre><b>ICM</b>(S::AlgEtQOrd : GRH:=false ) -> SeqEnum</pre>
+*returns the ideal class monoid of the order, that is a set of representatives for the isomorphism classes of the fractiona ideals.*
 
-> <dt>`<b>ICM</b>(S::AlgEtQOrd : GRH:=false ) -> SeqEnum`</dt>
-<dd>*returns the ideal class monoid of the order, that is a set of representatives for the isomorphism classes of the fractiona ideals.</dd>*
-
-
-</dl>
 

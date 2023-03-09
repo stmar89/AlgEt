@@ -19,7 +19,7 @@ import "Ord.m" : MatrixAtoQ , MatrixQtoA;
 //------------
 
 intrinsic ZBasisLLL(S::AlgEtQOrd)
-{A procedure that replaces the ZBasis with an LLL-reduced one.}
+{A procedure that replaces the ZBasis with an LLL-reduced one. Note: the attribute inclusion matrix, which depends on the Z-Basis is modified as well.}
   if (not assigned S`IsZBasisLLLReduced) or (not S`IsZBasisLLLReduced) then
     S`ZBasis:=MatrixQtoA(Algebra(S),LLL(MatrixAtoQ(ZBasis(S))));
     S`IsZBasisLLLReduced:=true;
@@ -28,7 +28,7 @@ intrinsic ZBasisLLL(S::AlgEtQOrd)
 end intrinsic;
 
 intrinsic ZBasisLLL(S::AlgEtQIdl)
-{A procedure that replaces the ZBasis with an LLL-reduced one.}
+{A procedure that replaces the ZBasis with an LLL-reduced one. Note: the attribute inclusion matrix, which depends on the Z-Basis is modified as well.}
   if (not assigned S`IsZBasisLLLReduced) or (not S`IsZBasisLLLReduced) then
     S`ZBasis:=MatrixQtoA(Algebra(S),LLL(MatrixAtoQ(ZBasis(S))));
     S`IsZBasisLLLReduced:=true;

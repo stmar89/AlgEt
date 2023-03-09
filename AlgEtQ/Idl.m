@@ -40,8 +40,8 @@ import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQ
 //----------
 
 CreateAlgEtQIdl:=function(S,gens)
-// Given S::AlgEtQOrd and some generateors creates the new object 
-// Here we just assign the generators. we do not compute the Zbasis unless necessary!
+// Given S::AlgEtQOrd and some generators creates the new object 
+// The ZBasis is computed only if there are more generators than the dimension of the algebra.
     A:=Algebra(S);
     I:=New(AlgEtQIdl);
     I`Algebra:=A;
@@ -89,7 +89,7 @@ intrinsic Ideal(S::AlgEtQOrd, gens::SeqEnum) -> AlgEtQIdl
 end intrinsic;
 
 intrinsic Ideal(S::AlgEtQOrd, idls::Tup) -> AlgEtQIdl
-{Given an order S which is a product of orders S_i in the number fiedls generting the Algebra(S), and a Tup of ideals I_i of S_i, returns the S-ideal direct product of the I_i.}
+{Given an order S which is a product of orders S_i in the number fields generating the Algebra(S), and a Tup of ideals I_i of S_i, returns the S-ideal corresponding to the direct sum of the I_i.}
     A:=Algebra(S);
     test,SasProd:=IsProductOfOrders(S);
     require test : "The order needs to be a product.";
@@ -150,7 +150,7 @@ end intrinsic;
 //----------
 
 intrinsic '!!'(T::AlgEtQOrd,I::AlgEtQIdl) -> AlgEtQIdl
-{Given an S-ideal I and an order T, returns the extension IT as a T-ideal. Note that if T is in S, then IT=I.}
+{Given an S-ideal I and an order T, returns the extension IT as a T-ideal. Note that if T is a subset of S, then IT=I.}
     if Order(I) eq T then
         return I;
     elif T subset Order(I) then
@@ -296,15 +296,6 @@ end intrinsic;
 intrinsic 'in'(x::AlgEtQElt , I::AlgEtQIdl ) -> BoolElt
 {Returns if x is in I.}
     require Algebra(x) eq Algebra(I) : "the elements must lie in the same algebra of definition";
-    /*if assigned I`Generators and x in I`Generators then 
-        return true;
-    end if;
-    if assigned I`ZBasis and x in I`ZBasis then 
-        return true;
-    end if;
-    mat := AbsoluteCoordinates([x], ZBasis(I))[1];
-    return &and[IsCoercible(Integers(), elt) : elt in Eltseq(mat)];
-    */
     ZZ:=Integers();
     coord:=AbsoluteCoordinates([x],I)[1];
     is_in:=forall{m : m in coord | IsCoercible(ZZ,m)};
@@ -323,14 +314,12 @@ end intrinsic;
 
 intrinsic 'subset'(S::AlgEtQOrd,I::AlgEtQIdl) -> BoolElt
 {Given an ideal I of S, return if S subseteq I.}
-    assert Algebra(I) cmpeq Algebra(S);
     require Order(I) eq S: "the second argument must be an ideal of the first argument";
     return OneIdeal(S) subset I;
 end intrinsic;
 
 intrinsic 'subset'(I::AlgEtQIdl,S::AlgEtQOrd) -> BoolElt
 {Given an ideal I of S, return if I subseteq S.}
-    assert Algebra(I) cmpeq Algebra(S);
     require Order(I) eq S: "the first argument must be an ideal of the second argument";
     return I subset OneIdeal(S);
 end intrinsic;
@@ -349,7 +338,7 @@ end intrinsic;
 //----------
 
 intrinsic Index(T::AlgEtQIdl) -> FldRatElt
-{Given an ideal T computes its index with respect to the basis of the algebra of T as a free Z-module.}
+{Given an ideal T computes its index with respect to the basis of the algebra of T as a free Q-module.}
   if not assigned T`Index then
     matT := MatrixAtoQ(ZBasis(T));
     T`Index := Abs(Rationals() ! Determinant(matT));
@@ -359,7 +348,7 @@ end intrinsic;
 
 intrinsic Index(J::AlgEtQIdl, I::AlgEtQIdl) -> Any
 {Given fractional ideals J and I defined over the same order returns [J:I] = [J:J cap I]/[I : J cap I].}
-    require Order(I) eq Order(J): "the ideals must be of the same order";
+  require Order(I) eq Order(J): "the ideals must be of the same order";
   out:=Index(I)/Index(J);
   if IsCoercible(Integers(),out) then
     out:=Integers()!out;
@@ -598,7 +587,6 @@ intrinsic 'meet'(I::AlgEtQIdl, J::AlgEtQIdl) -> AlgEtQIdl
 {Given ideals I and J, return J cap I.}
 // this code is inspired by H.Cohen "Advanced Topics in ...", page 36.]
 // note that the hnf in Magma is not the same as in the book. This is why the matrix M and P are take in a slightly different way compared to the refernce.
-    require Algebra(I) eq Algebra(J): "the ideals must lie in the same algebra";
     require Order(I) eq Order(J): "the ideals must be defined over the same order";
     A:=Algebra(I);
     if I subset J then 
@@ -607,16 +595,6 @@ intrinsic 'meet'(I::AlgEtQIdl, J::AlgEtQIdl) -> AlgEtQIdl
     if J subset I then
         return J;
     end if;
-
-    /* further experiments seems to show that the version using the hermite normal form is faster
-    id:=TraceDualIdeal(TraceDualIdeal(I)+TraceDualIdeal(J));
-    if GetAssertions() gt 1 then
-        zb:=meet_zbasis(ZBasis(I),ZBasis(J));
-        id0:=Ideal(Order(I),zb);
-        id0`ZBasis:=zb;
-        assert id eq id0;
-    end if;
-    */ 
     zb:=meet_zbasis(ZBasis(I),ZBasis(J));
     id:=Ideal(Order(I),zb);
     id`ZBasis:=zb;
@@ -633,12 +611,14 @@ intrinsic '&+'(seq::SeqEnum[AlgEtQIdl])->AlgEtQIdl
     return id;
 end intrinsic;
 
+// an analogous definition of &* seems to be very slow, probably because the number of generators grows too fast.
+
 //----------
 // ColonIdeals
 //----------
 
 intrinsic ColonIdeal(I::AlgEtQIdl,J::AlgEtQIdl)->AlgEtQIdl
-{Computes the colon ideal (I:J) (as an O-ideal) of two O-idealsi.}
+{Computes the colon ideal (I:J) (as an O-ideal) of two O-ideals, which is the set of elements x of the algebra such that x*J subset I.}
     A:=Algebra(I);
     O := Order(I);
     require Order(J) eq O : "the ideals must be of the same order";
@@ -647,37 +627,33 @@ intrinsic ColonIdeal(I::AlgEtQIdl,J::AlgEtQIdl)->AlgEtQIdl
         out:=(1/j)*I;
         return out;
     end if;
-    //if assigned I`TraceDualIdeal then
-    // // at a certain point I thought this would be faster, but it does not seem to be the case.
-    //    IJ:=TraceDualIdeal(TraceDualIdeal(I)*J);
-    //else
-        // based on jv code
-        N:=AbsoluteDimension(A);
-        zbI:=ZBasis(I);
-        //mIinv:=MatrixAtoQ(zbI)^-1;
-        mIinv:=inclusion_matrix(I);
-        zbJ:=ZBasis(J);
-        bas:=AbsoluteBasis(A);
-        M:=VerticalJoin([ Transpose( MatrixAtoQ([zj*bas[i] : i in [1..N]])*mIinv) : zj in zbJ] );
-        d:=Denominator(M);
-        P:=(1/d)*crZQ(hnf(crQZ(d*M)));
-        P:=Transpose(P)^-1;
-        zbIJ:=MatrixQtoA(A,P);
-        IJ:=Ideal(O,zbIJ);
-        IJ`ZBasis:=zbIJ; //we know that zbIJ is a ZBasis
-    //end if;
-
+    // based on jv code
+    N:=AbsoluteDimension(A);
+    zbI:=ZBasis(I);
+    //mIinv:=MatrixAtoQ(zbI)^-1;
+    mIinv:=inclusion_matrix(I);
+    zbJ:=ZBasis(J);
+    bas:=AbsoluteBasis(A);
+    M:=VerticalJoin([ Transpose( MatrixAtoQ([zj*bas[i] : i in [1..N]])*mIinv) : zj in zbJ] );
+    d:=Denominator(M);
+    P:=(1/d)*crZQ(hnf(crQZ(d*M)));
+    P:=Transpose(P)^-1;
+    zbIJ:=MatrixQtoA(A,P);
+    IJ:=Ideal(O,zbIJ);
+    IJ`ZBasis:=zbIJ; //we know that zbIJ is a ZBasis
     assert2 IJ*J subset I;
     return IJ;
 end intrinsic;
 
 intrinsic ColonIdeal(O::AlgEtQOrd,J::AlgEtQIdl)->AlgEtQIdl
 {Computes the colon ideal (1*O:J) (as an O-ideal).}
+    require Order(J) eq O : "The ideal is not defined of the same order";
     return ColonIdeal(OneIdeal(O), J);
 end intrinsic;
 
 intrinsic ColonIdeal(I::AlgEtQIdl,O::AlgEtQOrd)->AlgEtQIdl
 {Computes the colon ideal (I:1*O) (as an O-ideal).}
+    require Order(I) eq O : "The ideal is not defined of the same order";
     return I; //since we require O=Order(I)
 end intrinsic;
 
@@ -701,8 +677,8 @@ intrinsic IsInvertible(I::AlgEtQIdl) ->BoolElt
 end intrinsic;
 
 intrinsic Inverse(I::AlgEtQIdl) ->AlgEtQIdl
-{Computes the inverse of an ideal of a maximal order.}
-    require IsInvertible(I) : "the ideal is not invertible in the order of definition";
+{Computes the inverse of an invertible ideal.}
+    require IsInvertible(I) : "The ideal is not invertible in the order of definition";
     if not assigned I`Inverse then
         O:=Order(I);
         COI:=ColonIdeal(O,I);
@@ -715,7 +691,7 @@ intrinsic Inverse(I::AlgEtQIdl) ->AlgEtQIdl
 end intrinsic;
 
 intrinsic MultiplicatorRing(I::AlgEtQIdl) -> AlgEtQOrd
-{Given a fractional R-ideal I computes its multiplicator ring (I:I). If the overorders of R are known the corresponding overorder is returned, in order to preserve the known attributes.}
+{Given a fractional ideal I computes its multiplicator ring (I:I).}
     if not assigned I`MultiplicatorRing then
         R:=Order(I);
         if #Generators(I) eq 1 then
@@ -739,7 +715,7 @@ end intrinsic;
 //----------
 
 intrinsic IsProductOfIdeals(I::AlgEtQIdl) -> BoolElt, Tup
-{Return if the argument is a product of ideals in number fields, and if so return also the sequence of these ideals (in the appropriate orders). Note: we require the Order(I) to be the MultiplicatorRing(I).}
+{Return if the argument is a product of ideals in the number fields defining the algebra. If so, it returns also the sequence of these ideals (in the appropriate orders). Note: we require the Order(I) to be the MultiplicatorRing(I).}
     if not assigned I`IsProductOfIdeals then
         O:=Order(I);
         require O eq MultiplicatorRing(I) : "The ideal needs to be defined over its multiplicator ring.";
@@ -808,7 +784,7 @@ intrinsic IsCoprime(I::AlgEtQIdl,J::AlgEtQIdl) -> BoolElt
 end intrinsic;
 
 intrinsic IsIntegral(I::AlgEtQIdl) -> BoolElt
-{Returns wheter the ideal I of S is integral, that is I \subseteq S.}
+{Returns wheter the ideal I of S is integral, that is I subseteq S.}
     if not assigned I`IsIntegral then
         S:=Order(I);
         I`IsIntegral:=I subset S;
@@ -817,7 +793,7 @@ intrinsic IsIntegral(I::AlgEtQIdl) -> BoolElt
 end intrinsic;
 
 intrinsic MakeIntegral(I::AlgEtQIdl) -> AlgEtQIdl,RngIntElt
-{Given a fractional S ideal I, returns the ideal d*I,d when d is the smallest integer such that d*I is integral in S.}
+{Given a fractional S ideal I, returns the ideal d*I,d when d is the smallest integer such that d*I is integral in S. Compare with SmallRepresentative.}
     if IsIntegral(I) then return I,1; end if;
     S:=Order(I);
     d:=LCM(&cat[ [Denominator(x_coord) : x_coord in x] : x in AbsoluteCoordinates(Generators(I),S)]);

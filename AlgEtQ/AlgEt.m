@@ -51,7 +51,8 @@ intrinsic EtaleAlgebra(f::RngUPolElt[RngInt]) -> AlgEtQ
 end intrinsic;
 
 intrinsic EtaleAlgebra(f::RngUPolElt[FldRat]) -> AlgEtQ
-{Given a squarefree polynomial over the rationals returns the product of the number fields defined by the irreducible factors.}
+{.}
+//Given a squarefree polynomial over the rationals returns the product of the number fields defined by the irreducible factors.
     require IsSquarefree(f) : "The polynomial must be squarefree.";
     A:=EtaleAlgebra([NumberField(g[1] : DoLinearExtension) : g in Factorization(f)]);
     // DoLinearExtension is to avoid issues with g's of degree 1.

@@ -752,7 +752,7 @@ These are produced by recursively searching for maximal submodules.</em>
 ## List of instrinsics in AlgEtQ/ShortEltSmallRep.m:
 
 > <pre><b>ShortElement</b>(I::AlgEtQIdl) ->AlgEtQElt</pre>
-<em>Given an ideal I returns a non-zerodivisor in I with small coefficients (in the LLL sense). This is achieved by picking an element with small coefficients in a LLL-reduced basis (wrt the T2 norm as a Z-lattice).</em>
+<em>Given an ideal I returns a non-zerodivisor in I with small coefficients (in the LLL sense). This is achieved by randomly picking an element with small coefficients in a LLL-reduced basis (wrt the T2 norm as a Z-lattice).</em>
 
 > <pre><b>SmallRepresentative</b>(I::AlgEtQIdl) ->AlgEtQIdl,AlgEtQElt</pre>
 <em>Given a fractional R-ideal I, it returns an isomorphic ideal a\*I, and the element a, such that a\*I is a subset of R, and the cardinality of R/aI is small. This is achieved by computing the ShortElement a of (R:I). Note that if I is invertible R/aI is isomorphic to (R:I)/aR.</em>
@@ -761,13 +761,13 @@ These are produced by recursively searching for maximal submodules.</em>
 ## List of instrinsics in AlgEtQ/MinimalGenerators.m:
 
 > <pre><b>TwoGeneratingSet</b>(I::AlgEtQIdl)</pre>
-<em>A procedure that given an invertible ideal I put in the attibute I`Generators two non-zerodivisors in I that generate I. If I is known to be principal, that is I`Generators consists of one single element, nothing is done.</em>
+<em>A procedure that given an invertible ideal I put in the attibute Generators of I two non-zerodivisors in I that generate I. If I is known to be principal nothing is done.</em>
 
 
 ## List of instrinsics in AlgEtQ/CRT.m:
 
 > <pre><b>ChineseRemainderTheorem</b>(Is::SeqEnum[AlgEtQIdl],as::SeqEnum[AlgEtQElt])-> AlgEtQElt</pre>
-<em>Given a sequence Is of coprime ideals of S, and a sequence as of elements of S, it returns an element e such that e-as[i] in Is[i] for every i.</em>
+<em>Given a sequence `Is` of ideals of S, pairwise coprime,, and a sequence `as` of elements of S, it returns an element e such that e-as[i] in Is[i] for every i.</em>
 
 > <pre><b>ChineseRemainderTheorem</b>(I::AlgEtQIdl,J::AlgEtQIdl,a::AlgEtQElt,b::AlgEtQElt)-> AlgEtQElt</pre>
 <em>Given two coprime ideals I and J of S, two elements a,b in S, finds e such that (e-a) in I and (e-b) in J.</em>

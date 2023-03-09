@@ -17,7 +17,7 @@ declare attributes AlgEtQIdl : ShortElement, SmallRepresentative;
 //------------
 
 intrinsic ShortElement(I::AlgEtQIdl) ->AlgEtQElt
-{Given an ideal I returns a non-zerodivisor in I with small coefficients (in the LLL sense). This is achieved by picking an element with small coefficients in a LLL-reduced basis (wrt the T2 norm as a Z-lattice).}
+{Given an ideal I returns a non-zerodivisor in I with small coefficients (in the LLL sense). This is achieved by randomly picking an element with small coefficients in a LLL-reduced basis (wrt the T2 norm as a Z-lattice).}
     if not assigned I`ShortElement then
         ZBasisLLL(I);
         B := ZBasis(I);

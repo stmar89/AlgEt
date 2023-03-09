@@ -15,6 +15,7 @@ Completion.m
 ComplexConj.m
 ComplexMult.m
 IntermediateIdeals.m
+IdealsOfIndex.m
 ShortEltSmallRep.m
 MinimalGenerators.m
 CRT.m

@@ -80,7 +80,7 @@
             if pos ne 0 then
                 //out cat:="> <pre><b>" cat name cat "</b>" cat name_2 cat "</pre>\n" cat 
                 //"*" cat desc cat "*\n\n";
-    out cat:="> <dt>\`<b>" cat name cat "</b>" cat name_2 cat "`</dt>\n" cat 
+    out cat:="> <dt>\`<b>" cat name cat "</b>" cat name_2 cat "\`</dt>\n" cat 
     "<dd>*" cat desc cat "</dd>*\n\n";
             end if;
         until pos eq 0;

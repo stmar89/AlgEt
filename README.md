@@ -25,7 +25,7 @@ To use them, use the magma command `AttachSpec("specMod")`, after opening magma 
 
 Functionalities for p-adic etale algebras, including how to build completion at rational primes, are developed by Casper Putz. Available [`here`](https://github.com/CPutz/etale-algebra-family).
 
-In the folder [`examples`](https://github.com/stmar89/PolsAbVarFpCanLift/tree/main/examples), you will find files containing the code to reproduce the examples from the papers in the references below, which should be of help to get a quick start on the functionalities.
+In the folder [`examples`](https://github.com/stmar89/AlgEt/blob/main/examples), you will find files containing the code to reproduce the examples from the papers in the references below, which should be of help to get a quick start on the functionalities.
 
 <!---
 In the file [`examples.txt`](https://github.com/stmar89/PolsAbVarFpCanLift/blob/main/doc/examples.txt) there is the code to see how to use the main functions of the package.

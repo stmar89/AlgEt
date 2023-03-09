@@ -48,7 +48,8 @@
 
     find_next_intrinsic:=function(inp,pos)
     // returns name,name_2,descr, pos
-    // 0 if Eof
+    // where: name is the intrinsic, name_2 is the rest of the line, descr is what is contained b/w {..},
+    // and pos is the position of the next 'intrinsic', if any, or 0 for Eof
         assert pos gt 0;
         name_in:=find_next(inp,pos,"intrinsic");
         if name_in eq 0 then return "","","",0; end if; //we hit the Eof
@@ -74,10 +75,11 @@
         repeat
             name,name_2,desc,pos:=find_next_intrinsic(inp,pos);
             if pos ne 0 then
-                out cat:="<pre>\n<b>" cat name cat "</b>" cat name_2 cat "\n</pre>\n\n" cat "*" cat desc cat "*\n\n";
+                out cat:="<pre>\n<b>" cat name cat "</b>" cat name_2 cat "\n</pre>\n" cat 
+                         "*" cat desc cat "*\n\n";
             end if;
         until pos eq 0;
-        fprintf output_file,"## List of instrinsics in %o:\n---\n\n%o\n",input_file,out;
+        fprintf output_file,"## List of instrinsics in %o:\n--\n\n%o\n",input_file,out;
     end for;
      
     quit;

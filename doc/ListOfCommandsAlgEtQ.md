@@ -773,10 +773,10 @@
 <b>QuotientVS</b>(I::AlgEtQIdl, J::AlgEtQIdl, P::AlgEtQIdl) -> ModRng, Map
 </pre>
 
-*Let I, J, P be fractional R-ideals such that:
- - P is prime of of some order R, with residue field K;
- - J in I and I/J is a vector space V over K, say of dimension d.
- The function returns the KModule K^d=V and the natural surjection I->V (with pre-image)*
+*BUGGED Let I, J, P be fractional R-ideals such that:
+//  - P is prime of of some order R, with residue field K;
+//  - J in I and I/J is a vector space V over K, say of dimension d.
+//  The function returns the KModule K^d=V and the natural surjection I->V (with pre-image)*
 
 <pre>
 <b>QuotientVS</b>(I::AlgEtQOrd, J::AlgEtQOrd, P::AlgEtQIdl) -> ModRng, Map

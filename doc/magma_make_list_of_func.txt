@@ -77,7 +77,7 @@
         repeat
             name,name_2,desc,pos:=find_next_intrinsic(inp,pos);
             if pos ne 0 then
-                out cat:="> <dt><b>" cat name cat "</b>" cat name_2 cat "</dt>\n" cat 
+                out cat:="> <dt><pre><b>" cat name cat "</b>" cat name_2 cat "</pre></dt>\n" cat 
                 // "*" cat desc cat "*\n\n";
                 "<dd>" cat desc cat "</dd>\n\n";
             end if;

@@ -1,5 +1,5 @@
-# List of instrinsics in AlgEtQ/AlgEt.m:
---
+## List of instrinsics in AlgEtQ/AlgEt.m:
+---
 
 <pre>
 <b>EtaleAlgebra</b>(seq::SeqEnum[FldNum]) -> AlgEtQ
@@ -20,8 +20,8 @@
 *Given a squarefree polynomial over the rationals returns the product of the number fields defined by the irreducible factors.*
 
 
-# List of instrinsics in AlgEtQ/AlgEtAttributes.m:
---
+## List of instrinsics in AlgEtQ/AlgEtAttributes.m:
+---
 
 <pre>
 <b>Print</b>(A::AlgEtQ)
@@ -78,8 +78,8 @@
 *A1 eq A2.*
 
 
-# List of instrinsics in AlgEtQ/Homs.m:
---
+## List of instrinsics in AlgEtQ/Homs.m:
+---
 
 <pre>
 <b>HomsToC</b>(A::AlgEtQ : Precision:=30)->SeqEnum[Map]
@@ -88,8 +88,8 @@
 *returns Hom(A,\C) as a sequence of maps. The precision of \C is given by the optional parameter "Precision". Default value is 30*
 
 
-# List of instrinsics in AlgEtQ/Elt.m:
---
+## List of instrinsics in AlgEtQ/Elt.m:
+---
 
 <pre>
 <b>Print</b>(x::AlgEtQElt)
@@ -512,8 +512,8 @@
 *Returns the ideampotent element of the étale algebra A.*
 
 
-# List of instrinsics in AlgEtQ/TraceNorm.m:
---
+## List of instrinsics in AlgEtQ/TraceNorm.m:
+---
 
 <pre>
 <b>Trace</b>(x::AlgEtQElt) -> Any
@@ -552,8 +552,8 @@
 *Returns the trace dual ideal of an order in an etale algebra.*
 
 
-# List of instrinsics in AlgEtQ/Ord.m:
---
+## List of instrinsics in AlgEtQ/Ord.m:
+---
 
 <pre>
 <b>Print</b>(A::AlgEtQOrd)
@@ -730,8 +730,8 @@
 *Returns the multiplicator ring of an order R, that is R itself.*
 
 
-# List of instrinsics in AlgEtQ/Quotients.m:
---
+## List of instrinsics in AlgEtQ/Quotients.m:
+---
 
 <pre>
 <b>Quotient</b>(I::AlgEtQIdl, zbJ::SeqEnum[AlgEtQElt]) -> GrpAb, Map
@@ -770,15 +770,6 @@
 *Returns an element of P that maps to the primitive element of the residue field S/P, that is a multiplicative generator of (S/P)^*.*
 
 <pre>
-<b>QuotientVS</b>(I::AlgEtQIdl, J::AlgEtQIdl, P::AlgEtQIdl) -> ModRng, Map
-</pre>
-
-*BUGGED Let I, J, P be fractional R-ideals such that:
-//  - P is prime of of some order R, with residue field K;
-//  - J in I and I/J is a vector space V over K, say of dimension d.
-//  The function returns the KModule K^d=V and the natural surjection I->V (with pre-image)*
-
-<pre>
 <b>QuotientVS</b>(I::AlgEtQOrd, J::AlgEtQOrd, P::AlgEtQIdl) -> ModRng, Map
 </pre>
 
@@ -809,14 +800,14 @@
 <b>QuotientVS</b>(I::AlgEtQIdl, J::AlgEtQIdl, P::AlgEtQIdl) -> ModRng, Map
 </pre>
 
-*let I, J, P be fractional R-ideals such that:
+*Let I, J, P be fractional R-ideals such that:
  - P is prime of of some order R;
  - J in I and I/J is a vector space over R/P, say of dimension d;
  the function returns the KModule K^d=V and the natural surjection I->V (with pre-image).*
 
 
-# List of instrinsics in AlgEtQ/OverOrders.m:
---
+## List of instrinsics in AlgEtQ/OverOrders.m:
+---
 
 <pre>
 <b>IsMaximalAtPrime</b>(R::AlgEtQOrd, P::AlgEtQIdl) -> BoolElt
@@ -855,8 +846,8 @@
 *We compute all the overorders of R. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana. The Vararg "populateoo_inoo" (default false) determines whether we should fill the attribute T`OverOrders for every overorder T of R.*
 
 
-# List of instrinsics in AlgEtQ/GraphOverOrders.m:
---
+## List of instrinsics in AlgEtQ/GraphOverOrders.m:
+---
 
 <pre>
 <b>GraphOverOrders</b>(R:AlgEtQOrd) -> GrphDir
@@ -865,8 +856,8 @@
 *Given an order R returns the graph G of minimal inclusions of the overorders of R. More precisely, the vertices of G are integers between 1 and the number of OverOrders(R), and there is an edge [i,j] if and only if OverOrder(R)[j] is a minimal overorder of OverOrders(R)[i].*
 
 
-# List of instrinsics in AlgEtQ/Idl.m:
---
+## List of instrinsics in AlgEtQ/Idl.m:
+---
 
 <pre>
 <b>Ideal</b>(S::AlgEtQOrd, gens::SeqEnum) -> AlgEtQIdl
@@ -1223,8 +1214,8 @@
 *Returns an element x such that x*I is an integral ideal coprime with J, togheter with the product x*I. The first ideal must be invertible and the second should be integral.*
 
 
-# List of instrinsics in AlgEtQ/ZBasisLLL.m:
---
+## List of instrinsics in AlgEtQ/ZBasisLLL.m:
+---
 
 <pre>
 <b>ZBasisLLL</b>(S::AlgEtQOrd)
@@ -1239,8 +1230,8 @@
 *A procedure that replaces the ZBasis with an LLL-reduced one.*
 
 
-# List of instrinsics in AlgEtQ/Completion.m:
---
+## List of instrinsics in AlgEtQ/Completion.m:
+---
 
 <pre>
 <b>Completion</b>(P::AlgEtQIdl : MinPrecision:=20) -> FldPad,Map
@@ -1249,8 +1240,8 @@
 *Given a prime ideal of the maximal order of an etale algebra L it returns the p-adic field corresponding to the completion LP and a homormophism map:L->LP. The vararg MinPrecision is passed to Completion. map has preimage (it acts a bit weird).*
 
 
-# List of instrinsics in AlgEtQ/ComplexConj.m:
---
+## List of instrinsics in AlgEtQ/ComplexConj.m:
+---
 
 <pre>
 <b>HasComplexConjugate</b>(A::AlgEtQ) -> BoolElt
@@ -1289,8 +1280,8 @@
 *If A is a product of CM fields, it returns the complex conjugate of the argument.*
 
 
-# List of instrinsics in AlgEtQ/ComplexMult.m:
---
+## List of instrinsics in AlgEtQ/ComplexMult.m:
+---
 
 <pre>
 <b>CMType</b>(seq::SeqEnum[Map]) -> AlgEtQCMType
@@ -1371,8 +1362,8 @@
 *Returns all the AlgEtQCMTypes of A.*
 
 
-# List of instrinsics in AlgEtQ/IntermediateIdeals.m:
---
+## List of instrinsics in AlgEtQ/IntermediateIdeals.m:
+---
 
 <pre>
 <b>MinimalIntermediateIdeals</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]
@@ -1435,8 +1426,8 @@
 *Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that J subset K subset I. They are produced recursively using from the minimal ones*
 
 
-# List of instrinsics in AlgEtQ/IdealsOfIndex.m:
---
+## List of instrinsics in AlgEtQ/IdealsOfIndex.m:
+---
 
 <pre>
 <b>IdealsOfIndex</b>(O::RngOrd, N::RngIntElt) -> SeqEnum[RngOrdIdl]
@@ -1469,8 +1460,8 @@
 *Given an order O and a positive integer N, returns all the O-ideals J with index [O:J]=N. The function is very fast if N is coprime to the conductor of O. If this conditions are not satisfied a slow algorithm is used which doesn't require additional hypothesis. One can force the slow-naive by setting the vararg Method:="Slow".*
 
 
-# List of instrinsics in AlgEtQ/ShortEltSmallRep.m:
---
+## List of instrinsics in AlgEtQ/ShortEltSmallRep.m:
+---
 
 <pre>
 <b>ShortElement</b>(I::AlgEtQIdl) ->AlgEtQElt
@@ -1485,8 +1476,8 @@
 *Given a fractional R-ideal I, it returns an isomorphic ideal a*I, and the element a, such that a*I is a subset of R, and the cardinality of R/aI is small. This is achieved by computing the ShortElement a of (R:I). Note that if I is invertible R/aI is isomorphic to (R:I)/aR.*
 
 
-# List of instrinsics in AlgEtQ/MinimalGenerators.m:
---
+## List of instrinsics in AlgEtQ/MinimalGenerators.m:
+---
 
 <pre>
 <b>TwoGeneratingSet</b>(I::AlgEtQIdl)
@@ -1495,8 +1486,8 @@
 *A procedure that given an invertible ideal I put in the attibute I`Generators two non-zerodivisors in I that generate I. If I is known to be principal, that is I`Generators consists of one single element, nothing is done.*
 
 
-# List of instrinsics in AlgEtQ/CRT.m:
---
+## List of instrinsics in AlgEtQ/CRT.m:
+---
 
 <pre>
 <b>ChineseRemainderTheorem</b>(Is::SeqEnum[AlgEtQIdl],as::SeqEnum[AlgEtQElt])-> AlgEtQElt
@@ -1511,8 +1502,8 @@
 *Given two coprime ideals I and J of S, two elements a,b in S, finds e such that (e-a) in I and (e-b) in J.*
 
 
-# List of instrinsics in AlgEtQ/PicardGroup.m:
---
+## List of instrinsics in AlgEtQ/PicardGroup.m:
+---
 
 <pre>
 <b>ResidueRingUnits</b>(S::AlgEtQOrd,I::AlgEtQIdl) -> GrpAb,Map
@@ -1545,8 +1536,8 @@
 *Checks if I=x*J, for some x. If so, also x is returned. The optional argument "GRH" decides wheter the bound for the IsPrincipal test should be conditional. The default value is "false".*
 
 
-# List of instrinsics in AlgEtQ/FactPrimes.m:
---
+## List of instrinsics in AlgEtQ/FactPrimes.m:
+---
 
 <pre>
 <b>Factorization</b>(I::AlgEtQIdl) -> Tup
@@ -1597,8 +1588,8 @@
 *Check if the order is Gorenstein at the prime ideal P.*
 
 
-# List of instrinsics in AlgEtQ/TotRealTotPos.m:
---
+## List of instrinsics in AlgEtQ/TotRealTotPos.m:
+---
 
 <pre>
 <b>IsTotallyReal</b>(a::AlgEtQElt) -> BoolElt
@@ -1631,8 +1622,8 @@
 *Given an order S in a CM étale algebra A. Returns the groups of totally positive units of S, as a subgroup of S^*.*
 
 
-# List of instrinsics in AlgEtQ/PrintSave.m:
---
+## List of instrinsics in AlgEtQ/PrintSave.m:
+---
 
 <pre>
 <b>PrintSeqAlgEtQElt</b>(seq::SeqEnum[AlgEtQElt]) -> SeqEnum,MonStgElt
@@ -1653,8 +1644,8 @@
 *Given a string produced with PrintWKICM it returns the corresponding order R. In the attributes of R, its algebra and its overorders one can find the weak equivalence classes. This can be recovered with the approriate intrinsics.*
 
 
-# List of instrinsics in AlgEtQ/LowCohenMacaulayType.m:
---
+## List of instrinsics in AlgEtQ/LowCohenMacaulayType.m:
+---
 
 <pre>
 <b>NonGorensteinPrimes</b>(S::AlgEtQOrd)->SeqEnum,SeqEnum
@@ -1675,8 +1666,8 @@
 *Given an order S returns its Cohen-Macaulay Type. This integer equals the max dimension of S^t/P*S^t where S^t is the trace dual of S and P runs over all (non-Gorenstein) primes of S.*
 
 
-# List of instrinsics in AlgEtQ/WkClasses.m:
---
+## List of instrinsics in AlgEtQ/WkClasses.m:
+---
 
 <pre>
 <b>WKICM_bar</b>(S::AlgEtQOrd : Method:="Auto") -> SeqEnum
@@ -1691,8 +1682,8 @@
 *Computes the Weak equivalence class monoid of E. The VarArg Method (default "Auto") determines if we should use the "IntermediateIdeals" routine or the "LowIndexProcess", which is potentially much slower but more memory efficient.*
 
 
-# List of instrinsics in AlgEtQ/WkTesting.m:
---
+## List of instrinsics in AlgEtQ/WkTesting.m:
+---
 
 <pre>
 <b>IsWeakEquivalent</b>(I::AlgEtQIdl,J::AlgEtQIdl)->BoolElt
@@ -1725,8 +1716,8 @@
 *Checks if the order O is Gorenstein.*
 
 
-# List of instrinsics in AlgEtQ/IdealClassMonoid.m:
---
+## List of instrinsics in AlgEtQ/IdealClassMonoid.m:
+---
 
 <pre>
 <b>ICM_bar</b>(S::AlgEtQOrd : GRH:=false ) -> SeqEnum

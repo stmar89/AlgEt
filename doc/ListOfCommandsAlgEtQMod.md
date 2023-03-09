@@ -1,5 +1,5 @@
-# List of instrinsics in AlgEtQMod/IntermediateModules.m:
---
+## List of instrinsics in AlgEtQMod/IntermediateModules.m:
+---
 
 <pre>
 <b>MinimalIntermediateModules</b>(I::AlgEtQMod,J::AlgEtQMod)->SetIndx[AlgEtQMod]
@@ -26,8 +26,8 @@
 *Given S-modules J subset I, and overorder O of S, it returns all the S-modules N such that J subset N subset I and NO=I. Note: we need O!!I eq I. They are produced recursively using from the maximal ones*
 
 
-# List of instrinsics in AlgEtQMod/IsomModules.m:
---
+## List of instrinsics in AlgEtQMod/IsomModules.m:
+---
 
 <pre>
 <b>IsIsomorphic</b>(I::AlgEtQMod,J::AlgEtQMod : Method:="Magma") -> BoolElt
@@ -46,8 +46,8 @@ The vararg Method allows to choose if the isomorphism testing is done with "Magm
 In the latter case, the Method should be of the form "julia path/to/AlgEtQ/", or if Hecke/Nemo has been built,"julia -J /tmp/Hecke.so ~/path/to/AlgEtQ/" (the ".so" might be different according to your SO. See the documentation of Hecke.Build()).*
 
 
-# List of instrinsics in AlgEtQMod/Modules.m:
---
+## List of instrinsics in AlgEtQMod/Modules.m:
+---
 
 <pre>
 <b>Module</b>(S::AlgEtQOrd, m::Map, gens::SeqEnum) -> AlgEtQMod

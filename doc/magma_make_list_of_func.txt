@@ -77,7 +77,7 @@
                 out cat:="<pre>\n<b>" cat name cat "</b>" cat name_2 cat "\n</pre>\n\n" cat "*" cat desc cat "*\n\n";
             end if;
         until pos eq 0;
-        fprintf output_file,"# List of instrinsics in %o:\n--\n\n%o\n",input_file,out;
+        fprintf output_file,"## List of instrinsics in %o:\n---\n\n%o\n",input_file,out;
     end for;
      
     quit;

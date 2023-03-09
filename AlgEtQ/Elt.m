@@ -437,7 +437,7 @@ intrinsic '&*'(seq::SeqEnum[AlgEtQElt]) -> AlgEtQElt
 end intrinsic;
 
 intrinsic SumOfProducts(as::SeqEnum[AlgEtQElt],bs::SeqEnum[AlgEtQElt]) -> AlgEtQElt
-{Given sequences as and bs, such that #as eq #bs, returns `&+[as[i]*bs[i] : i in [1..#as]]`. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.}
+{Given sequences as and bs, such that #as eq #bs, returns &+[as[i]*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.}
     A:=Universe(bs);
     N:=#as;
     require N eq #bs : "The sequences don't have the same size";
@@ -448,7 +448,7 @@ intrinsic SumOfProducts(as::SeqEnum[AlgEtQElt],bs::SeqEnum[AlgEtQElt]) -> AlgEtQ
 end intrinsic;
 
 intrinsic SumOfProducts(as::SeqEnum[RngIntElt],bs::SeqEnum[AlgEtQElt]) -> AlgEtQElt
-{Given sequences as and bs, such that #as eq #bs, returns `&+[as[i]*bs[i] : i in [1..#as]]`. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.}
+{Given sequences as and bs, such that #as eq #bs, returns &+[as[i]*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.}
     A:=Universe(bs);
     N:=#as;
     require N eq #bs : "The sequences don't have the same size";
@@ -458,7 +458,7 @@ intrinsic SumOfProducts(as::SeqEnum[RngIntElt],bs::SeqEnum[AlgEtQElt]) -> AlgEtQ
 end intrinsic;
 
 intrinsic SumOfProducts(as::SeqEnum[FldRatElt],bs::SeqEnum[AlgEtQElt]) -> AlgEtQElt
-{Given sequences as and bs, such that #as eq #bs, returns `&+[as[i]*bs[i] : i in [1..#as]]`. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.}
+{Given sequences as and bs, such that #as eq #bs, returns &+[as[i]*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.}
     A:=Universe(bs);
     N:=#as;
     require N eq #bs : "The sequences don't have the same size";
@@ -468,7 +468,7 @@ intrinsic SumOfProducts(as::SeqEnum[FldRatElt],bs::SeqEnum[AlgEtQElt]) -> AlgEtQ
 end intrinsic;
 
 intrinsic SumOfProducts(as::SeqEnum[AlgEtQElt],bs::SeqEnum[RngIntElt]) -> AlgEtQElt
-{Given sequences as and bs, such that #as eq #bs, returns `&+[as[i]*bs[i] : i in [1..#as]]`. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.}
+{Given sequences as and bs, such that #as eq #bs, returns &+[as[i]*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.}
     A:=Universe(as);
     N:=#as;
     require N eq #bs : "The sequences don't have the same size";
@@ -478,7 +478,7 @@ intrinsic SumOfProducts(as::SeqEnum[AlgEtQElt],bs::SeqEnum[RngIntElt]) -> AlgEtQ
 end intrinsic;
 
 intrinsic SumOfProducts(as::SeqEnum[AlgEtQElt],bs::SeqEnum[FldRatElt]) -> AlgEtQElt
-{Given sequences as and bs, such that #as eq #bs, returns `&+[as[i]*bs[i] : i in [1..#as]]`. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.}
+{Given sequences as and bs, such that #as eq #bs, returns &+[as[i]*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.}
     A:=Universe(as);
     N:=#as;
     require N eq #bs : "The sequences don't have the same size";
@@ -488,7 +488,7 @@ intrinsic SumOfProducts(as::SeqEnum[AlgEtQElt],bs::SeqEnum[FldRatElt]) -> AlgEtQ
 end intrinsic;
 
 //------------
-// Minimal polynomials and integrability
+// Minimal polynomials and integrality
 //------------
 
 intrinsic MinimalPolynomial(x::AlgEtQElt) -> RngUPolElt

@@ -1,7 +1,6 @@
    
     .m files from AbVarFq to 'translate':
 
---> - IdealsOfIndex.m (work in progress, see below)
     - IntegralMatrices.m
     - RepsZConjugacy.m
 --> - PowerBass.m
@@ -11,8 +10,6 @@
 
     TODO:
     ### Priority ###
-    - dev/IdealsOfIndex.m add tests and timings to complete
-      This would make the code of many other functions a lot cleaner.
 
     ### Modules ###
     - In IsomorphismClasses and IsIsomorphic, I should first order/test whether M and N have the same multiplicator ring S in K and with #M/PM = #N/PN for every singular prime of S, since these are necessary conditions of being isomorphic.
@@ -40,16 +37,7 @@
       This is needed for finding a minimal set of generators of non-necessarly invertible ideals.
 
     ### WKICM ###
-    - Possible improvement to WKICM(S).
-      Let T be the smallest overorder of S such that St*T is invertible in T. Let ff be the (S:T).
-      For EVERY overorder S' of S such that S't*T is invertible we have that each weak equiv class of S'
-      will have a representative I such that ff \in I \in T.
-      If looping over the subgroups is the most expensie part, then we might save some time in this way.
-      UPDATE: it seems that generating the subgroups is not the most expensive part.
-      I am doubtful that this idea will speed up the computation.
-
-    - Possible improvement to WKICM(S).
-      Doing the computation prime per prime should help.
+    - (happening in dev/ folder) Doing the computation prime per prime should help.
       But there are many cases where this is still too slow with only one non-Gorestein prime.
 
     ### Other ###

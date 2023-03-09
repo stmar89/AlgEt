@@ -767,7 +767,7 @@ These are produced by recursively searching for maximal submodules.</em>
 ## List of instrinsics in AlgEtQ/CRT.m:
 
 > <pre><b>ChineseRemainderTheorem</b>(Is::SeqEnum[AlgEtQIdl],as::SeqEnum[AlgEtQElt])-> AlgEtQElt</pre>
-<em>Given a sequence `Is` of ideals of S, pairwise coprime,, and a sequence `as` of elements of S, it returns an element e such that e-as[i] in Is[i] for every i.</em>
+<em>Given a sequence `Is` of ideals of S, pairwise coprime, and a sequence `as` of elements of S, it returns an element e such that e-as[i] in Is[i] for every i.</em>
 
 > <pre><b>ChineseRemainderTheorem</b>(I::AlgEtQIdl,J::AlgEtQIdl,a::AlgEtQElt,b::AlgEtQElt)-> AlgEtQElt</pre>
 <em>Given two coprime ideals I and J of S, two elements a,b in S, finds e such that (e-a) in I and (e-b) in J.</em>
@@ -776,7 +776,7 @@ These are produced by recursively searching for maximal submodules.</em>
 ## List of instrinsics in AlgEtQ/PicardGroup.m:
 
 > <pre><b>ResidueRingUnits</b>(S::AlgEtQOrd,I::AlgEtQIdl) -> GrpAb,Map</pre>
-<em>Returns the group (S/I)^\* and a map (S/I)^\* -> S. It is required S to be maximal.</em>
+<em>Returns the group (S/I)^\* and a map (S/I)^\* -> S. The order S is required to be maximal.</em>
 
 > <pre><b>IsPrincipal</b>(I1::AlgEtQIdl : GRH:=false )->BoolElt, AlgAssElt</pre>
 <em>Return if the argument is a principal ideal; if so the function returns also the generator. The optional argument "GRH" decides wheter the bound for the IsPrincipal test should be conditional. The default value is "false".</em>
@@ -809,49 +809,22 @@ These are produced by recursively searching for maximal submodules.</em>
 <em>Given an integral S-ideal, returns if the ideal is a prime fractional ideal of S, that is a maximal S ideal.</em>
 
 > <pre><b>IsBassAtPrime</b>(S::AlgEtQOrd,P::AlgEtQIdl) -> BoolElt</pre>
-<em>Check if the order is Bass at the prime ideal P.</em>
+<em>Check if the order is Bass at the prime ideal P, that is, if every overorder of S is Gorenstein at the primes above P.</em>
 
 > <pre><b>IsBass</b>(S::AlgEtQOrd) -> BoolElt</pre>
-<em>Check if the order is Bass.</em>
+<em>Check if the order is Bass, that is, if every overorder of S is Gorenstein.</em>
 
 > <pre><b>IsGorensteinAtPrime</b>(S::AlgEtQOrd,P::AlgEtQIdl) -> BoolElt</pre>
-<em>Check if the order is Gorenstein at the prime ideal P.</em>
+<em>Check if the order is Gorenstein at the prime ideal P, that is, if every fractional ideal I with (I:I)=S is locally principal at P.</em>
 
-
-## List of instrinsics in AlgEtQ/TotRealTotPos.m:
-
-> <pre><b>IsTotallyReal</b>(a::AlgEtQElt) -> BoolElt</pre>
-<em>Returns whther a is totally real.</em>
-
-> <pre><b>IsTotallyRealPositive</b>(a::AlgEtQElt) -> BoolElt</pre>
-<em>Returns whether a is totally positive, that is, totally real and with positive image in C.</em>
-
-> <pre><b>TotallyRealSubAlgebra</b>(K::AlgEtQ) -> AlgEtQ,Map</pre>
-<em>Given a CM algebra K returns the unique totally real subalgebra, and an embedding.</em>
-
-> <pre><b>TotallyRealUnitGroup</b>(S::AlgEtQOrd) -> Grp</pre>
-<em>Given an order S in a CM étale algebra A returns the groups of totally real units of S, as a subgroup of S^\*.</em>
-
-> <pre><b>TotallyRealPositiveUnitGroup</b>(S::AlgEtQOrd) -> Grp</pre>
-<em>Given an order S in a CM étale algebra A. Returns the groups of totally positive units of S, as a subgroup of S^\*.</em>
-
-
-## List of instrinsics in AlgEtQ/PrintSave.m:
-
-> <pre><b>PrintSeqAlgEtQElt</b>(seq::SeqEnum[AlgEtQElt]) -> SeqEnum,MonStgElt</pre>
-<em>Given a sequence of elements of an AlgEtQ, returns a sequence of tuples of sequence of integers that can be coerced into the original algebra to obtain the input sequece. As a second output it reuturns a string that can be printed to file.</em>
-
-> <pre><b>PrintWKICM</b>(R::AlgEtQOrd) -> MonStgElt</pre>
-<em>Given an order R in an AlgEtQ, it returns a string that contains the weak equivalence classes of R, sorted by multiplicator ring. In particular, the overorders of R can be recovered fro this string. Such string can be easily printed to file. To load the string, after using Read() on the file, use the intrinsic LoadWKICM.</em>
-
-> <pre><b>LoadWKICM</b>(str::MonStgElt) -> AlgEtQOrd</pre>
-<em>Given a string produced with PrintWKICM it returns the corresponding order R. In the attributes of R, its algebra and its overorders one can find the weak equivalence classes. This can be recovered with the approriate intrinsics.</em>
+> <pre><b>IsGorenstein</b>(O::AlgEtQOrd)->BoolElt</pre>
+<em>Checks if the order O is Gorenstein, that is if the TraceDualIdeal of O is invertible, or equivalently, if all fractional ideals I with (I:I)=O are invertible.</em>
 
 
 ## List of instrinsics in AlgEtQ/LowCohenMacaulayType.m:
 
 > <pre><b>NonGorensteinPrimes</b>(S::AlgEtQOrd)->SeqEnum,SeqEnum</pre>
-<em>Given an order S it returns two sequences the first containing the primes at which S is locally not Gorenstein and the second containing the CohenMacaulay types of S at this primes, that is, the dimension of S^t/PS^t over S/P, where S^t is the TraceDualIdeal of S.</em>
+<em>Given an order S it returns two sequences: the first containis the primes at which S is locally not Gorenstein; the second containis the CohenMacaulay types of S at these primes, that is, the dimension of S^t/PS^t over S/P, where S^t is the TraceDualIdeal of S.</em>
 
 > <pre><b>CohenMacaulayTypeAtPrime</b>(S::AlgEtQOrd,P::AlgEtQIdl)->RngIntElt</pre>
 <em>Given an order S and a prime ideal P, it returns its Cohen-Macaulay Type at P. This integer equals the dimension of S^t/P\*S^t where S^t is the trace dual of S.</em>
@@ -863,36 +836,63 @@ These are produced by recursively searching for maximal submodules.</em>
 ## List of instrinsics in AlgEtQ/WkClasses.m:
 
 > <pre><b>WKICM_bar</b>(S::AlgEtQOrd : Method:="Auto") -> SeqEnum</pre>
-<em>Returns all the weak eq classes I, such that (I:I)=S. The VarArg Method (default "Auto") determines if we should use the "IntermediateIdeals" routine or the "LowIndexProcess", which is potentially much slower but more memory efficient.</em>
+<em>Returns representatives of all the weak equivalence classes I of S satisfying (I:I)=S. The VarArg Method (default "Auto") determines if we should use the "IntermediateIdeals" routine or the "LowIndexProcess", which is potentially much slower but more memory efficient.</em>
 
 > <pre><b>WKICM</b>(E::AlgEtQOrd : Method:="Auto")->SeqEnum</pre>
-<em>Computes the Weak equivalence class monoid of E. The VarArg Method (default "Auto") determines if we should use the "IntermediateIdeals" routine or the "LowIndexProcess", which is potentially much slower but more memory efficient.</em>
+<em>Computes the weak equivalence class monoid of E. The VarArg Method (default "Auto") determines if we should use the "IntermediateIdeals" routine or the "LowIndexProcess", which is potentially much slower but more memory efficient.</em>
 
 
 ## List of instrinsics in AlgEtQ/WkTesting.m:
 
 > <pre><b>IsWeakEquivalent</b>(I::AlgEtQIdl,J::AlgEtQIdl)->BoolElt</pre>
-<em>Checks if I and J are weakly equivalent 1 \in (I:J)\*(J:I). This function does not require that the ideals are defined over the same order.</em>
+<em>Checks if I and J are weakly equivalent, that is, if 1 \in (I:J)\*(J:I), or equivalently, if I and J are locally equivalent at all prime of their common multiplicator ring. This function does not require that the ideals are defined over the same order.</em>
 
 > <pre><b>IsWeakEquivalent</b>(O1::AlgEtQOrd,O2::AlgEtQOrd)->BoolElt</pre>
 <em>Check if the two orders are weakly equivalent, that is equal.</em>
 
 > <pre><b>IsWeakEquivalent</b>(O::AlgEtQOrd,J::AlgEtQIdl)->BoolElt</pre>
-<em>Checks if the second argument is weakly equivalent to the first argument.</em>
+<em>Checks if the ideal J is weakly equivalent to order O, that is, if J is invertible in O.</em>
 
 > <pre><b>IsWeakEquivalent</b>(J::AlgEtQIdl,O::AlgEtQOrd)->BoolElt</pre>
-<em>Checks if the second argument is weakly equivalent to the first argument.</em>
-
-> <pre><b>IsGorenstein</b>(O::AlgEtQOrd)->BoolElt</pre>
-<em>Checks if the order O is Gorenstein.</em>
+<em>Checks if the ideal J is weakly equivalent to order O, that is, if J is invertible in O.</em>
 
 
 ## List of instrinsics in AlgEtQ/IdealClassMonoid.m:
 
 > <pre><b>ICM_bar</b>(S::AlgEtQOrd : GRH:=false ) -> SeqEnum</pre>
-<em>returns the ideal classes of the order S having S as MultiplicatorRing, that is the orbits of the action of PicardGroup(S) on WKICM_bar(S).</em>
+<em>Returns the ideal classes of fractional S-ideals having MultiplicatorRing equal to S. This is the same as the orbit of the action of PicardGroup(S) on WKICM_bar(S).</em>
 
 > <pre><b>ICM</b>(S::AlgEtQOrd : GRH:=false ) -> SeqEnum</pre>
-<em>returns the ideal class monoid of the order, that is a set of representatives for the isomorphism classes of the fractiona ideals.</em>
+<em>Returns the ideal class monoid of the order, that is, a set of representatives for the isomorphism classes of the fractional S-ideals.</em>
+
+
+## List of instrinsics in AlgEtQ/TotRealTotPos.m:
+
+> <pre><b>IsTotallyReal</b>(a::AlgEtQElt) -> BoolElt</pre>
+<em>Returns whether a is totally real.</em>
+
+> <pre><b>IsTotallyRealPositive</b>(a::AlgEtQElt) -> BoolElt</pre>
+<em>Returns whether a is totally positive, that is, totally real and with positive image in CC.</em>
+
+> <pre><b>TotallyRealSubAlgebra</b>(K::AlgEtQ) -> AlgEtQ,Map</pre>
+<em>Given a CM algebra K, returns the unique totally real subalgebra, with an embedding.</em>
+
+> <pre><b>TotallyRealUnitGroup</b>(S::AlgEtQOrd) -> Grp</pre>
+<em>Given an order S in a CM étale algebra A returns the groups of totally real units of S, as a subgroup of S^\*.</em>
+
+> <pre><b>TotallyRealPositiveUnitGroup</b>(S::AlgEtQOrd) -> Grp</pre>
+<em>Given an order S in a CM étale algebra. Returns the groups of totally positive units of S, as a subgroup of S^\*.</em>
+
+
+## List of instrinsics in AlgEtQ/PrintSave.m:
+
+> <pre><b>PrintSeqAlgEtQElt</b>(seq::SeqEnum[AlgEtQElt]) -> SeqEnum,MonStgElt</pre>
+<em>Given a sequence of elements of an AlgEtQ, returns a sequence of tuples of sequence of integers that can be coerced into the original algebra to obtain the input sequece. As a second output it returns a string that can be printed to file.</em>
+
+> <pre><b>PrintWKICM</b>(R::AlgEtQOrd) -> MonStgElt</pre>
+<em>Given an order R in an AlgEtQ, it returns a string that contains the weak equivalence classes of R, sorted by multiplicator ring. In particular, the overorders of R can be recovered from this string. Such string can be easily printed to file. To load the string, after using Read() on the file, use the intrinsic LoadWKICM.</em>
+
+> <pre><b>LoadWKICM</b>(str::MonStgElt) -> AlgEtQOrd</pre>
+<em>Given a string produced with PrintWKICM it returns the corresponding order R. In the attributes of R, its algebra and its overorders one can find the weak equivalence classes. These can be recovered with the approriate intrinsics.</em>
 
 

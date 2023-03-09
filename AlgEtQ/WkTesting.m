@@ -18,7 +18,7 @@ declare verbose AlgEtQIdlWkClasses,3;
 //----------
 
 intrinsic IsWeakEquivalent(I::AlgEtQIdl,J::AlgEtQIdl)->BoolElt
-{Checks if I and J are weakly equivalent 1 \in (I:J)*(J:I). This function does not require that the ideals are defined over the same order.}
+{Checks if I and J are weakly equivalent, that is, if 1 \in (I:J)*(J:I), or equivalently, if I and J are locally equivalent at all prime of their common multiplicator ring. This function does not require that the ideals are defined over the same order.}
     S := MultiplicatorRing(I);
     if MultiplicatorRing(J) ne S then
         return false;
@@ -40,29 +40,14 @@ intrinsic IsWeakEquivalent(O1::AlgEtQOrd,O2::AlgEtQOrd)->BoolElt
 end intrinsic;
 
 intrinsic IsWeakEquivalent(O::AlgEtQOrd,J::AlgEtQIdl)->BoolElt
-{Checks if the second argument is weakly equivalent to the first argument.}
+{Checks if the ideal J is weakly equivalent to order O, that is, if J is invertible in O.}
     return IsWeakEquivalent(OneIdeal(O), J);
 end intrinsic;
 
 intrinsic IsWeakEquivalent(J::AlgEtQIdl,O::AlgEtQOrd)->BoolElt
-{Checks if the second argument is weakly equivalent to the first argument.}
+{Checks if the ideal J is weakly equivalent to order O, that is, if J is invertible in O.}
     return IsWeakEquivalent(OneIdeal(O), J);
 end intrinsic;
-
-intrinsic IsGorenstein(O::AlgEtQOrd)->BoolElt
-{Checks if the order O is Gorenstein.}
-    if not assigned O`IsGorenstein then
-        if assigned O`IsMaximal and O`IsMaximal then
-            O`IsGorenstein:=true;
-        else
-            T:=TraceDualIdeal(O);
-            O`IsGorenstein:=IsInvertible(T);
-        end if;
-    end if;
-    return O`IsGorenstein;
-end intrinsic
-
-
 
 /* TESTS
 

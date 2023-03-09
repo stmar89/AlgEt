@@ -23,14 +23,14 @@ end function;
 //------------
 
 intrinsic PrintSeqAlgEtQElt(seq::SeqEnum[AlgEtQElt]) -> SeqEnum,MonStgElt
-{Given a sequence of elements of an AlgEtQ, returns a sequence of tuples of sequence of integers that can be coerced into the original algebra to obtain the input sequece. As a second output it reuturns a string that can be printed to file.}
+{Given a sequence of elements of an AlgEtQ, returns a sequence of tuples of sequence of integers that can be coerced into the original algebra to obtain the input sequece. As a second output it returns a string that can be printed to file.}
     seq:=[ < Eltseq(c) : c in Components(elt) > : elt in seq ];
     str:=RemoveBlanks(Sprint(seq));
     return seq,str;
 end intrinsic;
 
 intrinsic PrintWKICM(R::AlgEtQOrd) -> MonStgElt
-{Given an order R in an AlgEtQ, it returns a string that contains the weak equivalence classes of R, sorted by multiplicator ring. In particular, the overorders of R can be recovered fro this string. Such string can be easily printed to file. To load the string, after using Read() on the file, use the intrinsic LoadWKICM.}
+{Given an order R in an AlgEtQ, it returns a string that contains the weak equivalence classes of R, sorted by multiplicator ring. In particular, the overorders of R can be recovered from this string. Such string can be easily printed to file. To load the string, after using Read() on the file, use the intrinsic LoadWKICM.}
     str:="<\n";
     A:=Algebra(R);
     nf:=Components(A);
@@ -76,7 +76,7 @@ intrinsic PrintWKICM(R::AlgEtQOrd) -> MonStgElt
 end intrinsic;
 
 intrinsic LoadWKICM(str::MonStgElt) -> AlgEtQOrd
-{Given a string produced with PrintWKICM it returns the corresponding order R. In the attributes of R, its algebra and its overorders one can find the weak equivalence classes. This can be recovered with the approriate intrinsics.}
+{Given a string produced with PrintWKICM it returns the corresponding order R. In the attributes of R, its algebra and its overorders one can find the weak equivalence classes. These can be recovered with the approriate intrinsics.}
 
     data:=eval(str);
     PP:=PolynomialRing(Rationals());

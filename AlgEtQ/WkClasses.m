@@ -16,7 +16,7 @@ declare attributes AlgEtQOrd:WKICM,
 import "LowCohenMacaulayType.m" : wkicm_bar_CM_type2;
 
 intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum
-{Returns all the weak eq classes I, such that (I:I)=S. The VarArg Method (default "Auto") determines if we should use the "IntermediateIdeals" routine or the "LowIndexProcess", which is potentially much slower but more memory efficient.}
+{Returns representatives of all the weak equivalence classes I of S satisfying (I:I)=S. The VarArg Method (default "Auto") determines if we should use the "IntermediateIdeals" routine or the "LowIndexProcess", which is potentially much slower but more memory efficient.}
     if not assigned S`WKICM_bar then
         if IsGorenstein(S) then
             S`WKICM_bar:=[OneIdeal(S)];
@@ -40,33 +40,6 @@ intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum
                 Q,q:=Quotient(T1,ff);
                 QispGroup:=IspGroup(Q);
                 if (Method eq "Auto" and not QispGroup) or (Method eq "IntermediateIdeals") then
-                    // // NEW CODE based on MinimalIntermediateIdeals
-                    // queue:={@ ff @};
-                    // seqWk_bar:=[ OneIdeal(S) , St  ];
-                    // done:={@ @};
-                    // while #queue gt 0 do
-                    //     pot_new:=&join[MinimalIntermediateIdeals(T1,elt) : elt in queue ];
-                    //     for I in pot_new do
-                    //         if MultiplicatorRing(I) eq S and not exists{ J : J in seqWk_bar | IsWeakEquivalent(I,J) } then
-                    //             Append(~seqWk_bar,I);
-                    //         end if;
-                    //     end for;
-                    //     done join:=queue;
-                    //     queue := pot_new diff done;
-                    // end while;
-                    
-                    // // NEW CODE based on IntermediateIdeals
-                    // idls:=IntermediateIdeals(T1,ff);
-                    // for I in idls do
-                    //     if MultiplicatorRing(I) eq S and not exists{ J : J in seqWk_bar | IsWeakEquivalent(I,J) } then
-                    //         Append(~seqWk_bar,I);
-                    //     end if;
-                    // end for;
-                     
-                    // // NEW CODE based on IntermediateIdealsWithPrescribedMultiplicatorRing
-                    // vprintf WkClasses,2:"Using code with IntermediateIdealsWithPrescribedMultiplicatorRing: T/(S:T) = %o\n",Q;
-                    // idls:=IntermediateIdealsWithPrescribedMultiplicatorRing(T1,ff);
-                    // NEW CODE based on IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing
                     vprintf WkClasses,2:"Using code with IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing: T/(S:T) = %o\n",Q;
                     idls:=IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing(T1,ff,T);
                     for I in idls do
@@ -102,7 +75,7 @@ intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum
 end intrinsic;
 
 intrinsic WKICM(E::AlgEtQOrd : Method:="Auto")->SeqEnum
-{Computes the Weak equivalence class monoid of E. The VarArg Method (default "Auto") determines if we should use the "IntermediateIdeals" routine or the "LowIndexProcess", which is potentially much slower but more memory efficient.}
+{Computes the weak equivalence class monoid of E. The VarArg Method (default "Auto") determines if we should use the "IntermediateIdeals" routine or the "LowIndexProcess", which is potentially much slower but more memory efficient.}
     if not assigned E`WKICM then
         require Method in {"Auto","LowIndexProcess","IntermediateIdeals"} : "The VarArg parameter Method is assigned to a not avaialble value";
         seqOO:=FindOverOrders(E : populateoo_in_oo:=true);

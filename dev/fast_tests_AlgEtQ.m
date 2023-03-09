@@ -157,26 +157,6 @@ time_start:=Cputime();
 
 
 
-
-    printf "### Testing Trace and Norm:";
-    //AttachSpec("~/packages_github/AlgEt/spec");
-    SetVerbose("AlgEtQTraceNorm",1);
-
-    _<x>:=PolynomialRing(Integers());
-    f:=(x^8+16)*(x^8+81);
-    A:=EtaleAlgebra(f);
-    for i in [1..100] do
-        a:=Random(A);
-        b:=Random(A);
-        assert Trace(a)+Trace(b) eq Trace(a+b);
-        assert Norm(a)*Norm(b) eq Norm(a*b);
-    end for;
-    printf " all good!\n"; 
-
-
-
-
-
     
     printf "### Testing Orders:";
 	//AttachSpec("~/packages_github/AlgEt/spec");
@@ -260,90 +240,6 @@ time_start:=Cputime();
     O:=MaximalOrder(A);
 
     printf " all good!\n"; 
-
-
-
-
-
-
-    printf "### Testing Quotients:";
-    //AttachSpec("~/packages_github/AlgEt/spec");
-	SetAssertions(2);
-	_<x>:=PolynomialRing(Integers());
-    f:=(x^4+16);
-	A:=EtaleAlgebra(f);
-	E:=EquationOrder(A);
-    icm:=ICM(E);
-    pp:=SingularPrimes(E);
-    for P in pp do
-        r:=ResidueField(P);
-        _:=PrimitiveElementResidueField(P);
-        assert #r eq #Quotient(OneIdeal(E),P);
-        assert #r eq #ResidueRing(E,P);
-        assert #r eq #QuotientVS(OneIdeal(E),P,P);
-        printf ".";
-    end for;
-
-    for I in icm do
-        _:=Quotient(OneIdeal(E),MakeIntegral(I));
-        for P in pp do
-            PI:=P*I;
-            n:=#Quotient(I,PI);
-            assert n eq #QuotientVS(I,PI,P);
-            printf ".";
-        end for;
-    end for;
-
-    printf " all good!\n"; 
-
-
-
-
-
-
-    printf "### Testing OverOrders:";
-	//AttachSpec("~/packages_github/AlgEt/spec");
-
-    SetVerbose("OverOrders",1);
-    SetAssertions(1);
-
-    _<x>:=PolynomialRing(Integers());
-    f:=(x^4+16);
-    A:=EtaleAlgebra(f);
-    O:=MaximalOrder(A);
-    assert #FindOverOrders(O) eq 1;
-    assert #MinimalOverOrders(O) eq 0;
-
-    E:=EquationOrder(A);
-    oo:=FindOverOrders(E);
-    assert #oo eq 11;
-
-    printf " all good!\n"; 
-
-
-
-
-
-    
-    printf "### Testing GraphOverOrders:";
-    //AttachSpec("~/packages_github/AlgEt/spec");
-    P<x>:=PolynomialRing(Integers());
-    fs:=[ 
-          x^8 + 16, //1 sing prime
-          x^4-10000*x^3-10000*x^2-10000*x-10000, //2 sing primes
-          x^4-30^3*x^3-30^3*x^2-30^3*x-30^3 //3 sing primes
-        ];
-    for f in fs do
-        printf ".";
-        A:=EtaleAlgebra(f);
-        _:=GraphOverOrders(MaximalOrder(A));
-        R:=EquationOrder(A); 
-        _:=OverOrders(R);
-        SetAssertions(2);
-        _:=GraphOverOrders(R);
-        SetAssertions(1);
-    end for;
-    printf " all good!\n";
 
 
 
@@ -449,6 +345,110 @@ time_start:=Cputime();
   assert ZBasis(J) ne ZBasis(I);
   assert J eq I;
   printf " all good!\n"; 
+
+
+
+
+
+
+    printf "### Testing Quotients:";
+    //AttachSpec("~/packages_github/AlgEt/spec");
+	SetAssertions(2);
+	_<x>:=PolynomialRing(Integers());
+    f:=(x^4+16);
+	A:=EtaleAlgebra(f);
+	E:=EquationOrder(A);
+    icm:=ICM(E);
+    pp:=SingularPrimes(E);
+    for P in pp do
+        r:=ResidueField(P);
+        _:=PrimitiveElementResidueField(P);
+        assert #r eq #Quotient(OneIdeal(E),P);
+        assert #r eq #ResidueRing(E,P);
+        assert #r eq #QuotientVS(OneIdeal(E),P,P);
+        printf ".";
+    end for;
+
+    for I in icm do
+        _:=Quotient(OneIdeal(E),MakeIntegral(I));
+        for P in pp do
+            PI:=P*I;
+            n:=#Quotient(I,PI);
+            assert n eq #QuotientVS(I,PI,P);
+            printf ".";
+        end for;
+    end for;
+
+    printf " all good!\n"; 
+
+
+
+
+
+
+    printf "### Testing OverOrders:";
+	//AttachSpec("~/packages_github/AlgEt/spec");
+
+    SetVerbose("OverOrders",1);
+    SetAssertions(1);
+
+    _<x>:=PolynomialRing(Integers());
+    f:=(x^4+16);
+    A:=EtaleAlgebra(f);
+    O:=MaximalOrder(A);
+    assert #FindOverOrders(O) eq 1;
+    assert #MinimalOverOrders(O) eq 0;
+
+    E:=EquationOrder(A);
+    oo:=FindOverOrders(E);
+    assert #oo eq 11;
+
+    printf " all good!\n"; 
+
+
+
+
+
+    
+    printf "### Testing GraphOverOrders:";
+    //AttachSpec("~/packages_github/AlgEt/spec");
+    P<x>:=PolynomialRing(Integers());
+    fs:=[ 
+          x^8 + 16, //1 sing prime
+          x^4-10000*x^3-10000*x^2-10000*x-10000, //2 sing primes
+          x^4-30^3*x^3-30^3*x^2-30^3*x-30^3 //3 sing primes
+        ];
+    for f in fs do
+        printf ".";
+        A:=EtaleAlgebra(f);
+        _:=GraphOverOrders(MaximalOrder(A));
+        R:=EquationOrder(A); 
+        _:=OverOrders(R);
+        SetAssertions(2);
+        _:=GraphOverOrders(R);
+        SetAssertions(1);
+    end for;
+    printf " all good!\n";
+
+
+
+
+
+
+    printf "### Testing Trace and Norm:";
+    //AttachSpec("~/packages_github/AlgEt/spec");
+    SetVerbose("AlgEtQTraceNorm",1);
+
+    _<x>:=PolynomialRing(Integers());
+    f:=(x^8+16)*(x^8+81);
+    A:=EtaleAlgebra(f);
+    for i in [1..100] do
+        a:=Random(A);
+        b:=Random(A);
+        assert Trace(a)+Trace(b) eq Trace(a+b);
+        assert Norm(a)*Norm(b) eq Norm(a*b);
+    end for;
+    printf " all good!\n"; 
 
 
 
@@ -834,67 +834,6 @@ time_start:=Cputime();
 
 
 
-    printf "### Testing TotRealPos:";
-    //AttachSpec("~/packages_github/AlgEt/spec");
-    PP<x>:=PolynomialRing(Integers());
-    SetAssertions(2);
-
-    f:=x^8+16;
-    A:=EtaleAlgebra(f);
-    F:=PrimitiveElement(A);
-    R:=Order([F,2/F]);
-    oo:=FindOverOrders(R);
-    for iS in [1..#oo] do
-        S:=oo[iS];
-        _:=TotallyRealUnitGroup(S);
-        _:=TotallyRealPositiveUnitGroup(S);
-    end for;
-    SetAssertions(1);
-    printf " all good!\n"; 
-
-
-
-
-
-    
-    printf "### Testing Print Saving:";
-    //AttachSpec("~/packages_github/AlgEt/spec");
-    _<x>:=PolynomialRing(Integers());
-    f:=x^6 - 3*x^5 - 3*x^4 + 65*x^3 - 48*x^2 - 768*x + 4096;
-    A:=EtaleAlgebra(f);
-    E:=EquationOrder(A);
-    seq,str:=PrintSeqAlgEtQElt(ZBasis(E));
-    assert Order([ A! s : s in eval(str)]) eq E;
-    printf ".";
-
-    //AttachSpec("~/packages_github/AlgEt/spec");
-    _<x>:=PolynomialRing(Integers());
-    f:=x^8+16;
-    A:=EtaleAlgebra(f);
-    O:=MaximalOrder(A);
-    str:=PrintWKICM(O);
-    O1:=LoadWKICM(str);
-    printf ".";
-
-    //AttachSpec("~/packages_github/AlgEt/spec");
-    _<x>:=PolynomialRing(Integers());
-    f:=x^8+16;
-    A:=EtaleAlgebra(f);
-    F:=PrimitiveElement(A);
-    R:=Order([F,2/F]);
-    str:=PrintWKICM(R);
-    R1:=LoadWKICM(str);
-    assert #WKICM(R) eq #WKICM(R1);
-    assert #FindOverOrders(R) eq #FindOverOrders(R1);
-    printf ".";
-
-    printf " all good!\n"; 
-
-
-
-
-
-
     printf "### Testing LowCohenMacaulayType:";
     SetAssertions(2);
     _<x>:=PolynomialRing(Integers());
@@ -985,6 +924,67 @@ time_start:=Cputime();
     end for;
     SetAssertions(1);
     printf " all good!\n";
+
+
+
+
+
+
+    printf "### Testing TotRealPos:";
+    //AttachSpec("~/packages_github/AlgEt/spec");
+    PP<x>:=PolynomialRing(Integers());
+    SetAssertions(2);
+
+    f:=x^8+16;
+    A:=EtaleAlgebra(f);
+    F:=PrimitiveElement(A);
+    R:=Order([F,2/F]);
+    oo:=FindOverOrders(R);
+    for iS in [1..#oo] do
+        S:=oo[iS];
+        _:=TotallyRealUnitGroup(S);
+        _:=TotallyRealPositiveUnitGroup(S);
+    end for;
+    SetAssertions(1);
+    printf " all good!\n"; 
+
+
+
+
+
+    
+    printf "### Testing Print Saving:";
+    //AttachSpec("~/packages_github/AlgEt/spec");
+    _<x>:=PolynomialRing(Integers());
+    f:=x^6 - 3*x^5 - 3*x^4 + 65*x^3 - 48*x^2 - 768*x + 4096;
+    A:=EtaleAlgebra(f);
+    E:=EquationOrder(A);
+    seq,str:=PrintSeqAlgEtQElt(ZBasis(E));
+    assert Order([ A! s : s in eval(str)]) eq E;
+    printf ".";
+
+    //AttachSpec("~/packages_github/AlgEt/spec");
+    _<x>:=PolynomialRing(Integers());
+    f:=x^8+16;
+    A:=EtaleAlgebra(f);
+    O:=MaximalOrder(A);
+    str:=PrintWKICM(O);
+    O1:=LoadWKICM(str);
+    printf ".";
+
+    //AttachSpec("~/packages_github/AlgEt/spec");
+    _<x>:=PolynomialRing(Integers());
+    f:=x^8+16;
+    A:=EtaleAlgebra(f);
+    F:=PrimitiveElement(A);
+    R:=Order([F,2/F]);
+    str:=PrintWKICM(R);
+    R1:=LoadWKICM(str);
+    assert #WKICM(R) eq #WKICM(R1);
+    assert #FindOverOrders(R) eq #FindOverOrders(R1);
+    printf ".";
+
+    printf " all good!\n"; 
 
 
 

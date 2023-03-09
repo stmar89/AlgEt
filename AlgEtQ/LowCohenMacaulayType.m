@@ -17,7 +17,7 @@ declare attributes AlgEtQOrd:NonGorensteinPrimes, CohenMacaulayType;
 //------------
 
 intrinsic NonGorensteinPrimes(S::AlgEtQOrd)->SeqEnum,SeqEnum
-{Given an order S it returns two sequences the first containing the primes at which S is locally not Gorenstein and the second containing the CohenMacaulay types of S at this primes, that is, the dimension of S^t/PS^t over S/P, where S^t is the TraceDualIdeal of S.}
+{Given an order S it returns two sequences: the first containis the primes at which S is locally not Gorenstein; the second containis the CohenMacaulay types of S at these primes, that is, the dimension of S^t/PS^t over S/P, where S^t is the TraceDualIdeal of S.}
     if not assigned S`NonGorensteinPrimes then
         if IsGorenstein(S) then
             S`NonGorensteinPrimes:=<[],[]>;

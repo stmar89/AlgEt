@@ -12,7 +12,7 @@ declare attributes AlgEtQOrd:   ICM,
                                 ICM_bar;
 
 intrinsic ICM_bar(S::AlgEtQOrd : GRH:=false ) -> SeqEnum
-{returns the ideal classes of the order S having S as MultiplicatorRing, that is the orbits of the action of PicardGroup(S) on WKICM_bar(S).}
+{Returns the ideal classes of fractional S-ideals having MultiplicatorRing equal to S. This is the same as the orbit of the action of PicardGroup(S) on WKICM_bar(S).}
     if not assigned S`ICM_bar then
         seqWKS_bar:=WKICM_bar(S);
         GS,gS:=PicardGroup(S : GRH:=GRH );
@@ -29,7 +29,7 @@ intrinsic ICM_bar(S::AlgEtQOrd : GRH:=false ) -> SeqEnum
 end intrinsic;
 
 intrinsic ICM(S::AlgEtQOrd : GRH:=false ) -> SeqEnum
-{returns the ideal class monoid of the order, that is a set of representatives for the isomorphism classes of the fractiona ideals.}
+{Returns the ideal class monoid of the order, that is, a set of representatives for the isomorphism classes of the fractional S-ideals.}
     if not assigned S`ICM then
         _:=WKICM(S); // This is to populate the attribute WKICM_bar. Currently it is superfluous.
                      // It will make the computation faster once the recursive method for WKICM is included.

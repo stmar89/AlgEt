@@ -34,7 +34,7 @@ CRT_data_ideal:=function(I)
 end function;
 
 intrinsic ChineseRemainderTheorem(Is::SeqEnum[AlgEtQIdl],as::SeqEnum[AlgEtQElt])-> AlgEtQElt
-{Given a sequence `Is` of ideals of S, pairwise coprime,, and a sequence `as` of elements of S, it returns an element e such that e-as[i] in Is[i] for every i.}
+{Given a sequence `Is` of ideals of S, pairwise coprime, and a sequence `as` of elements of S, it returns an element e such that e-as[i] in Is[i] for every i.}
     N:=#as;
     S:=Order(Is[1]);
     require #Is eq N: "The number of ideals is not the same as the number of elements";

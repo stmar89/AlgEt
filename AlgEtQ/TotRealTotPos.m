@@ -17,12 +17,12 @@ freeze;
 //////////////////////////
 
     intrinsic IsTotallyReal(a::AlgEtQElt) -> BoolElt
-    {Returns whther a is totally real.}
+    {Returns whether a is totally real.}
         return a eq ComplexConjugate(a); 
     end intrinsic;
 
     intrinsic IsTotallyRealPositive(a::AlgEtQElt) -> BoolElt
-    {Returns whether a is totally positive, that is, totally real and with positive image in C.}
+    {Returns whether a is totally positive, that is, totally real and with positive image in CC.}
         return IsTotallyReal(a) and forall{ h : h in HomsToC(Parent(a)) | Re(h(a)) gt 0 }; 
     end intrinsic;
 
@@ -31,7 +31,7 @@ freeze;
 //////////////////////////
 
     intrinsic TotallyRealSubAlgebra(K::AlgEtQ) -> AlgEtQ,Map
-    {Given a CM algebra K returns the unique totally real subalgebra, and an embedding.}
+    {Given a CM algebra K, returns the unique totally real subalgebra, with an embedding.}
         if not assigned K`TotallyRealSubAlgebra then
             require HasComplexConjugate(K) : "the algebra does not have CM ";
             a:=PrimitiveElement(K);
@@ -110,7 +110,7 @@ freeze;
     end function;
 
     intrinsic TotallyRealPositiveUnitGroup(S::AlgEtQOrd) -> Grp
-    {Given an order S in a CM étale algebra A. Returns the groups of totally positive units of S, as a subgroup of S^*.}
+    {Given an order S in a CM étale algebra. Returns the groups of totally positive units of S, as a subgroup of S^*.}
         if not assigned S`TotallyRealPositiveUnitGroup then
             K:=Algebra(S);
             F,FtoK:=TotallyRealSubAlgebra(K);

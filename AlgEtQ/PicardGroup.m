@@ -15,7 +15,7 @@ declare attributes AlgEtQOrd:PicardGroup,
 declare attributes AlgEtQIdl:residue_class_ring_unit_subgroup_generator;
 
 intrinsic ResidueRingUnits(S::AlgEtQOrd,I::AlgEtQIdl) -> GrpAb,Map
-{Returns the group (S/I)^* and a map (S/I)^* -> S. It is required S to be maximal.}
+{Returns the group (S/I)^* and a map (S/I)^* -> S. The order S is required to be maximal.}
     //the following code works only for maximal orders in etale algebras
     require IsMaximal(S): "implemented only for the maximal order";
     test,I_asProd:=IsProductOfIdeals(I);

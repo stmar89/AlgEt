@@ -16,7 +16,7 @@ declare attributes AlgEtQ : HomsToC;
 //------------
 
 intrinsic HomsToC(A::AlgEtQ : Precision:=30)->SeqEnum[Map]
-{returns Hom(A,\C) as a sequence of maps. The precision of \C is given by the optional parameter "Precision". Default value is 30}
+{Returns the sequence of homomorphisms from A to the complex field CC. The precision of CC is given by the optional parameter "Precision". Default value is 30}
     if not assigned A`HomsToC then
         require Type(PrimeField(A)) eq  FldRat : "The algebra needs to be over Q";
         CC:=ComplexField(Precision);

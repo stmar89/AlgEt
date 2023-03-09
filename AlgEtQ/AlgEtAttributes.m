@@ -10,7 +10,7 @@
 declare verbose AlgEtQ, 1;
 
 //------------
-// Creation and Printing for AlgEtQ
+// Printing
 //------------
 
 intrinsic Print(A::AlgEtQ)
@@ -98,7 +98,7 @@ end intrinsic;
 //------------
 
 intrinsic 'eq'(A1::AlgEtQ,A2::AlgEtQ) -> BoolElt
-{A1 eq A2.}
+{Equality testing.}
    c1,e1,p1:=Components(A1);
    c2,e2,p2:=Components(A2);
    return <c1,e1,p1> eq <c2,e2,p2>;

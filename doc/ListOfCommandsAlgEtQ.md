@@ -7,7 +7,7 @@
 *Given a squarefree polynomial over the integers returns the product of the number fields defined by the irreducible factors.*
 
 > <pre><b>EtaleAlgebra</b>(f::RngUPolElt[FldRat]) -> AlgEtQ</pre>
-*.*
+*Given a squarefree polynomial over the rationals returns the product of the number fields defined by the irreducible factors.*
 
 
 ## List of instrinsics in AlgEtQ/AlgEtAttributes.m:
@@ -37,19 +37,19 @@
 *Returns the prime field of the Algebra.*
 
 > <pre><b>'eq'</b>(A1::AlgEtQ,A2::AlgEtQ) -> BoolElt</pre>
-*A1 eq A2.*
+*Equality testing.*
 
 
 ## List of instrinsics in AlgEtQ/Homs.m:
 
 > <pre><b>HomsToC</b>(A::AlgEtQ : Precision:=30)->SeqEnum[Map]</pre>
-*returns Hom(A,\C) as a sequence of maps. The precision of \C is given by the optional parameter "Precision". Default value is 30*
+*Returns the sequence of homomorphisms from A to the complex field CC. The precision of CC is given by the optional parameter "Precision". Default value is 30*
 
 
 ## List of instrinsics in AlgEtQ/Elt.m:
 
 > <pre><b>Print</b>(x::AlgEtQElt)</pre>
-*Print the AlgEtQElt.*
+*Print the element.*
 
 > <pre><b>Parent</b>(x::AlgEtQElt) -> AlgEtQ</pre>
 *Returns the algebra to which the elemenet belongs to.*
@@ -58,13 +58,13 @@
 *Returns the algebra to which the elemenet belongs to.*
 
 > <pre><b>Components</b>(x::AlgEtQElt) -> SeqEnum</pre>
-*Given an element x returns its components, which are elements of number fields.*
+*Given an element, returns its components, which are elements of number fields.*
 
 > <pre><b>AbsoluteCoordinates</b>(x::AlgEtQElt) -> SeqEnum</pre>
-*Given an element x returns the coordinates relative to the absolute basis, which are elements of the prime field.*
+*Given an element, returns the coordinates relative to the absolute basis, which are elements of the prime rational field.*
 
 > <pre><b>IsCoercible</b>(A::AlgEtQ, x::.) -> BoolElt, .</pre>
-*Return whether x is coercible into A and the result of the coercion if so.*
+*Return whether the element is coercible into A and the result of the coercion if so.*
 
 > <pre><b>'!'</b>(A::AlgEtQ, x::.) -> AlgEtQElt</pre>
 *Coerce x into A.*
@@ -81,14 +81,11 @@
 > <pre><b>IsZeroDivisor</b>(x::AlgEtQElt) -> BoolElt</pre>
 *Returns wheter x is a not unit in A.*
 
-> <pre><b>IsZeroDivisor2</b>(x::AlgEtQElt) -> BoolElt</pre>
-*Returns wheter x is a not unit in A.*
-
 > <pre><b>Random</b>(A::AlgEtQ , bd::RngIntElt) -> AlgEtQElt</pre>
 *Random element of A. The Coefficients are bounded by the positive integer bd.*
 
 > <pre><b>Random</b>(A::AlgEtQ : bd:=3) -> AlgEtQElt</pre>
-*Random element of A. The Coefficients are bounded by VarArg bd (default 3).*
+*Random element of A. The Coefficients are bounded by the VarArg bd (default 3).*
 
 > <pre><b>RandomUnit</b>(A::AlgEtQ , bd::RngIntElt) -> AlgEtQElt</pre>
 *Random unit of A. The Coefficients are bounded by the positive integer bd.*
@@ -208,7 +205,7 @@
 *Given a sequence of AlgEtQElt returns the product of the entries.*
 
 > <pre><b>SumOfProducts</b>(as::SeqEnum[AlgEtQElt],bs::SeqEnum[AlgEtQElt]) -> AlgEtQElt</pre>
-*Given sequences as and bs, such that #as eq #bs, returns &+[as[i]\*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.*
+*Given sequences as and bs, such that #as eq #bs, returns `&+[as[i]\*bs[i] : i in [1..#as]]`. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.*
 
 > <pre><b>SumOfProducts</b>(as::SeqEnum[RngIntElt],bs::SeqEnum[AlgEtQElt]) -> AlgEtQElt</pre>
 *Given sequences as and bs, such that #as eq #bs, returns &+[as[i]\*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.*

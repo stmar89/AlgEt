@@ -21,11 +21,11 @@ declare attributes AlgEtQ : Basis,
                            Idempotents;
 
 //------------
-// Printing for AlgEtQElt
+// Printing 
 //------------
 
 intrinsic Print(x::AlgEtQElt)
-{Print the AlgEtQElt.}
+{Print the element.}
     printf "%o", Components(x);
 end intrinsic;
 
@@ -44,12 +44,12 @@ intrinsic Algebra(x::AlgEtQElt) -> AlgEtQ
 end intrinsic;
 
 intrinsic Components(x::AlgEtQElt) -> SeqEnum
-{Given an element x returns its components, which are elements of number fields.}
+{Given an element, returns its components, which are elements of number fields.}
   return x`Components;
 end intrinsic;
 
 intrinsic AbsoluteCoordinates(x::AlgEtQElt) -> SeqEnum
-{Given an element x returns the coordinates relative to the absolute basis, which are elements of the prime field.}
+{Given an element, returns the coordinates relative to the absolute basis, which are elements of the prime rational field.}
     if not assigned x`AbsoluteCoordinates then
         x`AbsoluteCoordinates:=&cat[ Flat(c) : c in Components(x) ];
     end if;
@@ -69,7 +69,7 @@ function CreateAlgEtQElt(A,comp)
 end function;
 
 intrinsic IsCoercible(A::AlgEtQ, x::.) -> BoolElt, .
-{Return whether x is coercible into A and the result of the coercion if so.}
+{Return whether the element is coercible into A and the result of the coercion if so.}
     if Parent(x) cmpeq A then
         return true,x;
     elif Type(x) in {List,Tup,SeqEnum} then
@@ -127,12 +127,6 @@ intrinsic IsZeroDivisor(x::AlgEtQElt) -> BoolElt
     return not IsUnit(x);
 end intrinsic;
 
-//kept for retro-compatbility
-intrinsic IsZeroDivisor2(x::AlgEtQElt) -> BoolElt
-{Returns wheter x is a not unit in A.}   
-    return not IsUnit(x);
-end intrinsic;
-
 intrinsic Random(A::AlgEtQ , bd::RngIntElt) -> AlgEtQElt
 {Random element of A. The Coefficients are bounded by the positive integer bd.}   
     require bd gt 0 : "The bound needs to be a positive integer.";
@@ -148,7 +142,7 @@ intrinsic Random(A::AlgEtQ , bd::RngIntElt) -> AlgEtQElt
 end intrinsic;
 
 intrinsic Random(A::AlgEtQ : bd:=3) -> AlgEtQElt
-{Random element of A. The Coefficients are bounded by VarArg bd (default 3).}   
+{Random element of A. The Coefficients are bounded by the VarArg bd (default 3).}   
     return Random(A,bd);
 end intrinsic;
 
@@ -443,7 +437,7 @@ intrinsic '&*'(seq::SeqEnum[AlgEtQElt]) -> AlgEtQElt
 end intrinsic;
 
 intrinsic SumOfProducts(as::SeqEnum[AlgEtQElt],bs::SeqEnum[AlgEtQElt]) -> AlgEtQElt
-{Given sequences as and bs, such that #as eq #bs, returns &+[as[i]*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.}
+{Given sequences as and bs, such that #as eq #bs, returns `&+[as[i]*bs[i] : i in [1..#as]]`. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.}
     A:=Universe(bs);
     N:=#as;
     require N eq #bs : "The sequences don't have the same size";

@@ -92,7 +92,7 @@ end intrinsic;
 /* TESTS
     
     printf "### Testing GraphOverOrders:";
-    AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/packages_github/AlgEt/spec");
     P<x>:=PolynomialRing(Integers());
     fs:=[ 
           x^8 + 16, //1 sing prime

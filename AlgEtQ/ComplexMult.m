@@ -216,7 +216,7 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing CM-types:";
-    AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/packages_github/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());
     polys:=[
     x^4+x^2+529,

@@ -16,7 +16,6 @@
     - [2] "Cohen-Macaulay type of orders, generators and ideal classes",
         Stefano Marseglia
         https://arxiv.org/abs/2206.03758
-
 */
 
 // ########################

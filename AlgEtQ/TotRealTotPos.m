@@ -139,7 +139,7 @@ freeze;
 /* TESTS
 
     printf "### Testing TotRealPos:";
-    AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/packages_github/AlgEt/spec");
     PP<x>:=PolynomialRing(Integers());
     SetAssertions(2);
 

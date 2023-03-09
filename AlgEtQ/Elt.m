@@ -624,7 +624,7 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing Elements:";
-    AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/packages_github/AlgEt/spec");
     SetVerbose("AlgEtQElt",2);
 
     _<x>:=PolynomialRing(Integers());
@@ -677,7 +677,7 @@ end intrinsic;
     end for;
 
     // testing sequences
-    AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/packages_github/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());
     f:=(x^8+16)*(x^8+81);
     A:=EtaleAlgebra(f);

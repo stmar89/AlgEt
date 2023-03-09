@@ -33,9 +33,11 @@
         return pos+n+1;
     end function;
 
+    out:="AttachSpec(\"" cat input cat "\");\n";
     input:=Split(Read(input),"{\n}");
     fld:=input[1];
-    out:="time_start:=Cputime();\n";
+    //input;
+    out cat:="time_start:=Cputime();\n";
     for input_file0 in input[2..#input] do
         input_file:=fld cat "/" cat input_file0;
         inp:=Read("../../" cat input_file);
@@ -44,7 +46,7 @@
         t1:=find_next(inp,t0,"*/")-3;
         out cat:=inp[t0..t1] cat "\n\n\n";
     end for;
-    out cat:="Cputime(time_start);";
+    out cat:="Cputime(time_start);\nquit;";
     fprintf output_file,"%o",out; 
 
     quit;

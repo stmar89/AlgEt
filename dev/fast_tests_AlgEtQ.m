@@ -1,8 +1,9 @@
+AttachSpec("../../spec");
 time_start:=Cputime();
 
 
     printf "### Testing Creation of Algebra:";
-    AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/packages_github/AlgEt/spec");
     SetAssertions(2);
     _<x>:=PolynomialRing(Integers());
     printf ".";
@@ -28,7 +29,7 @@ time_start:=Cputime();
 
 
     printf "### Testing Attributes and Equality:";
-    AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/packages_github/AlgEt/spec");
     SetAssertions(2);
     _<x>:=PolynomialRing(Integers());
     f:=(x^8+16)*(x^8+81);
@@ -48,7 +49,7 @@ time_start:=Cputime();
 
 
     printf "### Testing Homs:";
-    AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/packages_github/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());
     f:=(x^8+16)*(x^8+81);
     A:=EtaleAlgebra(f);
@@ -63,7 +64,7 @@ time_start:=Cputime();
 
 
     printf "### Testing Elements:";
-    AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/packages_github/AlgEt/spec");
     SetVerbose("AlgEtQElt",2);
 
     _<x>:=PolynomialRing(Integers());
@@ -116,7 +117,7 @@ time_start:=Cputime();
     end for;
 
     // testing sequences
-    AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/packages_github/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());
     f:=(x^8+16)*(x^8+81);
     A:=EtaleAlgebra(f);
@@ -158,7 +159,7 @@ time_start:=Cputime();
 
 
     printf "### Testing Trace and Norm:";
-    AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/packages_github/AlgEt/spec");
     SetVerbose("AlgEtQTraceNorm",1);
 
     _<x>:=PolynomialRing(Integers());
@@ -178,7 +179,7 @@ time_start:=Cputime();
 
     
     printf "### Testing Orders:";
-	AttachSpec("~/packages_github/AlgEt/spec");
+	//AttachSpec("~/packages_github/AlgEt/spec");
     SetVerbose("AlgEtQOrd",1);
     SetAssertions(2);
 
@@ -266,7 +267,7 @@ time_start:=Cputime();
 
 
     printf "### Testing Quotients:";
-    AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/packages_github/AlgEt/spec");
 	SetAssertions(2);
 	_<x>:=PolynomialRing(Integers());
     f:=(x^4+16);
@@ -301,7 +302,7 @@ time_start:=Cputime();
 
 
     printf "### Testing OverOrders:";
-	AttachSpec("~/packages_github/AlgEt/spec");
+	//AttachSpec("~/packages_github/AlgEt/spec");
 
     SetVerbose("OverOrders",1);
     SetAssertions(1);
@@ -325,7 +326,7 @@ time_start:=Cputime();
 
     
     printf "### Testing GraphOverOrders:";
-    AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/packages_github/AlgEt/spec");
     P<x>:=PolynomialRing(Integers());
     fs:=[ 
           x^8 + 16, //1 sing prime
@@ -350,7 +351,7 @@ time_start:=Cputime();
 
 
     printf "### Testing Ideals:";
-    AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/packages_github/AlgEt/spec");
     SetVerbose("AlgEtQIdl",1);
     SetAssertions(2);
 
@@ -435,7 +436,7 @@ time_start:=Cputime();
 
 
   printf "### Testing ZBasisLLL:";
-	AttachSpec("~/packages_github/AlgEt/spec");
+	//AttachSpec("~/packages_github/AlgEt/spec");
 	SetAssertions(2);
 	_<x>:=PolynomialRing(Integers());
   f:=x^4-100*x^3-100*x^2-100*x-100;
@@ -455,7 +456,7 @@ time_start:=Cputime();
 
     
     printf "### Testing Completion:";
-    AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/packages_github/AlgEt/spec");
     PP<x>:=PolynomialRing(Integers());
     polys:=[
         x^6+3*x^4-10*x^3+15*x^2+125,
@@ -481,7 +482,7 @@ time_start:=Cputime();
 
 
     printf "### Testing Complex Conjugation:";
-    AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/packages_github/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());
     f:=x^4 + 6*x^2 + 25;
     K:=EtaleAlgebra(f);
@@ -508,7 +509,7 @@ time_start:=Cputime();
 
 
     printf "### Testing CM-types:";
-    AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/packages_github/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());
     polys:=[
     x^4+x^2+529,
@@ -582,9 +583,40 @@ time_start:=Cputime();
 
 
 
+
+    printf "### Testing IdealsOfIndex:";
+    //AttachSpec("~/packages_github/AlgEt/spec");
+    SetVerbose("IdealsOfIndex",1);
+    SetAssertions(2);
+
+    _<x>:=PolynomialRing(Integers());
+    f:=(x^8+16)*(x^8+81);
+    A:=EtaleAlgebra(f);
+    E:=EquationOrder(A);
+    O:=MaximalOrder(A);
+    ind:=Index(O,E);
+    for N in [1..15] do
+        printf "."; 
+        // test with maximal order
+        assert Seqset(IdealsOfIndex(O,N)) eq Seqset(IdealsOfIndex(O,N : Method:="Slow"));
+
+        //test with equation order
+        if IsCoprime(N,ind) then
+            assert Seqset(IdealsOfIndex(E,N)) eq Seqset(IdealsOfIndex(E,N : Method:="Slow"));
+        else
+            _:=IdealsOfIndex(E,N);
+        end if;
+    end for;
+    SetAssertions(1);    
+    printf " all good!\n"; 
+
+
+
+
+
     
     printf "### Testing ShortEltSmallRep:";
-	AttachSpec("~/packages_github/AlgEt/spec");
+	//AttachSpec("~/packages_github/AlgEt/spec");
 	_<x>:=PolynomialRing(Integers());
     f:=(x^2+5)*(x^2+7)*(x^2+11);
     assert IsSquarefree(f);
@@ -606,7 +638,7 @@ time_start:=Cputime();
 
 
     printf "### Testing MinimalGenerators:";
-	AttachSpec("~/packages_github/AlgEt/spec");
+	//AttachSpec("~/packages_github/AlgEt/spec");
     SetClassGroupBounds("GRH");
 	_<x>:=PolynomialRing(Integers());
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
@@ -661,7 +693,7 @@ time_start:=Cputime();
 
 
     printf "### Testing CRT:";
-    AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/packages_github/AlgEt/spec");
     SetVerbose("CRT",1);
     SetAssertions(2);
 
@@ -718,7 +750,7 @@ time_start:=Cputime();
 
 
     printf "### Testing PicardGroup and UnitGroup:";
-    AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/packages_github/AlgEt/spec");
 	SetAssertions(2);
 	_<x>:=PolynomialRing(Integers());
 
@@ -733,7 +765,7 @@ time_start:=Cputime();
         printf ".";	
     end for;
 
-	AttachSpec("~/packages_github/AlgEt/spec");
+	//AttachSpec("~/packages_github/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
     SetAssertions(1);
@@ -756,7 +788,7 @@ time_start:=Cputime();
 
 
     printf "### Testing Primes and Factorizaton:";
-    AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/packages_github/AlgEt/spec");
     SetAssertions(2);
 
     _<x>:=PolynomialRing(Integers());
@@ -803,7 +835,7 @@ time_start:=Cputime();
 
 
     printf "### Testing TotRealPos:";
-    AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/packages_github/AlgEt/spec");
     PP<x>:=PolynomialRing(Integers());
     SetAssertions(2);
 
@@ -826,7 +858,7 @@ time_start:=Cputime();
 
     
     printf "### Testing Print Saving:";
-    AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/packages_github/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());
     f:=x^6 - 3*x^5 - 3*x^4 + 65*x^3 - 48*x^2 - 768*x + 4096;
     A:=EtaleAlgebra(f);
@@ -835,7 +867,7 @@ time_start:=Cputime();
     assert Order([ A! s : s in eval(str)]) eq E;
     printf ".";
 
-    AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/packages_github/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());
     f:=x^8+16;
     A:=EtaleAlgebra(f);
@@ -844,7 +876,7 @@ time_start:=Cputime();
     O1:=LoadWKICM(str);
     printf ".";
 
-    AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/packages_github/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());
     f:=x^8+16;
     A:=EtaleAlgebra(f);
@@ -867,7 +899,7 @@ time_start:=Cputime();
     SetAssertions(2);
     _<x>:=PolynomialRing(Integers());
     f:=x^4-10000*x^3-10000*x^2-10000*x-10000; 
-    AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/packages_github/AlgEt/spec");
     A:=EtaleAlgebra(f);
     E:=EquationOrder(A);
     oo:=FindOverOrders(E); // ~13 secs
@@ -891,7 +923,7 @@ time_start:=Cputime();
 
 
     printf "### Testing WKICM:";
-	AttachSpec("~/packages_github/AlgEt/spec");
+	//AttachSpec("~/packages_github/AlgEt/spec");
 	SetAssertions(2);
 	_<x>:=PolynomialRing(Integers());
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
@@ -918,7 +950,7 @@ time_start:=Cputime();
 
 
     printf "### Testing WKEq:";
-	AttachSpec("~/packages_github/AlgEt/spec");
+	//AttachSpec("~/packages_github/AlgEt/spec");
 	SetAssertions(2);
 	_<x>:=PolynomialRing(Integers());
     f:=x^4-100*x^3-100*x^2-100*x-100;
@@ -958,3 +990,4 @@ time_start:=Cputime();
 
 
 Cputime(time_start);
+quit;

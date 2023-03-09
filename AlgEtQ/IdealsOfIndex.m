@@ -126,8 +126,7 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing IdealsOfIndex:";
-    AttachSpec("~/packages_github/AlgEt/spec");
-    Attach("~/packages_github/AlgEt/dev/IdealsOfIndex.m");
+    //AttachSpec("~/packages_github/AlgEt/spec");
     SetVerbose("IdealsOfIndex",1);
     SetAssertions(2);
 

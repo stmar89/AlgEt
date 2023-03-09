@@ -132,7 +132,7 @@ end intrinsic;
 /* TESTS
     
     printf "### Testing Print Saving:";
-    AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/packages_github/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());
     f:=x^6 - 3*x^5 - 3*x^4 + 65*x^3 - 48*x^2 - 768*x + 4096;
     A:=EtaleAlgebra(f);
@@ -141,7 +141,7 @@ end intrinsic;
     assert Order([ A! s : s in eval(str)]) eq E;
     printf ".";
 
-    AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/packages_github/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());
     f:=x^8+16;
     A:=EtaleAlgebra(f);
@@ -150,7 +150,7 @@ end intrinsic;
     O1:=LoadWKICM(str);
     printf ".";
 
-    AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/packages_github/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());
     f:=x^8+16;
     A:=EtaleAlgebra(f);

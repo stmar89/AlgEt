@@ -1,6 +1,6 @@
 /* vim: set syntax=magma :*/
 
-//freeze;
+freeze;
 
 /////////////////////////////////////////////////////
 // Picard Group of orders in etale algebras over \Q

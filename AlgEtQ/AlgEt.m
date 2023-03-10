@@ -1,6 +1,6 @@
 /* vim: set syntax=magma :*/
 
-//freeze;
+freeze;
 
 /////////////////////////////////////////////////////
 // Stefano Marseglia, Utrecht University, s.marseglia@uu.nl
@@ -9,14 +9,9 @@
 
 declare verbose AlgEtQ, 1;
 
-/*TODO:
-
-*/
-
 declare type AlgEtQ[AlgEtQElt];
 
 declare attributes AlgEtQ : DefiningPolynomial, 
-                           // ass_algebra, 
                            Dimension,
                            AbsoluteDimension,
                            BaseField, //a tup : <F,m> where F is the Base field and m is the diagonal embedding into A

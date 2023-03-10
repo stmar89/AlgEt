@@ -13,7 +13,7 @@
     "-------------------------------------------------------------";
     "Picard group for AlgEtQOrd used to have very incosistent timings because of how certain randomized choices in CoprimeRepresentatives. Now the timings are consistent and better than RngOrd.";
     //picard groups
-	AttachSpec("~/packages_github/AlgEt/spec");
+	AttachSpec("../spec");
     SetClassGroupBounds("GRH");
 	_<x>:=PolynomialRing(Integers());
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
@@ -57,7 +57,7 @@
     "-------------------------------------------------------------";
     "The following order used to trigger a bug in CRT. now fixed";
     
-    AttachSpec("~/packages_github/AlgEt/spec");
+    AttachSpec("../spec");
     _<x>:=PolynomialRing(Integers());
     f:=x^6 - 3*x^5 - 3*x^4 + 65*x^3 - 48*x^2 - 768*x + 4096;
     A:=EtaleAlgebra(f);
@@ -92,7 +92,7 @@
     "-------------------------------------------------------------";
     "A quick one.";
     
-    AttachSpec("~/packages_github/AlgEt/spec");
+    AttachSpec("../spec");
 	_<x>:=PolynomialRing(Integers());
     f:=x^4-10000*x^3-10000*x^2-10000*x-10000; 
     // no profiler
@@ -136,7 +136,7 @@
     "-------------------------------------------------------------";
     "A bigger example.";
     
-    AttachSpec("~/packages_github/AlgEt/spec");
+    AttachSpec("../spec");
     // no profiler
 	_<x>:=PolynomialRing(Integers());
     f:=x^6 - 3*x^5 - 3*x^4 + 65*x^3 - 48*x^2 - 768*x + 4096;
@@ -183,7 +183,7 @@
     "-------------------------------------------------------------";
     "A big example.";
 
-    AttachSpec("~/packages_github/AlgEt/spec");
+    AttachSpec("../spec");
     P<x>:=PolynomialRing(Integers());
     f:=x^6 + 8*x^5 + 50*x^4 + 200*x^3 + 1250*x^2 + 5000*x + 15625;
     A:=EtaleAlgebra(f);
@@ -224,7 +224,7 @@
     
 	_<x>:=PolynomialRing(Integers());
     f:=x^8+16; 
-    AttachSpec("~/packages_github/AlgEt/spec");
+    AttachSpec("../spec");
 
     // no profiler
     A:=EtaleAlgebra(f);
@@ -260,11 +260,11 @@
     
 	_<x>:=PolynomialRing(Integers());
     f:=x^8+16; 
-    AttachSpec("~/packages_github/AlgEt/spec");
+    AttachSpec("../spec");
     A:=EtaleAlgebra(f);
     R:=EquationOrder(A);
     ooR:=FindOverOrders(R);
-    data:=eval(Read("~/packages_github/AlgEt/dev/input_big_test_WKICM.txt"));
+    data:=eval(Read("../dev/input_big_test_WKICM.txt"));
     // data contains a Seq with entries <S,T,ff,out> where
     // S is the ZBasis of the order S
     // T (resp. ff) is the ZBasis of the overorder T of S (resp ff=(S:T))

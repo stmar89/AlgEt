@@ -1,7 +1,7 @@
 ## List of instrinsics in AlgEtQ/AlgEt.m:
 
 > <pre><b>EtaleAlgebra</b>(seq::SeqEnum[FldNum]) -> AlgEtQ</pre>
-<em>Given a sequence of number fields returns the étale algebra corresponding to the direct product.</em>
+<em>Given a sequence of number fields returns the étale algebra corresponding to the direct product. Note: the number fields with DefiningPolynomial of degree one should be created with the vararg DoLinearExtention set to true.</em>
 
 > <pre><b>EtaleAlgebra</b>(f::RngUPolElt[RngInt]) -> AlgEtQ</pre>
 <em>Given a squarefree polynomial over the integers returns the product of the number fields defined by the irreducible factors.</em>

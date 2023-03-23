@@ -535,7 +535,7 @@ intrinsic PrimitiveElement(A::AlgEtQ) -> AlgEtQElt
 {Returns the primitive element of the étale algebra A. Note that A has a primitive element only if it is the product of distinct number fields.}
     if not assigned A`PrimitiveElement then
         nf,embs:=Components(A);
-        require #Seqset(nf) eq #nf : "The number fields defining the algebra are not distinct. Hence the algebra does not have a primitive element";
+        require #{ DefiningPolynomial(K) : K in nf } eq #nf : "The number fields defining the algebra are not distinct. Hence the algebra does not have a primitive element";
         A`PrimitiveElement:= CreateAlgEtQElt(A,<PrimitiveElement(F) : F in nf>);
     end if;
     return A`PrimitiveElement;

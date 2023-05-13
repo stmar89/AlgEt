@@ -105,7 +105,7 @@ intrinsic Homs( PHI::AlgEtQCMType : prec:=30 )->SeqEnum[Map]
     if not assigned PHI`Homs then
         b:=CMPositiveElement(PHI);
         A:=Parent(b); 
-        homs:=HomsToC(A : Precision:=prec);
+        homs:=HomsToC(A : Prec:=prec);
         phi:=[ ff : ff in homs | Im(ff( b )) gt 0 ];
         assert #phi eq #homs div 2;
         PHI`Homs:=phi;    
@@ -117,7 +117,7 @@ intrinsic 'eq'(PHI1 :: AlgEtQCMType, PHI2::AlgEtQCMType : prec:=30)->BoolElt
 {Returns whether two cm types are equal. This happens if and only if the quotient of (any) two CMPositiveElements is totally real and totally positive.}
     A:=Domain(Homs(PHI1)[1]);
     assert forall{ phi : phi in Homs(PHI1) cat Homs(PHI2) | Domain(phi) eq A };
-    homs:=HomsToC(A : Precision:=prec);
+    homs:=HomsToC(A : Prec:=prec);
     b1:=CMPositiveElement(PHI1);
     b2:=CMPositiveElement(PHI2);
     if b1 eq b2 then
@@ -145,7 +145,7 @@ intrinsic ChangePrecision(PHI0 :: AlgEtQCMType, prec::RngIntElt )->AlgEtQCMType
     if assigned PHI`CMPositiveElement then
         b:=CMPositiveElement(PHI);
         A:=Parent(b); 
-        homs:=HomsToC(A : Precision:=prec);
+        homs:=HomsToC(A : Prec:=prec);
         phi:=[ ff : ff in homs | Im(ff( b )) gt 0 ];
         assert #phi eq #homs div 2;
         PHI`Homs:=phi; //this might over-write the attribute
@@ -154,7 +154,7 @@ intrinsic ChangePrecision(PHI0 :: AlgEtQCMType, prec::RngIntElt )->AlgEtQCMType
         prec0:=Precision(Codomain(phi0[1]));
         A:=Domain(phi0[1]);
         FA:=PrimitiveElement(A);
-        homs:=HomsToC(A : Precision:=prec);
+        homs:=HomsToC(A : Prec:=prec);
         phi:=[];
         for ff in phi0 do
             guess:=[ gg : gg in homs | Abs(gg(FA)-ff(FA)) lt 10^-(prec0-1)];
@@ -175,7 +175,7 @@ intrinsic ChangePrecision(~PHI :: AlgEtQCMType, prec::RngIntElt )
     if assigned PHI`CMPositiveElement then
         b:=CMPositiveElement(PHI);
         A:=Parent(b); 
-        homs:=HomsToC(A : Precision:=prec);
+        homs:=HomsToC(A : Prec:=prec);
         phi:=[ ff : ff in homs | Im(ff( b )) gt 0 ];
         assert #phi eq #homs div 2;
         PHI`Homs:=phi; //this might over-write the attribute
@@ -184,7 +184,7 @@ intrinsic ChangePrecision(~PHI :: AlgEtQCMType, prec::RngIntElt )
         prec0:=Precision(Codomain(phi0[1]));
         A:=Domain(phi0[1]);
         FA:=PrimitiveElement(A);
-        homs:=HomsToC(A : Precision:=prec);
+        homs:=HomsToC(A : Prec:=prec);
         phi:=[];
         for ff in phi0 do
             guess:=[ gg : gg in homs | Abs(gg(FA)-ff(FA)) lt 10^-(prec0-1)];
@@ -202,11 +202,11 @@ end intrinsic;
 // AllCMTypes 
 /////////////////////////////////////////////////////
 
-intrinsic AllCMTypes(A::AlgEtQ : Precision := 30 ) -> SeqEnum[AlgEtQCMType]
-{Returns all the AlgEtQCMTypes of A. The vararg Precision determined the precision of the codomain of the maps defining the CMTypes.}
+intrinsic AllCMTypes(A::AlgEtQ : Prec := 30 ) -> SeqEnum[AlgEtQCMType]
+{Returns all the AlgEtQCMTypes of A. The vararg Prec determined the precision of the codomain of the maps defining the CMTypes.}
     if not assigned A`AllCMTypes then
         // this uses the fact that if A HasComplexConjugation then HomsToC come in conjugate pairs
-        cc:=CartesianProduct(Partition([ h: h in HomsToC(A : Precision:=Precision )],2));
+        cc:=CartesianProduct(Partition([ h: h in HomsToC(A : Prec:=Prec )],2));
         cc:=[ [ci : ci in c] : c in cc ]; //from tuple to seq
         A`AllCMTypes:=[ CMType(c) : c in cc ];
     end if;
@@ -241,6 +241,8 @@ end intrinsic;
         for i,j in [1..#all] do
             assert (i eq j) eq (all[i] eq ChangePrecision(all[j],2*Precision(all[j])));
         end for; 
+        ChangePrecision(~all[1],60);
+        assert Precision(all[1]) eq 60;
         printf ".";
     end for;
     printf " all good!\n";

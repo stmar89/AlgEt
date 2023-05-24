@@ -275,7 +275,7 @@ PicardGroup_prod_internal:=function( O , GRH )
             return Zero(G);
         end function;
         codomain:=Parent(OneIdeal(O));
-        return G,map<G -> codomain | x:-> from_G_to_ideals(x) , y:->from_ideals_to_G(y) >;
+        O`PicardGroup:=<G,map<G -> codomain | x:-> from_G_to_ideals(x) , y:->from_ideals_to_G(y) >>;
     else
         zerosinO:=[ Ideal(O,[ T[4](y) : y in Basis(T[2](Zero(T[1])),T[3])]) : T in groups_maps_fields_maps];
         assert2 &+zerosinO eq OneIdeal(O);
@@ -322,8 +322,9 @@ PicardGroup_prod_internal:=function( O , GRH )
         O`PicardGroup:=<G,mapGtoO>;
         vprintf AlgEtQPicardGroup, 2:"PicardGroup_prod_internal:\n
                               geninO = %o\n",[PrintSeqAlgEtQElt(ZBasis(I)) : I in geninO];
-        return G,mapGtoO;
+        O`PicardGroup:=<G,mapGtoO>;
     end if;
+    return Explode(O`PicardGroup);
 end function;
 
 intrinsic PicardGroup( S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
@@ -421,8 +422,10 @@ intrinsic PicardGroup( S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
             Append(~generators_ideals,gen_inS);
         end for;
     else
-        return P,map<P->Parent(OneIdeal(S)) | rep:->OneIdeal(S),
+        p:=map<P->Parent(OneIdeal(S)) | rep:->OneIdeal(S),
                                               id:->Zero(P)>;
+        S`PicardGroup:=<P,p>;
+        return Explode(S`PicardGroup);
     end if;
 
     representative_picard_group := function(rep)

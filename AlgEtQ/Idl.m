@@ -246,7 +246,8 @@ intrinsic 'eq'(I::AlgEtQIdl , J::AlgEtQIdl ) -> BoolElt
 {Equality testing.}
     require Algebra(I) cmpeq Algebra(J) : "The ideals are not in the same algebra.";
     require Order(I) cmpeq Order(J) : "The ideals are not over the same order.";
-    if (assigned I`Generators and assigned J`Generators and Generators(I) eq Generators(J)) then
+    if  (not (assigned I`Hash and assigned J`Hash)) and
+        (assigned I`Generators and assigned J`Generators and Generators(I) eq Generators(J)) then
         // to compute myHash we need compute an HNF. In this way we might avoid it.
         out:=true;
         //note that the set of generators is not unique for an ideal.

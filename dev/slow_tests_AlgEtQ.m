@@ -45,7 +45,6 @@
         end if;
     end if;
 
-
     // with profiler
     // K1:=EtaleAlgebra(f);
     // E1:=EquationOrder(K1);
@@ -83,7 +82,6 @@
             printf "PicardGroup for %o got slower. The previous code was better.\n",f;
         end if;
     end if;
-
 	
     "-------------------------------------------------------------";
     "-------------------------------------------------------------";
@@ -160,7 +158,7 @@
         ooet:=GraphOverOrders(Eet);
     t1:=Cputime(t0);
     printf "Current running time = %o \n",t1;
-    tprevbest:=37; //on diophantus
+    tprevbest:=30.5; //on diophantus
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "GraphOverOrders for %o got faster. Update the previous best known time\n",f;
@@ -193,7 +191,7 @@
     t1:=Cputime(t0);
     assert #ooet eq 3200;
     printf "Current running time = %o \n",t1;
-    tprevbest:=24; // on diophantus
+    tprevbest:=21; // on diophantus
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "FindOverOrders for %o got faster. Update the previous best known time\n",f;
@@ -205,7 +203,7 @@
         ooet:=GraphOverOrders(Eet);
     t1:=Cputime(t0);
     printf "Current running time = %o \n",t1;
-    tprevbest:=46; //on diophantus
+    tprevbest:=37; //on diophantus
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "GraphOverOrders for %o got faster. Update the previous best known time\n",f;
@@ -235,7 +233,7 @@
         _:=#WKICM(R);
     t1:=Cputime(t0);
     printf "Current running time = %o \n",t1;
-    tprevbest:=5.8; // diophantus
+    tprevbest:=4.7; // diophantus
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "WKICM for %o got faster. Update the previous best known time\n",f;
@@ -289,25 +287,25 @@
     end for;
     // out on diophantus
     out_prev:=[
-    <1, 4, 3.130>,
-    <2, 4, 2.300>,
-    <3, 2, 2.180>,
-    <4, 4, 2.810>,
-    <5, 2, 1.840>,
-    <6, 4, 2.890>,
-    <7, 4, 2.930>,
-    <8, 4, 2.540>,
-    <9, 2, 1.770>,
-    <10, 4, 2.520>,
-    <11, 4, 2.140>,
-    <12, 4, 2.450>,
-    <13, 4, 2.190>,
-    <14, 6, 24.570>,
-    <15, 6, 92.750>,
-    <16, 6, 96.850>,
-    <17, 6, 95.610>,
-    <18, 6, 216.540>,
-    <19, 6, 772.750> 
+    <1, 4, 3.620>,
+    <2, 4, 2.540>,
+    <3, 2, 2.440>,
+    <4, 4, 3.180>,
+    <5, 2, 2.040>,
+    <6, 4, 3.210>,
+    <7, 4, 3.220>,
+    <8, 4, 2.720>,
+    <9, 2, 1.920>,
+    <10, 4, 2.790>,
+    <11, 4, 2.320>,
+    <12, 4, 2.640>,
+    <13, 4, 2.260>,
+    <14, 6, 22.610>,
+    <15, 6, 71.680>,
+    <16, 6, 75.230>,
+    <17, 6, 72.930>,
+    <18, 6, 153.930>,
+    <19, 6, 451.890>
     ];
     // SetProfile(false);
     // ProfilePrintByTotalTime(ProfileGraph() : Max:=30);

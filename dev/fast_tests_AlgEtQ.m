@@ -56,6 +56,10 @@ time_start:=Cputime();
     homs:=HomsToC(A);
     a:=PrimitiveElement(A);
     assert &and[ Abs(Evaluate(f,h(a))) lt 10^-20 : h in homs ];
+    old_prec:=Precision(Codomain(homs[1]));
+    new_prec:=10*old_prec;
+    homs:=HomsToC(A : Prec:=new_prec);
+    assert Precision(Codomain(homs[1])) eq new_prec;
     printf " all good!\n"; 
 
 
@@ -534,6 +538,8 @@ time_start:=Cputime();
         for i,j in [1..#all] do
             assert (i eq j) eq (all[i] eq ChangePrecision(all[j],2*Precision(all[j])));
         end for; 
+        ChangePrecision(~all[1],60);
+        assert Precision(all[1]) eq 60;
         printf ".";
     end for;
     printf " all good!\n";

@@ -13,6 +13,7 @@ all: magma_script
 clean:
 	@echo "Removing old fast_tests_AlgEtQ.m..."
 	if [ -f $(outfileAlgEtQ) ]; then rm $(outfileAlgEtQ) ; fi
+	if [ -f set_quit_on_error.m ]; then rm set_quit_on_error.m ; fi
 	@echo "...Done"
 
 $(outfileAlgEtQ): $(SOURCES) magma_make_fast_tests_AlgEtQ.txt
@@ -22,6 +23,7 @@ $(outfileAlgEtQ): $(SOURCES) magma_make_fast_tests_AlgEtQ.txt
 	@echo "...Done"
 
 
+
 magma_script: $(outfileAlgEtQ)
 	@echo "-------------------------------------------------------------"
 	@echo "-------------------------------------------------------------"
@@ -29,6 +31,18 @@ magma_script: $(outfileAlgEtQ)
 	@echo "-------------------------------------------------------------"
 	@echo "-------------------------------------------------------------"
 	magma -b $<
+
+set_quit_on_error.m:
+	-echo 'SetQuitOnError(true);\n' > set_quit_on_error.m
+
+magma_script_fail_on_error: set_quit_on_error.m $(outfileAlgEtQ)
+	@echo "-------------------------------------------------------------"
+	@echo "-------------------------------------------------------------"
+	@echo "We now run the fast tests. It should take only a 5/6 minutes."
+	@echo "-------------------------------------------------------------"
+	@echo "-------------------------------------------------------------"
+	magma -b $^
+
 
 print-%:
 	@echo '$*=$($*)'

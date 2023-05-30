@@ -111,5 +111,7 @@ jobs:
       - name: Run fast tests
         shell: bash
         run: |
-          alias magma=cd dev/fast_tests_AlgEtQ_make && make magma_script_fail_on_error
+          alias magma=`pwd`/magma/magma
+          cd dev/fast_tests_AlgEtQ_make
+          make magma_script_fail_on_error
 

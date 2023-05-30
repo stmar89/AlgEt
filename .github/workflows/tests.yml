@@ -106,13 +106,12 @@ jobs:
         run: |
           sudo ip link add dumdum type dummy
           sudo ifconfig dumdum hw ether `./magma/magma -d | grep "Valid MAC addresses" -A1 | tail -n1`
-          echo | ./magma/magma
+          ln -s `pwd`/magma/magma /usr/local/bin/magma
+          echo | magma
 
       - name: Run fast tests
         shell: bash
         run: |
-          alias magma=`pwd`/magma/magma
-          alias
           cd dev/fast_tests_AlgEtQ_make
           make magma_script_fail_on_error
 

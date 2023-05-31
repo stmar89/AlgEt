@@ -1,4 +1,6 @@
-After the two big submissions,
-I have send a couple of bug fixes.
-See emails 20230405 and 20230513 to Cannon
+- Two big submissions: see .zip files.
+- I have send a couple of bug fixes: See emails 20230513 (Precision) and 20230524 (PicardGroup) to Cannon.
+- Changes not sent yet (as of 20230531): improved equality for ideals and bug in IdealsOfIndex (see commits f8a5a8c05836a12aed11471413e23df1d8d61080 and 254d37205466fae30587606f48a2f29f8d41b8dc)
+- 
+
 

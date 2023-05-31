@@ -106,7 +106,7 @@ intrinsic IdealsOfIndex(I::AlgEtQIdl, N::RngIntElt : Method := "Default") -> Seq
         for J in Js do
             assert #J eq #dec;
             assert #J eq #Components(A);
-            JA:= Ideal(Order(I) , J);
+            JA:= Order(I)!!Ideal(MultiplicatorRing(I) , J);
             assert Index(I,JA) eq N;
             Append(~result,JA);
         end for;

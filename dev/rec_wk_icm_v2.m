@@ -9,7 +9,7 @@
 
 // This is a variation of rec_wk_icm.m, started while finishing up the paper on July 2023.
 // It contains mainly 2 improvements: 
-// 1) if R has more than one singular prime ideals, WKICM_bar(R) splits the computation over R+P^nPO, as for WKICM. (at the time of writing rec_wk_icm.m I wasn't sure that this was true.)
+// DONE 1) if R has more than one singular prime ideals, WKICM_bar(R) splits the computation over R+P^nPO, as for WKICM. (at the time of writing rec_wk_icm.m I wasn't sure that this was true.)
 // 2) if R has one singular prime, in the recursion using the extension RcT, we use keep track of the orbits of (T_P)*/(R_P)* rather than lifting the sub-spaces and testing for weak equivalence.
 
 //------------
@@ -147,41 +147,132 @@ intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum[AlgEtQIdl]
             // general case
             seqWk_bar:=[];
             vprint WKICM_bar,2 : "Using new method";
-            pp:=PrimesAbove(Conductor(S));
-            mult_pp:=[ MultiplicatorRing(P) : P in pp ];
-            assert forall{T : T in mult_pp | assigned T`WKICM_bar};
-
-            if #pp gt 1 then
-                vprint WKICM_bar,2 : "WKICM_bar: type >2, more than 1 singular prime";
-                num_sub_vect_sp:=function(n,q)
-                // q a prime power. Returns the number of F_q-subvector spaces of F_q^n
-                    return &+[ GaussianBinomial(n,k,q) : k in [0..n]];
-                end function;
-                sub_vs_T:=[];
-                for iP->P in pp do
-                  wkT:=WKICM_bar(mult_pp[iP]);
-                  q:=Index(S,P);
-                  dimsT:=[ Ilog(q,Index(J,(mult_pp[iP]!!P)*J)) : J in wkT ];
-                  Append(~sub_vs_T,&+[num_sub_vect_sp(d,q) : d in dimsT]);
-                end for;
-                _,iP:=Min(sub_vs_T); // this is the T which make us compute less vector spaces.
-            else
+            pp:=SingularPrimes(S);
+            if #pp eq 1 then
                 vprint WKICM_bar,2 : "WKICM_bar: type >2, only 1 singular prime";
-                iP:=1;
-            end if;
-            P:=pp[iP];
-            T:=mult_pp[iP];
-            wkT:=$$(T);
-            for J in wkT do
-                seqWk_bar_J:=wkicm_bar_with_P_P(J,P);
-                for I in seqWk_bar_J do
+                P:=pp[1];
+                T:=MultiplicatorRing(P);
+                wkT:=$$(T);
+                for J in wkT do
+                    seqWk_bar_J:=wkicm_bar_with_P_P(J,P);
+                    for I in seqWk_bar_J do
+                        ZBasisLLL(I);
+                    end for;
+                    Append(~seqWk_bar,seqWk_bar_J);
+                end for;
+                vprintf WKICM_bar,2 : "sizes of seqWk_bar_J = %o\n",[#x : x in seqWk_bar];
+                seqWk_bar:=&cat(seqWk_bar);
+                S`WKICM_bar:=seqWk_bar;
+            else
+                vprint WKICM_bar,2 : "WKICM_bar: type >2, more than 1 singular prime";
+                O:=MaximalOrder(Algebra(S));
+                wk_pp:=[];
+                // We have W_bar(S) = \prod_P W_P_bar(S), where:
+                //     -  P runs over the singular primes of S, 
+                //     - W_bar(S) is the monoid of weak equivalence classes with mult ring S, and
+                //     - W_P_bar(S) is monoid of local P-equivalence classes with mult ring equal to S at P.
+                // We also have W_P_bar(S) = W_bar(S+P^kO), for any k big enough (eg. k ge v_p([O:S]),
+                //       where p is the rational prime of P).
+                ps:=[]; // rational primes of the pps
+                for iP->P in pp do
+                    t0:=Cputime();
+                    vprintf WKICM_bar,2 : "We start the local computation at the %o-th singular prime.",iP;
+                    wk_P:=[];
+                    _,p:=IsPrimePower(Index(S,P));
+                    Append(~ps,p);
+                    k:=Valuation(Index(O,S),p);
+                    SP:=Order(ZBasis(S) cat ZBasis(O!!P^k));
+                    wk_P_bar:=$$(SP); // recursion
+                    // wk_P = W_P(S) = W(S+P^k0O) in the notation above
+                    wk_P_bar:=[ S !! I : I in wk_P_bar];
+                    vprintf WKICM_bar,2 : "...Done in %o secs.\n",Cputime(t0);
+                    Append(~wk_pp,wk_P_bar);
+                end for;
+
+                ///////////////////////////////
+                // We now reconstruct W_bar(S) using the P-local parts W_P_bar(S) = W_bar(S+P^kO)
+                //////////////////////////////
+                wk_pp_idls:=[];
+                pp_pows:=[];
+                t1:=Cputime();
+                vprintf WKICM_bar,2 : "We make all the local parts integral\n";
+                for ip->wk in wk_pp do
+                    wk_exps:=[];
+                    wk_idls:=[];
+                    for i in [1..#wk] do
+                        I:=wk[i];
+                        if not IsIntegral(I) then
+                            I:=SmallRepresentative(I); // I c E with small norm
+                        end if;
+                        k:=Valuation(Index(S,I),ps[ip]);
+                        Append(~wk_exps,k);
+                        Append(~wk_idls,I);
+                    end for;
+                    k_ip:=Max(wk_exps);
+                    Pk_ip:=pp[ip]^k_ip; // for every local representative I at pp[ip] we have that Pk_ip c I (locally)
+                    ZBasisLLL(Pk_ip);
+                    Append(~pp_pows,Pk_ip);
+                    Append(~wk_pp_idls,wk_idls);
+                end for;
+                vprintf WKICM_bar,2 : "...Done in %o secs.\n",Cputime(t1);
+                    
+                n:=#pp;
+                t0:=Cputime();
+                vprintf WKICM_bar,2 : "We compute the \prod_{j \\ne i} P_j^k_j\n";
+                prod_j_ne_i:=[ ];
+                for i in [1..n] do
+                    prod:=&*[ pp_pows[j] : j in [1..n] | j ne i ];
+                    ZBasisLLL(prod);
+                    Append(~prod_j_ne_i,prod);
+                end for;
+                vprintf WKICM_bar,2 : "\t...Done in %o secs.\n",Cputime(t0);
+
+                t0:=Cputime();
+                vprintf WKICM_bar,2 : "We modify each entry of the cartesian product\n";
+                for ip in [1..n] do
+                    for i in [1..#wk_pp_idls[ip]] do
+                        I:=(wk_pp_idls[ip][i]+pp_pows[ip])*prod_j_ne_i[ip];
+                        ZBasisLLL(I);
+                        wk_pp_idls[ip][i]:=I;
+                    end for;
+                end for;
+                vprintf WKICM_bar,2 : "\t...Done in %o secs.\n",Cputime(t0);
+
+                t0:=Cputime();
+                tot:=&*[#x : x in wk_pp_idls]; perc_old:=0; iI:=0;
+                wk_pp_idls:=CartesianProduct(wk_pp_idls);
+                vprintf WKICM_bar,2 : "We start patching together the local parts\n";
+                wk:=[];
+                for I_Ps in wk_pp_idls do
+                    if GetVerbose("WKICM_bar") ge 3 then
+                        iI +:=100; perc:=Truncate(iI/tot); 
+                        if perc gt perc_old then perc_old:=perc; printf "\t%o%% in %o secs\n",perc,Cputime(t0); end if;
+                    end if;
+                    J:=&+[ I_Ps[ip] : ip in [1..n] ];
+                    // J satisfies: J = I_Ps[ip] locally at pp[ip] for every ip.
+                    assert2 forall{ ip : ip in [1..n] | 
+                                                    (J+I_Ps[ip]) eq I_Ps[ip]+pp[ip]*(J+I_Ps[ip]) and 
+                                                    (J+I_Ps[ip]) eq J+pp[ip]*(J+I_Ps[ip])};
+                    Append(~wk,J);
+                end for;
+                vprintf WKICM_bar,2 : "\t...Done in %o secs.\n",Cputime(t0);
+
+                t0:=Cputime();
+                vprintf WKICM_bar,2 : "We LLL all the ZBasis\n";
+                for I in wk do
                     ZBasisLLL(I);
                 end for;
-                Append(~seqWk_bar,seqWk_bar_J);
-            end for;
-            vprintf WKICM_bar,2 : "sizes of seqWk_bar_J = %o\n",[#x : x in seqWk_bar];
-            seqWk_bar:=&cat(seqWk_bar);
-            S`WKICM_bar:=seqWk_bar;
+                vprintf WKICM_bar,2 : "\t...Done in %o secs\n",Cputime(t0);
+
+                t0:=Cputime();
+                vprintf WKICM_bar,2 : "Checking assert2 ...\n";
+                // asserts
+                assert2 forall{ J : J in wk | Order(J) eq S };
+                assert2 forall{ J : J in wk | not exists{I : I in wk | I ne J and IsWeakEquivalent(I,J) }  };
+                vprintf WKICM_bar,2 : "\t...Done in %o secs\n",Cputime(t0);
+
+                S`WKICM_bar:=wk;
+            end if;
         end if;
     end if;
     // populate MultiplicatorRing, if not done before

@@ -143,7 +143,6 @@ intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum[AlgEtQIdl]
             vprintf WKICM_bar,2 : " Cohen Macaulay type 2 case\n";
             S`WKICM_bar:=wkicm_bar_CM_type2(S,NonGorensteinPrimes(S));
         else
-            require Method in {"Auto","LowIndexProcess","IntermediateIdeals","IntermediateIdealsVSWithTrivialExtensionAndPrescribedMultiplicatorRing"} : "The VarArg parameter Method is assigned to a not avaialble value";
             vprintf WkClasses,2:"Order of CohenMacaulayType = %o\n",CohenMacaulayType(S);
             // general case
             seqWk_bar:=[];
@@ -153,6 +152,7 @@ intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum[AlgEtQIdl]
             assert forall{T : T in mult_pp | assigned T`WKICM_bar};
 
             if #pp gt 1 then
+                vprint WKICM_bar,2 : "WKICM_bar: type >2, more than 1 singular prime";
                 num_sub_vect_sp:=function(n,q)
                 // q a prime power. Returns the number of F_q-subvector spaces of F_q^n
                     return &+[ GaussianBinomial(n,k,q) : k in [0..n]];
@@ -166,22 +166,13 @@ intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum[AlgEtQIdl]
                 end for;
                 _,iP:=Min(sub_vs_T); // this is the T which make us compute less vector spaces.
             else
+                vprint WKICM_bar,2 : "WKICM_bar: type >2, only 1 singular prime";
                 iP:=1;
             end if;
             P:=pp[iP];
             T:=mult_pp[iP];
             wkT:=$$(T);
             for J in wkT do
-                /* OLD rec without AssociativeArray
-                seqWk_bar_J:=[];
-                cands_J:=IntermediateIdealsVSWithTrivialExtensionAndPrescribedMultiplicatorRing(J,P);
-                for I in cands_J do
-                    if not exists{K : K in seqWk_bar_J | IsWeakEquivalent(I,K)} then
-                        ZBasisLLL(I);
-                        Append(~seqWk_bar_J,I);
-                    end if;
-                end for;
-                */
                 seqWk_bar_J:=wkicm_bar_with_P_P(J,P);
                 for I in seqWk_bar_J do
                     ZBasisLLL(I);
@@ -408,93 +399,6 @@ intrinsic WKICM(E::AlgEtQOrd : Method:="Auto")->SeqEnum[AlgEtQIdl]
 end intrinsic;
 
 /* TESTS
- 
-    //SetAssertions(2);
-
-    //AttachSpec("~/packages_github/AlgEt/spec");
-    Attach("~/packages_github/AlgEt/dev/rec_wk_icm.m");
-    //SetVerbose("WKICM",2);
-    P<x>:=PolynomialRing(Integers());
-    f:=x^8+16;
-    A:=EtaleAlgebra(f);
-    R:=EquationOrder(A);
-    // only one singular prime
-    t0:=Cputime();
-        assert #WKICM(R) eq 173;
-    t_curr:=Cputime(t0);
-    t_prev_best:=22.5;
-    "Current running time: ",t_curr;
-    if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
-        print "The current timing is different from the previous best known one. UPDATE!"; 
-    end if;
-    "the size of the output, 173 classes, has been computed using the OLD method, in 189000 seconds";
-
-    // Here: R has 2 singular primes
-    //AttachSpec("~/packages_github/AlgEt/spec");
-    Attach("~/packages_github/AlgEt/dev/rec_wk_icm.m");
-    //SetVerbose("WKICM",2);
-    P<x>:=PolynomialRing(Integers());
-    f:=x^10 - x^9 + 4*x^8 - 6*x^7 + 8*x^6 - 16*x^5 + 16*x^4 - 24*x^3 + 32*x^2 - 16*x + 32;
-    A:=EtaleAlgebra(f);
-    F:=PrimitiveElement(A);
-    q:=Integers() ! Round(ConstantCoefficient(f)^(2/Degree(f)));
-    R:=Order([F,q/F]);
-    t0:=Cputime();
-        wk:=WKICM(R);
-    t_curr:=Cputime(t0);
-    "Current running time: ",t_curr;
-    t_prev_best:=10.4;
-    if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
-        print "The current timing is different from the previous best known one. UPDATE!"; 
-    end if;
-
-    // Here: R has 3 singular primes
-    //AttachSpec("~/packages_github/AlgEt/spec");
-    Attach("~/packages_github/AlgEt/dev/rec_wk_icm.m");
-    //SetVerbose("WKICM",2);
-    P<x>:=PolynomialRing(Integers());
-    f:=x^6 - 3*x^5 + 30*x^4 - 175*x^3 + 750*x^2 - 1875*x + 15625;
-    A:=EtaleAlgebra(f);
-    F:=PrimitiveElement(A);
-    q:=Integers() ! Round(ConstantCoefficient(f)^(2/Degree(f)));
-    R:=Order([F,q/F]);
-    t0:=Cputime();
-        #WKICM(R);
-    t_curr:=Cputime(t0);
-    "Current running time: ",t_curr;
-    t_prev_best:=28.4;
-    if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
-        print "The current timing is different from the previous best known one. UPDATE!"; 
-    end if;
-
-    // Here: R has 5 singular primes
-    //AttachSpec("~/packages_github/AlgEt/spec");
-    Attach("~/packages_github/AlgEt/dev/rec_wk_icm.m");
-    //SetVerbose("WKICM",2);
-    P<x>:=PolynomialRing(Integers());
-    f:=x^6 + 8*x^5 + 50*x^4 + 200*x^3 + 1250*x^2 + 5000*x + 15625;
-    A:=EtaleAlgebra(f);
-    F:=PrimitiveElement(A);
-    R:=Order([F,25/F]);
-    t0:=Cputime();
-        wk:=WKICM(R);
-    t_curr:=Cputime(t0);
-    "Current running time: ",t_curr;
-    t_prev_best:=27;
-    if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
-        print "The current timing is different from the previous best known one. UPDATE!"; 
-    end if;
-
-    // VERY big it should not be in this test suit
-    // I have improved a lot KnownOrders. I expect that populating OverORders should be much faster now
-    //AttachSpec("~/packages_github/AlgEt/spec");
-    Attach("~/packages_github/AlgEt/dev/rec_wk_icm.m");
-    //SetVerbose("WKICM",2);
-    P<x>:=PolynomialRing(Integers());
-    f:=x^8 - 2*x^7 + 7*x^6 - 14*x^5 + 40*x^4 - 56*x^3 + 112*x^2 - 128*x + 256;
-    A:=EtaleAlgebra(f);
-    R:=EquationOrder(A);
-    time assert #WKICM(R) eq 114492; // 114492 in ~519000 second ~ 144h with the OLD method
-                                     // Now we have 1.63 h
+    see rec_wk_icm_v2_timings.m
 */
 

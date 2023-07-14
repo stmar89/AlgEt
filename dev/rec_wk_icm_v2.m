@@ -422,15 +422,15 @@ end intrinsic;
     t0:=Cputime();
         assert #WKICM(R) eq 173;
     t_curr:=Cputime(t0);
-    t_prev_best:=32.7; //22.9
+    t_prev_best:=22.5;
     "Current running time: ",t_curr;
     if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
         print "The current timing is different from the previous best known one. UPDATE!"; 
     end if;
     "the size of the output, 173 classes, has been computed using the OLD method, in 189000 seconds";
 
-    // these tests have more than one singular prime. each takes <1 min
-    AttachSpec("~/packages_github/AlgEt/spec");
+    // Here: R has 2 singular primes
+    //AttachSpec("~/packages_github/AlgEt/spec");
     Attach("~/packages_github/AlgEt/dev/rec_wk_icm.m");
     //SetVerbose("WKICM",2);
     P<x>:=PolynomialRing(Integers());
@@ -443,13 +443,13 @@ end intrinsic;
         wk:=WKICM(R);
     t_curr:=Cputime(t0);
     "Current running time: ",t_curr;
-    t_prev_best:=12.7; //10.6
+    t_prev_best:=10.4;
     if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
         print "The current timing is different from the previous best known one. UPDATE!"; 
     end if;
 
-    // Here: R has 3 singular primes, whose local parts require ~60 secs, the patching is <5 secs.
-    AttachSpec("~/packages_github/AlgEt/spec");
+    // Here: R has 3 singular primes
+    //AttachSpec("~/packages_github/AlgEt/spec");
     Attach("~/packages_github/AlgEt/dev/rec_wk_icm.m");
     //SetVerbose("WKICM",2);
     P<x>:=PolynomialRing(Integers());
@@ -462,13 +462,13 @@ end intrinsic;
         #WKICM(R);
     t_curr:=Cputime(t0);
     "Current running time: ",t_curr;
-    t_prev_best:=57; //31
+    t_prev_best:=28.4;
     if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
         print "The current timing is different from the previous best known one. UPDATE!"; 
     end if;
 
-    // Here: R has 5 singular primes, whose local parts require <60 secs, while the patching requires <5 secs.
-    AttachSpec("~/packages_github/AlgEt/spec");
+    // Here: R has 5 singular primes
+    //AttachSpec("~/packages_github/AlgEt/spec");
     Attach("~/packages_github/AlgEt/dev/rec_wk_icm.m");
     //SetVerbose("WKICM",2);
     P<x>:=PolynomialRing(Integers());
@@ -480,14 +480,14 @@ end intrinsic;
         wk:=WKICM(R);
     t_curr:=Cputime(t0);
     "Current running time: ",t_curr;
-    t_prev_best:=53; //30.9
+    t_prev_best:=27;
     if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
         print "The current timing is different from the previous best known one. UPDATE!"; 
     end if;
 
     // VERY big it should not be in this test suit
     // I have improved a lot KnownOrders. I expect that populating OverORders should be much faster now
-    AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/packages_github/AlgEt/spec");
     Attach("~/packages_github/AlgEt/dev/rec_wk_icm.m");
     //SetVerbose("WKICM",2);
     P<x>:=PolynomialRing(Integers());

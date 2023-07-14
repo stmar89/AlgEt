@@ -3,7 +3,7 @@
     //SetAssertions(2);
 
     //AttachSpec("~/packages_github/AlgEt/spec");
-    Attach("~/packages_github/AlgEt/dev/rec_wk_icm_v2.m");
+    Attach("~/packages_github/AlgEt/dev/rec_wk_icm_v3.m");
     //SetVerbose("WKICM",2);
    
     // several overorders of S have more than one singular prime
@@ -109,4 +109,3 @@
     if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
         print "The current timing is different from the previous best known one. UPDATE!"; 
     end if;
-

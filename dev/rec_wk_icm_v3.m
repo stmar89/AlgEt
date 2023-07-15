@@ -19,13 +19,15 @@
 // - change the verbose variable when incorporating in package
 declare verbose WKICM, 3;
 declare verbose WKICM_bar, 2;
-// - when incorporating in package, the next line needs to be removed (replaced by the one commented out below)
+// - when incorporating in package, the next two lines need to be removed (replaced by the ones commented out below)
 import "../AlgEtQ/LowCohenMacaulayType.m" : wkicm_bar_CM_type2;
+import "../AlgEtQ/PicardGroup.m" : residue_class_ring_unit_subgroup_generators;
 //------------
 
 //declare verbose WkClasses, 3;
 //declare attributes AlgEtQOrd: WKICM,WKICM_bar;
 //import "LowCohenMacaulayType.m" : wkicm_bar_CM_type2;
+//import "PicardGroup.m" : residue_class_ring_unit_subgroup_generators;
 
 
 join_ass_arr:=function(A,B)
@@ -92,9 +94,24 @@ wkicm_bar_with_P_P:=function(I,P)
     maximal_sub_T_mod:=[ sub<Q | [q(z) : z in ZBasis(M)]> : M in maximal_sub_T_mod ] ; // maximal sub-T-modules m of Q,
                                                                                        // whose lift M=q^-1(m) c I
                                                                                        // satisfies PI c M c I
+    // we compute U:=transversal in T of U:=(T_P)*/(S_P)*
+    // U = (T/ff+P^N)*/(R/ff+P^N)* where N=vp([T:ff])
+    ff:=Conductor(S);
+    O:=MaximalOrder(Algebra(S));
+    _,p:=IsPrimePower(Index(S,P));
+    N:=Valuation(Index(O,O!!ff),p);
+    FPS:=ff+P^N;
+    FPT:=T!!FPS;
+    FPO:=O!!FPS;
+    uOP,map:=ResidueRingUnits(O,FPO);
+    uTP:=sub<uOP|[ g@@map : g in residue_class_ring_unit_subgroup_generators(FPT)]>;
+    uSP:=sub<uTP|[uTP!(g@@map) : g in residue_class_ring_unit_subgroup_generators(FPS)]>;
+    U:=[ map(uOP!t) : t in Transversal(uTP,uSP) ];
+
     queue:=AssociativeArray();
     queue[Dimension(Q)]:=[Q];
     output:=AssociativeArray();
+    output_vs:=AssociativeArray(); //will contain the orbits
     if MultiplicatorRing(I) eq S then
         output[Dimension(Q)]:=[IS];
     end if;
@@ -118,16 +135,24 @@ wkicm_bar_with_P_P:=function(I,P)
                 Append(~pot_new[dimW],W);
                 J:=Ideal(S,[ (Q!b)@@q : b in Basis(W) ] cat zbPI);
                 if MultiplicatorRing(J) eq S then
-    // MAKE changes here!
-    // make a new AssociativeArray output_vs
-    // if W not in output_vs, then 
-    //      append to output_vs the orbit W.U,
-    //      lift each vs in W.U and those ideals to output
-    // end if;
-                    if not IsDefined(output,dimW) then
-                        output[dimW]:=[J];
-                    elif not exists{ K : K in output[dimW] | IsWeakEquivalent(J,K) } then
-                        Append(~output[dimW],J);
+                    if not IsDefined(output_vs,dimW) or not W in output_vs[dimW] then
+                        // something new! we compute the orbit
+                        zbJ:=Generators(J);
+                        orb_vs:=[ sub<Q | [q(u*g) : g in zbJ]> : u in U ];
+                        // we add the orbit to the output_vs, and J to the output
+                        for i in [1..#orb_vs] do
+                            dimJJ:=Dimension(orb_vs[i]);  
+                            if not IsDefined(output_vs,dimJJ) then
+                                output_vs[dimJJ]:=[orb_vs[i]];
+                            else
+                                Append(~output_vs[dimJJ],orb_vs[i]);
+                            end if;
+                        end for;
+                        if not IsDefined(output,dimW) then
+                            output[dimW]:=[J];
+                        else
+                            Append(~output[dimW],J);
+                        end if;
                     end if;
                 end if;
             end if;

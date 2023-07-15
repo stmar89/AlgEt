@@ -23,7 +23,7 @@
     t0:=Cputime();
         assert #WKICM_bar(S) eq 7;   
     t_curr:=Cputime(t0);
-    t_prev_best:=22.2;
+    t_prev_best:=11.9;
     "Current running time: ",t_curr;
     if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
         print "The current timing is different from the previous best known one. UPDATE!"; 
@@ -74,7 +74,7 @@
         assert #WKICM(R) eq 315;
     t_curr:=Cputime(t0);
     "Current running time: ",t_curr;
-    t_prev_best:=28.4;
+    t_prev_best:=14.1;
     if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
         print "The current timing is different from the previous best known one. UPDATE!"; 
     end if;
@@ -90,7 +90,7 @@
         assert #WKICM(R) eq 560;
     t_curr:=Cputime(t0);
     "Current running time: ",t_curr;
-    t_prev_best:=27;
+    t_prev_best:=16.5;
     if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
         print "The current timing is different from the previous best known one. UPDATE!"; 
     end if;
@@ -105,7 +105,7 @@
         assert #WKICM(R) eq 114492 ;
     t_curr:=Cputime(t0);
     "Current running time: ",t_curr;
-    t_prev_best:=4739;
+    t_prev_best:=4462;
     if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
         print "The current timing is different from the previous best known one. UPDATE!"; 
     end if;

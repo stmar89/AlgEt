@@ -9,8 +9,8 @@
 
 // This is a variation of rec_wk_icm.m, started while finishing up the paper on July 2023.
 // It contains mainly 2 improvements: 
-// DONE in rec_wk_icm_v2.m 1) if R has more than one singular prime ideals, WKICM_bar(R) splits the computation over R+P^nPO, as for WKICM. (at the time of writing rec_wk_icm.m I wasn't sure that this was true.)
-// 2) if R has one singular prime, in the recursion using the extension RcT, we use keep track of the orbits of (T_P)*/(R_P)* rather than lifting the sub-spaces and testing for weak equivalence.
+// DONE: in rec_wk_icm_v2.m 1) if R has more than one singular prime ideals, WKICM_bar(R) splits the computation over R+P^nPO, as for WKICM. (at the time of writing rec_wk_icm.m I wasn't sure that this was true.)
+// 2) DONE: if R has one singular prime, in the recursion using the extension RcT, we use keep track of the orbits of (T_P)*/(R_P)* rather than lifting the sub-spaces and testing for weak equivalence.
 
 //------------
 // TODO:

@@ -2,11 +2,11 @@
 
     //SetAssertions(2);
 
-    //Attach("~/packages_github/AlgEt/dev/rec_wk_icm_v3.m"); //on diophantus
+    //Attach("~/packages_github/AlgEt/dev/rec_wk_icm_v4.m"); //on diophantus
    
     // on gemini
     AttachSpec("~/AlgEt/spec");
-    Attach("~/AlgEt/dev/rec_wk_icm_v3.m");
+    Attach("~/AlgEt/dev/rec_wk_icm_v4.m");
 
     //SetVerbose("WKICM",2);
    

@@ -30,6 +30,8 @@ freeze;
 
 import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQtoA , meet_zbasis , inclusion_matrix;
 
+declare verbose OverOrders, 1;
+
 declare attributes AlgEtQOrd : MinimalOverOrders, // a sequence of tuples <P,{@ T1,...,Tn @}>, where
                                                   // P is a singular prime of the order R, and
                                                   // T1,..,Tn are all the minimal overorders with conductor (R:Ti)=P.

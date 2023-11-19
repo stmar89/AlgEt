@@ -1,4 +1,4 @@
-AttachSpec("../../spec");
+AttachSpec("../spec");
 time_start:=Cputime();
 
 

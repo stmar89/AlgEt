@@ -1,8 +1,8 @@
 /* vim: set syntax=magma :*/
 
 /////////////////////////////////////////////////////
-// Stefano Marseglia, Utrecht University, s.marseglia@uu.nl
-// http://www.staff.science.uu.nl/~marse004/
+// Stefano Marseglia, Utrecht University, stefano.marseglia89@gmail.com
+// https://stmar89.github.io/index.html
 // We are grateful to Edgar Costa (MIT) who helped 
 // with a preliminary version of this code
 // 

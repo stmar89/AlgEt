@@ -3,8 +3,8 @@
 //freeze;
 
 /////////////////////////////////////////////////////
-// Stefano Marseglia, Utrecht University, s.marseglia@uu.nl
-// http://www.staff.science.uu.nl/~marse004/
+// Stefano Marseglia, Utrecht University, stefano.marseglia89@gmail.com
+// https://stmar89.github.io/index.html
 /////////////////////////////////////////////////////
 
 // This is a variation of rec_wk_icm.m, started while finishing up the paper on July 2023.

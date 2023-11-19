@@ -1,0 +1,32 @@
+/* vim: set syntax=magma :*/
+
+/////////////////////////////////////////////////////
+// Stefano Marseglia, Utrecht University, stefano.marseglia89@gmail.com
+// https://stmar89.github.io/index.html
+/////////////////////////////////////////////////////
+
+    // REPORTED ON Nov 2, 2023
+
+    // Magma V2.28-3     Thu Nov  2 2023 07:12:09 on diophantus [Seed = 4022941753]
+
+    _<x>:=PolynomialRing(Integers());
+    f:=x^6 - x^5 + 2*x^4 - 67*x^3 + 32*x^2 - 256*x + 4096; 
+
+    K<a>:=NumberField(f);
+    O:=MaximalOrder(K);
+    gensS:=[
+    <[1/9,1/144,1/2304,29/1152,1147/2304,1717/2304]>,
+    <[0,1/48,1/384,43/64,323/384,325/384]>,
+    <[0,0,1/256,101/128,11/256,213/256]>,
+    <[0,0,0,1,0,0]>,
+    <[0,0,0,0,1,0]>,
+    <[0,0,0,0,0,1]>
+    ];
+    gensS:=[ &+[ g[1][i]*a^(i-1) : i in [1..Degree(f)] ] : g in gensS ];
+    S:=Order(gensS);
+    ff:=O!!Conductor(S);
+
+    R,r:=RayResidueRing(ff); // (O/ff)^*
+
+    // there is something wrong with the map r.
+    assert forall{x : x in Generators(R) | r(x)@@r eq x}; 

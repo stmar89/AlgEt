@@ -10,22 +10,6 @@
 
     TODO:
     ### Priority ###
-    // There is a bug in PicardGroup. It seems to be something in the NumberField code.
-    // Code to reproduce an Assertion Failed
-        SetAssertions(2);
-        _<x>:=PolynomialRing(Integers());
-        f:=x^6 - x^5 + 2*x^4 - 67*x^3 + 32*x^2 - 256*x + 4096; 
-        A:=EtaleAlgebra(f);
-        gensS:=[
-        <[1/9,1/144,1/2304,29/1152,1147/2304,1717/2304]>,
-        <[0,1/48,1/384,43/64,323/384,325/384]>,
-        <[0,0,1/256,101/128,11/256,213/256]>,
-        <[0,0,0,1,0,0]>,
-        <[0,0,0,0,1,0]>,
-        <[0,0,0,0,0,1]>
-        ];
-        S:=Order([A!s : s in gensS]);
-        #PicardGroup(S);
 
     ### Modules ###
     - In IsomorphismClasses and IsIsomorphic, I should first order/test whether M and N have the same multiplicator ring S in K and with #M/PM = #N/PN for every singular prime of S, since these are necessary conditions of being isomorphic.

@@ -258,7 +258,7 @@
         _:=#WKICM(R);
     t1:=Cputime(t0);
     printf "Current running time = %o \n",t1;
-    tprevbest:=4.7; // diophantus
+    tprevbest:=2.1; // diophantus
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "WKICM for %o got faster. Update the previous best known time\n",f;
@@ -317,7 +317,7 @@
     t0:=Cputime();
         assert #WKICM(R) eq 173;
     t_curr:=Cputime(t0);
-    t_prev_best:=22.5;
+    t_prev_best:=26;
     "Current running time: ",t_curr;
     if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
         print "The current timing is different from the previous best known one. UPDATE!"; 
@@ -383,85 +383,6 @@
         print "The current timing is different from the previous best known one. UPDATE!"; 
     end if;
 
-
-    "-------------------------------------------------------------";
-    "A much bigger example: the interesting overorders, with CohenMacaulyType > 2, have been already computed and saved in a special file. We compute the WkICM_bar for these orders, and compare timings. The orders are sorted from the fastest to the slowest.";
-    
-	_<x>:=PolynomialRing(Integers());
-    f:=x^8+16; 
-    AttachSpec("../spec");
-    A:=EtaleAlgebra(f);
-    R:=EquationOrder(A);
-    ooR:=FindOverOrders(R);
-    data:=eval(Read("../dev/input_big_test_WKICM.txt"));
-    // data contains a Seq with entries <S,T,ff,out> where
-    // S is the ZBasis of the order S
-    // T (resp. ff) is the ZBasis of the overorder T of S (resp ff=(S:T))
-    // out is the number of intermedite S-modules between T and ff.
-    // data is already sorted wrt to the size of out.
-    oo:={@ @};
-    for x in data do
-        S:=Order([ A!z:z in x[1]]);
-        S`OverOrders:=[ T :T in ooR | S subset T ];
-        Include(~oo,S);
-    end for;
-    // "IntermediateIdeals";
-    // SetProfile(true);
-    out_new:=[]; //oo[15] takes ~100 seconds
-    for i->S in oo do
-        t0:=Cputime();
-        delete S`WKICM_bar;
-        N:=#WKICM_bar(S : Method:="IntermediateIdeals");
-        t1:=Cputime(t0);
-        out:=<i,N,t1>; out;
-        Append(~out_new,out);
-    end for;
-    // out on diophantus
-    out_prev:=[
-    <1, 4, 3.620>,
-    <2, 4, 2.540>,
-    <3, 2, 2.440>,
-    <4, 4, 3.180>,
-    <5, 2, 2.040>,
-    <6, 4, 3.210>,
-    <7, 4, 3.220>,
-    <8, 4, 2.720>,
-    <9, 2, 1.920>,
-    <10, 4, 2.790>,
-    <11, 4, 2.320>,
-    <12, 4, 2.640>,
-    <13, 4, 2.260>,
-    <14, 6, 22.610>,
-    <15, 6, 71.680>,
-    <16, 6, 75.230>,
-    <17, 6, 72.930>,
-    <18, 6, 153.930>,
-    <19, 6, 451.890>
-    ];
-    // SetProfile(false);
-    // ProfilePrintByTotalTime(ProfileGraph() : Max:=30);
-    assert forall{ i : i in [1..#out_prev] | out_prev[i,2] eq out_new[i,2] };
-    tprevbest:=&+[ o[3] : o in out_prev ];
-    t1:=&+[ o[3] : o in out_new ];
-    if Abs(t1 - tprevbest) gt 0.1*tprevbest then
-        if t1 lt tprevbest then
-            printf "WKICM for %o got faster. Update the previous best known time\n",f;
-        elif t1 gt tprevbest then
-            printf "WKICM for %o got slower. The previous code was better.\n",f;
-        end if;
-    end if;
-    // "LowIndexProcess";
-    // outputLowIndexProcess:=[];
-    // for i->S in oo[1..14] do //the last five are very slow.
-    //     t0:=Cputime();
-    //     N:=#WKICM_bar(S : Method:="LowIndexProcess");
-    //     t1:=Cputime(t0);
-    //     out:=<i,N,t1>; out;
-    //     Append(~outputLowIndexProcess,out);
-    //     assert N eq outputIntermediateIdeals[i][2];
-    // end for;
-    
-    
     "-------------------------------------------------------------";
     "A very big example. It should take approx 1.5h";
     P<x>:=PolynomialRing(Integers());

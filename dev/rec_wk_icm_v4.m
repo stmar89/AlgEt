@@ -15,7 +15,6 @@
 
 //------------
 // TODO:
-// - remove Method
 // - IMPORTANT: once this is done I will have to update also the ICM!!!!
 // - change the verbose variable when incorporating in package
 declare verbose WKICM, 3;
@@ -47,7 +46,7 @@ end function;
 
 diff_ass_arr:=function(A,B,stop_at_dim_2)
 // returns A diff B, where A[i], B[i] are of type SeqEnum
-// if stop_at_dim_2 then A[2] is removed
+// if stop_at_dim_2 then A[2] and B[2] are removed at the beginning
     if stop_at_dim_2 then
         Remove(~B,2);
         Remove(~A,2);
@@ -170,7 +169,7 @@ wkicm_bar_with_P_P:=function(I,P)
 end function;
 
 intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum[AlgEtQIdl]
-{Returns all the weak eq classes I, such that (I:I)=S. The VarArg Method (default "Auto") determines if we should use the "IntermediateIdeals" routine or the "LowIndexProcess", which is potentially much slower but more memory efficient.}
+{Returns all the weak eq classes I, such that (I:I)=S. The VarArg Method (default "Auto") is not used and kept for retrocompatibility.}
     if not assigned S`WKICM_bar then
         if IsGorenstein(S) then
             vprintf WKICM_bar,2 : " Gorenstein case\n";
@@ -327,13 +326,12 @@ intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum[AlgEtQIdl]
 end intrinsic;
 
 intrinsic WeakEquivalenceClassesWithPrescribedMultiplicatorRing(S::AlgEtQOrd : Method:="Auto") -> SeqEnum[AlgEtQIdl]
-{}
-    return WKICM_bar(S : Method:=Method);
+{Returns all the weak eq classes I, such that (I:I)=S. The VarArg Method (default "Auto") is not used and kept for retrocompatibility.}
+    return WKICM_bar(S);
 end intrinsic;
 
 intrinsic WKICM(E::AlgEtQOrd : Method:="Auto")->SeqEnum[AlgEtQIdl]
-{}
-    require Method in {"Auto","LowIndexProcess","IntermediateIdeals","IntermediateIdealsVSWithTrivialExtensionAndPrescribedMultiplicatorRing"} : "The VarArg parameter Method is assigned to a not available value";
+{Computes the weak equivalence class monoid of E. The VarArg Method (default "Auto") is not used and kept for retrocompatibility.}
     if not assigned E`WKICM then
         pp:=SingularPrimes(E);
         if #pp eq 0 then

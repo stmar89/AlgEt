@@ -278,6 +278,112 @@
     G2:=ProfileGraph();
     ProfilePrintByTotalTime(ProfilePruneGraphByTime(G2,30));
     */
+
+
+    "-------------------------------------------------------------";
+    "An example in which several overorders have more than one singular prime";
+
+    P<x>:=PolynomialRing(Integers());
+    f:=x^6 + 8*x^5 + 50*x^4 + 200*x^3 + 1250*x^2 + 5000*x + 15625;
+    A:=EtaleAlgebra(f);
+    F:=PrimitiveElement(A);
+    gensS:=[
+    <[1,0],[1,0],[1,0]>,
+    <[0,1],[0,1],[0,1]>,
+    <[0,-2],[0,4],[0,-2]>,
+    <[8,0],[-2,0],[-5,0]>,
+    <[0,-6],[0,-2],[0,7]>,
+    <[2,0],[-18,0],[15,0]>
+    ];
+    S:=Order([A!g: g in gensS]);
+    t0:=Cputime();
+        assert #WKICM_bar(S) eq 7;   
+    t_curr:=Cputime(t0);
+    t_prev_best:=11.9;
+    "Current running time: ",t_curr;
+    if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
+        print "The current timing is different from the previous best known one. UPDATE!"; 
+    end if;
+
+    "-------------------------------------------------------------";
+    "An example in which the order has a unique singular prime";
+
+    // R has one singular prime
+    P<x>:=PolynomialRing(Integers());
+    f:=x^8+16;
+    A:=EtaleAlgebra(f);
+    R:=EquationOrder(A);
+    // only one singular prime
+    t0:=Cputime();
+        assert #WKICM(R) eq 173;
+    t_curr:=Cputime(t0);
+    t_prev_best:=22.5;
+    "Current running time: ",t_curr;
+    if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
+        print "The current timing is different from the previous best known one. UPDATE!"; 
+    end if;
+    //"the size of the output, 173 classes, has been computed using the OLD method, in 189000 seconds";
+
+    "-------------------------------------------------------------";
+    "An example in which the order has 2 singular primes";
+
+    // Here: R has 2 singular primes
+    //SetVerbose("WKICM",2);
+    P<x>:=PolynomialRing(Integers());
+    f:=x^10 - x^9 + 4*x^8 - 6*x^7 + 8*x^6 - 16*x^5 + 16*x^4 - 24*x^3 + 32*x^2 - 16*x + 32;
+    A:=EtaleAlgebra(f);
+    F:=PrimitiveElement(A);
+    q:=Integers() ! Round(ConstantCoefficient(f)^(2/Degree(f)));
+    R:=Order([F,q/F]);
+    t0:=Cputime();
+        assert #WKICM(R) eq 238;
+    t_curr:=Cputime(t0);
+    "Current running time: ",t_curr;
+    t_prev_best:=10.4;
+    if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
+        print "The current timing is different from the previous best known one. UPDATE!"; 
+    end if;
+
+    "-------------------------------------------------------------";
+    "An example in which the order has 3 singular primes";
+
+    // Here: R has 3 singular primes
+    //SetVerbose("WKICM",2);
+    P<x>:=PolynomialRing(Integers());
+    f:=x^6 - 3*x^5 + 30*x^4 - 175*x^3 + 750*x^2 - 1875*x + 15625;
+    A:=EtaleAlgebra(f);
+    F:=PrimitiveElement(A);
+    q:=Integers() ! Round(ConstantCoefficient(f)^(2/Degree(f)));
+    R:=Order([F,q/F]);
+    t0:=Cputime();
+        assert #WKICM(R) eq 315;
+    t_curr:=Cputime(t0);
+    "Current running time: ",t_curr;
+    t_prev_best:=14.1;
+    if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
+        print "The current timing is different from the previous best known one. UPDATE!"; 
+    end if;
+
+    "-------------------------------------------------------------";
+    "An example in which the order has 5 singular primes";
+
+    // Here: R has 5 singular primes
+    //SetVerbose("WKICM",2);
+    P<x>:=PolynomialRing(Integers());
+    f:=x^6 + 8*x^5 + 50*x^4 + 200*x^3 + 1250*x^2 + 5000*x + 15625;
+    A:=EtaleAlgebra(f);
+    F:=PrimitiveElement(A);
+    R:=Order([F,25/F]);
+    t0:=Cputime();
+        assert #WKICM(R) eq 560;
+    t_curr:=Cputime(t0);
+    "Current running time: ",t_curr;
+    t_prev_best:=16.5;
+    if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
+        print "The current timing is different from the previous best known one. UPDATE!"; 
+    end if;
+
+
     "-------------------------------------------------------------";
     "A much bigger example: the interesting overorders, with CohenMacaulyType > 2, have been already computed and saved in a special file. We compute the WkICM_bar for these orders, and compare timings. The orders are sorted from the fastest to the slowest.";
     
@@ -354,5 +460,22 @@
     //     Append(~outputLowIndexProcess,out);
     //     assert N eq outputIntermediateIdeals[i][2];
     // end for;
+    
+    
+    "-------------------------------------------------------------";
+    "A very big example. It should take approx 1.5h";
+    P<x>:=PolynomialRing(Integers());
+    f:=x^8 - 2*x^7 + 7*x^6 - 14*x^5 + 40*x^4 - 56*x^3 + 112*x^2 - 128*x + 256;
+    A:=EtaleAlgebra(f);
+    R:=EquationOrder(A);
+    t0:=Cputime();
+        assert #WKICM(R) eq 114492 ;
+    t_curr:=Cputime(t0);
+    "Current running time: ",t_curr;
+    t_prev_best:=4462;
+    if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
+        print "The current timing is different from the previous best known one. UPDATE!"; 
+    end if;
+
     "-------------------------------------------------------------";
     printf "The whole set of slow tests required %o\n",Cputime(time_start_slow_tests);

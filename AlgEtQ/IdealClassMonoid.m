@@ -49,8 +49,6 @@ end intrinsic;
 intrinsic ICM(S::AlgEtQOrd : GRH:=false ) -> SeqEnum
 {Returns the ideal class monoid of the order, that is, a set of representatives for the isomorphism classes of the fractional S-ideals.}
     if not assigned S`ICM then
-        _:=WKICM(S); // This is to populate the attribute WKICM_bar. Currently it is superfluous.
-                     // It will make the computation faster once the recursive method for WKICM is included.
         seqOO:=OverOrders(S);
         seqICM:=[];
         for T in seqOO do

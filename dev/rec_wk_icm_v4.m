@@ -67,6 +67,22 @@ diff_ass_arr:=function(A,B,stop_at_dim_2)
     return A;
 end function;
 
+units_T_P_mod_S_P:=function(T,S,P)
+    // Let S be an order with a unique singular prime ideal P, and T = (P:P)
+    // we compute U:=transversal in T of U:=(T_P)*/(S_P)*
+    // U = (T/ff)*/(R/ff)*, where ff is the conductor of S in O=MaximalOrder
+    // Alternatively, one could use that ff = (S:T) = P, but at the moment there is no implementation to compute A^*, where A=T/P.
+    FPS:=Conductor(S);
+    O:=MaximalOrder(Algebra(S));
+    FPT:=T!!FPS;
+    FPO:=O!!FPS;
+    uOP,map:=ResidueRingUnits(O,FPO);
+    uTP:=sub<uOP|[ g@@map : g in residue_class_ring_unit_subgroup_generators(FPT)]>;
+    uSP:=sub<uTP|[uTP!(g@@map) : g in residue_class_ring_unit_subgroup_generators(FPS)]>;
+    U:=[ map(uOP!t) : t in Transversal(uTP,uSP) ];
+    return U;
+end function;
+
 wkicm_bar_with_P_P:=function(I,P)
 // Let S be an order, P a prime of S, and I a fractional (P:P)-ideal. 
 // The function returns all fractional S-ideals J such that  P*I c J c I, (J:J)=S, and J(P:P)=I, up to weak equivalence.
@@ -95,19 +111,7 @@ wkicm_bar_with_P_P:=function(I,P)
     maximal_sub_T_mod:=[ sub<Q | [q(z) : z in ZBasis(M)]> : M in maximal_sub_T_mod ] ; // maximal sub-T-modules m of Q,
                                                                                        // whose lift M=q^-1(m) c I
                                                                                        // satisfies PI c M c I
-    // we compute U:=transversal in T of U:=(T_P)*/(S_P)*
-    // U = (T/ff+P^N)*/(R/ff+P^N)* where N=vp([T:ff])
-    ff:=Conductor(S);
-    O:=MaximalOrder(Algebra(S));
-    _,p:=IsPrimePower(Index(S,P));
-    N:=Valuation(Index(O,O!!ff),p);
-    FPS:=ff+P^N;
-    FPT:=T!!FPS;
-    FPO:=O!!FPS;
-    uOP,map:=ResidueRingUnits(O,FPO);
-    uTP:=sub<uOP|[ g@@map : g in residue_class_ring_unit_subgroup_generators(FPT)]>;
-    uSP:=sub<uTP|[uTP!(g@@map) : g in residue_class_ring_unit_subgroup_generators(FPS)]>;
-    U:=[ map(uOP!t) : t in Transversal(uTP,uSP) ];
+    U:=units_T_P_mod_S_P(T,S,P);
 
     queue:=AssociativeArray();
     queue[Dimension(Q)]:=[Q];

@@ -43,3 +43,6 @@ Stefano Marseglia,<br>
 
 Stefano Marseglia,<br>
 *Modules over orders, conjugacy classes of integral matrices, and abelian varieties over finite fields*, [`arXiv`](https://arxiv.org/abs/2208.05409)
+
+Stefano Marseglia,<br>
+*Local isomorphism classes of fractional ideals of orders in étale algebras*, [`arXiv`](https://arxiv.org/abs/2311.18571)

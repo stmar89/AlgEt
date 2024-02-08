@@ -190,7 +190,7 @@ intrinsic Order(A::AlgEtQ , orders::Tup) -> AlgEtQOrd
 {Given a sequence of order in the number fields defining the étale algebra A, generates the direct sum order.}
     nf,embs,projs:=Components(A);
     require #nf eq #orders and forall{ i : i in [1..#orders] | NumberField(orders[i]) eq nf[i]} and 
-forall{ S : S in orders | Type(S) eq RngOrd } : "The second input should be a sequence of orders in the number fields defining A";
+forall{ S : S in orders | Type(S) in {RngCyc,RngOrd} } : "The second input should be a sequence of orders in the number fields defining A";
     gens:=&cat[ [ embs[i](z) : z in AbsoluteBasis(orders[i]) ] : i in [1..#nf] ];
     O:=Order(gens : Check:=0); // the gens given generate a multiplicatively closed lattice in A
     assert2 O eq Order(gens);

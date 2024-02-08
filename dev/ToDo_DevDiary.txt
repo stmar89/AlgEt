@@ -11,6 +11,10 @@
     TODO:
     ### Priority ###
 
+    ### ICM/WKICM ###
+    - Add either new intrinsics, or attributes to the orders, that contain an abstract representation of the orbit or of the whole icm together with a map/function that produces a representative. The map should have an inverse.
+    What I need is to b able to do the following: let I be an R-ideal; compute the action of [I] in ICM(R) without using represntatives (of the isomorphism classes), but only the abstract represntatives. Similar to what happens with P,p:=PicardGroup(R): one can compute x:=I@@p and then use x*y with y in P, rather than working with ideals. This should make the functions to construct the isogeny graphs a lot faster.
+
     ### Modules ###
     - In IsomorphismClasses and IsIsomorphic, I should first order/test whether M and N have the same multiplicator ring S in K and with #M/PM = #N/PN for every singular prime of S, since these are necessary conditions of being isomorphic.
     - I have recently added the Type AlgEtMod. Many thinks that are valid for Idl should also be implemented for Modules. Eg, sum of modules, ideal*module, ...
@@ -35,10 +39,6 @@
     #### CRT ####
     - Make a CRT for modules : I/P1*...*Ps*I -> \prod_i (I/Pi*I)
       This is needed for finding a minimal set of generators of non-necessarly invertible ideals.
-
-    ### WKICM ###
-    - (happening in dev/ folder) Doing the computation prime per prime should help.
-      But there are many cases where this is still too slow with only one non-Gorestein prime.
 
     ### Other ###
     ...

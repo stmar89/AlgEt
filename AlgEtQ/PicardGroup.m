@@ -28,49 +28,76 @@ freeze;
 
 declare verbose AlgEtQPicardGroup, 3;
 
-declare attributes AlgEtQOrd:PicardGroup,
-                            UnitGroup;
-declare attributes AlgEtQIdl:residue_class_ring_unit_subgroup_generator;
+declare attributes AlgEtQOrd: PicardGroup,
+                              UnitGroup;
+
+declare attributes AlgEtQIdl: residue_class_ring_unit_subgroup_generators,
+                              ResidueRingUnits;
 
 intrinsic ResidueRingUnits(S::AlgEtQOrd,I::AlgEtQIdl) -> GrpAb,Map
-{Returns the group (S/I)^* and a map (S/I)^* -> S. The order S is required to be maximal.}
-    //the following code works only for maximal orders in etale algebras
-    require IsMaximal(S): "implemented only for the maximal order";
-    test,I_asProd:=IsProductOfIdeals(I);
-    assert test;
-    A:=Algebra(S);
-    n:=#I_asProd;
-    _,embs:=Components(A);
-    ray_res_rings:=[];
-    ray_res_rings_maps:=[**];
-    for i in [1..n] do
-        IL:=I_asProd[i];
-        OL:=Order(IL);
-        assert IsMaximal(OL);
-        R,r:=RayResidueRing(IL);
-        Append(~ray_res_rings,R);
-        Append(~ray_res_rings_maps,r);
-    end for;
-    D,mRD,mDR:=DirectSum(ray_res_rings);
+{Returns the group (S/I)^* and a map (S/I)^* -> S. The MultiplicatorRing(I) must be the maximal order.}
+    if not assigned I`ResidueRingUnits then
+        require IsMaximal(MultiplicatorRing(I)) : "the multiplicator ring of I is not the maximal order.";
+        require Order(I) eq S and I subset OneIdeal(S) : "I is not a proper S-ideal.";
 
-    map_ResRing_S:=function(x)
-        return &+[embs[i](ray_res_rings_maps[i](mDR[i](x))) : i in [1..n]];
-    end function;
+        maximal_order_case:=function(S,I)
+        // if S is maximal
+            test,I_asProd:=IsProductOfIdeals(I);
+            assert test;
+            A:=Algebra(S);
+            n:=#I_asProd;
+            _,embs:=Components(A);
+            ray_res_rings:=[];
+            ray_res_rings_maps:=[**];
+            for i in [1..n] do
+                IL:=I_asProd[i];
+                OL:=Order(IL);
+                assert IsMaximal(OL);
+                R,r:=RayResidueRing(IL);
+                Append(~ray_res_rings,R);
+                Append(~ray_res_rings_maps,r);
+            end for;
+            D,mRD,mDR:=DirectSum(ray_res_rings);
 
-    map_S_ResRing:=function(y)
-        comp:=Components(y);
-        assert #ray_res_rings_maps eq #comp;
-        return &+[mRD[i](comp[i]@@ray_res_rings_maps[i]) : i in [1..n]];
-    end function;
+            map_ResRing_S:=function(x)
+                return &+[embs[i](ray_res_rings_maps[i](mDR[i](x))) : i in [1..n]];
+            end function;
 
-    map:=map<D -> A | x:->map_ResRing_S(x) , y:->map_S_ResRing(y) >;
-    assert2 forall{ gen : gen in Generators(D) | (map(gen))@@map eq gen };
-    return D,map;
+            map_S_ResRing:=function(y)
+                comp:=Components(y);
+                assert #ray_res_rings_maps eq #comp;
+                return &+[mRD[i](comp[i]@@ray_res_rings_maps[i]) : i in [1..n]];
+            end function;
+
+            map:=map<D -> A | x:->map_ResRing_S(x) , y:->map_S_ResRing(y) >;
+            assert2 forall{ gen : gen in Generators(D) | (map(gen))@@map eq gen };
+            return D,map;
+        end function;
+
+        if IsMaximal(S) then
+            D,map:=maximal_order_case(S,I);
+            I`ResidueRingUnits:=<D,map>;
+        else
+            OO:=MaximalOrder(Algebra(S));
+            IOO:=OO!!I;
+            O_I,map:=maximal_order_case(OO,IOO);
+            gens:=[ g@@map : g in ResidueRingUnitsSubgroupGenerators(I) ];
+            D:=sub<O_I | gens >;
+            assert2 forall{ gen : gen in Generators(D) | (map(gen))@@map eq gen };
+            I`ResidueRingUnits:=<D,map>;
+        end if;
+    end if;
+    return Explode(I`ResidueRingUnits);
 end intrinsic;
 
-residue_class_ring_unit_subgroup_generators:=function(F)
-// determine generators of the subgroup of (S/F)^* as elements of A=Algebra(S)
-    if not assigned F`residue_class_ring_unit_subgroup_generator then
+intrinsic ResidueRingUnits(I::AlgEtQIdl) -> GrpAb,Map
+{Returns the group (S/I)^* and a map (S/I)^* -> S, where S=Order(I) and the multiplicator ring of I is maximal.}
+    return ResidueRingUnits(Order(I),I);
+end intrinsic;
+
+intrinsic ResidueRingUnitsSubgroupGenerators(F::AlgEtQIdl) -> SeqEnum[AlgEtQElt]
+{Returns generators of (S/F)^* where F is an ideal of the order S with maximal multiplicator ring.}
+    if not assigned F`residue_class_ring_unit_subgroup_generators then
         S:=Order(F);
         A:=Algebra(S);
         O:=MaximalOrder(A);
@@ -113,12 +140,12 @@ residue_class_ring_unit_subgroup_generators:=function(F)
             end while;
         end for;
         assert2 forall{x : x in elts | x in S and not x in F};
-        F`residue_class_ring_unit_subgroup_generator:=elts;
-        vprintf AlgEtQPicardGroup, 2 :"residue_class_ring_unit_subgroup_generator:\n
+        F`residue_class_ring_unit_subgroup_generators:=elts;
+        vprintf AlgEtQPicardGroup, 2 :"residue_class_ring_unit_subgroup_generators:\n
                                          elts = %o\n",PrintSeqAlgEtQElt(Setseq(elts));
     end if;
-	return F`residue_class_ring_unit_subgroup_generator ;
-end function;
+	return F`residue_class_ring_unit_subgroup_generators;
+end intrinsic;
 
 IsPrincipal_prod_internal_old:=function( I , GRH )
 //returns if the argument is a principal ideal; if so the function returns also the generator. It works only for products of ideals
@@ -232,8 +259,9 @@ intrinsic IsPrincipal(I1::AlgEtQIdl : GRH:=false )->BoolElt, AlgAssElt
         return true, gen_IO*cop^-1;
     end if;
     UO,uO:=UnitGroup(O : GRH:=GRH );
-    Sgens:=residue_class_ring_unit_subgroup_generators(F);
-    B,b:=quo<R|[gen@@r : gen in Sgens]>;
+    //Sgens:=ResidueRingUnitsSubgroupGenerators(F);
+    //B,b:=quo<R|[gen@@r : gen in Sgens]>;
+    B,b:=ResidueRingUnits(F);
     gens_UO_inB:=[ b(uO(UO.i)@@r) : i in [1..#Generators(UO)]  ];
     h:=hom<UO -> B | gens_UO_inB >;
     hUO:=Image(h);
@@ -404,7 +432,7 @@ intrinsic PicardGroup( S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
 
 
     R,r:=ResidueRingUnits(O,FO); // G, mG
-    Sgens:=residue_class_ring_unit_subgroup_generators(F); // ogens //generators in S of (S/F)*
+    Sgens:=ResidueRingUnitsSubgroupGenerators(F); // ogens //generators in S of (S/F)*
     UO,uO:=UnitGroup(O : GRH:=GRH ); // Um, mUm 
     H:=FreeAbelianGroup(#Generators(GO));
     D, mRD, mHD, mDR, mDH := DirectSum(R,H); // D, mGD, mHD, mDG, mDH
@@ -532,7 +560,7 @@ intrinsic UnitGroup(S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
 
     //Let's build B=(O/FO)^*/(S/F)^*
     R,r:=ResidueRingUnits(O,FO);
-    gens_SF:=residue_class_ring_unit_subgroup_generators(F);
+    gens_SF:=ResidueRingUnitsSubgroupGenerators(F);
     B,b:=quo<R| [ a@@r : a in gens_SF ]>;
 
     img_gensUO_in_B:=[ b(uO(UO.i)@@r) : i in [1..#Generators(UO)] ];
@@ -617,6 +645,19 @@ end intrinsic;
     assert #P eq 3548000;
     printf ".";
     SetAssertions(1);
+
+	//AttachSpec("~/packages_github/AlgEt/spec");
+    _<x>:=PolynomialRing(Integers());
+    f:=x^8+16;
+    A:=EtaleAlgebra(f);
+    OA:=MaximalOrder(A);
+    P:=PrimesAbove(2*OA)[1];
+    E:=Order(ZBasis(P^2));
+    assert not IsMaximal(E);
+    P:=Conductor(E);
+    assert IsPrime(P);
+    assert #ResidueRingUnits(P) eq Index(E,P)-1;
+    assert forall{ i : i in [1..20] | #ResidueRingUnits(Pi) eq Index(E,Pi) - Index(P,Pi) where Pi:=P^i};
 
     printf " all good!\n"; 
 

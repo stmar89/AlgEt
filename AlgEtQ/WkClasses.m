@@ -33,7 +33,6 @@ declare verbose WKICM_bar, 2;
 declare attributes AlgEtQOrd:   WKICM,
                                 WKICM_bar;
 import "LowCohenMacaulayType.m" : wkicm_bar_CM_type2;
-import "PicardGroup.m" : residue_class_ring_unit_subgroup_generators;
 
 
 join_ass_arr:=function(A,B)
@@ -80,11 +79,9 @@ units_T_P_mod_S_P:=function(T,S,P)
     FPS:=Conductor(S);
     O:=MaximalOrder(Algebra(S));
     FPT:=T!!FPS;
-    FPO:=O!!FPS;
-    uOP,map:=ResidueRingUnits(O,FPO);
-    uTP:=sub<uOP|[ g@@map : g in residue_class_ring_unit_subgroup_generators(FPT)]>;
-    uSP:=sub<uTP|[uTP!(g@@map) : g in residue_class_ring_unit_subgroup_generators(FPS)]>;
-    U:=[ map(uOP!t) : t in Transversal(uTP,uSP) ];
+    uTP,map:=ResidueRingUnits(FPT);
+    uSP:=sub<uTP|[uTP!(g@@map) : g in ResidueRingUnitsSubgroupGenerators(FPS)]>;
+    U:=[ map(t) : t in Transversal(uTP,uSP) ];
     return U;
 end function;
 

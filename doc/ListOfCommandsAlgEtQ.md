@@ -42,8 +42,8 @@
 
 ## List of instrinsics in AlgEtQ/Homs.m:
 
-> <pre><b>HomsToC</b>(A::AlgEtQ : Precision:=30)->SeqEnum[Map]</pre>
-<em>Returns the sequence of homomorphisms from A to the complex field CC. The precision of CC is given by the optional parameter "Precision". Default value is 30</em>
+> <pre><b>HomsToC</b>(A::AlgEtQ : Prec:=30)->SeqEnum[Map]</pre>
+<em>Returns the sequence of homomorphisms from A to the complex field CC. The precision of CC is given by the optional parameter "Prec". Default value is 30</em>
 
 
 ## List of instrinsics in AlgEtQ/Elt.m:
@@ -693,8 +693,8 @@
 > <pre><b>ChangePrecision</b>(~PHI :: AlgEtQCMType, prec::RngIntElt )</pre>
 <em>Changes the precision of the given CM-type, that is, the codomain of each homomorphism will be ComplexField(Precision).</em>
 
-> <pre><b>AllCMTypes</b>(A::AlgEtQ : Precision := 30 ) -> SeqEnum[AlgEtQCMType]</pre>
-<em>Returns all the AlgEtQCMTypes of A. The vararg Precision determined the precision of the codomain of the maps defining the CMTypes.</em>
+> <pre><b>AllCMTypes</b>(A::AlgEtQ : Prec := 30 ) -> SeqEnum[AlgEtQCMType]</pre>
+<em>Returns all the AlgEtQCMTypes of A. The vararg Prec determined the precision of the codomain of the maps defining the CMTypes.</em>
 
 
 ## List of instrinsics in AlgEtQ/IntermediateIdeals.m:
@@ -776,7 +776,13 @@ These are produced by recursively searching for maximal submodules.</em>
 ## List of instrinsics in AlgEtQ/PicardGroup.m:
 
 > <pre><b>ResidueRingUnits</b>(S::AlgEtQOrd,I::AlgEtQIdl) -> GrpAb,Map</pre>
-<em>Returns the group (S/I)^\* and a map (S/I)^\* -> S. The order S is required to be maximal.</em>
+<em>Returns the group (S/I)^\* and a map (S/I)^\* -> S. The MultiplicatorRing(I) must be the maximal order.</em>
+
+> <pre><b>ResidueRingUnits</b>(I::AlgEtQIdl) -> GrpAb,Map</pre>
+<em>Returns the group (S/I)^\* and a map (S/I)^\* -> S, where S=Order(I) and the multiplicator ring of I is maximal.</em>
+
+> <pre><b>ResidueRingUnitsSubgroupGenerators</b>(F::AlgEtQIdl) -> SeqEnum[AlgEtQElt]</pre>
+<em>Returns generators of (S/F)^\* where F is an ideal of the order S with maximal multiplicator ring.</em>
 
 > <pre><b>IsPrincipal</b>(I1::AlgEtQIdl : GRH:=false )->BoolElt, AlgAssElt</pre>
 <em>Return if the argument is a principal ideal; if so the function returns also the generator. The optional argument "GRH" decides wheter the bound for the IsPrincipal test should be conditional. The default value is "false".</em>
@@ -835,11 +841,14 @@ These are produced by recursively searching for maximal submodules.</em>
 
 ## List of instrinsics in AlgEtQ/WkClasses.m:
 
-> <pre><b>WKICM_bar</b>(S::AlgEtQOrd : Method:="Auto") -> SeqEnum</pre>
-<em>Returns representatives of all the weak equivalence classes I of S satisfying (I:I)=S. The VarArg Method (default "Auto") determines if we should use the "IntermediateIdeals" routine or the "LowIndexProcess", which is potentially much slower but more memory efficient.</em>
+> <pre><b>WKICM_bar</b>(S::AlgEtQOrd : Method:="Auto") -> SeqEnum[AlgEtQIdl]</pre>
+<em>Returns all the weak eq classes I, such that (I:I)=S. The VarArg Method (default "Auto") is not used and kept for retrocompatibility.</em>
 
-> <pre><b>WKICM</b>(E::AlgEtQOrd : Method:="Auto")->SeqEnum</pre>
-<em>Computes the weak equivalence class monoid of E. The VarArg Method (default "Auto") determines if we should use the "IntermediateIdeals" routine or the "LowIndexProcess", which is potentially much slower but more memory efficient.</em>
+> <pre><b>WeakEquivalenceClassesWithPrescribedMultiplicatorRing</b>(S::AlgEtQOrd : Method:="Auto") -> SeqEnum[AlgEtQIdl]</pre>
+<em>Returns all the weak eq classes I, such that (I:I)=S. The VarArg Method (default "Auto") is not used and kept for retrocompatibility.</em>
+
+> <pre><b>WKICM</b>(E::AlgEtQOrd : Method:="Auto")->SeqEnum[AlgEtQIdl]</pre>
+<em>Computes the weak equivalence class monoid of E. The VarArg Method (default "Auto") is not used and kept for retrocompatibility.</em>
 
 
 ## List of instrinsics in AlgEtQ/WkTesting.m:

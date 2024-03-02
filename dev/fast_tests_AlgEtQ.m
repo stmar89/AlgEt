@@ -786,6 +786,19 @@ time_start:=Cputime();
     printf ".";
     SetAssertions(1);
 
+	//AttachSpec("~/packages_github/AlgEt/spec");
+    _<x>:=PolynomialRing(Integers());
+    f:=x^8+16;
+    A:=EtaleAlgebra(f);
+    OA:=MaximalOrder(A);
+    P:=PrimesAbove(2*OA)[1];
+    E:=Order(ZBasis(P^2));
+    assert not IsMaximal(E);
+    P:=Conductor(E);
+    assert IsPrime(P);
+    assert #ResidueRingUnits(P) eq Index(E,P)-1;
+    assert forall{ i : i in [1..20] | #ResidueRingUnits(Pi) eq Index(E,Pi) - Index(P,Pi) where Pi:=P^i};
+
     printf " all good!\n"; 
 
 

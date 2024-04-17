@@ -76,14 +76,12 @@ intrinsic ChineseRemainderTheorem(Is::SeqEnum[AlgEtQIdl],as::SeqEnum[AlgEtQElt])
         H,U:=HermiteForm(C); //U*C = H;
         cc:=cc*crZQ(Matrix(Rows(U)[1..n]));
         cc:=Partition(Eltseq(cc),n);
-        // the following 2 lines are the slowest, many coercions in A
         //cs:=[ &+[cc[i][j]*ZBasis(Is[i])[j] : j in [1..n]] : i in [1..N] ]; 
         cs:=[ SumOfProducts(cc[i],ZBasis(Is[i])) : i in [1..N] ]; 
         // cs[i] in Is[i] and \sum_i cs[i] = 1
     else
         //1 = g = \sum_i c1s[i]*Is_min[i]
         cs:=[c1s[i]*Is_min[i] : i in [1..N]];// only integers here. very fast
-        // the following lines is the slowest, many coercions in A
     end if;
     //e:=&+[cs[i]*ashat[i] : i in [1..N]];
     e:=SumOfProducts(cs,ashat);
@@ -150,6 +148,26 @@ end intrinsic;
     printf ".";
     pp:=pp13[1]*pp13[2];
     assert forall{i : i in [1..#out1] | (out1[i] - out2[i]) in pp};
+
+    // test 3 : >2 primes
+    tuples:=[]; 
+    for i in [1..1000] do
+        i_tup:=[];
+        for j in [1..#pp] do
+            repeat
+                a:=Random(E1);
+            until not a in pp[j];
+            Append(~i_tup,a);
+        end for;
+        Append(~tuples,i_tup);
+    end for;
+
+    for tup in tuples do
+        e:=ChineseRemainderTheorem(pp,tup);
+    end for;
+
+    printf ".";
+
     SetAssertions(1);    
     printf " all good!\n"; 
 

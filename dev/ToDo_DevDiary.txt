@@ -12,7 +12,6 @@
     ### Priority ###
 
     ### Optimization ###
-    - meet(I,J) is faster than I*J : this should be exploited for whenever we have IsCoprime(I,J)
 
     ### ICM/WKICM ###
     - Add either new intrinsics, or attributes to the orders, that contain an abstract representation of the orbit or of the whole icm together with a map/function that produces a representative. The map should have an inverse.

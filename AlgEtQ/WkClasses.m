@@ -264,7 +264,8 @@ intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum[AlgEtQIdl]
                 vprintf WKICM_bar,2 : "We compute the \prod_{j \\ne i} P_j^k_j\n";
                 prod_j_ne_i:=[ ];
                 for i in [1..n] do
-                    prod:=&*[ pp_pows[j] : j in [1..n] | j ne i ];
+                    // coprime ideals, so we can use meet instead of *, which is faster
+                    prod:=&meet[ pp_pows[j] : j in [1..n] | j ne i ];
                     ZBasisLLL(prod);
                     Append(~prod_j_ne_i,prod);
                 end for;
@@ -428,7 +429,8 @@ intrinsic WKICM(E::AlgEtQOrd : Method:="Auto")->SeqEnum[AlgEtQIdl]
             vprintf WKICM,2 : "We compute the \prod_{j \\ne i} P_j^k_j\n";
             prod_j_ne_i:=[ ];
             for i in [1..n] do
-                prod:=&*[ pp_pows[j] : j in [1..n] | j ne i ];
+                // coprime ideals, so we can use meet instead of *, which is faster
+                prod:=&meet[ pp_pows[j] : j in [1..n] | j ne i ];
                 ZBasisLLL(prod);
                 Append(~prod_j_ne_i,prod);
             end for;

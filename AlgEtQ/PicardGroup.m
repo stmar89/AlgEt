@@ -112,7 +112,8 @@ intrinsic ResidueRingUnitsSubgroupGenerators(F::AlgEtQIdl) -> SeqEnum[AlgEtQElt]
             a1a2:=primes_powers[i];
             idp:=a[1];
             if #primes gt 1 then
-                rest:=&*[ primes_powers[j] : j in [1..#primes] | j ne i];
+                // coprime ideals, so we can use meet instead of *, which is faster
+                rest:=&meet[ primes_powers[j] : j in [1..#primes] | j ne i];
             else
                 rest:=OneIdeal(S);
             end if;

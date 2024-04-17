@@ -127,7 +127,8 @@ wkicm_bar_CM_type2:=function(S,pp)
                                               //   pp[i]^m \subseteq I_pp[i]
             Append(~pows,P^m);
         end for;
-        pows_hat:=[ &*[ pows[j] : j in [1..#pp] | j ne i ] : i in [1..#pp] ];
+        // coprime ideals, so we can use meet instead of *, which is faster
+        pows_hat:=[ &meet[ pows[j] : j in [1..#pp] | j ne i ] : i in [1..#pp] ];
         Is:=[ seq : seq in CartesianProduct([[OneIdeal(S),I] : i in [1..#pp]]) ];
         out:=[];
         for I in Is do

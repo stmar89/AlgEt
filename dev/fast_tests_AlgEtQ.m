@@ -745,8 +745,40 @@ time_start:=Cputime();
         Append(~out2,e);
     end for;
     printf ".";
-    pp:=pp13[1]*pp13[2];
-    assert forall{i : i in [1..#out1] | (out1[i] - out2[i]) in pp};
+    pp13:=pp13[1]*pp13[2];
+    assert forall{i : i in [1..#out1] | (out1[i] - out2[i]) in pp13};
+
+    // test 3 : >2 primes
+    tuples:=[]; 
+    for i in [1..1000] do
+        i_tup:=[];
+        for j in [1..#pp] do
+            repeat
+                a:=Random(E1);
+            until not a in pp[j];
+            Append(~i_tup,a);
+        end for;
+        Append(~tuples,i_tup);
+    end for;
+
+    out3:=[];
+    out4:=[];
+    for tup in tuples do
+        e:=ChineseRemainderTheorem(pp,tup);
+        Append(~out3,e);
+    end for;
+    
+    f,g:=ChineseRemainderTheoremFunctions(pp);
+    for tup in tuples do
+        e:=g(tup);
+        Append(~out4,e);
+    end for;
+
+    I:=&meet(pp);
+    assert forall{i : i in [1..#out3] | (out3[i] - out4[i]) in I};
+
+    printf ".";
+
     SetAssertions(1);    
     printf " all good!\n"; 
 

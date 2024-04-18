@@ -54,6 +54,7 @@ intrinsic ResidueRingUnits(S::AlgEtQOrd,I::AlgEtQIdl) -> GrpAb,Map
                 assert IsMaximal(OL);
                 R,r:=RayResidueRing(IL);
                 assert2 forall{ i : i,j in [1..Ngens(R)] | r(R.i+R.j) - r(R.i)*r(R.j) in IL };
+                assert2 forall{ i : i in [1..Ngens(R)] | r(R.i) in OL };
                 Append(~ray_res_rings,R);
                 Append(~ray_res_rings_maps,r);
             end for;
@@ -71,6 +72,8 @@ intrinsic ResidueRingUnits(S::AlgEtQOrd,I::AlgEtQIdl) -> GrpAb,Map
 
             map:=map<D -> A | x:->map_ResRing_S(x) , y:->map_S_ResRing(y) >;
             assert2 forall{ gen : gen in Generators(D) | (map(gen))@@map eq gen };
+            assert2 forall{ gen : gen in Generators(D) | (map(gen)) in S };
+            assert2 forall{ i : i,j in [1..Ngens(D)] | map(D.i+D.j) - map(D.i)*map(D.j) in I};
             return D,map;
         end function;
 
@@ -81,11 +84,14 @@ intrinsic ResidueRingUnits(S::AlgEtQOrd,I::AlgEtQIdl) -> GrpAb,Map
             OO:=MaximalOrder(Algebra(S));
             IOO:=OO!!I;
             O_I,map:=maximal_order_case(OO,IOO);
-            gens:=[ g@@map : g in ResidueRingUnitsSubgroupGenerators(I) ];
+            gens:=ResidueRingUnitsSubgroupGenerators(I);
+            assert2 forall{ g : g in gens | map(g@@map)-g in IOO };
+            assert2 forall{ g : g in gens | map(g@@map)-g in I };
+            gens:=[ g@@map : g in gens ];
             D:=sub<O_I | gens >;
-            assert2 forall{ gen : gen in Generators(D) | (map(gen))@@map eq gen };
             I`ResidueRingUnits:=<D,map>;
         end if;
+        assert2 forall{ gen : gen in Generators(D) | (map(gen))@@map eq gen };
         assert2 forall{ gen : gen in Generators(D) | (map(gen)) in S };
         assert2 forall{ i : i,j in [1..Ngens(D)] | map(D.i+D.j) - map(D.i)*map(D.j) in I};
     end if;
@@ -103,6 +109,7 @@ intrinsic ResidueRingUnitsSubgroupGenerators(F::AlgEtQIdl) -> SeqEnum[AlgEtQElt]
         S:=Order(F);
         A:=Algebra(S);
         O:=MaximalOrder(A);
+        require MultiplicatorRing(F) eq O : "the ideal must have maximal multiplicator ring";
         Fm:=O!!F;
         l:=Factorization(Fm);
         l2:=[ <(S!!x[1]) meet S,x[2]>: x in l]; 
@@ -116,7 +123,6 @@ intrinsic ResidueRingUnitsSubgroupGenerators(F::AlgEtQIdl) -> SeqEnum[AlgEtQElt]
             if #primes gt 1 then
                 // coprime ideals, so we can use meet instead of *, which is faster
                 rest:=&meet[ primes_powers[j] : j in [1..#primes] | j ne i];
-                //rest:=&*[ primes_powers[j] : j in [1..#primes] | j ne i];
             else
                 rest:=OneIdeal(S);
             end if;
@@ -128,6 +134,7 @@ intrinsic ResidueRingUnitsSubgroupGenerators(F::AlgEtQIdl) -> SeqEnum[AlgEtQElt]
             c:=c*e1+e2;
             //c:=ChineseRemainderTheorem(a1a2,rest,c,One(A));
             assert2 c - ChineseRemainderTheorem(a1a2,rest,c,One(A)) in a1a2*rest;
+            assert2 c - One(A) in rest;
             Include(~elts,c);
             b:=1;
             while b lt a[2] do
@@ -144,6 +151,7 @@ intrinsic ResidueRingUnitsSubgroupGenerators(F::AlgEtQIdl) -> SeqEnum[AlgEtQElt]
             end while;
         end for;
         assert2 forall{x : x in elts | x in S and not x in F};
+        assert2 forall{x : x in elts | 1 in x*S + F};
         F`residue_class_ring_unit_subgroup_generators:=elts;
         vprintf AlgEtQPicardGroup, 2 :"residue_class_ring_unit_subgroup_generators:\n
                                          elts = %o\n",PrintSeqAlgEtQElt(Setseq(elts));

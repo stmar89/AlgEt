@@ -37,7 +37,6 @@ declare attributes AlgEtQIdl: residue_class_ring_unit_subgroup_generators,
 intrinsic ResidueRingUnits(S::AlgEtQOrd,I::AlgEtQIdl) -> GrpAb,Map
 {Returns the group (S/I)^* and a map (S/I)^* -> S. The MultiplicatorRing(I) must be the maximal order.}
     if not assigned I`ResidueRingUnits then
-        require IsMaximal(MultiplicatorRing(I)) : "the multiplicator ring of I is not the maximal order.";
         require Order(I) eq S and I subset OneIdeal(S) : "I is not a proper S-ideal.";
 
         maximal_order_case:=function(S,I)
@@ -54,6 +53,7 @@ intrinsic ResidueRingUnits(S::AlgEtQOrd,I::AlgEtQIdl) -> GrpAb,Map
                 OL:=Order(IL);
                 assert IsMaximal(OL);
                 R,r:=RayResidueRing(IL);
+                assert2 forall{ i : i,j in [1..Ngens(R)] | r(R.i+R.j) - r(R.i)*r(R.j) in IL };
                 Append(~ray_res_rings,R);
                 Append(~ray_res_rings_maps,r);
             end for;
@@ -86,6 +86,8 @@ intrinsic ResidueRingUnits(S::AlgEtQOrd,I::AlgEtQIdl) -> GrpAb,Map
             assert2 forall{ gen : gen in Generators(D) | (map(gen))@@map eq gen };
             I`ResidueRingUnits:=<D,map>;
         end if;
+        assert2 forall{ gen : gen in Generators(D) | (map(gen)) in S };
+        assert2 forall{ i : i,j in [1..Ngens(D)] | map(D.i+D.j) - map(D.i)*map(D.j) in I};
     end if;
     return Explode(I`ResidueRingUnits);
 end intrinsic;
@@ -114,6 +116,7 @@ intrinsic ResidueRingUnitsSubgroupGenerators(F::AlgEtQIdl) -> SeqEnum[AlgEtQElt]
             if #primes gt 1 then
                 // coprime ideals, so we can use meet instead of *, which is faster
                 rest:=&meet[ primes_powers[j] : j in [1..#primes] | j ne i];
+                //rest:=&*[ primes_powers[j] : j in [1..#primes] | j ne i];
             else
                 rest:=OneIdeal(S);
             end if;

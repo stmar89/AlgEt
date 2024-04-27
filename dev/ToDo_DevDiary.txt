@@ -46,7 +46,8 @@
     ...
 
     ### FIXED/DONE: kept for the record. ###
-    - Fixed a bug in CRT, added ChineseRemainderTheoremFunctions.
+    - Fixed another bug in CRT: The issue was rising when I1 and I2 are generated separatly with different ZBases. If they turned out to be equal, the equality copies all 'missing' attributes. If I1 was already used for a CRT and I2 not, then the assigned attribute I1`CRT_data would have been copied onto the empty one of I2. If ZBasis(I) and ZBasis(I2) are different we get a mistake! It is now fixed by storing with CRT_data the ZBasis wrt to which it was computed. The same philosophy is applied now to inclusion_matrix as well.
+    - Fixed a bug in CRT, added ChineseRemainderTheoremFunctions. The old code only worked for 2 ideals. Fortunately, I have never used it before for more!!! In case, the correctedness of the output was asserted, so the previous computations are checked. 
     - replaced &* with &meet for coprime ideals because faster.
     - The current implementation of PrimesAbove goes through a Factorization over the maximal order.
       The same can be obtained using MaximalIntermediateIdeals, but it is slower. Discarded.

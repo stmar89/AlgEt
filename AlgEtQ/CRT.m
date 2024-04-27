@@ -33,13 +33,39 @@ declare attributes AlgEtQIdl : CRT_data;
 
 import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQtoA , meet_zbasis ;
 
+// Let z1,..,zn be ZBasis(S) and let c1,...,cn be the coefficients such that 1=c1z1+...+cnzn.
+// Let cc = (c1,...,cn, 0 , ... , 0 ).
+// Let zS be the matrix whose rows are given by z1,...,zn.
+// Let d be the denominator of zS.
+// Let V be such that V*VerticalJoin(d*zS , 0n)=H where 0n is the zero nxn-matrix and H is in HNF.
+//
+// Let I1+I2=S be ideals.
+// Let zI1 and zI2 be the matrices whose rows are given by ZBasis(I1) and ZBasis(I2).
+// Let U be such that U*VerticalJoin(d*zI1,d*zI2) = H, where H is in HNF, hence equal to the H above.
+// 
+// Then cc*VerticalJoin(d*zS , 0n) = cc * V^-1 * U * VerticalJoin(d*zI1,d*zI2).
+// This implies that (a1,...,an,b1,...,bn) = cc*V^-1*U satisfies
+// 1 = a1zI11+..+anzI1n + b1I21 + ... + bnzI2n.
+// Set c1 = a1zI11+..+anzI1n and b1I21 + ... + bnzI2n.
+// Then c1 in I1, c2 in I2 and c1+c2 = 1.
+
+
 CRT_data_order:=function(S)
     if not assigned S`CRT_data then
-        M:=MatrixAtoQ(ZBasis(S));
+        zS:=ZBasis(S);
+        M:=MatrixAtoQ(zS);
         d:=Denominator(M);
-        _,V:=HermiteForm(crQZ(d*M)); // V*d*M eq H
-        cc:=Matrix([AbsoluteCoordinates([One(Algebra(S))],S)[1]])*crZQ(V^-1);
-        S`CRT_data:=<cc,d>;
+        //_,V:=HermiteForm(crQZ(d*M)); // V*d*M eq H
+        //cc:=Matrix([AbsoluteCoordinates([One(Algebra(S))],S)[1]])*crZQ(V^-1);
+        M:=VerticalJoin(crQZ(d*M),ZeroMatrix(Integers(),#zS));
+        H,V:=HermiteForm(M); // V*M eq H
+        cc:=AbsoluteCoordinates([One(Algebra(S))],S)[1];
+        vprintf CRT,2 : "ZBasis(S)=%o\nM=\n%o\ncc=%o\nH=\n%o\nV=\n%o\n",zS,M,cc,H,V;
+        assert2 SumOfProducts(cc,zS) eq One(Algebra(S));
+        cc:=cc cat [0 : i in [1..#zS]];
+        cc:=Matrix([cc])*crZQ(V^-1);
+        vprintf CRT,2 : "cc*V^-1=%o\n",cc;
+        S`CRT_data:=<cc,d,zS>;
     end if;
     return Explode(S`CRT_data);
 end function;
@@ -47,40 +73,42 @@ end function;
 CRT_data_ideal:=function(I)
      if not assigned I`CRT_data then
          _,d:=CRT_data_order(Order(I));
-         I`CRT_data:=crQZ(d*MatrixAtoQ(ZBasis(I)));
+         zI:=ZBasis(I);
+         I`CRT_data:=<crQZ(d*MatrixAtoQ(zI)),zI>;
+         // 20240426 : we now store also the ZBasis, since the attribute might change (eg. when using LLL)
      end if;
-     return I`CRT_data;
+     return Explode(I`CRT_data);
 end function;
 
 intrinsic ChineseRemainderTheorem(I::AlgEtQIdl,J::AlgEtQIdl,a::AlgEtQElt,b::AlgEtQElt)-> AlgEtQElt
 {Given two coprime ideals I and J of S, two elements a,b in S, finds e such that (e-a) in I and (e-b) in J.}
     Is:=[I,J];
     as:=[a,b];
+    ashat:=[b,a];
     // the following code works only if N =2
-    N:=#as;
+    N:=2;
     S:=Order(Is[1]);
-    require #Is eq N: "The number of ideals is not the same as the number of elements";
-    require forall{i : i in [1..N] | as[i] in S}:"the elements must lie in order of definition of the ideals";
-    require forall{i : i in [2..N] | Order(Is[i]) eq S}:"the ideals must be of the same order";
-    ashat:=[ &*[as[j] : j in [1..N] | i ne j ]  : i in [1..N] ];
+    require a in S and b in S:"the elements must lie in order of definition of the ideals";
+    require Order(J) eq S:"the ideals must be of the same order";
     Is_min:=[ MinimalInteger(I) : I in Is ];
     g,c1s:=XGCD(Is_min);
     if g ne 1 then
-        // cc=coord of 1 in S * V^-1, where V*(zb(S)) = H. H is the same as below.
-        // let U*VerticalJoin(zb(I1),...,zb(IN)) = H 
-        // extend cc with zeros.
-        // hence cc*U gives the coordinates of 1 in I1+I2+...+IN. 
-        // Note that we use only the first n rows of U.
-        // So instead of extending cc, we can replace U wit only its first n rows.
         K:=Algebra(S);
         n:=AbsoluteDimension(K);
         cc,d:=CRT_data_order(S);
-        C:=VerticalJoin([ CRT_data_ideal(I) : I in Is ]);
+        CI,zI:=CRT_data_ideal(I);
+        CJ,zJ:=CRT_data_ideal(J);
+        zIs:=[zI,zJ];
+        C:=VerticalJoin([ CI,CJ ]);
+        vprintf CRT,2 : "zI=\n%o\nzJ=\n%o\nC=\n%o\n",zI,zJ,C;
         H,U:=HermiteForm(C); //U*C = H;
-        cc:=cc*crZQ(Matrix(Rows(U)[1..n]));
+        vprintf CRT,2 : "H=\n%o\nU=\n%o\n",H,U;
+        //cc:=cc*crZQ(Matrix(Rows(U)[1..n]));
+        cc:=cc*crZQ(U);
+        vprintf CRT,2 : "cc*V^-1*U=%o\n",cc;
         cc:=Partition(Eltseq(cc),n);
-        //cs:=[ &+[cc[i][j]*ZBasis(Is[i])[j] : j in [1..n]] : i in [1..N] ]; 
-        cs:=[ SumOfProducts(cc[i],ZBasis(Is[i])) : i in [1..N] ]; 
+        cs:=[ SumOfProducts(cc[i],zIs[i]) : i in [1..N] ]; 
+        vprintf CRT,2 : "c1,c2=\n%o\n",cs;
         // cs[i] in Is[i] and \sum_i cs[i] = 1
     else
         //1 = g = \sum_i c1s[i]*Is_min[i]
@@ -88,9 +116,10 @@ intrinsic ChineseRemainderTheorem(I::AlgEtQIdl,J::AlgEtQIdl,a::AlgEtQElt,b::AlgE
     end if;
     //e:=&+[cs[i]*ashat[i] : i in [1..N]];
     e:=SumOfProducts(cs,ashat);
-    assert2 &+cs eq One(Algebra(S));
     assert2 forall{ cs : i in [1..N] | cs[i] in Is[i] };
+    assert2 &+cs eq One(Algebra(S));
     assert forall{ i : i in [1..N] | e-as[i] in Is[i]};
+    vprintf CRT,2 : "all good!\n";
     return e;
 end intrinsic;
 

@@ -1,4 +1,5 @@
 AttachSpec("../../spec");
+SetAssertions(2);
 time_start:=Cputime();
 
 

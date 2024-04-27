@@ -34,6 +34,7 @@
     end function;
 
     out:="AttachSpec(\"" cat input cat "\");\n";
+    out cat:="SetAssertions(2);\n";
     input:=Split(Read(input),"{\n}");
     fld:=input[1];
     //input;

@@ -280,9 +280,12 @@ inclusion_matrix:=function(O)
 // solving a system (as in AbsoluteCoordinates). It is much faster.
 // O can also be an ideal.
     if not assigned O`inclusion_matrix then
-        O`inclusion_matrix:=MatrixAtoQ(ZBasis(O))^-1; 
+        zO:=ZBasis(O);
+        O`inclusion_matrix:=<MatrixAtoQ(zO)^-1,zO>; 
     end if;
-    return O`inclusion_matrix;
+    assert2 ZBasis(O) eq O`inclusion_matrix[2]; // if the ZBasis(O) is changed and inclusion_matrix is not deleted
+                                                // the assert will fail.
+    return Explode(O`inclusion_matrix);
 end function;
 
 intrinsic 'in'(x::AlgEtQElt,O::AlgEtQOrd) -> BoolElt

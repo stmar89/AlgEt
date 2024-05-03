@@ -269,9 +269,9 @@ intrinsic IsPrincipal(I1::AlgEtQIdl : GRH:=false )->BoolElt, AlgAssElt
         return true, gen_IO*cop^-1;
     end if;
     UO,uO:=UnitGroup(O : GRH:=GRH );
-    //Sgens:=ResidueRingUnitsSubgroupGenerators(F);
-    //B,b:=quo<R|[gen@@r : gen in Sgens]>;
-    B,b:=ResidueRingUnits(F);
+    Sgens:=ResidueRingUnitsSubgroupGenerators(F);
+    B,b:=quo<R|[gen@@r : gen in Sgens]>;
+    //B,b:=ResidueRingUnits(F); // it does't see that it is related to R.
     gens_UO_inB:=[ b(uO(UO.i)@@r) : i in [1..#Generators(UO)]  ];
     h:=hom<UO -> B | gens_UO_inB >;
     hUO:=Image(h);

@@ -24,7 +24,7 @@ magma_script:
 	@echo "The commands will be sorted in the same way as they are listed in the spec file"
 	magma -b input:=${inputAlgEtQ} output_file:=${outfileAlgEtQ} magma_make_list_of_func.txt
 	@echo "...Done"
-	@echo "Printing the new ListOfCommandsAlgEtQ.md."
+	@echo "Printing the new ListOfCommandsAlgEtQMod.md."
 	@echo "The commands will be sorted in the same way as they are listed in the spec file"
 	magma -b input:=${inputAlgEtQMod} output_file:=${outfileAlgEtQMod} magma_make_list_of_func.txt
 	@echo "...Done"

@@ -766,11 +766,14 @@ These are produced by recursively searching for maximal submodules.</em>
 
 ## List of instrinsics in AlgEtQ/CRT.m:
 
+> <pre><b>ChineseRemainderTheorem</b>(I::AlgEtQIdl,J::AlgEtQIdl,a::AlgEtQElt,b::AlgEtQElt)-> AlgEtQElt</pre>
+<em>Given two coprime ideals I and J of S, two elements a,b in S, finds e such that (e-a) in I and (e-b) in J.</em>
+
 > <pre><b>ChineseRemainderTheorem</b>(Is::SeqEnum[AlgEtQIdl],as::SeqEnum[AlgEtQElt])-> AlgEtQElt</pre>
 <em>Given a sequence `Is` of ideals of S, pairwise coprime, and a sequence `as` of elements of S, it returns an element e such that e-as[i] in Is[i] for every i.</em>
 
-> <pre><b>ChineseRemainderTheorem</b>(I::AlgEtQIdl,J::AlgEtQIdl,a::AlgEtQElt,b::AlgEtQElt)-> AlgEtQElt</pre>
-<em>Given two coprime ideals I and J of S, two elements a,b in S, finds e such that (e-a) in I and (e-b) in J.</em>
+> <pre><b>ChineseRemainderTheoremFunctions</b>(Is::SeqEnum[AlgEtQIdl])-> AlgEtQElt</pre>
+<em>Given a sequence `Is` of N ideals of S, pairwise coprime, returns a function S->S^N representing the natural isomorphism S/&\*(Is) -> \prod_(I in Is) S/I and a function S^N-S representing the inverse.</em>
 
 
 ## List of instrinsics in AlgEtQ/PicardGroup.m:
@@ -782,7 +785,7 @@ These are produced by recursively searching for maximal submodules.</em>
 <em>Returns the group (S/I)^\* and a map (S/I)^\* -> S, where S=Order(I) and the multiplicator ring of I is maximal.</em>
 
 > <pre><b>ResidueRingUnitsSubgroupGenerators</b>(F::AlgEtQIdl) -> SeqEnum[AlgEtQElt]</pre>
-<em>Returns generators of (S/F)^\* where F is an ideal of the order S with maximal multiplicator ring.</em>
+<em>Returns generators of (S/F)^\* where F is an ideal of the order S.</em>
 
 > <pre><b>IsPrincipal</b>(I1::AlgEtQIdl : GRH:=false )->BoolElt, AlgAssElt</pre>
 <em>Return if the argument is a principal ideal; if so the function returns also the generator. The optional argument "GRH" decides wheter the bound for the IsPrincipal test should be conditional. The default value is "false".</em>

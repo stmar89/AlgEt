@@ -18,12 +18,16 @@
 > <pre><b>IsIsomorphic</b>(I::AlgEtQMod,J::AlgEtQMod : Method:="Magma") -> BoolElt</pre>
 <em>Given two modules I and J returns wheater they are isomorphic.
 The vararg Method allows to choose if the isomorphism testing is done with "Magma", very slow, or with the Hecke/Nemo package for julia, which is much faster.
-In the latter case, the Method should be of the form "julia path/to/AlgEtQ/", or if Hecke/Nemo has been built,"julia -J /tmp/Hecke.so ~/path/to/AlgEtQ/" (the ".so" might be different according to your SO. See the documentation of Hecke.Build()).</em>
+To use the latter option, install julia, add the package Hecke and build the package.
+Detailed instructions are provided in the example file in the GitHub repository.
+Method should be of the form "julia -J /tmp/Hecke.so ~/path/to/AlgEt/" (the ".so" might be different according to your SO, according to the output of the julia command "Hecke.build()").</em>
 
 > <pre><b>IsomorphismClasses</b>(R::AlgEtQOrd,m::Map : Method:="Magma") -> SeqEnum[AlgEtQMod]</pre>
 <em>Given an order R in some AlgEtQ K, where K acts on some V, by m:K->V, returns representatives of hte isomorphism classes of the S-module lattices in V.
 The vararg Method allows to choose if the isomorphism testing is done with "Magma", very slow, or with the Hecke/Nemo package for julia, which is much faster.
-In the latter case, the Method should be of the form "julia path/to/AlgEtQ/", or if Hecke/Nemo has been built,"julia -J /tmp/Hecke.so ~/path/to/AlgEtQ/" (the ".so" might be different according to your SO. See the documentation of Hecke.Build()).</em>
+To use the latter option, install julia, add the package Hecke and build the package.
+Detailed instructions are provided in the example file in the GitHub repository.
+Method should be of the form "julia -J /tmp/Hecke.so ~/path/to/AlgEt/" (the ".so" might be different according to your SO, according to the output of the julia command "Hecke.build()").</em>
 
 
 ## List of instrinsics in AlgEtQMod/Modules.m:

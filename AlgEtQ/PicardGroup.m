@@ -27,6 +27,7 @@
 freeze;
 
 declare verbose AlgEtQPicardGroup, 3;
+declare verbose ResidueRingUnits, 3;
 
 declare attributes AlgEtQOrd: PicardGroup,
                               UnitGroup;
@@ -41,6 +42,7 @@ intrinsic ResidueRingUnits(S::AlgEtQOrd,I::AlgEtQIdl) -> GrpAb,Map
         require IsMaximal(MultiplicatorRing(I)) : "the ideals needs to have maximal multiplicator ring.";
         maximal_order_case:=function(S,I)
         // if S is maximal
+            vprintf ResidueRingUnits,2 : "ResidueRingUnits, maximal_order_case\n";
             test,I_asProd:=IsProductOfIdeals(I);
             assert test;
             A:=Algebra(S);
@@ -49,16 +51,20 @@ intrinsic ResidueRingUnits(S::AlgEtQOrd,I::AlgEtQIdl) -> GrpAb,Map
             ray_res_rings:=[];
             ray_res_rings_maps:=[**];
             for i in [1..n] do
+                vprintf ResidueRingUnits,2 : "ResidueRingUnits, maximal_order_case: %o-th/%o component...",i,n;
                 IL:=I_asProd[i];
                 OL:=Order(IL);
                 assert IsMaximal(OL);
+                vprintf ResidueRingUnits,2 : "...RayResidueRing...";
                 R,r:=RayResidueRing(IL);
+                vprintf ResidueRingUnits,2 : "...done\n";
                 assert2 forall{ i : i,j in [1..Ngens(R)] | r(R.i+R.j) - r(R.i)*r(R.j) in IL };
                 assert2 forall{ i : i in [1..Ngens(R)] | r(R.i) in OL };
                 Append(~ray_res_rings,R);
                 Append(~ray_res_rings_maps,r);
             end for;
             D,mRD,mDR:=DirectSum(ray_res_rings);
+            vprintf ResidueRingUnits,2 : "ResidueRingUnits, maximal_order_case: DirectSum done\n";
 
             map_ResRing_S:=function(x)
                 return &+[embs[i](ray_res_rings_maps[i](mDR[i](x))) : i in [1..n]];
@@ -71,6 +77,7 @@ intrinsic ResidueRingUnits(S::AlgEtQOrd,I::AlgEtQIdl) -> GrpAb,Map
             end function;
 
             map:=map<D -> A | x:->map_ResRing_S(x) , y:->map_S_ResRing(y) >;
+            vprintf ResidueRingUnits,2 : "ResidueRingUnits, maximal_order_case: map done\n";
             assert2 forall{ gen : gen in Generators(D) | (map(gen))@@map eq gen };
             assert2 forall{ gen : gen in Generators(D) | (map(gen)) in S };
             assert2 forall{ i : i,j in [1..Ngens(D)] | map(D.i+D.j) - map(D.i)*map(D.j) in I};

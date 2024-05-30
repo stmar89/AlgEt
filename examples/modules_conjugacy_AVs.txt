@@ -29,7 +29,11 @@
 
     Here are the instructions to use the hybrid Magma+julia option (on Unix):
     - install julia
-    - add julia to path (eg. add the line "PATH="$PATH:/home/username/julia-1.7.3/bin/julia-1.7.3/bin"; export PATH" to your .bashrc) and restart the system.
+    - add julia to the PATH variable
+        eg. modify and add the line "PATH="$PATH:/home/username/julia-1.7.3/bin/julia-1.7.3/bin"; export PATH" to your .bashrc
+            then run "source .bashrc" or restart your system.
+            to make sure: the following command in Magma, should not trigger an error
+            > Pipe("julia","");
     - open julia and run the following code (the last command might take a while, but it will make every future startup of julia+Hecke much faster).
     julia> using Pkg
     julia> Pkg.add("Hecke")
@@ -104,9 +108,8 @@ m:=NaturalAction(K,V); // m:K -> V component-wise diagonal action of K on V
 // To run the Magma-only version of the code, use the following line:
 time classes:=IsomorphismClasses(R,m); // Attention! This is very slow!
 
-// To use the hybrid Magma-julia version use the following line after having followed the instructions given at the top of this file.
-time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/AlgEtQMod/"); // changes this line accordingly to wheter you have used Hecke.Build() or not,
-                                                                                                   // and to the appriopriate path to the the packages AlgEt
+// To use the hybrid Magma-julia version, follow the instrucions above and then run
+time classes:=IsomorphismClasses(R,m : Method:="julia -J " cat julia_compiled cat " " cat path cat "AlgEtQMod/");
                                                                                                    // It should take ~200 secs
 #classes;
 // By Theorem 4.1, they correspond to the conjugacy classes of matrices with with minimal polynomial m1*m2 and characteristic polynomial h.

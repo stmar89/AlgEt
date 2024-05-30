@@ -1,7 +1,7 @@
 /* vim: set syntax=magma :*/
 
 /////////////////////////////////////////////////////
-// Stefano Marseglia, Utrecht University, stefano.marseglia89@gmail.com
+// Stefano Marseglia, stefano.marseglia89@gmail.com
 // https://stmar89.github.io/index.html
 /////////////////////////////////////////////////////
 
@@ -41,6 +41,8 @@
     julia> Hecke.build()
     - Take note of the path which is printed out (something like "/tmp/Hecke.so" or "/tmp/Hecke.dylib") and change it in the variable "julia_compiled" below.
     
+    The code was last tested on May 30, 2024, on Magma V2.28-8, julia 1.7.3, Hecke 0.14.13.
+
 */
 
 // Before strating with the examples, modify the following line and attach the packages AlgEt and AlgEtMod

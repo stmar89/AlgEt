@@ -11,27 +11,44 @@
         Stefano Marseglia
         https://arxiv.org/abs/2208.05409
     One needs several functionalities for étale algebra.
-    Please download the following repository on your machine:
+    Please clone the following repository on your machine:
         https://github.com/stmar89/AlgEt
 
-    WARNING:.
-    The isomorphism testing (IsIsomorphic) with the Method Magma is based on results from 
+    WARNING:
+    The isomorphism testing (IsIsomorphic) and the computation of the isomorphism classes (IsomorphismClasses) 
+    with the Method Magma is based on results from 
         "The conjugacy problem in GL(n, Z)", T. Hofmann, B. Eick and E. A. O’Brien, J. Lond. Math. Soc. (2) 100 (2019), no. 3, 731–756.
-    and the corresponding implementation of their code, which is in MAGMA.
+    and the corresponding implementation of their code, which is included in Magma.
+
+
     In the paper, we suggest to use instead to use the results from
-        "Computation of lattice isomorphisms and the integral matrix similarity problem", T. Hofmann, W. Bley and H. Johnston,
+        "Computation of lattice isomorphisms and the integral matrix similarity problem", T. Hofmann, W. Bley and H. Johnston, Forum Math. Sigma, 10:Paper No. e87, 36, 2022
         https://arxiv.org/abs/2202.03526
-    Their code at the moment is not implemented in MAGMA, but only in julia package Hecke/Nemo. Requires julia 1.7.0 or higher and Hecke http://www.thofma.com/Hecke.jl/dev/ 
-    See below for instructions.
+    Their code at the moment is not implemented in MAGMA, but only in the julia package Hecke/Nemo. 
+    Requires julia 1.7.0 or higher and Hecke http://www.thofma.com/Hecke.jl/dev/ 
+
+    Here are the instructions to use the hybrid Magma+julia option (on Unix):
+    - install julia
+    - add julia to path (eg. add the line "PATH="$PATH:/home/username/julia-1.7.3/bin/julia-1.7.3/bin"; export PATH" to your .bashrc) and restart the system.
+    - open julia and run the following code (the last command might take a while, but it will make every future startup of julia+Hecke much faster).
+    julia> using Pkg
+    julia> Pkg.add("Hecke")
+    julia> using Hecke
+    julia> Hecke.build()
+    - Take note of the path which is printed out (something like "/tmp/Hecke.so" or "/tmp/Hecke.dylib") and change it in the variable "julia_compiled" below.
+    
 */
+
+// Before strating with the examples, modify the following line and attach the packages AlgEt and AlgEtMod
+
+path:="~/AlgEt/"; // Put here the path where you have cloned the repo AlgEt
+julia_compiled:="/tmp/Hecke.so"; //modify this according to the output of Hecke.build, as explained above.
+AttachSpec(path cat "spec");
+AttachSpec(path cat "specMod");
 
 // ###################
 // ### Example 6.1 ###
 // ###################
-
-// Modify the following lines with the folder where you have downloaded the repository https://github.com/stmar89/AlgEt
-AttachSpec("~/packages_github/AlgEt/spec");
-AttachSpec("~/packages_github/AlgEt/specMod");
 
 _<x>:=PolynomialRing(Integers());
 m1:=x^2-x+3;
@@ -44,18 +61,21 @@ q:=Integers() ! Truncate( ConstantCoefficient(h)^(2/Degree(h)) );
 K1:=NumberField(m1);
 K2:=NumberField(m2);
 K:=EtaleAlgebra([K1,K2]); // K = K1 x K2
-pi:=PrimitiveElement(K); //
+pi:=PrimitiveElement(K);
 R:=Order([pi,q/pi]);
 O:=MaximalOrder(K);
 V:=EtaleAlgebra([K1,K1,K2]); // V = K1^s1 x K2^s2
 m:=NaturalAction(K,V); // m:K -> V component-wise diagonal action of K on V
-time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/AlgEtQMod/"); // changes this line accordingly to wheter you have used Hecke.Build() or not,
-                                                                                                   // and to the appriopriate path to the the packages AlgEt. 
+
+// To run the Magma-only version of the code, use the following line:
+time classes:=IsomorphismClasses(R,m); //~1 minute
+
+// To use the hybrid Magma-julia version, follow the instrucions above and then run
+time classes:=IsomorphismClasses(R,m : Method:="julia -J " cat julia_compiled cat " " cat path cat "AlgEtQMod/");
                                                                                                    // It should take ~12 seconds.
 #classes;
 // classes now contains the representatives of the isomorphism classes of the sub-R-modules of V.
 // By Theorem 5.1, they correspond to the Fq-isomorphism classes of abelian varieties in the isogeny class determined by h.
-
 
 
 
@@ -64,10 +84,6 @@ time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/package
 // ###################
 // We want to find the representatives of the conjugacy classes of integral matrices with minimal polynomial m1*m2 and characteristic polynomial h.
 // This code is essentially the same of the one from the previous example, but replacing R=Z[pi,q/pi] with R=Z[pi]. Since E is smaller than R, there will be more candidates. So this computation will take more time to run than the previous one.
-
-// Modify the following lines with the folder where you have downloaded the repository https://github.com/stmar89/AlgEt
-AttachSpec("~/packages_github/AlgEt/spec");
-AttachSpec("~/packages_github/AlgEt/specMod");
 
 _<x>:=PolynomialRing(Integers());
 m1:=x^2-x+3;
@@ -83,6 +99,12 @@ R:=Order([pi]);
 O:=MaximalOrder(K);
 V:=EtaleAlgebra([K1,K1,K2]); // V = K1^s1 x K2^s2
 m:=NaturalAction(K,V); // m:K -> V component-wise diagonal action of K on V
+
+
+// To run the Magma-only version of the code, use the following line:
+time classes:=IsomorphismClasses(R,m); // Attention! This is very slow!
+
+// To use the hybrid Magma-julia version use the following line after having followed the instructions given at the top of this file.
 time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/AlgEtQMod/"); // changes this line accordingly to wheter you have used Hecke.Build() or not,
                                                                                                    // and to the appriopriate path to the the packages AlgEt
                                                                                                    // It should take ~200 secs

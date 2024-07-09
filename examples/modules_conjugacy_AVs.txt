@@ -45,7 +45,7 @@
 
 */
 
-// Before strating with the examples, modify the following line and attach the packages AlgEt and AlgEtMod
+// Before starting with the examples, modify the following line and attach the packages AlgEt and AlgEtMod
 
 path:="~/AlgEt/"; // Put here the path where you have cloned the repo AlgEt
 julia_compiled:="/tmp/Hecke.so"; //modify this according to the output of Hecke.build, as explained above.

@@ -53,12 +53,12 @@ end intrinsic;
 //------------
 
 intrinsic Parent(x::AlgEtQElt) -> AlgEtQ
-{Returns the algebra to which the elemenet belongs to.}
+{Returns the algebra to which the element belongs to.}
   return x`Algebra;
 end intrinsic;
 
 intrinsic Algebra(x::AlgEtQElt) -> AlgEtQ
-{Returns the algebra to which the elemenet belongs to.}
+{Returns the algebra to which the element belongs to.}
   return x`Algebra;
 end intrinsic;
 
@@ -92,6 +92,9 @@ intrinsic IsCoercible(A::AlgEtQ, x::.) -> BoolElt, .
     if Parent(x) cmpeq A then
         return true,x;
     elif Type(x) in {List,Tup,SeqEnum} then
+        if #x ne #Components(A) then
+            return false,"";
+        end if;
         comp:=<>;
         for i in [1..#x] do
             t,xi:=IsCoercible(Components(A)[i],x[i]); 

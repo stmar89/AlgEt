@@ -1,7 +1,7 @@
 /* vim: set syntax=magma :*/
 
 /////////////////////////////////////////////////////
-// Stefano Marseglia, Utrecht University, stefano.marseglia89@gmail.com
+// Stefano Marseglia, stefano.marseglia89@gmail.com
 // https://stmar89.github.io/index.html
 // 
 // Distributed under the terms of the GNU Lesser General Public License (L-GPL)
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA
 // 
-// Copyright 2023, S. Marseglia
+// Copyright 2024, S. Marseglia
 /////////////////////////////////////////////////////
 
 freeze;

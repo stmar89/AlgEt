@@ -1,5 +1,5 @@
 ############################################################# 
-# Stefano Marseglia, Utrecht University, stefano.marseglia89@gmail.com
+# Stefano Marseglia, stefano.marseglia89@gmail.com
 # https://stmar89.github.io/index.html
 #############################################################
 # Requires julia 1.7.0 or higher and Hecke

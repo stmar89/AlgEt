@@ -1,7 +1,7 @@
 /* vim: set syntax=magma :*/
 
 /////////////////////////////////////////////////////
-// Stefano Marseglia, Utrecht University, stefano.marseglia89@gmail.com
+// Stefano Marseglia, stefano.marseglia89@gmail.com
 // https://stmar89.github.io/index.html
 // 
 // Distributed under the terms of the GNU Lesser General Public License (L-GPL)
@@ -21,7 +21,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA
 // 
-// Copyright 2023, S. Marseglia
+// Copyright 2024, S. Marseglia
 /////////////////////////////////////////////////////
 
 freeze;
@@ -36,7 +36,6 @@ declare type AlgEtQMod;
 declare attributes AlgEtQMod : Index, //stores the index
                               Order, // an order R
                               UniverseAlgebra, // A pair <V,m> where V is the algebra where M lives in, and m is the action Algebra(R)->V
-                              //MultiplicatorRing,
                               Generators,
                               ZBasis,
                               IsDirectSumOfIdeals,
@@ -109,11 +108,42 @@ intrinsic Module(S::AlgEtQOrd,m::Map,idls::Tup) -> AlgEtQMod
     return I;
 end intrinsic;
 
+intrinsic ModuleFromDirectSum(R::AlgEtQOrd,m::Map,seq::SeqEnum[Tup])->AlgEtQMod
+{Let K and V be AlgEtQ such that m:K->V is a K-module. Let R be an order and a map m:Algebra(R)->A, where A is an algebra isomorphic to Algebra(R)^s. Let seq be a sequence of pairs <J,v> where J is a fractional R ideal and v is either an element of A or a map v:Algebra(J)->A. It returns the AlgEtQMod M=J1v1+J2v2+...Jsvs (in the first case) or J1v1(1)+...+Jsvs(1) (in the second case).}
+    is_pure_power,ones:=IsPurePower(m);
+    require is_pure_power : "The universe algebra is not of the form K^r";
+    AR:=Algebra(R);
+    UA:=Codomain(m);
+    assert m(One(AR)) eq One(UA);
+    require AR eq Domain(m) : "the map does not have Algebra(R) as codomain";
+    require forall{I : I in seq | Order(I[1]) eq R } : "the fractional ideals are not R ideals";
+    if forall{I : I in seq | Type(I[2]) eq Map } then
+        require forall{I : I in seq | Domain(I[2]) eq AR and Codomain(I[2]) eq UA } : "the sequence is not valid for this constructor";
+        //in this case the given seq is the DirectSumRep of the module
+        gens:=&cat[ [ I[2](z) : z in ZBasis(I[1]) ] : I in seq ];
+        dsr:=seq;
+    elif forall{I : I in seq | Type(I[2]) eq AlgEtQElt } then 
+        require forall{I : I in seq | Parent(I[2]) eq UA } : "the sequence is not valid for this constructor";
+        dsr:=[];
+        gens:=[];
+        basisAR:=AbsoluteBasis(AR);
+        for I in seq do 
+            mI:=Hom(AR,UA,[m(basisAR[i])*I[2] : i in [1..Dimension(AR)] ] : ComputeInverse:=false);  //map that sends one to I[2] 
+            Append(~dsr,<I,mI>);
+            gens cat:=[ mI(z) : z in ZBasis(I[1]) ];
+        end for;
+    else
+        error "the sequence is not valid for this constructor";
+    end if;
+    require Dimension(UA) eq Rank(MatrixAtoQ(gens)) : "gens do not generater a Z-module of full rank";
+    M:=Module(R,m,gens);
+    return M;
+end intrinsic;
+
 intrinsic Print(I::AlgEtQMod)
 {Prints the module.}
   printf"Module over %o", Order(I);
 end intrinsic;
-
 
 //----------
 // Natural Action

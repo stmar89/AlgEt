@@ -24,7 +24,7 @@
 // Copyright 2024, S. Marseglia
 /////////////////////////////////////////////////////
 
-// freeze;
+freeze;
 
 /*
     Write the étale algebra as K=K1x...xKn with each Ki a number field.

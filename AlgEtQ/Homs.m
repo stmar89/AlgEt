@@ -30,7 +30,7 @@ declare verbose AlgEtQHoms, 1;
 
 declare attributes AlgEtQ : HomsToC;
 
-import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQtoA , meet_zbasis , inclusion_matrix;
+import "Ord.m" : MatrixAtoQ , MatrixQtoA;
 
 //------------
 // Homomorphism to the Complex Numbers
@@ -53,7 +53,7 @@ end intrinsic;
 // Homomorphism between AlgEtQ
 //------------
 
-intrinsic Hom(A::AlgEtQ , B::AlgEtQ , img::SeqEnum[AlgEtQElt] : CheckMultiplicative:=true, CheckUnital:=false, ComputeInverse:=true)->Map
+intrinsic Hom(A::AlgEtQ , B::AlgEtQ , img::SeqEnum[AlgEtQElt] : CheckMultiplicative:=false, CheckUnital:=false, ComputeInverse:=true)->Map
 {Given two étale algebras A and B and a sequence img of elements of B, returns the Q-algbra homomorphism defined by sending the AbsoluteBasis of A to img. The VarArg CheckMultiplicative determines if the multiplicativity of the defined map is checked, while the VarArg CheckUnital determines wheter One(A) is sent to One(B). If the VarArg ComputeInverse is true, it checkes whether the map is invertible and, if so, it defines also the inverse (by assigning preimages).}
     basis:=AbsoluteBasis(A);
     require forall{x : x in img | x in B} and #img eq #basis : "the images do not defined an additive map.";
@@ -64,7 +64,7 @@ intrinsic Hom(A::AlgEtQ , B::AlgEtQ , img::SeqEnum[AlgEtQElt] : CheckMultiplicat
     has_inverse:=false;
     if ComputeInverse then 
         mm:=MatrixAtoQ(img);
-        has_inverse:=NumberOfRows(mm) eq NumberOfColumns(mm) and Determinant(mm) ne 0;
+        has_inverse:=Rank(mm) eq AbsoluteDimension(A) and AbsoluteDimension(A) eq AbsoluteDimension(B);
     end if;
 
     if has_inverse then
@@ -111,7 +111,7 @@ end intrinsic;
     aut:=[ Automorphisms(K) : K in Components(B) ];
     aut:=[ Random(a) : a in aut ];
     img:=[ B!<aut[i](Components(a)[i]) : i in [1..#aut] > : a in AbsoluteBasis(B) ];
-    aut:=Hom(B,B,img: CheckUnital:=true);
+    aut:=Hom(B,B,img: CheckMultiplicative:=true, CheckUnital:=true);
     inv:=Inverse(aut);
     assert forall{ b : b in AbsoluteBasis(B) | (inv*aut)(b) eq b and (aut*inv)(b) eq b};
     printf " all good!\n"; 

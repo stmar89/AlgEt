@@ -49,25 +49,6 @@ time_start:=Cputime();
 
 
 
-    printf "### Testing Homs:";
-    //AttachSpec("~/packages_github/AlgEt/spec");
-    _<x>:=PolynomialRing(Integers());
-    f:=(x^8+16)*(x^8+81);
-    A:=EtaleAlgebra(f);
-    homs:=HomsToC(A);
-    a:=PrimitiveElement(A);
-    assert &and[ Abs(Evaluate(f,h(a))) lt 10^-20 : h in homs ];
-    old_prec:=Precision(Codomain(homs[1]));
-    new_prec:=10*old_prec;
-    homs:=HomsToC(A : Prec:=new_prec);
-    assert Precision(Codomain(homs[1])) eq new_prec;
-    printf " all good!\n"; 
-
-
-
-
-
-
     printf "### Testing Elements:";
     //AttachSpec("~/packages_github/AlgEt/spec");
     SetVerbose("AlgEtQElt",2);
@@ -157,6 +138,70 @@ time_start:=Cputime();
     assert s1 eq s2 and s1 eq s3 and s1 eq s4;
 
     printf " all good!\n"; 
+
+
+
+
+
+
+    printf "### Testing Homs:";
+    //AttachSpec("~/packages_github/AlgEt/spec");
+    _<x>:=PolynomialRing(Integers());
+    f:=(x^8+16)*(x^8+81);
+    A:=EtaleAlgebra(f);
+    homs:=HomsToC(A);
+    a:=PrimitiveElement(A);
+    assert &and[ Abs(Evaluate(f,h(a))) lt 10^-20 : h in homs ];
+    printf ".";
+    old_prec:=Precision(Codomain(homs[1]));
+    new_prec:=10*old_prec;
+    homs:=HomsToC(A : Prec:=new_prec);
+    assert Precision(Codomain(homs[1])) eq new_prec;
+    printf ".";
+    B:=EtaleAlgebra(Components(A) cat [NumberField(x^2+2)]);
+    img:=[ B!(Components(b) cat <0>) : b in AbsoluteBasis(A) ];
+    incl:=Hom(A,B,img : CheckMultiplicative:=true );
+    assert incl(One(A)) ne One(B);
+    printf ".";
+    assert forall{ a : a in AbsoluteBasis(A) | MinimalPolynomial(incl(a)) eq MinimalPolynomial(a)};
+    printf ".";
+    aut:=[ Automorphisms(K) : K in Components(B) ];
+    aut:=[ Random(a) : a in aut ];
+    img:=[ B!<aut[i](Components(a)[i]) : i in [1..#aut] > : a in AbsoluteBasis(B) ];
+    aut:=Hom(B,B,img: CheckMultiplicative:=true, CheckUnital:=true);
+    inv:=Inverse(aut);
+    assert forall{ b : b in AbsoluteBasis(B) | (inv*aut)(b) eq b and (aut*inv)(b) eq b};
+    printf ".";
+    A:=EtaleAlgebra(x^2+x+2);
+    B:=EtaleAlgebra(x^2-x+2);
+    pi:=PrimitiveElement(B);
+    m:=Hom(A,B,[(-pi)^i : i in [0..Dimension(B)-1]]);
+    assert Inverse(m)(pi) eq -PrimitiveElement(A);
+    assert m(One(A)) eq One(B) and Inverse(m)(One(B)) eq One(A);
+    printf ".";
+    printf " all good!\n"; 
+
+
+
+
+
+
+    printf "### Testing DirectProduct:";
+    //AttachSpec("~/AlgEt/spec");
+    SetAssertions(2);
+    _<x>:=PolynomialRing(Integers());
+    seq:=[x^2-5,x^2-7,x^2-5,x^2-11,x^3+x+1];
+    seq:=[NumberField(f) : f in seq];
+    A:=EtaleAlgebra(seq);
+    _,_,_:=DirectProduct([A,A,A]);
+    printf ".";
+
+    B:=EtaleAlgebra([NumberField(x^8+16),NumberField(x^3+x+1)]);
+    _,_,_:=DirectProduct([A,B]);
+    printf ".";
+    
+    SetAssertions(1);
+    printf " all good!\n";
 
 
 

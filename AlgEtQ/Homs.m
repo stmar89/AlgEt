@@ -68,7 +68,7 @@ intrinsic Hom(A::AlgEtQ , B::AlgEtQ , img::SeqEnum[AlgEtQElt] : CheckMultiplicat
     end if;
 
     if has_inverse then
-        img_inv:=MatrixQtoA(B,mm^-1);
+        img_inv:=MatrixQtoA(A,mm^-1);
         preimage:=function(y)
             return SumOfProducts(AbsoluteCoordinates(y),img_inv);
         end function;
@@ -99,21 +99,33 @@ end intrinsic;
     homs:=HomsToC(A);
     a:=PrimitiveElement(A);
     assert &and[ Abs(Evaluate(f,h(a))) lt 10^-20 : h in homs ];
+    printf ".";
     old_prec:=Precision(Codomain(homs[1]));
     new_prec:=10*old_prec;
     homs:=HomsToC(A : Prec:=new_prec);
     assert Precision(Codomain(homs[1])) eq new_prec;
+    printf ".";
     B:=EtaleAlgebra(Components(A) cat [NumberField(x^2+2)]);
     img:=[ B!(Components(b) cat <0>) : b in AbsoluteBasis(A) ];
     incl:=Hom(A,B,img : CheckMultiplicative:=true );
     assert incl(One(A)) ne One(B);
+    printf ".";
     assert forall{ a : a in AbsoluteBasis(A) | MinimalPolynomial(incl(a)) eq MinimalPolynomial(a)};
+    printf ".";
     aut:=[ Automorphisms(K) : K in Components(B) ];
     aut:=[ Random(a) : a in aut ];
     img:=[ B!<aut[i](Components(a)[i]) : i in [1..#aut] > : a in AbsoluteBasis(B) ];
     aut:=Hom(B,B,img: CheckMultiplicative:=true, CheckUnital:=true);
     inv:=Inverse(aut);
     assert forall{ b : b in AbsoluteBasis(B) | (inv*aut)(b) eq b and (aut*inv)(b) eq b};
+    printf ".";
+    A:=EtaleAlgebra(x^2+x+2);
+    B:=EtaleAlgebra(x^2-x+2);
+    pi:=PrimitiveElement(B);
+    m:=Hom(A,B,[(-pi)^i : i in [0..Dimension(B)-1]]);
+    assert Inverse(m)(pi) eq -PrimitiveElement(A);
+    assert m(One(A)) eq One(B) and Inverse(m)(One(B)) eq One(A);
+    printf ".";
     printf " all good!\n"; 
 
 */

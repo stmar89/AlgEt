@@ -55,6 +55,12 @@ declare attributes AlgEtQMtrx :
 
 intrinsic Print(x::AlgEtQMtrx)
 {Print the element.}
+    /*
+    if not assigned x`Entries then
+        assert assigned x`Components;
+        print Components(x);
+    end if;
+    */
     Q:=Entries(x);
     Q:=[ [ &cat(Split(Sprint(e)," ")) : e in seq ] : seq in Q ];
     max:=Max([ #s : s in Flat(Q) ]);
@@ -146,6 +152,7 @@ CreateMtrxFromComponents:=function(A,comp)
     s:=NumberOfRows(comp[1]);
     r:=NumberOfColumns(comp[1]);
     assert forall{ c : c in comp | NumberOfRows(c) eq s and NumberOfColumns(c) eq r };
+    assert Type(A) eq AlgEtQ;
     x:=New(AlgEtQMtrx);
     x`Universe:=A;
     x`NumberOfRows:=s;
@@ -278,8 +285,8 @@ end intrinsic;
 // eq 
 intrinsic 'eq'(x1::AlgEtQMtrx,x2::AlgEtQMtrx) -> BoolElt
 {Is x1=x2 ?}
-    A:=Parent(x1);
-    require A cmpeq Parent(x2): "The matrices are not defined over the same algebra.";
+    A:=Universe(x1);
+    require A cmpeq Universe(x2): "The matrices are not defined over the same algebra.";
     if assigned x1`Components and assigned x2`Components then // matrix operations are only on components.
                                                               // it is more likely that entries are not assigned.
         return Components(x1) eq Components(x2);
@@ -292,8 +299,8 @@ end intrinsic;
 // // using the components, as below, is faster!
 // intrinsic '+'(x1::AlgEtQMtrx,x2::AlgEtQMtrx) -> AlgEtQMtrx
 // {x1+x2.}
-//     A:=Parent(x1);
-//     require A cmpeq Parent(x2): "The matrices are not defined over the same algebra.";
+//     A:=Universe(x1);
+//     require A cmpeq Universe(x2): "The matrices are not defined over the same algebra.";
 //     s:=NumberOfRows(x1);
 //     r:=NumberOfColumns(x1);
 //     sr:=s*r;
@@ -307,7 +314,7 @@ end intrinsic;
 // // -
 // intrinsic '-'(x1::AlgEtQMtrx) -> AlgEtQMtrx
 // {-x1.}
-//     A:=Parent(x1);
+//     A:=Universe(x1);
 //     s:=NumberOfRows(x1);
 //     r:=NumberOfColumns(x1);
 //     sr:=s*r;
@@ -318,8 +325,8 @@ end intrinsic;
 // 
 // intrinsic '-'(x1::AlgEtQMtrx,x2::AlgEtQMtrx) -> AlgEtQMtrx
 // {x1-x2.}
-//     A:=Parent(x1);
-//     require A cmpeq Parent(x2): "The matrices are not defined over the same algebra.";
+//     A:=Universe(x1);
+//     require A cmpeq Universe(x2): "The matrices are not defined over the same algebra.";
 //     s:=NumberOfRows(x1);
 //     r:=NumberOfColumns(x1);
 //     sr:=s*r;
@@ -333,8 +340,8 @@ end intrinsic;
 // // *
 // intrinsic '*'(x1::AlgEtQMtrx,x2::AlgEtQMtrx) -> AlgEtQMtrx
 // {x1*x2.}
-//     A:=Parent(x1);
-//     require A cmpeq Parent(x2): "The elements must belong to the same algebra.";
+//     A:=Universe(x1);
+//     require A cmpeq Universe(x2): "The elements must belong to the same algebra.";
 //     require NumberOfColumns(x1) eq NumberOfRows(x2) : "The matrices have the wrong sizes.";
 //     s:=NumberOfRows(x1);
 //     r:=NumberOfColumns(x2);
@@ -349,8 +356,8 @@ end intrinsic;
 // +
 intrinsic '+'(x1::AlgEtQMtrx,x2::AlgEtQMtrx) -> AlgEtQMtrx
 {x1+x2.}
-    A:=Parent(x1);
-    require A cmpeq Parent(x2): "The matrices are not defined over the same algebra.";
+    A:=Universe(x1);
+    require A cmpeq Universe(x2): "The matrices are not defined over the same algebra.";
     comp1:=Components(x1);
     comp2:=Components(x2);
     return CreateMtrxFromComponents(A,<comp1[i]+comp2[i] : i in [1..#comp1]> );
@@ -359,14 +366,14 @@ end intrinsic;
 // -
 intrinsic '-'(x1::AlgEtQMtrx) -> AlgEtQMtrx
 {-x1.}
-    A:=Parent(x1);
+    A:=Universe(x1);
     return CreateMtrxFromComponents(A,<-c : c in Components(x1)>);
 end intrinsic;
 
 intrinsic '-'(x1::AlgEtQMtrx,x2::AlgEtQMtrx) -> AlgEtQMtrx
 {x1-x2.}
-    A:=Parent(x1);
-    require A cmpeq Parent(x2): "The matrices are not defined over the same algebra.";
+    A:=Universe(x1);
+    require A cmpeq Universe(x2): "The matrices are not defined over the same algebra.";
     comp1:=Components(x1);
     comp2:=Components(x2);
     return CreateMtrxFromComponents(A,<comp1[i]-comp2[i] : i in [1..#comp1]> );
@@ -375,8 +382,8 @@ end intrinsic;
 // *
 intrinsic '*'(x1::AlgEtQMtrx,x2::AlgEtQMtrx) -> AlgEtQMtrx
 {x1*x2.}
-    A:=Parent(x1);
-    require A cmpeq Parent(x2): "The matrices are not defined over the same algebra.";
+    A:=Universe(x1);
+    require A cmpeq Universe(x2): "The matrices are not defined over the same algebra.";
     comp1:=Components(x1);
     comp2:=Components(x2);
     return CreateMtrxFromComponents(A,<comp1[i]*comp2[i] : i in [1..#comp1]> );
@@ -476,6 +483,34 @@ intrinsic '&*'(seq::SeqEnum[AlgEtQMtrx]) -> AlgEtQMtrx
         out:=CreateMtrxFromComponents(Universe(seq[1]),comps);
     end if;
     return out;
+end intrinsic;
+
+//------------
+// InsertBlock
+//------------
+
+intrinsic InsertBlock(x::AlgEtQMtrx,y::AlgEtQMtrx,i::RngIntElt,j::RngIntElt) -> AlgEtQMtrx
+{Return the matrix obtained by inserting matrix Y in X at position [i,j].}
+    A:=Universe(x);
+    x:=Components(x);
+    y:=Components(y);
+    n:=#x;
+    z:=<InsertBlock(x[k],y[k],i,j) : k in [1..n]>;
+    return CreateMtrxFromComponents(A,z);
+end intrinsic;
+
+//------------
+// Solution
+//------------
+
+intrinsic Solution(x::AlgEtQMtrx,y::AlgEtQMtrx)->AlgEtQMtrx
+{Returns a solution V to the system V.x=y.}
+    A:=Universe(x);
+    N:=#Components(x);
+    x:=Components(x);
+    y:=Components(y);
+    comps:=< Solution(x[i],y[i]) : i in [1..N] >;
+    return CreateMtrxFromComponents(A,comps);
 end intrinsic;
 
 /*

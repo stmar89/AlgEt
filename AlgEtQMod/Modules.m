@@ -43,6 +43,7 @@ declare attributes AlgEtQMod : Index, //stores the index
                               inclusion_matrix;
 
 import "../AlgEtQ/Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQtoA , meet_zbasis , inclusion_matrix;
+import "PowerBass.m" : is_pure_power_internal;
 
 /*TODO
 */
@@ -110,7 +111,7 @@ end intrinsic;
 
 intrinsic ModuleFromDirectSum(R::AlgEtQOrd,m::Map,seq::SeqEnum[Tup])->AlgEtQMod
 {Let K and V be AlgEtQ such that m:K->V is a K-module. Let R be an order and a map m:Algebra(R)->A, where A is an algebra isomorphic to Algebra(R)^s. Let seq be a sequence of pairs <J,v> where J is a fractional R ideal and v is either an element of A or a map v:Algebra(J)->A. It returns the AlgEtQMod M=J1v1+J2v2+...Jsvs (in the first case) or J1v1(1)+...+Jsvs(1) (in the second case).}
-    is_pure_power,ones:=IsPurePower(m);
+    is_pure_power,ones:=is_pure_power_internal(m);
     require is_pure_power : "The universe algebra is not of the form K^r";
     AR:=Algebra(R);
     UA:=Codomain(m);

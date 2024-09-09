@@ -245,7 +245,7 @@ IsPrincipal_prod_internal:=function( II , GRH )
     return true,gen;
 end function;
 
-intrinsic IsPrincipal(I1::AlgEtQIdl : GRH:=false )->BoolElt, AlgAssElt
+intrinsic IsPrincipal(I1::AlgEtQIdl : GRH:=false )->BoolElt, AlgEtQElt
 {Return if the argument is a principal ideal; if so the function returns also the generator. The optional argument "GRH" decides wheter the bound for the IsPrincipal test should be conditional. The default value is "false".}
     if not IsInvertible(I1) then return false,_; end if;
     if #Generators(I1) eq 1 then return true,Generators(I1)[1]; end if;
@@ -610,7 +610,7 @@ intrinsic UnitGroup(S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
     return P,p;
 end intrinsic;
 
-intrinsic IsIsomorphic(I::AlgEtQIdl, J::AlgEtQIdl : GRH:=false ) -> BoolElt, AlgAssElt
+intrinsic IsIsomorphic(I::AlgEtQIdl, J::AlgEtQIdl : GRH:=false ) -> BoolElt, AlgEtQElt
 {Checks if I=x*J, for some x. If so, also x is returned. The optional argument "GRH" decides wheter the bound for the IsPrincipal test should be conditional. The default value is "false".}
     test:=IsWeakEquivalent(I,J); //if so I=(I:J)*J and (I:J) is invertible in its MultiplicatorRing
     if test then

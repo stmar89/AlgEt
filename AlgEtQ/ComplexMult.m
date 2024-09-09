@@ -76,7 +76,7 @@ end intrinsic;
 
 intrinsic Print( PHI :: AlgEtQCMType)
 {Print the AlgEtQCMType.}
-    printf "CMType of the Associative Algebra %o determined by the element %o",Domain(Homs(PHI)[1]),CMPositiveElement(PHI);
+    printf "CMType of the Etale Algebra %o determined by the element %o",Domain(Homs(PHI)[1]),CMPositiveElement(PHI);
 end intrinsic;
 
 intrinsic CMPositiveElement( PHI::AlgEtQCMType )->AlgEtQElt

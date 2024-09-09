@@ -98,7 +98,7 @@ intrinsic Factorization(I::AlgEtQIdl) -> Tup
      return I`Factorization;
 end intrinsic;
 
-intrinsic PrimesAbove(I::AlgEtQIdl) -> SeqEnum[AlgAssEtOrdIdl]
+intrinsic PrimesAbove(I::AlgEtQIdl) -> SeqEnum[AlgEtQOrdIdl]
 {Given an integral S-ideal, returns the sequence of maximal ideals P of S above I.}
     require IsIntegral(I): "the ideal must be integral";
     if not assigned I`PrimesAbove then
@@ -135,7 +135,7 @@ intrinsic PrimesAbove(I::AlgEtQIdl) -> SeqEnum[AlgAssEtOrdIdl]
     return I`PrimesAbove;
 end intrinsic;
 
-intrinsic SingularPrimes(R::AlgEtQOrd) -> SeqEnum[AlgAssEtOrdIdl]
+intrinsic SingularPrimes(R::AlgEtQOrd) -> SeqEnum[AlgEtQOrdIdl]
 {Returns the non-invertible primes of the order.}
     if not assigned R`SingularPrimes then
         R`SingularPrimes:=PrimesAbove(Conductor(R));

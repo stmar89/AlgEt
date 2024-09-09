@@ -28,6 +28,9 @@ freeze;
 
 declare verbose IsomModules, 2;
 
+import "../AlgEtQ/Ord.m" : crQZ,crZQ,Columns;
+import "PowerBass.m" : is_pure_power_internal;
+
 /* TODO
 
 */
@@ -36,19 +39,48 @@ declare verbose IsomModules, 2;
 // Isomorphism Testing for modules
 //------------
 
-intrinsic IsIsomorphic(I::AlgEtQMod,J::AlgEtQMod : Method:="Magma") -> BoolElt
+intrinsic IsIsomorphic(I::AlgEtQMod,J::AlgEtQMod : Method:="Magma",UseSpecializedMethod:=true) -> BoolElt
 {Given two modules I and J returns wheater they are isomorphic.
+The vararg UseSpecializedMethod (default true) triggers the use of specialized code in the following two special cases: when I and J are fractional ideals, or when they are modules in V over a Bass order S in K with V = K^s for some s.
 The vararg Method allows to choose if the isomorphism testing is done with "Magma", very slow, or with the Hecke/Nemo package for julia, which is much faster.
 To use the latter option, install julia, add the package Hecke and build the package.
 Detailed instructions are provided in the example file in the GitHub repository.
 Method should be of the form "julia -J /tmp/Hecke.so ~/path/to/AlgEt/" (the ".so" might be different according to your SO, according to the output of the julia command "Hecke.build()").}
+//TODO return also the isomorphism. Below there are some comments about it. Add it above as well.
+
     require Method eq "Magma" or Method[1..5] eq "julia" : "Method should be Magma or julia or a string of julia command";
     V,m:=UniverseAlgebra(I);
-    VJ,mJ:=UniverseAlgebra(I);
+    VJ,mJ:=UniverseAlgebra(J);
     S:=Order(I);
-    require S eq Order(J) : "The ideals must be over the same order";
+    require S eq Order(J) : "The modules must be over the same order";
     require V eq VJ and forall{b : b in Basis(Algebra(S)) | m(b) eq mJ(b)} : "the modules are not compatible";
-   
+    
+    if UseSpecializedMethod then
+        if V eq Algebra(S) and forall{b:b in AbsoluteBasis(V)|m(b) eq b} then 
+            // fractional ideals case
+            dsr1:=DirectSumRepresentation(I)[1];
+            dsr2:=DirectSumRepresentation(J)[1];
+            Iid:=dsr1[1];
+            Jid:=dsr2[1];
+            test,x:=IsIsomorphic(Iid,Jid);
+            if not test then
+                return false,_;
+            else
+                assert x*Iid eq Jid;
+                m1:=dsr1[2](One(V));
+                m2:=dsr2[2](One(V));
+                isom:=Hom(V,V,[(b/m1)*x*m2 : b in AbsoluteBasis(V)]);
+                assert Module(S,m,[isom(z):z in ZBasis(I)]) eq J;
+                assert Module(S,m,[z@@isom:z in ZBasis(J)]) eq I;
+                return true,isom;
+            end if;
+        end if;
+        if IsBass(S) and is_pure_power_internal(m) then
+            // power of Bass case
+            return IsIsomorphicOverBassOrder(I,J);
+        end if;
+    end if;
+
     //require EquationOrder(Algebra(S)) subset S : "Implemented only for modules over orders containing the equation order";
     pi:=PrimitiveElement(Algebra(S));
     if not pi in S then
@@ -57,40 +89,76 @@ Method should be of the form "julia -J /tmp/Hecke.so ~/path/to/AlgEt/" (the ".so
     pi:=m(pi);
     // pi is now a primitive element of K such that Z[pi] c S.
     
-    // based on the following, two Z[pi] modules are isomorphic iff the matrices representing multiplcition by pi are Z-conjugte 
-    matI:=ChangeRing(Matrix(AbsoluteCoordinates([pi*z : z in ZBasis(I)],ZBasis(I))),Integers());
-    matJ:=ChangeRing(Matrix(AbsoluteCoordinates([pi*z : z in ZBasis(J)],ZBasis(J))),Integers());
+    // based on the following, two Z[pi] modules are isomorphic iff the matrices representing multiplcition by pi are Z-conjugate 
+    matI:=crQZ(Matrix(AbsoluteCoordinates([pi*z : z in ZBasis(I)],ZBasis(I))));
+    matJ:=crQZ(Matrix(AbsoluteCoordinates([pi*z : z in ZBasis(J)],ZBasis(J))));
     if Method eq "Magma" then
-        test:=AreGLConjugate(matI,matJ);
+        test,T:=AreGLConjugate(matI,matJ);
+        if test then
+            // matI*T eq T*matJ
+            /*
+            // TODO add isom. it should be something like what is below
+            zz:=ZBasis(I);
+            assert forall{r:r in Rows(T)|SumOfProducts(Eltseq(r),ZBasis(J)) in I};
+            mat:=crZQ(matI)^-1*T^-1*matJ;
+
+            imgs:=[ SumOfProducts(Eltseq(r),AbsoluteBasis(V)) : r in Columns(mat) ];
+            isom:=Hom(V,V,imgs);
+            assert Module(S,m,[isom(z):z in ZBasis(I)]) eq J;
+            return true,isom;
+            */
+            return true,_;
+        else
+            return false,_;
+        end if;
     else //Method eq "julia ...."
         ID:=&cat[ Sprint(Random(0,9)) : i in [1..20] ];
         file:="tmp_" cat ID cat ".txt";
         str:=Sprintf("[\n%o,\n%o\n]\n", Eltseq(matI),Eltseq(matJ));
         fprintf file, "%o",str;
-        indices:=eval(Pipe(Method cat "IsIsomorphic_julia_script.jl " cat file,""));
+        julia_str:=Pipe(Method cat "IsIsomorphic_julia_script.jl " cat file,"");
+        assert julia_str[1..7] eq "Vector[";
+        indices:=eval(julia_str[8..Index(julia_str,"]")]);
         // file is erase inside the julia script immediately after loading
         if #indices eq 2 then
         // the matrices are not conjugate
-            test:=false;
+            return false,_;
         else
             assert #indices eq 1;
-            test:=true;
+            /*
+            //TODO
+            // add isom. it should be similar to what we have above
+            return true,isom;
+            */
+            return true,_;
         end if;
     end if;
-    return test;
 end intrinsic;
 
 //------------
 // Isomorphism Classes for modules
 //------------
 
-intrinsic IsomorphismClasses(R::AlgEtQOrd,m::Map : Method:="Magma") -> SeqEnum[AlgEtQMod]
-{Given an order R in some AlgEtQ K, where K acts on some V, by m:K->V, returns representatives of hte isomorphism classes of the S-module lattices in V.
+intrinsic IsomorphismClasses(R::AlgEtQOrd,m::Map : Method:="Magma", UseSpecializedMethod:=true) -> SeqEnum[AlgEtQMod]
+{Given an order R in some AlgEtQ K, where K acts on some V, by m:K->V, returns representatives of the isomorphism classes of the S-module lattices in V.
+The vararg UseSpecializedMethod (default true) triggers the use of specialized code in the following two special cases: when K=V by using IdealClassMonoid, or when V = K^s for some s and R is Bass, by using IsomorphismClassesOverBassOrder.
 The vararg Method allows to choose if the isomorphism testing is done with "Magma", very slow, or with the Hecke/Nemo package for julia, which is much faster.
 To use the latter option, install julia, add the package Hecke and build the package.
 Detailed instructions are provided in the example file in the GitHub repository.
 Method should be of the form "julia -J /tmp/Hecke.so ~/path/to/AlgEt/" (the ".so" might be different according to your SO, according to the output of the julia command "Hecke.build()").}
     require Method eq "Magma" or Method[1..5] eq "julia" : "Method should be Magma or julia or a string of julia command";
+
+    if UseSpecializedMethod then
+        if Codomain(m) eq Domain(m) and forall{b:b in AbsoluteBasis(Domain(m))|m(b) eq b} then 
+            // early exit: using ICM
+            return [ Module(R,m,[m(z):z in ZBasis(I)]) : I in ICM(R) ];
+        end if;
+        if IsBass(R) and is_pure_power_internal(m) then
+            // early exit: using power-of-Bass code
+            return IsomorphismClassesOverBassOrder(R,m);
+        end if;
+    end if;
+
     V:=Codomain(m);
     K:=Domain(m);
     pi:=PrimitiveElement(K);
@@ -112,7 +180,9 @@ Method should be of the form "julia -J /tmp/Hecke.so ~/path/to/AlgEt/" (the ".so
     assert test;
     ind:=[ #Vnfpoly+1 - Index(Reverse(Vnfpoly),fK)  : fK in Knfpoly ]; // last occurence of each number field from the dec of K 
                                                                        // in the decomposition of V
-    Mff:=Module(R,m,<ff_prod[Index(Knfpoly,Vnfpoly[i])] : i in [1..#Vnf]>);
+    tup:=<ff_prod[Index(Knfpoly,Vnfpoly[i])] : i in [1..#Vnf]>;
+    assert forall{i : i in [1..#tup] | Vnf[i] eq NumberField(Order(tup[i]))};
+    Mff:=Module(R,m,tup);
     vprint IsomModules,1 : "candidates:";
     vtime IsomModules,1 : candidates:=IntermediateModulesWithTrivialExtension(MO,Mff,O);
     // candidates contains all representatives of the isomorphism classes of modules whose O-extension is the trivial Steinitz class.
@@ -139,11 +209,13 @@ Method should be of the form "julia -J /tmp/Hecke.so ~/path/to/AlgEt/" (the ".so
         end for;
         str:=Prune(Prune(str)) cat "\n]\n";
         fprintf file, "%o",str;
-        indices_of_classes_O:=eval(Pipe(Method cat "IsIsomorphic_julia_script.jl " cat file,""));
+        julia_str:=Pipe(Method cat "IsIsomorphic_julia_script.jl " cat file,"");
+        assert julia_str[1..7] eq "Vector[";
+        indices_of_classes_O:=eval(julia_str[8..Index(julia_str,"]")]);
         vprintf IsomModules,1 : "indices_of_classes_k = %o\n",indices_of_classes_O;
         classes_O:=[candidates[i] : i in indices_of_classes_O];
     end if;
-
+    assert2 forall{i:i,j in [1..#classes_O]|(i eq j) eq IsIsomorphic(classes_O[i],classes_O[j])};
 
     PO,pO:=PicardGroup(O);
     for g in PO do
@@ -151,12 +223,12 @@ Method should be of the form "julia -J /tmp/Hecke.so ~/path/to/AlgEt/" (the ".so
             classes_k:=classes_O; 
         else
             _,Ik:=CoprimeRepresentative(pO(g),ff); // Ik+ff=O, Ik cap ff = Ik*ff
+            assert not IsPrincipal(Ik);
             test,Ik_prod:=IsProductOfIdeals(Ik);
             assert test;
-            MffIk:=Module(R,m,<i in ind select 
-                                            ff_prod[Index(Knfpoly,Vnfpoly[i])] 
-                                        else ff_prod[Index(Knfpoly,Vnfpoly[i])]*Ik_prod[Index(Knfpoly,Vnfpoly[i])] 
-                                                : i in [1..#Vnf]>); // MffIk = f1^(s1-1)+f1I1 + ... + fn^(sn-1)+fnIn
+            MffIk:=Module(R,m,<i notin ind select ff_prod[Index(Knfpoly,Vnfpoly[i])] 
+                                        else ff_prod[Index(Knfpoly,Vnfpoly[i])]*Ik_prod[Index(Knfpoly,Vnfpoly[i])]
+                                        : i in [1..#Vnf]>); // MffIk = f1^(s1-1)+f1I1 + ... + fn^(sn-1)+fnIn
             zbMffIk:=ZBasis(MffIk);
             e:=ChineseRemainderTheorem(ff,Ik,One(K),Zero(K)); // e in Ik, e-1 in ff.
             assert not IsZeroDivisor(e);
@@ -167,10 +239,12 @@ Method should be of the form "julia -J /tmp/Hecke.so ~/path/to/AlgEt/" (the ".so
             // and (O1^(s1-1)+I1 + ... + On^(sn-1)+In)/(f1^(s1-1)+f1I1 + ... + fn^(sn-1)+fnIn),
             // where Ik = I1 + .... + In.
             classes_k:=[ Module(R,m, [ik(z) : z in ZBasis(M)] cat zbMffIk ) : M in classes_O];
+            assert2 forall{i:i,j in [1..#classes_k]|(i eq j) eq IsIsomorphic(classes_k[i],classes_k[j])};
         end if;
         Append(~classes,classes_k);
     end for;
     classes:=&cat(classes);
+    assert2 forall{i:i,j in [1..#classes]|(i eq j) eq IsIsomorphic(classes[i],classes[j])};
     return classes;
 end intrinsic;
 

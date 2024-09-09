@@ -62,10 +62,9 @@ declare attributes AlgEtQMod :
                              StandardDirectSumRep, // < seq,map >, where seq is a sequence of pairs <Si,ei> with ei an orthogonal idempotent of the UniverseAlgebra UA and Si is the multiplicator ring of Ji (from the direct sum decomposition) for i = 1,...,s-1 and Ss is the SteinitzClass. map:UA->UA sends the DirectSumRep into seq.
                              multiplicator_overorder; // the multiplicator ring of the module, that is, the biggest over-order S of R for which M is an S-module
 
+
 is_pure_power_internal:=function(m)
-// Given a m:K->V module returns whether V is isomorphic to K^r, for some r, and, 
-// if so, also a sequence of elements of V which are the r distinct copies if 1_K in V
-// and an isomorphism K^r->V, together with embeddings K->Kr and projections Kr->K.
+//Given a m:K->V module returns whether V is isomorphic to K^r, for some r, and, if so, also a sequence of elements of V which are the r distinct copies if 1_K in V and an isomorphism K^r->V, together with embeddings K->Kr and projections Kr->K.
     K:=Domain(m);
     V:=Codomain(m);
     dimK:=AbsoluteDimension(K);
@@ -96,13 +95,14 @@ is_pure_power_internal:=function(m)
         ith_oneK:=V!<j in pos select 1 else 0 : j in [1..#Vnf]>;
         Append(~oneKs,ith_oneK);
     end for;
-    if not m(One(K)) eq &+(oneKs) then
+    Kr,embs,projs:=DirectProduct([K:i in [1..r]]);
+    imgs:=[ &+[m(projs[i](b))*oneKs[i] : i in [1..r]] : b in AbsoluteBasis(Kr) ];
+    isom:=Hom(Kr,V, imgs : ComputeInverse:=true);
+    assert forall{ b : b in AbsoluteBasis(Kr) | Inverse(isom)(isom(b)) eq b } and isom(One(Kr)) eq &+(oneKs);
+    if not forall{z:z in AbsoluteBasis(K)|forall{p:p in projs|p(Inverse(isom)(m(z))) eq z}} then 
+        // we test if m is the diag embedding
         return false,_,_,_,_;
     else
-        Kr,embs,projs:=DirectProduct([K:i in [1..r]]);
-        imgs:=[ &+[m(projs[i](b))*oneKs[i] : i in [1..r]] : b in AbsoluteBasis(Kr) ];
-        isom:=Hom(Kr,V, imgs : ComputeInverse:=true);
-        assert forall{ b : b in AbsoluteBasis(Kr) | Inverse(isom)(isom(b)) eq b } and isom(One(Kr)) eq &+(oneKs);
         return true,oneKs,isom,embs,projs;
     end if;
 end function;
@@ -137,8 +137,8 @@ end function;
 // Multiplicator Ring
 // ------------------- //
 
-compute_multiplicator_overorder:=function(M)
-// given an AlgEtQMod over the order R, it returns the biggest overorder S of R such that S*M=M
+intrinsic compute_multiplicator_overorder(M::AlgEtQMod)->AlgEtQOrd
+{given an AlgEtQMod over the order R, it returns the biggest overorder S of R such that S*M=M}
     if not assigned M`multiplicator_overorder then
         if assigned M`DirectSumRep then
             mult_rings:=[ MultiplicatorRing(J[1]) : J in M`DirectSumRep ];
@@ -157,7 +157,7 @@ compute_multiplicator_overorder:=function(M)
         end if;
     end if;
     return M`multiplicator_overorder;
-end function;
+end intrinsic;
 
 // ------------------- //
 // DirectSumRep
@@ -363,9 +363,10 @@ intrinsic DirectSumRepresentation(M::AlgEtQMod)->SeqEnum[Tup]
                 assert forall{H : H in subs | not exists{G : G in subs | G ne H and not IsTrivial(G meet H)}}; 
                     //the intersections are trivial, that is the sum is direct
             // END TESTS //////////////////////////////////////
+            assert forall{bc:bc in BC|Type(bc[1]) eq AlgEtQIdl};
             M`DirectSumRep:=BC;
         elif n eq Dimension(UA) then //squarefree case
-            M`DirectSumRep:=<Ideal(Rg,ZBasis(M)),mR>;
+            M`DirectSumRep:=[<Ideal(Rg,ZBasis(M)),mR>];
         else
             error "implemented only for the squarefree or power-of-bass case";
         end if;
@@ -437,8 +438,9 @@ intrinsic IsomorphismClassesOverBassOrder(R::AlgEtQOrd, map::Map )->SeqEnum[AlgE
         assert2 forall{ i : i in [2..#seqid] | MultiplicatorRing(seqid[i-1]) subset MultiplicatorRing(seqid[i])};
         // the conditions asserted in the previous condition is assumed by the DirectSumRep attribute
         M:=ModuleFromDirectSum(R,map,[<seqid[i],ones[i]> : i in [1..#seq]]);
-        maps_ones:=[ Hom(AR,UA,[map(a)*ones[i] : a in AbsoluteBasis(AR)]) : i in [1..#ones] ];
-        M`DirectSumRep:=[ <seqid[i],maps_ones[i]> : i in [1..#ones] ]; 
+        // moved the next two lines into ModuleFromDirectSum
+        //maps_ones:=[ Hom(AR,UA,[map(a)*ones[i] : a in AbsoluteBasis(AR)]) : i in [1..#ones] ];
+        //M`DirectSumRep:=[ <seqid[i],maps_ones[i]> : i in [1..#ones] ]; 
         Append(~output,M);
     end for;
     return output;
@@ -498,12 +500,14 @@ intrinsic StandardDirectSumRepresentation(M::AlgEtQMod)->SeqEnum[Tup],Map
     if not assigned M`StandardDirectSumRep then
         UA,mR:=UniverseAlgebra(M);
         R:=Order(M);
+        require IsBass(R) : "the order is not Bass";
         is_pure_power,oid,isom,embs,projs:=is_pure_power_internal(mR);
         require is_pure_power : "The universe algebra is not of the form K^r.";
         AR:=Algebra(R);
         oneAR:=One(AR);
         dr:=Dimension(AR);
         DRS:=DirectSumRepresentation(M);
+        assert forall{d:d in DRS | Type(d[1]) eq AlgEtQIdl};
         s:=#DRS;
         assert #oid eq s;
         Si_s:=[ i lt s select Ideal(R,ZBasis(MultiplicatorRing(DRS[i,1]))) else SteinitzClass(M) : i in [1..s] ]; 
@@ -537,6 +541,7 @@ intrinsic IsIsomorphicOverBassOrder( M1::AlgEtQMod, M2::AlgEtQMod )->BoolElt,Map
     AR:=Algebra(R);
     require UniverseAlgebra(M2) eq UA : "the modules don't live in the same algebra";
     require R eq Order(M2) : "the modules are not defiend over the same order";
+    require IsBass(R) : "the order is not Bass";
     is_pure_power,ones,isom,embs,projs:=is_pure_power_internal(mR);
     require is_pure_power : "The universe algebra is not of the form K^r.";
     Std1,mStd1:=StandardDirectSumRepresentation(M1);   
@@ -574,85 +579,5 @@ end intrinsic;
 /*
 //TESTS
 
-    //TODO move these tests to all_tests_AlgEtQMod.m
-
-    AttachSpec("~/AlgEt/spec");
-    AttachSpec("~/AlgEt/specMod");
-    AttachSpec("~/AlgEt/specMtrx");
-    SetDebugOnError(true);
-    
-    P<x>:=PolynomialRing(Integers());
-    f:=x^2 + x + 2;
-    A:=EtaleAlgebra(f);
-    F:=PrimitiveElement(A);
-    R:=Order([2*F]);
-
-    O:=MaximalOrder(A);
-    ff:=Conductor(R);
-    V:=DirectProduct([A,A,A]);
-    m:=NaturalAction(A,V);
-    Vnf:=Components(V);
-    Anfpoly:=[ DefiningPolynomial(L) : L in Components(A) ];
-    Vnfpoly:=[ DefiningPolynomial(L) : L in Vnf ];
-    MO:=Module(R,m,<1*MaximalOrder(Vnf[i]) : i in [1..#Vnf]>);
-    ff:=O!!Conductor(R);
-    test,ff_prod:=IsProductOfIdeals(ff);
-    assert test;
-    ind:=[ #Vnfpoly+1 - Index(Reverse(Vnfpoly),fA)  : fA in Anfpoly ]; // last occurence of each 
-                                                                       // number field from the dec of K 
-                                                                       // in the decomposition of V
-    Mff:=Module(R,m,<ff_prod[Index(Anfpoly,Vnfpoly[i])] : i in [1..#Vnf]>);
-    candidates:=MaximalIntermediateModules(MO,Mff);
-    for M in candidates do
-        _:=DirectSumRepresentation(M);
-        _:=SteinitzClass(M);
-    end for;
-
-    ///////////////////
-
-    AttachSpec("~/AlgEt/spec");
-    AttachSpec("~/AlgEt/specMod");
-    AttachSpec("~/AlgEt/specMtrx");
-    SetDebugOnError(true);
-
-    // takes a while
-    P<x>:=PolynomialRing(Integers());
-    f:=x^4 + 3*x^3 + 8*x^2 + 39*x + 169;
-    A:=EtaleAlgebra(f);
-    F:=PrimitiveElement(A);
-    q:=Integers() ! (Coefficients(f)[1]^(2/Degree(f)));
-    R:=Order([F,q/F]);
-    ver:=[62,97,144,206,286];
-    res:=[ #IsomorphismClassesOverBassOrder(R,i) : i in [1..5] ];
-    assert res eq ver;
-    
-    ///////////////////
-    
-    AttachSpec("~/AlgEt/spec");
-    AttachSpec("~/AlgEt/specMod");
-    AttachSpec("~/AlgEt/specMtrx");
-    SetDebugOnError(true);
-
-    P<x>:=PolynomialRing(Integers());
-    f:=x^6-x^5+2*x^4-2*x^3+4*x^2-4*x+8;
-    A:=EtaleAlgebra(f);
-    F:=PrimitiveElement(A);
-    R:=Order([F,ComplexConjugate(F)]);
-    iso_cl:=IsomorphismClassesOverBassOrder(R,3);
-    assert #iso_cl eq 6;
-
-    M:=iso_cl[1];
-    
-    _:=[ StandardDirectSumRepresentation(M) : M in iso_cl ];
-
-    t,s:=IsIsomorphicOverBassOrder(iso_cl[1],iso_cl[1]);
-    assert t;
-    t,s:=IsIsomorphicOverBassOrder(iso_cl[1],iso_cl[2]);
-    assert not t;
-
-    for M1,M2 in iso_cl do
-        t,s:=IsIsomorphicOverBassOrder(M1,M2);
-        assert2 IsIsomorphic(M1,M2); // generic test
-    end for;
-
+    // see all_tests_AlgEtQMod.m
 */

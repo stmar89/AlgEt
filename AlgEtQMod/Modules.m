@@ -130,7 +130,7 @@ intrinsic ModuleFromDirectSum(R::AlgEtQOrd,m::Map,seq::SeqEnum[Tup])->AlgEtQMod
         basisAR:=AbsoluteBasis(AR);
         for I in seq do 
             mI:=Hom(AR,UA,[m(basisAR[i])*I[2] : i in [1..Dimension(AR)] ] : ComputeInverse:=false);  //map that sends one to I[2] 
-            Append(~dsr,<I,mI>);
+            Append(~dsr,<I[1],mI>);
             gens cat:=[ mI(z) : z in ZBasis(I[1]) ];
         end for;
     else
@@ -138,6 +138,8 @@ intrinsic ModuleFromDirectSum(R::AlgEtQOrd,m::Map,seq::SeqEnum[Tup])->AlgEtQMod
     end if;
     require Dimension(UA) eq Rank(MatrixAtoQ(gens)) : "gens do not generater a Z-module of full rank";
     M:=Module(R,m,gens);
+    assert forall{d:d in dsr|Type(d[1]) eq AlgEtQIdl};
+    M`DirectSumRep:=dsr;
     return M;
 end intrinsic;
 

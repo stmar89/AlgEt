@@ -24,6 +24,10 @@
 // Copyright 2023, S. Marseglia
 /////////////////////////////////////////////////////
 
+    SetDebugOnError(true);
+
+    path_to_package:="~/"; //folder where the package is installed.
+
     "-------------------------------------------------------------";
     "-------------------------------------------------------------";
     "All tests for AlgEtQMod";
@@ -35,8 +39,9 @@
     "-------------------------------------------------------------";
     "-------------------------------------------------------------";
 
-    AttachSpec("~/packages_github/AlgEt/spec");
-    AttachSpec("~/packages_github/AlgEt/specMod");
+    AttachSpec(path_to_package cat "AlgEt/spec");
+    AttachSpec(path_to_package cat "AlgEt/specMod");
+    AttachSpec(path_to_package cat "AlgEt/specMtrx");
     _<x>:=PolynomialRing(Integers());
     m1:=x^4 - 2*x^2 + 9;
     m2:=x^2 -5*x + 7;
@@ -73,8 +78,9 @@
     "-------------------------------------------------------------";
     "-------------------------------------------------------------";
 
-    AttachSpec("~/packages_github/AlgEt/spec");
-    AttachSpec("~/packages_github/AlgEt/specMod");
+    AttachSpec(path_to_package cat "AlgEt/spec");
+    AttachSpec(path_to_package cat "AlgEt/specMod");
+    AttachSpec(path_to_package cat "AlgEt/specMtrx");
     _<x>:=PolynomialRing(Integers());
     m1:=x^4 - 2*x^2 + 9;
     m2:=x^2 -5*x + 7;
@@ -122,8 +128,9 @@
     // ##########
 
     "A very quick test.";
-    AttachSpec("~/packages_github/AlgEt/spec");
-    AttachSpec("~/packages_github/AlgEt/specMod");
+    AttachSpec(path_to_package cat "AlgEt/spec");
+    AttachSpec(path_to_package cat "AlgEt/specMod");
+    AttachSpec(path_to_package cat "AlgEt/specMtrx");
     SetVerbose("IsomModules",1);
     _<x>:=PolynomialRing(Integers()); 
     g:=x^2+5;
@@ -132,18 +139,23 @@
     pi:=PrimitiveElement(K);
     R:=Order([7*pi]);
     m:=NaturalAction(K,K);
-    time icm:=ICM(R);
-    time classes:=IsomorphismClasses(R,m : Method:="Magma");
+    time icm0:=ICM(R);
+    time icm:=IsomorphismClasses(R,m : Method:="Magma", UseSpecializedMethod:=true);
+    assert #icm eq #icm0;
+    time classes:=IsomorphismClasses(R,m : Method:="Magma", UseSpecializedMethod:=false);
     assert #classes eq #icm; // Since R is Bass, the ICM is Pic(R) cup Pic(O)
-    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/AlgEtQMod/"); // this is the ICM
+    assert forall{i:i,j in [1..#classes]|(i eq j) eq IsIsomorphic(classes[i],classes[j] : UseSpecializedMethod:=true)};
+    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so " cat path_to_package cat "AlgEt/AlgEtQMod/", UseSpecializedMethod:=false); // this is the ICM
     assert #classes eq #icm; // Since R is Bass, the ICM is Pic(R) cup Pic(O)
+    assert forall{i:i,j in [1..#classes]|(i eq j) eq IsIsomorphic(classes[i],classes[j] : UseSpecializedMethod:=true)};
 
     "-------------------------------------------------------------";
     "-------------------------------------------------------------";
     "A quick test, with non trivial Class group, first with V=K and then with V = K^2";
     // Pic(O) is non trivial
-    AttachSpec("~/packages_github/AlgEt/spec");
-    AttachSpec("~/packages_github/AlgEt/specMod");
+    AttachSpec(path_to_package cat "AlgEt/spec");
+    AttachSpec(path_to_package cat "AlgEt/specMod");
+    AttachSpec(path_to_package cat "AlgEt/specMtrx");
     SetVerbose("IsomModules",1);
     _<x>:=PolynomialRing(Integers()); 
     g:=x^2+15;
@@ -152,23 +164,31 @@
     pi:=PrimitiveElement(K);
     R:=Order([pi]);
     m:=NaturalAction(K,K);
+    time icm0:=ICM(R);
+    time icm:=IsomorphismClasses(R,m : Method:="Magma", UseSpecializedMethod:=true);
+    assert #icm eq #icm0;
+    assert forall{i:i,j in [1..#classes]|(i eq j) eq IsIsomorphic(classes[i],classes[j] : UseSpecializedMethod:=true)};
     time classes:=IsomorphismClasses(R,m : Method:="Magma");
-    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/AlgEtQMod/"); // this is the ICM
-    time icm:=ICM(R);
     assert #classes eq #icm; // Since R is Bass, the ICM is Pic(R) cup Pic(O)
+    assert forall{i:i,j in [1..#classes]|(i eq j) eq IsIsomorphic(classes[i],classes[j] : UseSpecializedMethod:=true)};
+    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so " cat path_to_package cat "AlgEt/AlgEtQMod/"); // this is the ICM
+    assert #classes eq #icm; // Since R is Bass, the ICM is Pic(R) cup Pic(O)
+    assert forall{i:i,j in [1..#classes]|(i eq j) eq IsIsomorphic(classes[i],classes[j] : UseSpecializedMethod:=true)};
     // V = K^2
     V:=EtaleAlgebra(&cat[nf : i in [1..2]]);
     m:=NaturalAction(K,V);
     time classes:=IsomorphismClasses(R,m : Method:="Magma");
     assert #classes eq 6; // because R is Bass 
-    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/AlgEtQMod/");
+    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so " cat path_to_package cat "AlgEt/AlgEtQMod/");
     assert #classes eq 6; // because R is Bass 
+    assert forall{i:i,j in [1..#classes]|(i eq j) eq IsIsomorphic(classes[i],classes[j] : UseSpecializedMethod:=true)};
 
     "-------------------------------------------------------------";
     "-------------------------------------------------------------";
     "A very quick test, where V = K, that is we compute the ICM";
-    AttachSpec("~/packages_github/AlgEt/spec");
-    AttachSpec("~/packages_github/AlgEt/specMod");
+    AttachSpec(path_to_package cat "AlgEt/spec");
+    AttachSpec(path_to_package cat "AlgEt/specMod");
+    AttachSpec(path_to_package cat "AlgEt/specMtrx");
     SetVerbose("IsomModules",1);
     _<x>:=PolynomialRing(Integers()); 
     g:=x^6-x^5+2*x^4-2*x^3+4*x^2-4*x+8;
@@ -180,16 +200,20 @@
     O:=MaximalOrder(K);
     assert IsBass(R);
     m:=NaturalAction(K,K);
-    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/AlgEtQMod/"); // this is the ICM
+    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so " cat path_to_package cat "AlgEt/AlgEtQMod/", UseSpecializedMethod:=false);
     time icm:=ICM(R);
     assert #classes eq #icm; // Since R is Bass, the ICM is Pic(R) cup Pic(O)
-
+    assert forall{i:i,j in [1..#classes]|(i eq j) eq IsIsomorphic(classes[i],classes[j] : UseSpecializedMethod:=true)};
+    time classes:=IsomorphismClasses(R,m); // using icm
+    assert #classes eq #icm; // Since R is Bass, the ICM is Pic(R) cup Pic(O)
+    assert forall{i:i,j in [1..#classes]|(i eq j) eq IsIsomorphic(classes[i],classes[j] : UseSpecializedMethod:=true)};
 
     "-------------------------------------------------------------";
     "-------------------------------------------------------------";
     "A test that takes ~3 minutes, where V = K1^2 x K2";
-    AttachSpec("~/packages_github/AlgEt/spec");
-    AttachSpec("~/packages_github/AlgEt/specMod");
+    AttachSpec(path_to_package cat "AlgEt/spec");
+    AttachSpec(path_to_package cat "AlgEt/specMod");
+    AttachSpec(path_to_package cat "AlgEt/specMtrx");
     SetVerbose("IsomModules",1);
     _<x>:=PolynomialRing(Integers());
     SetVerbose("IsomModules",2);
@@ -206,9 +230,95 @@
     O:=MaximalOrder(K);
     V:=EtaleAlgebra([K1,K1,K2]); // V = K1^s1 x K2^s2
     m:=NaturalAction(K,V); // m:K -> V component-wise diagonal action of K on V
-    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/AlgEtQMod/"); // changes this line accordingly to wheter you have used Hecke.Build() or not,
+    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so " cat path_to_package cat "AlgEt/AlgEtQMod/"); // changes this line accordingly to wheter you have used Hecke.Build() or not,
                                                                                                        // and to the appriopriate path to the the packages AlgEtQ
     assert #classes eq 4;
+
+    // ########## 
+    // Tests specific for the Power of Bass cases
+    // #########
+
+    "-------------------------------------------------------------";
+    "-------------------------------------------------------------";
+    "--------------------------PowerBass.m------------------------";
+    "-------------------------------------------------------------";
+    "-------------------------------------------------------------";
+
+    AttachSpec("~/AlgEt/spec");
+    AttachSpec("~/AlgEt/specMod");
+    AttachSpec("~/AlgEt/specMtrx");
+    
+    P<x>:=PolynomialRing(Integers());
+    f:=x^2 + x + 2;
+    A:=EtaleAlgebra(f);
+    F:=PrimitiveElement(A);
+    R:=Order([2*F]);
+
+    O:=MaximalOrder(A);
+    ff:=Conductor(R);
+    V:=DirectProduct([A,A,A]);
+    m:=NaturalAction(A,V);
+    Vnf:=Components(V);
+    Anfpoly:=[ DefiningPolynomial(L) : L in Components(A) ];
+    Vnfpoly:=[ DefiningPolynomial(L) : L in Vnf ];
+    MO:=Module(R,m,<1*MaximalOrder(Vnf[i]) : i in [1..#Vnf]>);
+    ff:=O!!Conductor(R);
+    test,ff_prod:=IsProductOfIdeals(ff);
+    assert test;
+    ind:=[ #Vnfpoly+1 - Index(Reverse(Vnfpoly),fA)  : fA in Anfpoly ]; // last occurence of each 
+                                                                       // number field from the dec of K 
+                                                                       // in the decomposition of V
+    Mff:=Module(R,m,<ff_prod[Index(Anfpoly,Vnfpoly[i])] : i in [1..#Vnf]>);
+    candidates:=MaximalIntermediateModules(MO,Mff);
+    for M in candidates do
+        _:=DirectSumRepresentation(M);
+        _:=SteinitzClass(M);
+    end for;
+
+    ///////////////////
+
+    AttachSpec("~/AlgEt/spec");
+    AttachSpec("~/AlgEt/specMod");
+    AttachSpec("~/AlgEt/specMtrx");
+
+    // takes a while
+    P<x>:=PolynomialRing(Integers());
+    f:=x^4 + 3*x^3 + 8*x^2 + 39*x + 169;
+    A:=EtaleAlgebra(f);
+    F:=PrimitiveElement(A);
+    q:=Integers() ! (Coefficients(f)[1]^(2/Degree(f)));
+    R:=Order([F,q/F]);
+    ver:=[62,97,144,206,286];
+    res:=[ #IsomorphismClassesOverBassOrder(R,i) : i in [1..5] ];
+    assert res eq ver;
+    
+    ///////////////////
+    
+    AttachSpec("~/AlgEt/spec");
+    AttachSpec("~/AlgEt/specMod");
+    AttachSpec("~/AlgEt/specMtrx");
+
+    P<x>:=PolynomialRing(Integers());
+    f:=x^6-x^5+2*x^4-2*x^3+4*x^2-4*x+8;
+    A:=EtaleAlgebra(f);
+    F:=PrimitiveElement(A);
+    R:=Order([F,ComplexConjugate(F)]);
+    iso_cl:=IsomorphismClassesOverBassOrder(R,3);
+    assert #iso_cl eq 6;
+
+    M:=iso_cl[1];
+    
+    _:=[ StandardDirectSumRepresentation(M) : M in iso_cl ];
+
+    t,s:=IsIsomorphicOverBassOrder(iso_cl[1],iso_cl[1]);
+    assert t;
+    t,s:=IsIsomorphicOverBassOrder(iso_cl[1],iso_cl[2]);
+    assert not t;
+
+    for M1,M2 in iso_cl do
+        t,s:=IsIsomorphicOverBassOrder(M1,M2);
+        assert t eq IsIsomorphic(M1,M2 : UseSpecializedMethod:=false ); // generic test
+    end for;
 
     // ########## 
     // Slow Tests
@@ -221,8 +331,9 @@
     "-------------------------------------------------------------";
     "The following test should require around ~10000 for the julia sieving. Here R is Bass, but we compute it with the slow method to test it.";
     // Pic(O) is non triviali. Class construction is rther fast, isomorphism sieveng requires ~10000 secs using julia.
-    AttachSpec("~/packages_github/AlgEt/spec");
-    AttachSpec("~/packages_github/AlgEt/specMod");
+    AttachSpec(path_to_package cat "AlgEt/spec");
+    AttachSpec(path_to_package cat "AlgEt/specMod");
+    AttachSpec(path_to_package cat "AlgEt/specMtrx");
     SetVerbose("IsomModules",1);
     _<x>:=PolynomialRing(Integers()); 
     g:=x^2+15;
@@ -236,11 +347,12 @@
     m:=NaturalAction(K,V);
     //time classes:=IsomorphismClasses(R,m : Method:="Magma"); // 800 secs. Faster than expected.
     //assert #classes eq 8; // because R is Bass. Note that the Magma method is bugged.
-    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/AlgEtQMod/");
+    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so " cat path_to_package cat "AlgEt/AlgEtQMod/");
     assert #classes eq 8; // because R is Bass 
 
-    AttachSpec("~/packages_github/AlgEt/spec");
-    AttachSpec("~/packages_github/AlgEt/specMod");
+    AttachSpec(path_to_package cat "AlgEt/spec");
+    AttachSpec(path_to_package cat "AlgEt/specMod");
+    AttachSpec(path_to_package cat "AlgEt/specMtrx");
     SetVerbose("IsomModules",1);
     _<x>:=PolynomialRing(Integers()); 
     g:=x^6-x^5+2*x^4-2*x^3+4*x^2-4*x+8;
@@ -253,15 +365,16 @@
     // V = K^3
     V:=EtaleAlgebra(&cat[nf : i in [1..3]]);
     m:=NaturalAction(K,V);
-    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/AlgEtQMod/");
+    time classes:=IsomorphismClasses(R,m : Method:="julia -J /tmp/Hecke.so " cat path_to_package cat "AlgEt/AlgEtQMod/");
     assert #classes eq 6; // Example 6.1 in "Computing abelian varieties over finite fields isogenous to a power", by Marseglia
 
 
     
     "The following test is much bigger! (so far it never finished)";
     // a much bigger test!
-    AttachSpec("~/packages_github/AlgEt/spec");
-    AttachSpec("~/packages_github/AlgEt/specMod");
+    AttachSpec(path_to_package cat "AlgEt/spec");
+    AttachSpec(path_to_package cat "AlgEt/specMod");
+    AttachSpec(path_to_package cat "AlgEt/specMtrx");
     _<x>:=PolynomialRing(Integers()); 
     h:=x^8 - 4*x^6 + 22*x^4 - 36*x^2 + 81;
     q:=Integers() ! Truncate( ConstantCoefficient(h)^(2/Degree(h)) );
@@ -289,7 +402,26 @@
     nf:=Components(K);
     V:=EtaleAlgebra(&cat[nf : i in [1..2]]);
     m:=NaturalAction(K,V);
-    time classes:=IsomorphismClasses(ZFV,m : Method:="julia -J /tmp/Hecke.so ~/packages_github/AlgEt/AlgEtQMod/");
+    time classes:=IsomorphismClasses(ZFV,m : Method:="julia -J /tmp/Hecke.so " cat path_to_package cat "AlgEt/AlgEtQMod/");
     "We get this many classes:";
     #classes;
-    
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

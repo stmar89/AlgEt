@@ -40,22 +40,16 @@
 <em>Equality testing.</em>
 
 
-## List of instrinsics in AlgEtQ/Homs.m:
-
-> <pre><b>HomsToC</b>(A::AlgEtQ : Prec:=30)->SeqEnum[Map]</pre>
-<em>Returns the sequence of homomorphisms from A to the complex field CC. The precision of CC is given by the optional parameter "Prec". Default value is 30</em>
-
-
 ## List of instrinsics in AlgEtQ/Elt.m:
 
 > <pre><b>Print</b>(x::AlgEtQElt)</pre>
 <em>Print the element.</em>
 
 > <pre><b>Parent</b>(x::AlgEtQElt) -> AlgEtQ</pre>
-<em>Returns the algebra to which the elemenet belongs to.</em>
+<em>Returns the algebra to which the element belongs to.</em>
 
 > <pre><b>Algebra</b>(x::AlgEtQElt) -> AlgEtQ</pre>
-<em>Returns the algebra to which the elemenet belongs to.</em>
+<em>Returns the algebra to which the element belongs to.</em>
 
 > <pre><b>Components</b>(x::AlgEtQElt) -> SeqEnum</pre>
 <em>Given an element, returns its components, which are elements of number fields.</em>
@@ -254,6 +248,21 @@
 
 > <pre><b>Idempotents</b>(A::AlgEtQ) -> SeqEnum</pre>
 <em>Returns the ideampotent element of the étale algebra A.</em>
+
+
+## List of instrinsics in AlgEtQ/Homs.m:
+
+> <pre><b>HomsToC</b>(A::AlgEtQ : Prec:=30)->SeqEnum[Map]</pre>
+<em>Returns the sequence of homomorphisms from A to the complex field CC. The precision of CC is given by the optional parameter "Prec". Default value is 30</em>
+
+> <pre><b>Hom</b>(A::AlgEtQ , B::AlgEtQ , img::SeqEnum[AlgEtQElt] : CheckMultiplicative:=false, CheckUnital:=false, ComputeInverse:=true)->Map</pre>
+<em>Given two étale algebras A and B and a sequence img of elements of B, returns the Q-algbra homomorphism defined by sending the AbsoluteBasis of A to img. The VarArg CheckMultiplicative determines if the multiplicativity of the defined map is checked, while the VarArg CheckUnital determines wheter One(A) is sent to One(B). If the VarArg ComputeInverse is true, it checkes whether the map is invertible and, if so, it defines also the inverse (by assigning preimages).</em>
+
+
+## List of instrinsics in AlgEtQ/DirectProduct.m:
+
+> <pre><b>DirectProduct</b>(seq::SeqEnum[AlgEtQ]) -> AlgEtQ,SeqEnum[Map],SeqEnum[Map]</pre>
+<em>Given a sequence of étale algebras, it returns the direct product,togheter with canonical inclusions and projections.</em>
 
 
 ## List of instrinsics in AlgEtQ/Ord.m:

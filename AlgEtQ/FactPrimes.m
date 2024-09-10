@@ -135,6 +135,18 @@ intrinsic PrimesAbove(I::AlgEtQIdl) -> SeqEnum[AlgEtQOrdIdl]
     return I`PrimesAbove;
 end intrinsic;
 
+intrinsic PlacesAboveRationalPrime(E::AlgEtQ,p::RngIntElt)->SeqEnum[AlgEtQIdl]
+{Returns the maximal ideals of maximal order of the algebra E above the rational prime p.}
+    if not assigned E`PlacesAboveRationalPrime then
+        E`PlacesAboveRationalPrime:=AssociativeArray();
+    end if;
+    if not IsDefined(E`PlacesAboveRationalPrime,p) then
+        require IsPrime(p) : "The integer p needs to be a prime number";
+        E`PlacesAboveRationalPrime:=PrimesAbove(p*MaximalOrder(E));
+    end if;
+    return E`PlacesAboveRationalPrime;
+end intrinsic;
+
 intrinsic SingularPrimes(R::AlgEtQOrd) -> SeqEnum[AlgEtQOrdIdl]
 {Returns the non-invertible primes of the order.}
     if not assigned R`SingularPrimes then

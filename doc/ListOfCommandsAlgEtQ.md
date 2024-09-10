@@ -796,7 +796,7 @@ These are produced by recursively searching for maximal submodules.</em>
 > <pre><b>ResidueRingUnitsSubgroupGenerators</b>(F::AlgEtQIdl) -> SeqEnum[AlgEtQElt]</pre>
 <em>Returns generators of (S/F)^\* where F is an ideal of the order S.</em>
 
-> <pre><b>IsPrincipal</b>(I1::AlgEtQIdl : GRH:=false )->BoolElt, AlgAssElt</pre>
+> <pre><b>IsPrincipal</b>(I1::AlgEtQIdl : GRH:=false )->BoolElt, AlgEtQElt</pre>
 <em>Return if the argument is a principal ideal; if so the function returns also the generator. The optional argument "GRH" decides wheter the bound for the IsPrincipal test should be conditional. The default value is "false".</em>
 
 > <pre><b>PicardGroup</b>( S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map</pre>
@@ -805,7 +805,7 @@ These are produced by recursively searching for maximal submodules.</em>
 > <pre><b>UnitGroup</b>(S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map</pre>
 <em>Return the unit group of a order in a etale algebra. The optional argument "GRH" decides the bound for the computation of the unit group of the maximal order. The default value is "false".</em>
 
-> <pre><b>IsIsomorphic</b>(I::AlgEtQIdl, J::AlgEtQIdl : GRH:=false ) -> BoolElt, AlgAssElt</pre>
+> <pre><b>IsIsomorphic</b>(I::AlgEtQIdl, J::AlgEtQIdl : GRH:=false ) -> BoolElt, AlgEtQElt</pre>
 <em>Checks if I=x\*J, for some x. If so, also x is returned. The optional argument "GRH" decides wheter the bound for the IsPrincipal test should be conditional. The default value is "false".</em>
 
 
@@ -814,10 +814,13 @@ These are produced by recursively searching for maximal submodules.</em>
 > <pre><b>Factorization</b>(I::AlgEtQIdl) -> Tup</pre>
 <em>Given an integral S-ideal I coprime with the conductor of S (hence invertible in S), returns its factorization into a product of primes of S.</em>
 
-> <pre><b>PrimesAbove</b>(I::AlgEtQIdl) -> SeqEnum[AlgAssEtOrdIdl]</pre>
+> <pre><b>PrimesAbove</b>(I::AlgEtQIdl) -> SeqEnum[AlgEtQOrdIdl]</pre>
 <em>Given an integral S-ideal, returns the sequence of maximal ideals P of S above I.</em>
 
-> <pre><b>SingularPrimes</b>(R::AlgEtQOrd) -> SeqEnum[AlgAssEtOrdIdl]</pre>
+> <pre><b>PlacesAboveRationalPrime</b>(E::AlgEtQ,p::RngIntElt)->SeqEnum[AlgEtQIdl]</pre>
+<em>Returns the maximal ideals of maximal order of the algebra E above the rational prime p.</em>
+
+> <pre><b>SingularPrimes</b>(R::AlgEtQOrd) -> SeqEnum[AlgEtQOrdIdl]</pre>
 <em>Returns the non-invertible primes of the order.</em>
 
 > <pre><b>NonInvertiblePrimes</b>(R::AlgEtQOrd) -> SetIndx</pre>

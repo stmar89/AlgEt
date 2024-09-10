@@ -842,6 +842,24 @@ These are produced by recursively searching for maximal submodules.</em>
 <em>Checks if the order O is Gorenstein, that is if the TraceDualIdeal of O is invertible, or equivalently, if all fractional ideals I with (I:I)=O are invertible.</em>
 
 
+## List of instrinsics in AlgEtQ/PrimesAttributes.m:
+
+> <pre><b>Valuation</b>(x::AlgEtQElt,P::AlgEtQIdl)->RngIntElt</pre>
+<em>Given an element x and a maximal ideal P of the maximal order, it returns the valuation of x at P.</em>
+
+> <pre><b>Valuation</b>(I::AlgEtQIdl,P::AlgEtQIdl)->RngIntElt</pre>
+<em>Given a fractional ideal I and a maximal ideal P, both of the maximal order, it returns the valuation of I at P.</em>
+
+> <pre><b>InertiaDegree</b>(P::AlgEtQIdl)->RngIntElt</pre>
+<em>Given a maximal ideal P of the maximal order O above the rational prime p, it returns the inertia degree of P, that is, the index of the finite field extension GF(p)->O/P.</em>
+
+> <pre><b>RamificationIndex</b>(P::AlgEtQIdl)->RngIntElt</pre>
+<em>Given a maximal ideal P of the maximal order O, it returns the reamification index of P.</em>
+
+> <pre><b>Uniformizers</b>(PPs::SeqEnum[AlgEtQIdl])->SeqEnum</pre>
+<em>Given a sequence of maximal ideals P of the maximal order, it returns a sequence of elements t_P such that t_P is a uniformizer of P and a unit at every other prime in the sequence.</em>
+
+
 ## List of instrinsics in AlgEtQ/LowCohenMacaulayType.m:
 
 > <pre><b>NonGorensteinPrimes</b>(S::AlgEtQOrd)->SeqEnum,SeqEnum</pre>

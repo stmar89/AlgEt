@@ -22,6 +22,7 @@ MinimalGenerators.m
 CRT.m
 PicardGroup.m
 FactPrimes.m
+PrimesAttributes.m
 LowCohenMacaulayType.m
 WkClasses.m
 WkTesting.m

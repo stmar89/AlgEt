@@ -1,4 +1,5 @@
 /* vim: set syntax=magma : */
+
 /////////////////////////////////////////////////////
 // Stefano Marseglia, stefano.marseglia89@gmail.com
 // https://stmar89.github.io/index.html

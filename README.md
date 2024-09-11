@@ -19,9 +19,13 @@ We have functionalities to compute isomorphism classes of invertible and non-inv
 For complete descriptions and more details we refer to the [`List of commands for AlgEtQ`](https://github.com/stmar89/AlgEt/blob/main/doc/ListOfCommandsAlgEtQ.md).
 To use them, use the magma command `AttachSpec("spec")`, after opening magma in the folder where you have downloaded the repo.
 
-We also introduce the type `AlgEtQMod`, for modules over `AlgEtQ`. This code is functional but less mature.
+We also introduce the type `AlgEtQMod`, for modules over `AlgEtQ`.
 For complete descriptions and more details we refer to the [`List of commands for AlgEtQMod`](https://github.com/stmar89/AlgEt/blob/main/doc/ListOfCommandsAlgEtQMod.md)
 To use them, use the magma command `AttachSpec("specMod")`, after opening magma in the folder where you have downloaded the repo.
+
+We also introduce the type `AlgEtQMtrx`, for matrices over `AlgEtQ`.
+For complete descriptions and more details we refer to the [`List of commands for AlgEtQMtrx`](https://github.com/stmar89/AlgEt/blob/main/doc/ListOfCommandsAlgEtQMtrx.md)
+To use them, use the magma command `AttachSpec("specMtrx")`, after opening magma in the folder where you have downloaded the repo.
 
 Functionalities for p-adic etale algebras, including how to build completion at rational primes, are developed by Casper Putz. Available [`here`](https://github.com/CPutz/etale-algebra-family).
 
@@ -33,6 +37,7 @@ In the file [`examples.txt`](https://github.com/stmar89/PolsAbVarFpCanLift/blob/
 
 References
 --
+Check my webpage for more up-to-date bibliography info.
 
 Stefano Marseglia,<br>
 *Computing the ideal class monoid of an order*,<br>

@@ -18,8 +18,11 @@ clean_old:
 	@echo "Removing old ListOfCommandsAlgEtQ.md..."
 	-rm ${outfileAlgEtQ}
 	@echo "...Done"
-	@echo "Removing old ListOfCommandsAlgEtQ.md..."
+	@echo "Removing old ListOfCommandsAlgEtQMod.md..."
 	-rm ${outfileAlgEtQMod}
+	@echo "...Done"
+	@echo "Removing old ListOfCommandsAlgEtQMtrx.md..."
+	-rm ${outfileAlgEtQMtrx}
 	@echo "...Done"
 
 magma_script:

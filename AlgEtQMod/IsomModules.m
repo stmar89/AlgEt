@@ -66,10 +66,10 @@ Method should be of the form "julia -J /tmp/Hecke.so ~/path/to/AlgEt/" (the ".so
             if not test then
                 return false,_;
             else
-                assert x*Iid eq Jid;
+                assert Iid eq x*Jid;
                 m1:=dsr1[2](One(V));
                 m2:=dsr2[2](One(V));
-                isom:=Hom(V,V,[(b/m1)*x*m2 : b in AbsoluteBasis(V)]);
+                isom:=Hom(V,V,[(b/m1)*(1/x)*m2 : b in AbsoluteBasis(V)]);
                 assert Module(S,m,[isom(z):z in ZBasis(I)]) eq J;
                 assert Module(S,m,[z@@isom:z in ZBasis(J)]) eq I;
                 return true,isom;

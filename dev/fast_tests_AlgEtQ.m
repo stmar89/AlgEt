@@ -931,6 +931,10 @@ time_start:=Cputime();
 
 
 
+
+
+
+
     printf "### Testing LowCohenMacaulayType:";
     SetAssertions(2);
     _<x>:=PolynomialRing(Integers());

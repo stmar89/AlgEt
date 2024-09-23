@@ -36,7 +36,8 @@ intrinsic ICM_bar(S::AlgEtQOrd : GRH:=false ) -> SeqEnum
         GS,gS:=PicardGroup(S : GRH:=GRH );
         repS:=[gS(x) : x in GS];
         ICM_barS := &cat[[I*J : I in seqWKS_bar] : J in repS];
-        for I in ICM_barS do
+        for iI in [1..#ICM_barS] do
+            I:=ICM_barS[iI];
             I`MultiplicatorRing:=S;
             ZBasisLLL(I);
         end for;

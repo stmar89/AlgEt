@@ -37,6 +37,7 @@ intrinsic ICM_bar(S::AlgEtQOrd : GRH:=false ) -> SeqEnum
         repS:=[gS(x) : x in GS];
         ICM_barS := &cat[[I*J : I in seqWKS_bar] : J in repS];
         for I in ICM_barS do
+            I`MultiplicatorRing:=S;
             ZBasisLLL(I);
         end for;
         assert2 forall{J : J in ICM_barS | MultiplicatorRing(J) eq S};

@@ -151,7 +151,7 @@ Method should be of the form "julia -J /tmp/Hecke.so ~/path/to/AlgEt/" (the ".so
     if UseSpecializedMethod then
         if Codomain(m) eq Domain(m) and forall{b:b in AbsoluteBasis(Domain(m))|m(b) eq b} then 
             // early exit: using ICM
-            return [ Module(R,m,[m(z):z in ZBasis(I)]) : I in ICM(R) ];
+            return [ ModuleFromDirectSum(R,m,[<I,m>]) : I in ICM(R) ];
         end if;
         if IsBass(R) and is_pure_power_internal(m) then
             // early exit: using power-of-Bass code

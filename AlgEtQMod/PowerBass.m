@@ -291,7 +291,7 @@ intrinsic DirectSumRepresentation(M::AlgEtQMod)->SeqEnum[Tup]
         Ag:=Algebra(Rg);
         n:=Dimension(Ag);
         s:=Dimension(Ags) div n;
-        if IsBass(Rg) then
+        if s gt 1 and IsBass(Rg) then
             T:=compute_multiplicator_overorder(M);
             UAtoAgs:=Inverse(AgstoUA);
             mAgs:=mR*UAtoAgs;

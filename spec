@@ -2,6 +2,7 @@ AlgEtQ
 {
 AlgEt.m
 AlgEtAttributes.m
+NF.m
 Elt.m
 Homs.m
 DirectProduct.m

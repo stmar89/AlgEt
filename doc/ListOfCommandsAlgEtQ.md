@@ -40,6 +40,12 @@
 <em>Equality testing.</em>
 
 
+## List of instrinsics in AlgEtQ/NF.m:
+
+> <pre><b>IsNumberField</b>(A::AlgEtQ) -> BoolElt,FldNum,Map</pre>
+<em>Given an étale algebra over Q returns wheter it is a number field, and if so the number field and an isomorphism.</em>
+
+
 ## List of instrinsics in AlgEtQ/Elt.m:
 
 > <pre><b>Print</b>(x::AlgEtQElt)</pre>

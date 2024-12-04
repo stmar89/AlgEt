@@ -49,6 +49,44 @@ time_start:=Cputime();
 
 
 
+    printf "### Testing IsNumberField:";
+    //AttachSpec("~/packages_github/AlgEt/spec");
+    SetAssertions(2);
+    _<x>:=PolynomialRing(Integers());
+    printf ".";
+    f:=x^8+16;
+    A:=EtaleAlgebra(f);
+    test,K,i:=IsNumberField(A);
+    assert test;
+    for j in [1..100] do
+        a:=Random(A);
+        b:=Random(A);
+        assert i(a+b) eq i(a)+i(b);
+        assert i(a*b) eq i(a)*i(b);
+        ii:=Inverse(i);
+        OK:=MaximalOrder(K);
+        a:=Random(OK,3);
+        b:=Random(OK,3);
+        assert ii(a+b) eq ii(a)+ii(b);
+        assert ii(a*b) eq ii(a)*ii(b);
+    end for;
+
+
+
+    seq:=[x^2-5,x^2-7];
+    seq:=[NumberField(f) : f in seq];
+    A:=EtaleAlgebra(seq);
+    assert not IsNumberField(A);
+    printf ".";
+
+    SetAssertions(1);
+    printf " all good!\n";
+
+
+
+
+
+
     printf "### Testing Elements:";
     //AttachSpec("~/packages_github/AlgEt/spec");
     SetVerbose("AlgEtQElt",2);

@@ -43,7 +43,7 @@
 ## List of instrinsics in AlgEtQ/NF.m:
 
 > <pre><b>IsNumberField</b>(A::AlgEtQ) -> BoolElt,FldNum,Map</pre>
-<em>Given an étale algebra over Q returns wheter it is a number field, and if so the number field and an isomorphism.</em>
+<em>Given an étale algebra over Q returns wheter it is a number field, and if so the number field and an isomorphism from the étale algebra to the number field.</em>
 
 
 ## List of instrinsics in AlgEtQ/Elt.m:

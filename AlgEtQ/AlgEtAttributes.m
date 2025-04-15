@@ -55,8 +55,8 @@ intrinsic DefiningPolynomial(A::AlgEtQ) -> RngUPolElt
     return A`DefiningPolynomial;
 end intrinsic;
 
-intrinsic Components(A::AlgEtQ) -> SeqEnum
-{Returns the number fields of which A is a product of,together with embeddings and projections.}
+intrinsic Components(A::AlgEtQ) -> SeqEnum,SeqEnum,SeqEnum
+{Returns the number fields of which A is a product of, together with embeddings and projections.}
     return Explode(A`Components);
 end intrinsic;
 

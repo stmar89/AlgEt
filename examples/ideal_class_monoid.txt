@@ -18,11 +18,13 @@
         https://arxiv.org/abs/2206.03758
 */
 
+path:="~/AlgEt/"; // Put here the path where you have cloned the repo AlgEt
+
 // ########################
 // ### [1, Example 7.1] ###
 // ########################
 
-AttachSpec("~/packages_github/AlgEt/spec");
+AttachSpec(path * "spec");
 
 P<x>:=PolynomialRing(Integers());
 f:=x^3+31*x^2+43*x+77;
@@ -60,7 +62,7 @@ end for;
 // ### [1, Example 7.2] ###
 // ########################
 
-AttachSpec("~/packages_github/AlgEt/spec");
+AttachSpec(path * "spec");
 
 P<x>:=PolynomialRing(Integers());
 f:=x^3-1000*x^2-1000*x-1000;
@@ -93,7 +95,7 @@ size_icm_E;
 // ### [1, Example 7.3] ###
 // ########################
 
-AttachSpec("~/packages_github/AlgEt/spec");
+AttachSpec(path * "spec");
 
 P<x>:=PolynomialRing(Integers());
 f1:=x^2+4*x+7;
@@ -132,7 +134,7 @@ size_icm_R;
 // ### [2, Example 6.6] ###
 // ########################
 
-AttachSpec("~/packages_github/AlgEt/spec");
+AttachSpec(path * "spec");
 
 P<x>:=PolynomialRing(Integers());
 f:=x^6-6*x^5+6*x^4+43*x^3+96*x^2-1536*x+4096;

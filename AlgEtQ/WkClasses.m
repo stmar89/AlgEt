@@ -339,6 +339,7 @@ intrinsic WKICM(E::AlgEtQOrd : Method:="Auto")->SeqEnum[AlgEtQIdl]
     if not assigned E`WKICM then
         pp:=SingularPrimes(E);
         if #pp eq 0 then
+            E`OverOrders:=[E];
             E`WKICM:=[OneIdeal(E)]; // the order is maximal
             E`WKICM_bar:=[OneIdeal(E)]; // the order is maximal
         elif #pp eq 1 then // 1 singular prime: go for the recursion

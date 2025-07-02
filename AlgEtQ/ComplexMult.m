@@ -118,7 +118,7 @@ intrinsic CMPosElt( PHI::AlgEtQCMType )->AlgEtQElt
     return CMPositiveElement(PHI);
 end intrinsic;
 
-intrinsic Homs( PHI::AlgEtQCMType : prec:=30 )->SeqEnum[Map]
+intrinsic Homs( PHI::AlgEtQCMType : prec:=Precision(GetDefaultRealField()) )->SeqEnum[Map]
 {Given a AlgEtQCMType PHI returns the sequence of maps to the complex field. The vararg prec (default value 30) determines the precision of the codomains of the maps.}
     if not assigned PHI`Homs then
         b:=CMPositiveElement(PHI);
@@ -131,17 +131,17 @@ intrinsic Homs( PHI::AlgEtQCMType : prec:=30 )->SeqEnum[Map]
     return PHI`Homs;
 end intrinsic;
 
-intrinsic 'eq'(PHI1 :: AlgEtQCMType, PHI2::AlgEtQCMType : prec:=30)->BoolElt
+intrinsic 'eq'(PHI1 :: AlgEtQCMType, PHI2::AlgEtQCMType : prec:=Precision(GetDefaultRealField()))->BoolElt
 {Returns whether two cm types are equal. This happens if and only if the quotient of (any) two CMPositiveElements is totally real and totally positive.}
     A:=Domain(Homs(PHI1)[1]);
     assert forall{ phi : phi in Homs(PHI1) cat Homs(PHI2) | Domain(phi) eq A };
-    homs:=HomsToC(A : Prec:=prec);
     b1:=CMPositiveElement(PHI1);
     b2:=CMPositiveElement(PHI2);
     if b1 eq b2 then
         return true;
     else
         b:=b1/b2;
+        homs:=HomsToC(A : Prec:=prec);
         return forall{ h : h in homs | Re(h(b)) gt 0 };
     end if;
 end intrinsic;
@@ -152,7 +152,7 @@ intrinsic Precision(PHI :: AlgEtQCMType)->RngIntElt
         phi0:=Homs(PHI);
         return Precision(Codomain(phi0[1]));
     else
-        return 30; //the default precision
+        return Precision(GetDefaultRealField()); //the default precision
     end if;
 end intrinsic;
 
@@ -220,7 +220,7 @@ end intrinsic;
 // AllCMTypes 
 /////////////////////////////////////////////////////
 
-intrinsic AllCMTypes(A::AlgEtQ : Prec := 30 ) -> SeqEnum[AlgEtQCMType]
+intrinsic AllCMTypes(A::AlgEtQ : Prec := Precision(GetDefaultRealField()) ) -> SeqEnum[AlgEtQCMType]
 {Returns all the AlgEtQCMTypes of A. The vararg Prec determined the precision of the codomain of the maps defining the CMTypes.}
     if not assigned A`AllCMTypes then
         // this uses the fact that if A HasComplexConjugation then HomsToC come in conjugate pairs

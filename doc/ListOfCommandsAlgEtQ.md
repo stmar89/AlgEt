@@ -18,8 +18,8 @@
 > <pre><b>DefiningPolynomial</b>(A::AlgEtQ) -> RngUPolElt</pre>
 <em>Returns the defining polynomial of A, if the corresponding number fields are distinct.</em>
 
-> <pre><b>Components</b>(A::AlgEtQ) -> SeqEnum</pre>
-<em>Returns the number fields of which A is a product of,together with embeddings and projections.</em>
+> <pre><b>Components</b>(A::AlgEtQ) -> SeqEnum,SeqEnum,SeqEnum</pre>
+<em>Returns the number fields of which A is a product of, together with embeddings and projections.</em>
 
 > <pre><b>Dimension</b>(A::AlgEtQ)->RngInt</pre>
 <em>Dimension of A.</em>
@@ -258,11 +258,11 @@
 
 ## List of instrinsics in AlgEtQ/Homs.m:
 
-> <pre><b>HomsToC</b>(A::AlgEtQ : Prec:=30)->SeqEnum[Map]</pre>
+> <pre><b>HomsToC</b>(A::AlgEtQ : Prec:=Precision(GetDefaultRealField()))->SeqEnum[Map]</pre>
 <em>Returns the sequence of homomorphisms from A to the complex field CC. The precision of CC is given by the optional parameter "Prec". Default value is 30</em>
 
 > <pre><b>Hom</b>(A::AlgEtQ , B::AlgEtQ , img::SeqEnum[AlgEtQElt] : CheckMultiplicative:=false, CheckUnital:=false, ComputeInverse:=true)->Map</pre>
-<em>Given two étale algebras A and B and a sequence img of elements of B, returns the Q-algbra homomorphism defined by sending the AbsoluteBasis of A to img. The VarArg CheckMultiplicative determines if the multiplicativity of the defined map is checked, while the VarArg CheckUnital determines wheter One(A) is sent to One(B). If the VarArg ComputeInverse is true, it checkes whether the map is invertible and, if so, it defines also the inverse (by assigning preimages).</em>
+<em>Given two étale algebras A and B and a sequence img of elements of B, returns the Q-algebra homomorphism defined by sending the AbsoluteBasis of A to img. The VarArg CheckMultiplicative determines if the multiplicativity of the defined map is checked, while the VarArg CheckUnital determines wheter One(A) is sent to One(B). If the VarArg ComputeInverse is true, it checkes whether the map is invertible and, if so, it defines also the inverse (by assigning preimages).</em>
 
 
 ## List of instrinsics in AlgEtQ/DirectProduct.m:
@@ -693,10 +693,10 @@
 > <pre><b>CMPosElt</b>( PHI::AlgEtQCMType )->AlgEtQElt</pre>
 <em>Given a CMType PHI returns a totally imaginary PHI-positive element (which uniquely determines PHI).</em>
 
-> <pre><b>Homs</b>( PHI::AlgEtQCMType : prec:=30 )->SeqEnum[Map]</pre>
+> <pre><b>Homs</b>( PHI::AlgEtQCMType : prec:=Precision(GetDefaultRealField()) )->SeqEnum[Map]</pre>
 <em>Given a AlgEtQCMType PHI returns the sequence of maps to the complex field. The vararg prec (default value 30) determines the precision of the codomains of the maps.</em>
 
-> <pre><b>'eq'</b>(PHI1 :: AlgEtQCMType, PHI2::AlgEtQCMType : prec:=30)->BoolElt</pre>
+> <pre><b>'eq'</b>(PHI1 :: AlgEtQCMType, PHI2::AlgEtQCMType : prec:=Precision(GetDefaultRealField()))->BoolElt</pre>
 <em>Returns whether two cm types are equal. This happens if and only if the quotient of (any) two CMPositiveElements is totally real and totally positive.</em>
 
 > <pre><b>Precision</b>(PHI :: AlgEtQCMType)->RngIntElt</pre>
@@ -708,7 +708,7 @@
 > <pre><b>ChangePrecision</b>(~PHI :: AlgEtQCMType, prec::RngIntElt )</pre>
 <em>Changes the precision of the given CM-type, that is, the codomain of each homomorphism will be ComplexField(Precision).</em>
 
-> <pre><b>AllCMTypes</b>(A::AlgEtQ : Prec := 30 ) -> SeqEnum[AlgEtQCMType]</pre>
+> <pre><b>AllCMTypes</b>(A::AlgEtQ : Prec := Precision(GetDefaultRealField()) ) -> SeqEnum[AlgEtQCMType]</pre>
 <em>Returns all the AlgEtQCMTypes of A. The vararg Prec determined the precision of the codomain of the maps defining the CMTypes.</em>
 
 

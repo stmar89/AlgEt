@@ -36,7 +36,7 @@ import "Ord.m" : MatrixAtoQ , MatrixQtoA;
 // Homomorphism to the Complex Numbers
 //------------
 
-intrinsic HomsToC(A::AlgEtQ : Prec:=30)->SeqEnum[Map]
+intrinsic HomsToC(A::AlgEtQ : Prec:=Precision(GetDefaultRealField()))->SeqEnum[Map]
 {Returns the sequence of homomorphisms from A to the complex field CC. The precision of CC is given by the optional parameter "Prec". Default value is 30}
     if not assigned A`HomsToC or (Prec ne Precision(Codomain(A`HomsToC[1]))) then
         CC:=ComplexField(Prec);

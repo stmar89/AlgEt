@@ -264,6 +264,12 @@
 > <pre><b>Hom</b>(A::AlgEtQ , B::AlgEtQ , img::SeqEnum[AlgEtQElt] : CheckMultiplicative:=false, CheckUnital:=false, ComputeInverse:=true)->Map</pre>
 <em>Given two étale algebras A and B and a sequence img of elements of B, returns the Q-algebra homomorphism defined by sending the AbsoluteBasis of A to img. The VarArg CheckMultiplicative determines if the multiplicativity of the defined map is checked, while the VarArg CheckUnital determines wheter One(A) is sent to One(B). If the VarArg ComputeInverse is true, it checkes whether the map is invertible and, if so, it defines also the inverse (by assigning preimages).</em>
 
+> <pre><b>NaturalAction</b>(K::AlgEtQ, V::AlgEtQ)->Map</pre>
+<em>Let K=K1x...Kn be a product of distinct number fields, and s1,...,sn be strinctly positive integers. Put V=K1^s1x...xKn^sn. It returns the natural action of K on V, that is, the componentwise diagonal.</em>
+
+> <pre><b>DiagonalEmbedding</b>(K::AlgEtQ, V::AlgEtQ)->Map</pre>
+<em>Let K=K1x...Kn be a product of distinct number fields, and s1,...,sn be strinctly positive integers. Put V=K1^s1x...xKn^sn. It returns the natural action of K on V, that is, the componentwise diagonal.</em>
+
 
 ## List of instrinsics in AlgEtQ/DirectProduct.m:
 

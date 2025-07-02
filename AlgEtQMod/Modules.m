@@ -148,25 +148,6 @@ intrinsic Print(I::AlgEtQMod)
   printf"Module over %o", Order(I);
 end intrinsic;
 
-//----------
-// Natural Action
-//----------
-
-intrinsic NaturalAction(K::AlgEtQ, V::AlgEtQ)->Map
-{Let K=K1x...Kn be a product of distinct number fields, and s1,...,sn be strinctly positive integers. Put V=K1^s1x...xKn^sn. It returns the natural action of K on V, that is, the componentwise diagonal.}
-    Knf:=[ DefiningPolynomial(L) : L in Components(K) ];
-    Vnf:=[ DefiningPolynomial(L) : L in Components(V) ];
-    require #Seqset(Knf) eq #Components(K) : "The number fields defining K are not distinct";
-    require Seqset(Knf) eq Seqset(Vnf) : "There is no componentwise diagonal action of K on V";
-    ind:=[ Index(Knf,fV) : fV in Vnf]; // there is only one index in Knf for each fV since Knf is a product of distinct number fields
-    mKV:=function(x)
-        cx:=Components(x);
-        y:=< cx[ind[i]] : i in  [1..#Vnf]>;
-        return y;
-    end function;
-    m:=map< K->V | x:->mKV(x)>;
-    return m;
-end intrinsic;
 
 //----------
 // Access the attributes

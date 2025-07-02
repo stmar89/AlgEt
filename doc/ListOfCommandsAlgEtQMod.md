@@ -46,9 +46,6 @@ Method should be of the form "julia -J /tmp/Hecke.so ~/path/to/AlgEt/" (the ".so
 > <pre><b>Print</b>(I::AlgEtQMod)</pre>
 <em>Prints the module.</em>
 
-> <pre><b>NaturalAction</b>(K::AlgEtQ, V::AlgEtQ)->Map</pre>
-<em>Let K=K1x...Kn be a product of distinct number fields, and s1,...,sn be strinctly positive integers. Put V=K1^s1x...xKn^sn. It returns the natural action of K on V, that is, the componentwise diagonal.</em>
-
 > <pre><b>UniverseAlgebra</b>(I::AlgEtQMod) -> AlgEtQ,Map</pre>
 <em>Returns the étale algebra in which the module lives, together with the action map:Algebra(Order(I))->UniverseAlgebra(I).</em>
 

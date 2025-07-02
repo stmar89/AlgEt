@@ -839,7 +839,13 @@ These are produced by recursively searching for maximal submodules.</em>
 <em>Returns the non-invertible primes of the order.</em>
 
 > <pre><b>IsPrime</b>(I::AlgEtQIdl) -> BoolElt</pre>
-<em>Given an integral S-ideal, returns if the ideal is a prime fractional ideal of S, that is a maximal S ideal.</em>
+<em>Given an integral S-ideal, returns if the ideal is a prime fractional ideal of S, that is, a maximal S ideal.</em>
+
+> <pre><b>IsMaximal</b>(I::AlgEtQIdl) -> BoolElt</pre>
+<em>Given an integral S-ideal, returns if the ideal is a prime fractional ideal of S, that is, a maximal S ideal.</em>
+
+> <pre><b>IsMaximalIdeal</b>(I::AlgEtQIdl) -> BoolElt</pre>
+<em>Given an integral S-ideal, returns if the ideal is a prime fractional ideal of S, that is, a maximal S ideal.</em>
 
 > <pre><b>IsBassAtPrime</b>(S::AlgEtQOrd,P::AlgEtQIdl) -> BoolElt</pre>
 <em>Check if the order is Bass at the prime ideal P, that is, if every overorder of S is Gorenstein at the primes above P.</em>

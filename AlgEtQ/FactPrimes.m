@@ -161,7 +161,7 @@ intrinsic NonInvertiblePrimes(R::AlgEtQOrd) -> SetIndx
 end intrinsic;
 
 intrinsic IsPrime(I::AlgEtQIdl) -> BoolElt
-{Given an integral S-ideal, returns if the ideal is a prime fractional ideal of S, that is a maximal S ideal.}
+{Given an integral S-ideal, returns if the ideal is a prime fractional ideal of S, that is, a maximal S ideal.}
     require IsIntegral(I): "the ideal must be integral";
     if not assigned I`IsPrime then
         prim:=PrimesAbove(I);
@@ -173,6 +173,16 @@ intrinsic IsPrime(I::AlgEtQIdl) -> BoolElt
         I`IsPrime:=bool;
     end if;
     return I`IsPrime;
+end intrinsic;
+
+intrinsic IsMaximal(I::AlgEtQIdl) -> BoolElt
+{Given an integral S-ideal, returns if the ideal is a prime fractional ideal of S, that is, a maximal S ideal.}
+    return IsPrime(I);
+end intrinsic;
+
+intrinsic IsMaximalIdeal(I::AlgEtQIdl) -> BoolElt
+{Given an integral S-ideal, returns if the ideal is a prime fractional ideal of S, that is, a maximal S ideal.}
+    return IsPrime(I);
 end intrinsic;
 
 intrinsic IsBassAtPrime(S::AlgEtQOrd,P::AlgEtQIdl) -> BoolElt

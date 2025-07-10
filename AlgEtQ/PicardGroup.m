@@ -208,7 +208,7 @@ IsPrincipal_prod_internal:=function( II , GRH )
 
 
     I,a:=SmallRepresentative(II); //a*II=I
-    vprintf AlgEtQPicardGroup, 2:"IsPrincipal_prod_internal:\n
+    vprintf AlgEtQPicardGroup, 3:"IsPrincipal_prod_internal:\n
                                     ZBasis(II) = %o\n,ZBasis(I) = %o\n",
                                     PrintSeqAlgEtQElt(ZBasis(II)),PrintSeqAlgEtQElt(ZBasis(I));
     test,I_asProd:=IsProductOfIdeals(I);
@@ -239,7 +239,7 @@ IsPrincipal_prod_internal:=function( II , GRH )
     assert2 gen*S eq I;
     
     gen:=gen/a;
-    vprintf AlgEtQPicardGroup, 2:"IsPrincipal_prod_internal:\n
+    vprintf AlgEtQPicardGroup, 3:"IsPrincipal_prod_internal:\n
                             [gen,a] = %o\n",PrintSeqAlgEtQElt([gen,a]); 
     II`Generators:=[gen];
     return true,gen;
@@ -450,7 +450,9 @@ intrinsic PicardGroup( S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
 
     R,r:=ResidueRingUnits(O,FO); // G, mG
     Sgens:=ResidueRingUnitsSubgroupGenerators(F); // ogens //generators in S of (S/F)*
+    vprintf AlgEtQPicardGroup, 2: "PicardGroup: UO..."; 
     UO,uO:=UnitGroup(O : GRH:=GRH ); // Um, mUm 
+    vprintf AlgEtQPicardGroup, 2: "done\n"; 
     H:=FreeAbelianGroup(#Generators(GO));
     D, mRD, mHD, mDR, mDH := DirectSum(R,H); // D, mGD, mHD, mDG, mDH
     relDresidue:=[mRD(x@@r) : x in Sgens];
@@ -465,11 +467,51 @@ intrinsic PicardGroup( S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
     end for;
 
     P, mDP := quo<D|relDresidue cat relDunits cat relDglue>;
+    vprintf AlgEtQPicardGroup, 2: "PicardGroup: D = %o\n",D; 
+    vprintf AlgEtQPicardGroup, 2: "PicardGroup: P = %o\n",P; 
+    vprintf AlgEtQPicardGroup, 2: "PicardGroup: ker(mDP) = %o\n",Kernel(mDP); 
     gens_P_in_D:=[P.i@@mDP : i in [1..#Generators(P)]];
+    // Issue: the elements in gens_P_in_D might have very large coefficients, resulting in generators with
+    // horrible Z-bases. The next few lines, minimize the coefficients that appear in fron of the free generators.
+        gens_P_in_D_small:=[];
+        ker:=Kernel(mDP);
+        ker_gens_inD:=[D!ker.i:i in [1..Ngens(ker)]];
+        ker_free_gens_inD:=[g:g in ker_gens_inD|Order(g) eq 0];
+        if #ker_free_gens_inD gt 0 then
+            basis_mat:=Matrix([Eltseq(mDH(g)):g in ker_free_gens_inD]);
+            basis_mat_LLL,T:=LLL(basis_mat); // basis_mat_LLL = T*basis_mat
+            Latt:=LatticeWithBasis(basis_mat_LLL);
+            vprintf AlgEtQPicardGroup, 2: "PicardGroup: basis_mat = \n%o\n",basis_mat; 
+            vprintf AlgEtQPicardGroup, 2: "PicardGroup: basis_mat_LLL = \n%o\n",basis_mat_LLL; 
+            for g in gens_P_in_D do
+                elt:=Vector(Eltseq(-mDH(g)));
+                vprintf AlgEtQPicardGroup, 2: "PicardGroup: ClosestVector to %o...",elt; 
+                c:=ClosestVector(Latt,elt);
+                vprintf AlgEtQPicardGroup, 2: "done\n"; 
+                c:=Eltseq(Vector(Coordinates(c))*T);
+                g_small:=g+&+[c[i]*ker_free_gens_inD[i]:i in [1..#c]];
+                // replace coeffs c of finite order N with N-c if better size
+                c_small:=Eltseq(g_small);
+                orders_Di:=[Order(D.i) : i in [1..Ngens(D)]];
+                N_c_small:=[c_small[i]-orders_Di[i]:i in [1..#c_small]];
+                c_better:=[Order(D.i) ne 0 and (Abs(N_c_small[i]) lt Abs(c_small[i])) select N_c_small[i] else c_small[i] : i in [1..#c_small]];
+                g_small:=&+[c_better[i]*D.i:i in[1..Ngens(D)]];
+                assert g-g_small in ker;
+                vprintf AlgEtQPicardGroup, 2: "PicardGroup: g,g_small = %o\t%o\n",g,g_small; 
+                if &+[Abs(c):c in Eltseq(g)] lt &+[Abs(c):c in Eltseq(g_small)] then
+                    Append(~gens_P_in_D_small,g);
+                else
+                    Append(~gens_P_in_D_small,g_small);
+                end if;
+            end for;
+            gens_P_in_D:=gens_P_in_D_small;
+        end if;
+    // End of optimization
+
     if #P gt 1 then
         generators_ideals:=[];
         for igen->gen in gens_P_in_D do
-            vprintf AlgEtQPicardGroup, 2: "PicardGroup: gens_P_in_D[%o]...\n",igen; 
+            vprintf AlgEtQPicardGroup, 2: "PicardGroup: gens_P_in_D[%o]i = %o...\n",igen,gen; 
             vprintf AlgEtQPicardGroup, 2: "\t\tcomputing id1 ..."; 
             id1:=(S!!( O*(r(mDR(gen))) )) meet S;
             vprintf AlgEtQPicardGroup, 2: "done: it has ZBasis of length %o\n",#Sprint(ZBasis(id1)); 

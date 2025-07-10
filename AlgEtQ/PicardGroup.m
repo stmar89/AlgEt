@@ -418,13 +418,13 @@ intrinsic PicardGroup( S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
         end for;
 
         mGO_to_S:=function(rep)  
-            vprint AlgEtQPicardGroup, 2: "PicardGroup: mGO_to_S\n";
+            vprint AlgEtQPicardGroup, 3: "PicardGroup: mGO_to_S\n";
             coeff:=Eltseq(rep);
             idS:=&*[(gens_GO_in_S[i])^coeff[i] : i in [1..#coeff] ];
             return idS;
         end function;
         mGO_to_O:=function(rep) 
-            vprint AlgEtQPicardGroup, 2: "PicardGroup: mGO_to_O\n"; 
+            vprint AlgEtQPicardGroup, 3: "PicardGroup: mGO_to_O\n"; 
             coeff:=Eltseq(rep);
             assert #coeff eq #gens_GO_in_O;
             idO:=&*[(gens_GO_in_O[i])^coeff[i] : i in [1..#coeff] ];
@@ -468,17 +468,28 @@ intrinsic PicardGroup( S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
     gens_P_in_D:=[P.i@@mDP : i in [1..#Generators(P)]];
     if #P gt 1 then
         generators_ideals:=[];
-        for gen in gens_P_in_D do
+        for igen->gen in gens_P_in_D do
+            vprintf AlgEtQPicardGroup, 2: "PicardGroup: gens_P_in_D[%o]...\n",igen; 
+            vprintf AlgEtQPicardGroup, 2: "\t\tcomputing id1 ..."; 
             id1:=(S!!( O*(r(mDR(gen))) )) meet S;
+            vprintf AlgEtQPicardGroup, 2: "done: it has ZBasis of length %o\n",#Sprint(ZBasis(id1)); 
+            vprintf AlgEtQPicardGroup, 2: "\t\tcomputing id2 ..."; 
             id2:=mGO_to_S(mDH(gen));
+            vprintf AlgEtQPicardGroup, 2: "done: it has ZBasis of length %o\n",#Sprint(ZBasis(id2)); 
+            vprintf AlgEtQPicardGroup, 2: "\t\tcomputing id1*id2 ..."; 
             gen_inS:=id1*id2;
+            vprintf AlgEtQPicardGroup, 2: "done: it has ZBasis of length %o\n",#Sprint(ZBasis(gen_inS)); 
             // make the rep small
+            vprintf AlgEtQPicardGroup, 2: "\t\tcalling SmallRepresentative ..."; 
             gen_inS:=SmallRepresentative(gen_inS); // the ZBasis is already LLL-ed
+            vprintf AlgEtQPicardGroup, 2: "done\n"; 
             assert2 IsInvertible(gen_inS); //test using colon ideal
             gen_inS`IsInvertible:=true;
             gen_inS`MultiplicatorRing:=S;
             // invertible, so 2-generated.
+            vprintf AlgEtQPicardGroup, 2: "\t\tcalling TwoGeneratingSet ..."; 
             TwoGeneratingSet(gen_inS);
+            vprintf AlgEtQPicardGroup, 2: "done\n"; 
             Append(~generators_ideals,gen_inS);
         end for;
     else
@@ -488,16 +499,19 @@ intrinsic PicardGroup( S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
         return Explode(S`PicardGroup);
     end if;
 
+    vprint AlgEtQPicardGroup, 2: "PicardGroup: defining representative_picard_group ..."; 
     representative_picard_group := function(rep)
-        vprint AlgEtQPicardGroup, 2: "PicardGroup: representative_picard_group\n"; 
+        vprint AlgEtQPicardGroup, 3: "PicardGroup: representative_picard_group\n"; 
         repseq := Eltseq(rep);
         return &*[generators_ideals[i]^repseq[i]:i in [1..#generators_ideals]];
     end function;
+    vprint AlgEtQPicardGroup, 2: "done\n"; 
 
 
+    vprint AlgEtQPicardGroup, 2: "PicardGroup: defining disc_log_picard_group ..."; 
     disc_log_picard_group:=function(id)
     // (crep*id)^-1 is coprime with F
-        vprint AlgEtQPicardGroup, 2: "PicardGroup: disc_log_picard_group\n"; 
+        vprint AlgEtQPicardGroup, 3: "PicardGroup: disc_log_picard_group\n"; 
         crep:=1/(CoprimeRepresentative(id^-1,F));//here we check if id is invertible
         idO:=O!!(crep*id); //idO is coprime with FO
         GOrep:=idO@@gO;
@@ -510,12 +524,18 @@ intrinsic PicardGroup( S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
         rep_P:=mDP(-mRD(Rrep)+mHD(H!Eltseq(GOrep)));//[I]=-[xO meet S]+GOrep
         return rep_P;        
     end function;
+    vprint AlgEtQPicardGroup, 2: "done\n"; 
 
+    vprint AlgEtQPicardGroup, 2: "PicardGroup: computing cod ..."; 
     cod:=Parent(representative_picard_group(Zero(P)));
+    vprint AlgEtQPicardGroup, 2: "done\n"; 
+
+    vprint AlgEtQPicardGroup, 2: "PicardGroup: defining the map p ..."; 
     p:=map<P -> cod | rep:->representative_picard_group(rep),
                        id:->disc_log_picard_group(id) >;
+    vprint AlgEtQPicardGroup, 2: "done\n"; 
     S`PicardGroup:=<P,p>;
-    vprintf AlgEtQPicardGroup, 2:"PicardGroup:\n
+    vprintf AlgEtQPicardGroup, 2:"PicardGroup: computation is concluded\n
                         generators_ideals = %o\n",
                         [PrintSeqAlgEtQElt(ZBasis(I)) : I in generators_ideals];
     return P,p;

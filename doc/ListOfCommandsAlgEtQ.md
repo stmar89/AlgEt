@@ -721,35 +721,43 @@
 ## List of instrinsics in AlgEtQ/IntermediateIdeals.m:
 
 > <pre><b>MinimalIntermediateIdeals</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]</pre>
-<em>Given fractional S-ideals J subset I, returns the minimal (with respect to inclusion) fractional S-ideals K such that J subset K subset I.</em>
+<em>Given fractional S-ideals J subseteq I, returns the minimal (with respect to inclusion) fractional S-ideals K such that J subsetneq K subseteq I. Note J is never in the output.</em>
 
 > <pre><b>IntermediateIdeals</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]</pre>
-<em>Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that J subset K subset I. They are produced recursively from the minimal ones.</em>
+<em>Given fractional S-ideals J subseteq I, returns all the fractional S-ideals K such that J subseteq K subseteq I. They are produced recursively from the minimal ones. The output includes I and J.</em>
 
 > <pre><b>IntermediateIdealsWithPrescribedMultiplicatorRing</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]</pre>
-<em>Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that (K:K)=S and  J subset K subset I. They are produced recursively from the minimal ones.</em>
+<em>Given fractional S-ideals J subseteq I, returns all the fractional S-ideals K such that J subseteq K subseteq I and (K:K)=S. They are produced recursively from the minimal ones. The output includes I, if (I:I)=S, and J, if (J:J)=S.</em>
 
 > <pre><b>MaximalIntermediateIdeals</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]</pre>
-<em>Given fractional S-ideals J subset I, returns the maximal (with respect to inclusion) fractional S-ideals K such that J subset K subset I.</em>
+<em>Given fractional S-ideals J subseteq I, returns the maximal (with respect to inclusion) fractional S-ideals K such that J subseteq K subsetneq I. Note I is never in the output, while J is in the output if and only if the S-module I/J is simple, in which case the output consists only of J.</em>
 
 > <pre><b>IntermediateIdealsWithTrivialExtension</b>(I::AlgEtQIdl,J::AlgEtQIdl, O::AlgEtQOrd)->SetIndx[AlgEtQIdl]</pre>
-<em>Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that
-- J subset K subset I, and 
+<em>Given fractional S-ideals I and J and an order O such that 
+- S subset O,  
+- J subseteq I, and 
+- O subset (I:I),
+returns all the fractional S-ideals K such that 
+- J subseteq K subseteq I, and 
 - O!!K = I. 
-Note that we need O subset (J:J). They are produced recursively using from the maximal ones.</em>
+Note that the output always contains I. The output is produced by a recursiv use of MaximalIntermediateIdeals.</em>
 
 > <pre><b>IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing</b>(I::AlgEtQIdl,J::AlgEtQIdl, O::AlgEtQOrd)->SetIndx[AlgEtQIdl]</pre>
-<em>Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that 
-- J subset K subset I, 
+<em>Given fractional S-ideals I and J and an order O such that 
+- S subseteq O,  
+- J subseteq I, and 
+- O subseteq (I:I), 
+returns all the fractional S-ideals K satisfying
+- J subseteq K subseteq I, 
 - O!!K = I, and 
 - (K:K) eq S. 
-Note that we need O subset (J:J). They are produced recursively using from the maximal ones.</em>
+In particular, the output contains I if and only if O = (I:I) = S. The output is produced by a recursive use of MaximalIntermediateIdeals.</em>
 
 > <pre><b>IntermediateIdealsOfIndex</b>(I::AlgEtQIdl,J::AlgEtQIdl,N::RngIntElt)->SetIndx[AlgEtQIdl]</pre>
-<em>Given ideals J subset I over the same order, and a positive integer N, it returns all the ideals K such that 
-- J subset K subset I, and 
+<em>Given ideals J subseteq I over the same order, and a positive integer N, it returns all the ideals K such that 
+- J subseteq K subseteq I, and 
 - [I:K]=N. 
-These are produced by recursively searching for maximal submodules.</em>
+The output is produced by a recursive use of MaximalIntermediateIdeals.</em>
 
 
 ## List of instrinsics in AlgEtQ/IdealsOfIndex.m:

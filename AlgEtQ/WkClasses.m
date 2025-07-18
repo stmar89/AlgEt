@@ -211,11 +211,11 @@ intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum[AlgEtQIdl]
                 O:=MaximalOrder(Algebra(S));
                 wk_pp:=[];
                 // We have W_bar(S) = \prod_P W_P_bar(S), where:
-                //     -  P runs over the singular primes of S, 
+                //     - P runs over the singular primes of S, 
                 //     - W_bar(S) is the monoid of weak equivalence classes with mult ring S, and
                 //     - W_P_bar(S) is monoid of local P-equivalence classes with mult ring equal to S at P.
                 // We also have W_P_bar(S) = W_bar(S+P^kO), for any k big enough (eg. k ge v_p([O:S]),
-                //       where p is the rational prime of P).
+                //       where p is the rational prime in P).
                 ps:=[]; // rational primes of the pps
                 for iP->P in pp do
                     t0:=Cputime();
@@ -377,7 +377,7 @@ intrinsic WKICM(E::AlgEtQOrd : Method:="Auto")->SeqEnum[AlgEtQIdl]
             O:=MaximalOrder(Algebra(E));
             wk_pp:=[];
             // We have W(E) = \prod_P W_P(E), where:
-            //     -  P runs over the singular primes of E, 
+            //     - P runs over the singular primes of E, 
             //     - W(E) is the monoid of weak equivalence classes, and 
             //     - W_P(E) is monoid of local P-equivalence classes.
             // We also have W_P(E) = W(E+P^kO), for any k big enough (eg. k ge v_p([O:E]),
@@ -486,7 +486,7 @@ intrinsic WKICM(E::AlgEtQOrd : Method:="Auto")->SeqEnum[AlgEtQIdl]
             // We populate the attributes E`OverOrders and S`WKICM_bar for each overorder.
             // This is needed for the recursion step.
             // Note that some of the overorders have already the vararg WKICM_bar populated, because, for 
-            // example, there were coming from the recursive-1-single-singular-prime part of the code.
+            // example, they were coming from the recursive-1-single-singular-prime part of the code.
             // In this case, we don't want to add it a second time. Hence we need to keep track of this info.
             // We do it by using nested AssociativeArrays
             t0:=Cputime();

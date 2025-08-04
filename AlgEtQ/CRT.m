@@ -1,5 +1,3 @@
-/* vim: set syntax=magma :*/
-
 /////////////////////////////////////////////////////
 // Stefano Marseglia, stefano.marseglia89@gmail.com
 // https://stmar89.github.io/index.html
@@ -138,8 +136,8 @@ intrinsic ChineseRemainderTheorem(Is::SeqEnum[AlgEtQIdl],as::SeqEnum[AlgEtQElt])
     end if;
 end intrinsic;
 
-intrinsic ChineseRemainderTheoremFunctions(Is::SeqEnum[AlgEtQIdl])-> AlgEtQElt
-{Given a sequence `Is` of N ideals of S, pairwise coprime, returns a function S->S^N representing the natural isomorphism S/&*(Is) -> \prod_(I in Is) S/I and a function S^N-S representing the inverse.}
+intrinsic ChineseRemainderTheoremFunctions(Is::SeqEnum[AlgEtQIdl])-> Map,Map
+{Given a sequence `Is` of N ideals of S, pairwise coprime, returns a function S->S^N representing the natural isomorphism S/&*(Is) -> \prod_(I in Is) S/I and a function S^N->S representing the inverse.}
     S:=Order(Is[1]);
     N:=#Is;
     require forall{i : i in [2..N] | Order(Is[i]) eq S}:"the ideals must be of the same order";

@@ -105,6 +105,7 @@ intrinsic IntermediateIdealsWithPrescribedMultiplicatorRing(I::AlgEtQIdl,J::AlgE
     return output;
 end intrinsic;
 
+// OLD version
 intrinsic MaximalIntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]
 {Given fractional S-ideals J subseteq I, returns the maximal (with respect to inclusion) fractional S-ideals K such that J subseteq K subsetneq I. Note I is never in the output, while J is in the output if and only if the S-module I/J is simple, in which case the output consists only of J.}
     assert2 J subset I; // "the ideal J needs to be inside I";
@@ -137,6 +138,33 @@ intrinsic MaximalIntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQId
             max_Rmod:=MaximalSubmodules(Qp_Rmod);
             max_ideals join:={@ Ideal(S, mp_in_I cat 
                                     [(Qp!Eltseq(Qp_Rmod!b))@@qp@@q : b in Basis(max)]) : max in max_Rmod @};
+        end for;
+        return max_ideals;
+    end if;
+end intrinsic;
+
+intrinsic MaximalIntermediateIdeals_NEW(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]
+{Given fractional S-ideals J subseteq I, returns the maximal (with respect to inclusion) fractional S-ideals K such that J subseteq K subsetneq I. Note I is never in the output, while J is in the output if and only if the S-module I/J is simple, in which case the output consists only of J.}
+    assert2 J subset I; // "the ideal J needs to be inside I";
+    S:=Order(I);
+    assert2 S eq Order(J); // "The ideals must be over the same order";
+    if J eq I then 
+        return {@ @};
+    else
+        // If J c K c I is maximal then I/K is a simple module, that is, isomorphic to S/P for some prime P of S
+        // lying in the support of the finite module I/J.
+        // These are precisely the prime P satisfying (J:I) meet S subseteq P.
+        supp:=PrimesAbove(ColonIdeal(J,I) meet OneIdeal(S));
+        assert #supp ge 1;
+        max_ideals:={@ @};
+        for P in supp do
+            PI:=P*I;
+            zPI:=ZBasis(PI);
+            Q,q:=QuotientVS(I,PI,P);
+            for V in MaximalSubmodules(Q) do
+                K:=Ideal(S,[b@@q:b in Basis(V)] cat zPI);
+                Include(~max_ideals,K);
+            end for;
         end for;
         return max_ideals;
     end if;

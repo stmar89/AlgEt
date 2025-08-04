@@ -1,6 +1,7 @@
 AttachSpec("../../spec");
 SetAssertions(2);
 time_start:=Cputime();
+time_start_local:=Cputime();
 
 
     printf "### Testing Creation of Algebra:";
@@ -24,9 +25,9 @@ time_start:=Cputime();
     SetAssertions(1);
     printf " all good!\n";
 
-
-
-
+printf "time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
 
 
     printf "### Testing Attributes and Equality:";
@@ -44,9 +45,9 @@ time_start:=Cputime();
     SetAssertions(1);
     printf " all good!\n";
 
-
-
-
+printf "time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
 
 
     printf "### Testing IsNumberField:";
@@ -82,16 +83,17 @@ time_start:=Cputime();
     SetAssertions(1);
     printf " all good!\n";
 
-
-
-
+printf "time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
 
 
     printf "### Testing Elements:";
-    //AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/AlgEt/spec");
     SetVerbose("AlgEtQElt",2);
 
     _<x>:=PolynomialRing(Integers());
+
     f:=(x^8+16)*(x^8+81);
     A:=EtaleAlgebra(f);
     a:=PrimitiveElement(A);
@@ -141,7 +143,7 @@ time_start:=Cputime();
     end for;
 
     // testing sequences
-    //AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());
     f:=(x^8+16)*(x^8+81);
     A:=EtaleAlgebra(f);
@@ -175,11 +177,32 @@ time_start:=Cputime();
     s4:=SumOfProducts(seq,seq1);
     assert s1 eq s2 and s1 eq s3 and s1 eq s4;
 
+    //testing PrimitiveElement and PowerBasis
+    //AttachSpec("~/AlgEt/spec");
+    _<x>:=PolynomialRing(Integers());
+    K:=NumberField(x^8+16);
+    A:=EtaleAlgebra([K,K]);
+    a:=PrimitiveElement(A);
+    assert Degree(MinimalPolynomial(a)) eq AbsoluteDimension(A);
+    _:=PowerBasis(A);
+
+    K:=RationalsAsNumberField();
+    A:=EtaleAlgebra([K,K,K,K]);
+    a:=PrimitiveElement(A);
+    assert Degree(MinimalPolynomial(a)) eq AbsoluteDimension(A);
+    _:=PowerBasis(A);
+
+    b:=A!<1,2,3,7>;
+    SetPrimitiveElement(b);
+    assert PrimitiveElement(A) eq b;
+    SetPrimitiveElement(a);
+    assert PrimitiveElement(A) eq a;
+
     printf " all good!\n"; 
 
-
-
-
+printf "time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
 
 
     printf "### Testing Homs:";
@@ -219,9 +242,9 @@ time_start:=Cputime();
     printf ".";
     printf " all good!\n"; 
 
-
-
-
+printf "time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
 
 
     printf "### Testing DirectProduct:";
@@ -241,9 +264,9 @@ time_start:=Cputime();
     SetAssertions(1);
     printf " all good!\n";
 
-
-
-
+printf "time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
 
     
     printf "### Testing Orders:";
@@ -329,9 +352,9 @@ time_start:=Cputime();
 
     printf " all good!\n"; 
 
-
-
-
+printf "time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
 
 
     printf "### Testing Ideals:";
@@ -414,9 +437,9 @@ time_start:=Cputime();
     printf " all good!\n";
 
 
-
-
-
+printf "time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
 
 
   printf "### Testing ZBasisLLL:";
@@ -434,9 +457,9 @@ time_start:=Cputime();
   assert J eq I;
   printf " all good!\n"; 
 
-
-
-
+printf "time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
 
 
     printf "### Testing Quotients:";
@@ -469,9 +492,9 @@ time_start:=Cputime();
 
     printf " all good!\n"; 
 
-
-
-
+printf "time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
 
 
     printf "### Testing OverOrders:";
@@ -493,9 +516,9 @@ time_start:=Cputime();
 
     printf " all good!\n"; 
 
-
-
-
+printf "time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
 
     
     printf "### Testing GraphOverOrders:";
@@ -518,9 +541,9 @@ time_start:=Cputime();
     end for;
     printf " all good!\n";
 
-
-
-
+printf "time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
 
 
     printf "### Testing Trace and Norm:";
@@ -538,9 +561,9 @@ time_start:=Cputime();
     end for;
     printf " all good!\n"; 
 
-
-
-
+printf "time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
 
     
     printf "### Testing Completion:";
@@ -564,9 +587,9 @@ time_start:=Cputime();
     end for;
     printf " all good!\n";
 
-
-
-
+printf "time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
 
 
     printf "### Testing Complex Conjugation:";
@@ -591,9 +614,9 @@ time_start:=Cputime();
     printf ".";
     printf " all good!\n";
 
-
-
-
+printf "time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
 
 
     printf "### Testing CM-types:";
@@ -628,9 +651,9 @@ time_start:=Cputime();
     end for;
     printf " all good!\n";
 
-
-
-
+printf "time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
 
 
     printf "### Testing IntermediateIdeals:";
@@ -640,38 +663,98 @@ time_start:=Cputime();
     K:=EtaleAlgebra(f);
     E:=EquationOrder(K);
     O:=MaximalOrder(K);
+    EO:=E!!OneIdeal(O);
     ff:=Conductor(E);
-    _:=MinimalIntermediateIdeals(E!!OneIdeal(O),ff);
+    mm:=MinimalIntermediateIdeals(EO,ff);
     printf ".";
-    _:=IntermediateIdeals(E!!OneIdeal(O),ff);
+    assert forall{I:I in mm | {@ I @} eq MinimalIntermediateIdeals(I,ff)};
     printf ".";
-    _:=IntermediateIdealsWithPrescribedMultiplicatorRing(E!!OneIdeal(O),ff);
+    nn:=IntermediateIdeals(EO,ff);
     printf ".";
-    _:=MaximalIntermediateIdeals(E!!OneIdeal(O),ff);
+    assert mm subset nn;
+    assert EO in nn;
+    assert ff in nn;
     printf ".";
-    _:=IntermediateIdealsWithTrivialExtension(E!!OneIdeal(O),ff,O);
+    nn:=IntermediateIdealsWithPrescribedMultiplicatorRing(EO,ff);
+    assert OneIdeal(E) in nn;
     printf ".";
-    _:=IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing(E!!OneIdeal(O),ff,O);
+    nn:=IntermediateIdealsWithPrescribedMultiplicatorRing(OneIdeal(O),O!!ff);
+    assert OneIdeal(O) in nn;
+    assert O!!ff in nn;
+    printf ".";
+    nn:=IntermediateIdealsWithPrescribedMultiplicatorRing(EO,OneIdeal(E));
+    assert OneIdeal(E) in nn;
+    printf ".";
+    nn:=IntermediateIdealsWithPrescribedMultiplicatorRing(OneIdeal(E),ff);
+    assert OneIdeal(E) in nn;
+    printf ".";
+    mm:=MaximalIntermediateIdeals(EO,ff);
+    assert forall{I:I in mm | {@ I @} eq MaximalIntermediateIdeals(EO,I)};
+    printf ".";
+    nn:=IntermediateIdealsWithTrivialExtension(EO,ff,O);
+    assert EO in nn;
+    assert OneIdeal(E) in nn;
+    printf ".";
+    nn:=IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing(EO,ff,O);
+    assert OneIdeal(E) in nn;
+    printf ".";
+    nn:=IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing(EO,OneIdeal(E),O);
+    assert OneIdeal(E) in nn;
+    printf ".";
+    nn:=IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing(OneIdeal(O),O!!ff,O);
+    assert OneIdeal(O) in nn;
     printf ".";
     f:=x^4+291*x^3-988*x^2-1000*x-1000;
     K:=EtaleAlgebra(f);
     E:=EquationOrder(K);
     O:=MaximalOrder(K);
+    EO:=E!!OneIdeal(O);
     ff:=Conductor(E);
-    _:=MinimalIntermediateIdeals(E!!OneIdeal(O),ff);
+    mm:=MinimalIntermediateIdeals(EO,ff);
     printf ".";
-    _:=MaximalIntermediateIdeals(E!!OneIdeal(O),ff);    
+    assert forall{I:I in mm | {@ I @} eq MinimalIntermediateIdeals(I,ff)};
     printf ".";
-    _:=IntermediateIdealsWithTrivialExtension(E!!OneIdeal(O),ff,O);
+    nn:=IntermediateIdeals(EO,ff); //2 minutess
     printf ".";
-    _:=IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing(E!!OneIdeal(O),ff,O);
+    assert mm subset nn;
+    assert EO in nn;
+    assert ff in nn;
+    printf ".";
+    nn:=IntermediateIdealsWithPrescribedMultiplicatorRing(EO,ff);
+    assert OneIdeal(E) in nn;
+    printf ".";
+    nn:=IntermediateIdealsWithPrescribedMultiplicatorRing(OneIdeal(O),O!!ff);
+    assert OneIdeal(O) in nn;
+    assert O!!ff in nn;
+    printf ".";
+    nn:=IntermediateIdealsWithPrescribedMultiplicatorRing(EO,OneIdeal(E));
+    assert OneIdeal(E) in nn;
+    printf ".";
+    nn:=IntermediateIdealsWithPrescribedMultiplicatorRing(OneIdeal(E),ff);
+    assert OneIdeal(E) in nn;
+    printf ".";
+    mm:=MaximalIntermediateIdeals(EO,ff);
+    assert forall{I:I in mm | {@ I @} eq MaximalIntermediateIdeals(EO,I)};
+    printf ".";
+    nn:=IntermediateIdealsWithTrivialExtension(EO,ff,O);
+    assert EO in nn;
+    assert OneIdeal(E) in nn;
+    printf ".";
+    nn:=IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing(EO,ff,O);
+    assert OneIdeal(E) in nn;
+    printf ".";
+    nn:=IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing(EO,OneIdeal(E),O);
+    assert OneIdeal(E) in nn;
+    printf ".";
+    nn:=IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing(OneIdeal(O),O!!ff,O);
+    assert OneIdeal(O) in nn;
     printf ".";
     SetAssertions(1);
     printf " all good!\n"; 
 
-
-
-
+printf "time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
 
 
     printf "### Testing IdealsOfIndex:";
@@ -700,9 +783,9 @@ time_start:=Cputime();
     SetAssertions(1);    
     printf " all good!\n"; 
 
-
-
-
+printf "time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
 
     
     printf "### Testing ShortEltSmallRep:";
@@ -722,9 +805,9 @@ time_start:=Cputime();
     end for;
     printf " all good!\n"; 
 
-
-
-
+printf "time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
 
 
     printf "### Testing MinimalGenerators:";
@@ -777,9 +860,9 @@ time_start:=Cputime();
     assert l1 eq l2;
     printf " all good!\n"; 
 
-
-
-
+printf "time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
 
 
     printf "### Testing CRT:";
@@ -866,9 +949,9 @@ time_start:=Cputime();
     SetAssertions(1);    
     printf " all good!\n"; 
 
-
-
-
+printf "time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
 
 
     printf "### Testing PicardGroup and UnitGroup:";
@@ -917,9 +1000,9 @@ time_start:=Cputime();
 
     printf " all good!\n"; 
 
-
-
-
+printf "time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
 
 
     printf "### Testing Primes and Factorizaton:";
@@ -964,13 +1047,13 @@ time_start:=Cputime();
     SetAssertions(1);
     printf " all good!\n"; 
 
+printf "time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
 
-
-
-
-
-
-
+printf "time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
 
 
     printf "### Testing LowCohenMacaulayType:";
@@ -995,9 +1078,9 @@ time_start:=Cputime();
     SetAssertions(1);
     printf " all good!\n"; 
 
-
-
-
+printf "time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
 
 
     printf "### Testing WKICM:";
@@ -1022,9 +1105,9 @@ time_start:=Cputime();
     SetAssertions(1);
     printf " all good!\n"; 
 
-
-
-
+printf "time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
 
 
     printf "### Testing WKEq:";
@@ -1042,9 +1125,9 @@ time_start:=Cputime();
     printf " all good!\n"; 
     
 
-
-
-
+printf "time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
 
 
     printf "### Testing ICM:";
@@ -1064,9 +1147,9 @@ time_start:=Cputime();
     SetAssertions(1);
     printf " all good!\n";
 
-
-
-
+printf "time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
 
 
     printf "### Testing TotRealPos:";
@@ -1087,9 +1170,9 @@ time_start:=Cputime();
     SetAssertions(1);
     printf " all good!\n"; 
 
-
-
-
+printf "time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
 
     
     printf "### Testing Print Saving:";
@@ -1125,8 +1208,7 @@ time_start:=Cputime();
 
     printf " all good!\n"; 
 
-
-
-
+printf "time %o
+",Cputime(time_start_local);
 Cputime(time_start);
 quit;

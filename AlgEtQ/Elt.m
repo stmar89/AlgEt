@@ -554,11 +554,27 @@ end intrinsic;
 //------------
 
 intrinsic PrimitiveElement(A::AlgEtQ) -> AlgEtQElt
-{Returns the primitive element of the étale algebra A. Note that A has a primitive element only if it is the product of distinct number fields.}
+{Returns a primitive element of the étale algebra A, that is, an element of A whose minimal polynomial over Q has degree equal to the dimension of A over Q. The output is deterministically computed using the following procedure. Let N be the number of components of A, each one having primitive element a_i. Set b_1 = a_1. For i=2,..,N, set b_i = a_i+j where j is the smallest non-negative integer such that the minimal polynomial of a_i+j is not in the set of minimal polynomials of the elements b_1,...,b_(i-1). The output is the element of A whose components are b_1,...,b_N. In particular, if A is a product of number fields with different defining polynomials, then the output is the element of A whose components are the primitive elements of the components.}
     if not assigned A`PrimitiveElement then
         nf,embs:=Components(A);
-        require #{ DefiningPolynomial(K) : K in nf } eq #nf : "The number fields defining the algebra are not distinct. Hence the algebra does not have a primitive element";
-        A`PrimitiveElement:= CreateAlgEtQElt(A,<PrimitiveElement(F) : F in nf>);
+        ms:={DefiningPolynomial(nf[1])};
+        bs:=<PrimitiveElement(nf[1])>;
+        for i in [2..#nf] do
+            ai:=PrimitiveElement(nf[i]);
+            j:=0;
+            bi:=ai+j;
+            mi:=AbsoluteMinimalPolynomial(bi);
+            while mi in ms do
+                j+:=1;
+                bi:=ai+j;
+                mi:=AbsoluteMinimalPolynomial(bi);
+            end while;
+            Append(~bs,bi);
+            Include(~ms,mi);
+        end for;
+        prim_elt:=CreateAlgEtQElt(A,bs);
+        A`PrimitiveElement:=prim_elt;
+        assert2 Degree(MinimalPolynomial(prim_elt)) eq AbsoluteDimension(A);
     end if;
     return A`PrimitiveElement;
 end intrinsic;
@@ -640,10 +656,11 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing Elements:";
-    //AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/AlgEt/spec");
     SetVerbose("AlgEtQElt",2);
 
     _<x>:=PolynomialRing(Integers());
+
     f:=(x^8+16)*(x^8+81);
     A:=EtaleAlgebra(f);
     a:=PrimitiveElement(A);
@@ -726,6 +743,19 @@ end intrinsic;
     s3:=&+[seq[i]*seq1[i] : i in [1..#seq]];
     s4:=SumOfProducts(seq,seq1);
     assert s1 eq s2 and s1 eq s3 and s1 eq s4;
+
+    //testing PrimitiveElement and PowerBasis
+    K:=NumberField(x^8+16);
+    A:=EtaleAlgebra([K,K]);
+    a:=PrimitiveElement(A);
+    assert Degree(MinimalPolynomial(a)) eq AbsoluteDimension(A);
+    _:=PowerBasis(A);
+
+    K:=RationalsAsNumberField();
+    A:=EtaleAlgebra([K,K,K,K]);
+    a:=PrimitiveElement(A);
+    assert Degree(MinimalPolynomial(a)) eq AbsoluteDimension(A);
+    _:=PowerBasis(A);
 
     printf " all good!\n"; 
 

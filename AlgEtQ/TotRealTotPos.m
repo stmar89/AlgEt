@@ -170,6 +170,5 @@ declare attributes AlgEtQOrd:TotallyRealPositiveUnitGroup;
         _:=TotallyRealPositiveUnitGroup(S);
     end for;
     SetAssertions(1);
-    printf " all good!\n"; 
-
+    printf " all good!"; 
 */

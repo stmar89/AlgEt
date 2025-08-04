@@ -82,10 +82,6 @@ end intrinsic;
         _:=ICM(E);
     end for;
     SetAssertions(1);
-    printf " all good!\n";
+    printf " all good!";
 
 */
-
-
-
-

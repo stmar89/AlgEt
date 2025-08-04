@@ -106,7 +106,7 @@ intrinsic IntermediateIdealsWithPrescribedMultiplicatorRing(I::AlgEtQIdl,J::AlgE
 end intrinsic;
 
 // OLD version
-intrinsic MaximalIntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]
+intrinsic MaximalIntermediateIdeals_OLD(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]
 {Given fractional S-ideals J subseteq I, returns the maximal (with respect to inclusion) fractional S-ideals K such that J subseteq K subsetneq I. Note I is never in the output, while J is in the output if and only if the S-module I/J is simple, in which case the output consists only of J.}
     assert2 J subset I; // "the ideal J needs to be inside I";
     S:=Order(I);
@@ -143,7 +143,7 @@ intrinsic MaximalIntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQId
     end if;
 end intrinsic;
 
-intrinsic MaximalIntermediateIdeals_NEW(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]
+intrinsic MaximalIntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]
 {Given fractional S-ideals J subseteq I, returns the maximal (with respect to inclusion) fractional S-ideals K such that J subseteq K subsetneq I. Note I is never in the output, while J is in the output if and only if the S-module I/J is simple, in which case the output consists only of J.}
     assert2 J subset I; // "the ideal J needs to be inside I";
     S:=Order(I);
@@ -161,7 +161,9 @@ intrinsic MaximalIntermediateIdeals_NEW(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgE
             PI:=P*I;
             zPI:=ZBasis(PI);
             Q,q:=QuotientVS(I,PI,P);
-            for V in MaximalSubmodules(Q) do
+            max_sub_vs:=MaximalSubmodules(Q);
+            assert #max_sub_vs gt 0;
+            for V in max_sub_vs do
                 K:=Ideal(S,[b@@q:b in Basis(V)] cat zPI);
                 Include(~max_ideals,K);
             end for;
@@ -365,6 +367,6 @@ end intrinsic;
     assert OneIdeal(O) in nn;
     printf ".";
     SetAssertions(1);
-    printf " all good!\n"; 
+    printf " all good!"; 
 
 */

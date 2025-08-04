@@ -173,6 +173,5 @@ end intrinsic;
     assert #FindOverOrders(R) eq #FindOverOrders(R1);
     printf ".";
 
-    printf " all good!\n"; 
-
+    printf " all good!"; 
 */

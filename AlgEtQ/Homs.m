@@ -147,6 +147,6 @@ end intrinsic;
     assert Inverse(m)(pi) eq -PrimitiveElement(A);
     assert m(One(A)) eq One(B) and Inverse(m)(One(B)) eq One(A);
     printf ".";
-    printf " all good!\n"; 
+    printf " all good!"; 
 
 */

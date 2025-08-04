@@ -279,6 +279,5 @@ end intrinsic;
     oo:=FindOverOrders(E);
     assert #oo eq 11;
 
-    printf " all good!\n"; 
-
+    printf " all good!"; 
 */

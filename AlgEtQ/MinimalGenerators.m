@@ -106,6 +106,5 @@ end intrinsic;
     TwoGeneratingSet(I);
     l2:=[ I^i : i in exp ];
     assert l1 eq l2;
-    printf " all good!\n"; 
-
+    printf " all good!"; 
 */

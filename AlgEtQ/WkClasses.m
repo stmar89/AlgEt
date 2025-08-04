@@ -554,7 +554,6 @@ end intrinsic;
     assert #FindOverOrders(E) eq 15;
     assert #WKICM(E) eq 23;
     SetAssertions(1);
-    printf " all good!\n"; 
-
+    printf " all good!"; 
 */
 

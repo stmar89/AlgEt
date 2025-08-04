@@ -112,6 +112,5 @@ end intrinsic;
         ff:=Conductor(S);
         _:=ShortElement(ff);
     end for;
-    printf " all good!\n"; 
-
+    printf " all good!"; 
 */

@@ -47,8 +47,12 @@ input_file0;
         t0:=find_next(inp,pos,"TESTS");
         t1:=find_next(inp,t0,"*/")-3;
         out cat:="time_start_local:=Cputime();\n";
-        out cat:=inp[t0..t1];
-        out cat:="printf \"time %o\n\",Cputime(time_start_local);" cat "\n";
+        inp_local:=inp[t0..t1];
+        while #inp_local gt 0 and inp_local[#inp_local] eq "\n" do
+            Prune(~inp_local);
+        end while;
+        out cat:=inp_local;
+        out cat:="\nprintf \"\ttime %o\n\",Cputime(time_start_local);" cat "\n";
     end for;
     out cat:="Cputime(time_start);\nquit;";
     fprintf output_file,"%o",out; 

@@ -126,6 +126,6 @@ end intrinsic;
         _:=GraphOverOrders(R);
         SetAssertions(1);
     end for;
-    printf " all good!\n";
+    printf " all good!";
 
 */

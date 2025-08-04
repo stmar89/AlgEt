@@ -296,6 +296,6 @@ end intrinsic
     facs:=[ Factorization(I) : I in ids ];
     printf ".";
     SetAssertions(1);
-    printf " all good!\n"; 
+    printf " all good!"; 
 
 */

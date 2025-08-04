@@ -662,7 +662,6 @@ end intrinsic;
     assert E3 meet E4 eq E2;
     O:=MaximalOrder(A);
 
-    printf " all good!\n"; 
-
+    printf " all good!"; 
 */
 

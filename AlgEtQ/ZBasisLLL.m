@@ -68,6 +68,5 @@ end intrinsic;
   ZBasisLLL(I);
   assert ZBasis(J) ne ZBasis(I);
   assert J eq I;
-  printf " all good!\n"; 
-
+  printf " all good!"; 
 */

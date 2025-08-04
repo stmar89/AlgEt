@@ -165,6 +165,5 @@ end intrinsic;
         end if;
     end for;
     SetAssertions(1);    
-    printf " all good!\n"; 
-
+    printf " all good!"; 
 */

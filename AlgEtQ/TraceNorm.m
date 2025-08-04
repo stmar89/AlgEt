@@ -110,6 +110,5 @@ end intrinsic;
         assert Trace(a)+Trace(b) eq Trace(a+b);
         assert Norm(a)*Norm(b) eq Norm(a*b);
     end for;
-    printf " all good!\n"; 
-
+    printf " all good!"; 
 */

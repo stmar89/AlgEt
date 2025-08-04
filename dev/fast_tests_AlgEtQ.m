@@ -23,9 +23,8 @@ time_start_local:=Cputime();
     printf ".";
 
     SetAssertions(1);
-    printf " all good!\n";
-
-printf "time %o
+    printf " all good!";
+printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
 
@@ -43,9 +42,8 @@ time_start_local:=Cputime();
     assert A cmpeq A;
     assert not A cmpeq B;
     SetAssertions(1);
-    printf " all good!\n";
-
-printf "time %o
+    printf " all good!";
+printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
 
@@ -81,9 +79,8 @@ time_start_local:=Cputime();
     printf ".";
 
     SetAssertions(1);
-    printf " all good!\n";
-
-printf "time %o
+    printf " all good!";
+printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
 
@@ -198,9 +195,8 @@ time_start_local:=Cputime();
     SetPrimitiveElement(a);
     assert PrimitiveElement(A) eq a;
 
-    printf " all good!\n"; 
-
-printf "time %o
+    printf " all good!"; 
+printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
 
@@ -240,9 +236,8 @@ time_start_local:=Cputime();
     assert Inverse(m)(pi) eq -PrimitiveElement(A);
     assert m(One(A)) eq One(B) and Inverse(m)(One(B)) eq One(A);
     printf ".";
-    printf " all good!\n"; 
-
-printf "time %o
+    printf " all good!"; 
+printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
 
@@ -262,9 +257,8 @@ time_start_local:=Cputime();
     printf ".";
     
     SetAssertions(1);
-    printf " all good!\n";
-
-printf "time %o
+    printf " all good!";
+printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
 
@@ -350,9 +344,8 @@ time_start_local:=Cputime();
     assert E3 meet E4 eq E2;
     O:=MaximalOrder(A);
 
-    printf " all good!\n"; 
-
-printf "time %o
+    printf " all good!"; 
+printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
 
@@ -434,10 +427,8 @@ time_start_local:=Cputime();
     assert is_def and I5 eq (I*I)*(I*I)*I;
 
     SetAssertions(1);
-    printf " all good!\n";
-
-
-printf "time %o
+    printf " all good!";
+printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
 
@@ -455,9 +446,8 @@ time_start_local:=Cputime();
   ZBasisLLL(I);
   assert ZBasis(J) ne ZBasis(I);
   assert J eq I;
-  printf " all good!\n"; 
-
-printf "time %o
+  printf " all good!"; 
+printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
 
@@ -490,9 +480,8 @@ time_start_local:=Cputime();
         end for;
     end for;
 
-    printf " all good!\n"; 
-
-printf "time %o
+    printf " all good!"; 
+printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
 
@@ -514,9 +503,8 @@ time_start_local:=Cputime();
     oo:=FindOverOrders(E);
     assert #oo eq 11;
 
-    printf " all good!\n"; 
-
-printf "time %o
+    printf " all good!"; 
+printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
 
@@ -539,9 +527,8 @@ time_start_local:=Cputime();
         _:=GraphOverOrders(R);
         SetAssertions(1);
     end for;
-    printf " all good!\n";
-
-printf "time %o
+    printf " all good!";
+printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
 
@@ -559,9 +546,8 @@ time_start_local:=Cputime();
         assert Trace(a)+Trace(b) eq Trace(a+b);
         assert Norm(a)*Norm(b) eq Norm(a*b);
     end for;
-    printf " all good!\n"; 
-
-printf "time %o
+    printf " all good!"; 
+printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
 
@@ -585,9 +571,8 @@ time_start_local:=Cputime();
         end for;
         printf ".";
     end for;
-    printf " all good!\n";
-
-printf "time %o
+    printf " all good!";
+printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
 
@@ -613,8 +598,7 @@ time_start_local:=Cputime();
     assert not IsConjugateStable(EquationOrder(K));
     printf ".";
     printf " all good!\n";
-
-printf "time %o
+printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
 
@@ -649,9 +633,8 @@ time_start_local:=Cputime();
         assert Precision(all[1]) eq 60;
         printf ".";
     end for;
-    printf " all good!\n";
-
-printf "time %o
+    printf " all good!";
+printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
 
@@ -750,9 +733,8 @@ time_start_local:=Cputime();
     assert OneIdeal(O) in nn;
     printf ".";
     SetAssertions(1);
-    printf " all good!\n"; 
-
-printf "time %o
+    printf " all good!"; 
+printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
 
@@ -781,9 +763,8 @@ time_start_local:=Cputime();
         end if;
     end for;
     SetAssertions(1);    
-    printf " all good!\n"; 
-
-printf "time %o
+    printf " all good!"; 
+printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
 
@@ -803,9 +784,8 @@ time_start_local:=Cputime();
         ff:=Conductor(S);
         _:=ShortElement(ff);
     end for;
-    printf " all good!\n"; 
-
-printf "time %o
+    printf " all good!"; 
+printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
 
@@ -858,9 +838,8 @@ time_start_local:=Cputime();
     TwoGeneratingSet(I);
     l2:=[ I^i : i in exp ];
     assert l1 eq l2;
-    printf " all good!\n"; 
-
-printf "time %o
+    printf " all good!"; 
+printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
 
@@ -947,9 +926,8 @@ time_start_local:=Cputime();
     printf ".";
 
     SetAssertions(1);    
-    printf " all good!\n"; 
-
-printf "time %o
+    printf " all good!"; 
+printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
 
@@ -998,9 +976,8 @@ time_start_local:=Cputime();
     assert #ResidueRingUnits(P) eq Index(E,P)-1;
     assert forall{ i : i in [1..20] | #ResidueRingUnits(Pi) eq Index(E,Pi) - Index(P,Pi) where Pi:=P^i};
 
-    printf " all good!\n"; 
-
-printf "time %o
+    printf " all good!"; 
+printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
 
@@ -1045,13 +1022,12 @@ time_start_local:=Cputime();
     facs:=[ Factorization(I) : I in ids ];
     printf ".";
     SetAssertions(1);
-    printf " all good!\n"; 
-
-printf "time %o
+    printf " all good!"; 
+printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
 
-printf "time %o
+printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
 
@@ -1076,9 +1052,8 @@ time_start_local:=Cputime();
         printf ".";
     end for;
     SetAssertions(1);
-    printf " all good!\n"; 
-
-printf "time %o
+    printf " all good!"; 
+printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
 
@@ -1103,9 +1078,8 @@ time_start_local:=Cputime();
     assert #FindOverOrders(E) eq 15;
     assert #WKICM(E) eq 23;
     SetAssertions(1);
-    printf " all good!\n"; 
-
-printf "time %o
+    printf " all good!"; 
+printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
 
@@ -1122,10 +1096,8 @@ time_start_local:=Cputime();
     assert not IsWeakEquivalent(E,MaximalOrder(K));
     assert IsWeakEquivalent(OneIdeal(MaximalOrder(K)),Conductor(E));
     SetAssertions(1);
-    printf " all good!\n"; 
-    
-
-printf "time %o
+    printf " all good!"; 
+printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
 
@@ -1145,9 +1117,8 @@ time_start_local:=Cputime();
         _:=ICM(E);
     end for;
     SetAssertions(1);
-    printf " all good!\n";
-
-printf "time %o
+    printf " all good!";
+printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
 
@@ -1168,9 +1139,8 @@ time_start_local:=Cputime();
         _:=TotallyRealPositiveUnitGroup(S);
     end for;
     SetAssertions(1);
-    printf " all good!\n"; 
-
-printf "time %o
+    printf " all good!"; 
+printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
 
@@ -1206,9 +1176,8 @@ time_start_local:=Cputime();
     assert #FindOverOrders(R) eq #FindOverOrders(R1);
     printf ".";
 
-    printf " all good!\n"; 
-
-printf "time %o
+    printf " all good!"; 
+printf "	time %o
 ",Cputime(time_start_local);
 Cputime(time_start);
 quit;

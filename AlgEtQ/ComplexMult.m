@@ -261,6 +261,6 @@ end intrinsic;
         assert Precision(all[1]) eq 60;
         printf ".";
     end for;
-    printf " all good!\n";
+    printf " all good!";
 
 */

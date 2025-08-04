@@ -67,6 +67,6 @@ end intrinsic;
         end for;
         printf ".";
     end for;
-    printf " all good!\n";
+    printf " all good!";
 
 */

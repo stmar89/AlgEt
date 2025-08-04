@@ -76,7 +76,5 @@ end intrinsic;
     assert not IsWeakEquivalent(E,MaximalOrder(K));
     assert IsWeakEquivalent(OneIdeal(MaximalOrder(K)),Conductor(E));
     SetAssertions(1);
-    printf " all good!\n"; 
-    
-
+    printf " all good!"; 
 */

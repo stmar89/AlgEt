@@ -241,6 +241,5 @@ end intrinsic;
         end for;
     end for;
 
-    printf " all good!\n"; 
-
+    printf " all good!"; 
 */

@@ -770,6 +770,6 @@ end intrinsic;
     SetPrimitiveElement(a);
     assert PrimitiveElement(A) eq a;
 
-    printf " all good!\n"; 
+    printf " all good!"; 
 
 */

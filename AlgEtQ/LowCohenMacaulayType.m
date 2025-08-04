@@ -159,6 +159,5 @@ end function;
         printf ".";
     end for;
     SetAssertions(1);
-    printf " all good!\n"; 
-
+    printf " all good!"; 
 */

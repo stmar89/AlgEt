@@ -736,6 +736,5 @@ end intrinsic;
     assert #ResidueRingUnits(P) eq Index(E,P)-1;
     assert forall{ i : i in [1..20] | #ResidueRingUnits(Pi) eq Index(E,Pi) - Index(P,Pi) where Pi:=P^i};
 
-    printf " all good!\n"; 
-
+    printf " all good!"; 
 */

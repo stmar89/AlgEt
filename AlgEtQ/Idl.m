@@ -927,8 +927,6 @@ end intrinsic;
     assert is_def and I5 eq (I*I)*(I*I)*I;
 
     SetAssertions(1);
-    printf " all good!\n";
-
-
+    printf " all good!";
 */
 

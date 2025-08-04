@@ -80,6 +80,5 @@ end intrinsic;
     printf ".";
 
     SetAssertions(1);
-    printf " all good!\n";
-
+    printf " all good!";
 */

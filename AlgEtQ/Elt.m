@@ -579,6 +579,13 @@ intrinsic PrimitiveElement(A::AlgEtQ) -> AlgEtQElt
     return A`PrimitiveElement;
 end intrinsic;
 
+intrinsic SetPrimitiveElement(a::AlgEtQElt)
+{Given an element a in an étale algebra A such that the minimal polynomial of a over Q has degree equal to the Q-dimension of A, it sets a to be the primitive element of A.}
+    A:=Algebra(a);
+    require Degree(MinimalPolynomial(a)) eq AbsoluteDimension(A) : "The element does not define a primitive element of A";
+    A`PrimitiveElement:=a;
+end intrinsic;
+
 intrinsic PowerBasis(A::AlgEtQ) -> SeqEnum[AlgEtQElt]
 {Returns the power basis of the étale algebra A, consisting of powers of the PrimitiveElement of A.}
     if not assigned A`PowerBasis then
@@ -756,6 +763,10 @@ end intrinsic;
     a:=PrimitiveElement(A);
     assert Degree(MinimalPolynomial(a)) eq AbsoluteDimension(A);
     _:=PowerBasis(A);
+
+    b:=A!<1,2,3,7>;
+    SetPrimitiveElement(a);
+    assert PrimitiveElement(A) eq b;
 
     printf " all good!\n"; 
 

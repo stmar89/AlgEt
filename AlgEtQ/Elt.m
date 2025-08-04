@@ -717,7 +717,7 @@ end intrinsic;
     end for;
 
     // testing sequences
-    //AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());
     f:=(x^8+16)*(x^8+81);
     A:=EtaleAlgebra(f);
@@ -752,6 +752,8 @@ end intrinsic;
     assert s1 eq s2 and s1 eq s3 and s1 eq s4;
 
     //testing PrimitiveElement and PowerBasis
+    //AttachSpec("~/AlgEt/spec");
+    _<x>:=PolynomialRing(Integers());
     K:=NumberField(x^8+16);
     A:=EtaleAlgebra([K,K]);
     a:=PrimitiveElement(A);
@@ -765,9 +767,9 @@ end intrinsic;
     _:=PowerBasis(A);
 
     b:=A!<1,2,3,7>;
-    SetPrimitiveElement(a);
+    SetPrimitiveElement(b);
     assert PrimitiveElement(A) eq b;
+    SetPrimitiveElement(a);
+    assert PrimitiveElement(A) eq a;
 
     printf " all good!\n"; 
-
-*/

@@ -105,7 +105,6 @@ intrinsic IntermediateIdealsWithPrescribedMultiplicatorRing(I::AlgEtQIdl,J::AlgE
     return output;
 end intrinsic;
 
-// OLD version
 intrinsic MaximalIntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]
 {Given fractional S-ideals J subseteq I, returns the maximal (with respect to inclusion) fractional S-ideals K such that J subseteq K subsetneq I. Note I is never in the output, while J is in the output if and only if the S-module I/J is simple, in which case the output consists only of J.}
     assert2 J subset I; // "the ideal J needs to be inside I";
@@ -143,6 +142,7 @@ intrinsic MaximalIntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQId
     end if;
 end intrinsic;
 
+intrinsic IntermediateIdealsWithTrivialExtension(I::AlgEtQIdl,J::AlgEtQIdl, O::AlgEtQOrd)->SetIndx[AlgEtQIdl]
 {Given fractional S-ideals I and J and an order O such that 
 - S subset O,  
 - J subseteq I, and 

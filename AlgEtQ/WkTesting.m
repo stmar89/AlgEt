@@ -62,6 +62,26 @@ intrinsic IsWeakEquivalent(J::AlgEtQIdl,O::AlgEtQOrd)->BoolElt
     return IsWeakEquivalent(OneIdeal(O), J);
 end intrinsic;
 
+intrinsic IsWeaklyEquivalent(I::AlgEtQIdl,J::AlgEtQIdl)->BoolElt
+{Checks if I and J are weakly equivalent, that is, if 1 \in (I:J)*(J:I), or equivalently, if I and J are locally equivalent at all prime of their common multiplicator ring. This function does not require that the ideals are defined over the same order.}
+    return IsWeakEquivalent(I,J);
+end intrinsic;
+
+intrinsic IsWeaklyEquivalent(O1::AlgEtQOrd,O2::AlgEtQOrd)->BoolElt
+{Check if the two orders are weakly equivalent, that is equal.}
+    return O1 eq O2;
+end intrinsic;
+
+intrinsic IsWeaklyEquivalent(O::AlgEtQOrd,J::AlgEtQIdl)->BoolElt
+{Checks if the ideal J is weakly equivalent to order O, that is, if J is invertible in O.}
+    return IsWeakEquivalent(OneIdeal(O), J);
+end intrinsic;
+
+intrinsic IsWeaklyEquivalent(J::AlgEtQIdl,O::AlgEtQOrd)->BoolElt
+{Checks if the ideal J is weakly equivalent to order O, that is, if J is invertible in O.}
+    return IsWeakEquivalent(OneIdeal(O), J);
+end intrinsic;
+
 /* TESTS
 
     printf "### Testing WKEq:";

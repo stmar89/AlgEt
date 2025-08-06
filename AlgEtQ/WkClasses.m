@@ -33,6 +33,10 @@ declare attributes AlgEtQOrd:   WKICM,
 import "LowCohenMacaulayType.m" : wkicm_bar_CM_type2;
 
 
+///////////////////////////////////////////
+// useful functions to manypulate arrays //
+///////////////////////////////////////////
+
 join_ass_arr:=function(A,B)
 // returns A join B, where A[i], B[i] are of type SeqEnum
     for k in Keys(B) do
@@ -68,6 +72,10 @@ diff_ass_arr:=function(A,B,stop_at_dim_2)
     end for;
     return A;
 end function;
+
+/////////////////////
+// wkicm functions //
+/////////////////////
 
 units_T_P_mod_S_P:=function(T,S,P)
     // Let S be an order with a unique singular prime ideal P, and T = (P:P)
@@ -169,8 +177,12 @@ wkicm_bar_with_P_P:=function(I,P)
     return output;
 end function;
 
+//////////////////////////////////
+// wkicm as sequence intrinsics //
+//////////////////////////////////
+
 intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum[AlgEtQIdl]
-{Returns all the weak eq classes I, such that (I:I)=S. The VarArg Method (default "Auto") is not used and kept for retrocompatibility.}
+{Returns representatives I of all weak equivalence classes, such that (I:I)=S. The VarArg Method (default "Auto") is not used and kept for retrocompatibility.}
     if not assigned S`WKICM_bar then
         if IsGorenstein(S) then
             vprintf WKICM_bar,2 : " Gorenstein case\n";
@@ -328,12 +340,12 @@ intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum[AlgEtQIdl]
 end intrinsic;
 
 intrinsic WeakEquivalenceClassesWithPrescribedMultiplicatorRing(S::AlgEtQOrd : Method:="Auto") -> SeqEnum[AlgEtQIdl]
-{Returns all the weak eq classes I, such that (I:I)=S. The VarArg Method (default "Auto") is not used and kept for retrocompatibility.}
+{Returns representatives I of all weak equivalence classes, such that (I:I)=S. The VarArg Method (default "Auto") is not used and kept for retrocompatibility.}
     return WKICM_bar(S);
 end intrinsic;
 
 intrinsic WKICM(E::AlgEtQOrd : Method:="Auto")->SeqEnum[AlgEtQIdl]
-{Computes the weak equivalence class monoid of E. The VarArg Method (default "Auto") is not used and kept for retrocompatibility.}
+{Returns a set of representatives of the weak equivalence class monoid of E. The VarArg Method (default "Auto") is not used and kept for retrocompatibility.}
     if not assigned E`WKICM then
         pp:=SingularPrimes(E);
         if #pp eq 0 then
@@ -530,6 +542,11 @@ intrinsic WKICM(E::AlgEtQOrd : Method:="Auto")->SeqEnum[AlgEtQIdl]
     end if;
 
     return E`WKICM;
+end intrinsic;
+
+intrinsic WeakEquivalenceClassMonoid(E::AlgEtQOrd : Method:="Auto")->SeqEnum[AlgEtQIdl]
+{Returns a set of representatives of the weak equivalence class monoid of E. The VarArg Method (default "Auto") is not used and kept for retrocompatibility.}
+    return WKICM(E:Method:=Method);
 end intrinsic;
 
 /* TESTS

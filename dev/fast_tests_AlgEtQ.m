@@ -1101,6 +1101,81 @@ printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
 
+    printf "### Testing WkAbstract:";
+	AttachSpec("~/AlgEt/spec");
+	SetAssertions(2);
+    SetClassGroupBounds("GRH");
+	_<x>:=PolynomialRing(Integers());
+    f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
+    K:=EtaleAlgebra(f);
+    E:=EquationOrder(K);
+    W,w:=WeakEquivalenceClassMonoidAbstract(E);
+    wk:=WKICM(E);
+    wk1:=[w*Random(K):w in wk];
+    assert #W eq 25;
+    assert Seqset(Classes(W)) eq {x@@w : x in wk1};
+    assert One(W) eq W!OneIdeal(E);
+    assert IsOne(W!(Random(K)*OneIdeal(E)));
+    assert IsIdempotent(W!MaximalOrder(K));
+    assert #WeakEquivalenceClassMonoidAbstract(MaximalOrder(K)) eq 1;
+    assert Random(W) in W;
+    assert Seqset(Idempotents(W)) eq {W!T:T in OverOrders(E)};
+    assert #W eq &*[#Localization(W,P) : P in SingularPrimes(E)];
+    assert WeakEquivalenceClassMonoidAbstract(MaximalOrder(K)) eq Localization(W,PrimesAbove(11*E)[1]); // 11 is regular
+    assert not IsGeneratingSet(W,Idempotents(W));
+    assert Max([CohenMacaulayType(T):T in OverOrders(E)]) eq 2; //this implies the following line
+    assert IsGeneratingSet(W,Idempotents(W) cat [W!TraceDualIdeal(T):T in OverOrders(E)]);
+
+    f:=x^4+291*x^3-988*x^2-1000*x-1000;
+    K:=EtaleAlgebra(f);
+    E:=EquationOrder(K);
+    W,w:=WeakEquivalenceClassMonoidAbstract(E);
+    wk:=WKICM(E);
+    P,p:=PicardGroup(E);
+    inv:=[p(x):x in P];
+    wk1:=[w*Random(inv):w in wk];
+    assert #W eq 20;
+    assert Seqset(Classes(W)) eq {x@@w : x in wk1};
+    assert One(W) eq W!OneIdeal(E);
+    assert IsOne(W!(Random(K)*OneIdeal(E)));
+    assert IsIdempotent(W!MaximalOrder(K));
+    assert #WeakEquivalenceClassMonoidAbstract(MaximalOrder(K)) eq 1;
+    assert Random(W) in W;
+    assert Seqset(Idempotents(W)) eq {W!T:T in OverOrders(E)};
+    assert #W eq &*[#Localization(W,P) : P in SingularPrimes(E)];
+    assert WeakEquivalenceClassMonoidAbstract(MaximalOrder(K)) eq Localization(W,PrimesAbove(11*E)[1]); // 11 is regular
+    assert not IsGeneratingSet(W,Idempotents(W));
+    assert Max([CohenMacaulayType(T):T in OverOrders(E)]) eq 2; //this implies the following line
+    assert IsGeneratingSet(W,Idempotents(W) cat [W!TraceDualIdeal(T):T in OverOrders(E)]);
+
+    f:=x^3+31*x^2+43*x+77;
+    K:=EtaleAlgebra(f);
+    E:=EquationOrder(K);
+    W,w:=WeakEquivalenceClassMonoidAbstract(E);
+    wk:=WKICM(E);
+    P,p:=PicardGroup(E);
+    inv:=[p(x):x in P];
+    wk1:=[w*Random(inv):w in wk];
+    assert #W eq 23;
+    assert Seqset(Classes(W)) eq {x@@w : x in wk1};
+    assert One(W) eq W!OneIdeal(E);
+    assert IsOne(W!(Random(K)*OneIdeal(E)));
+    assert IsIdempotent(W!MaximalOrder(K));
+    assert #WeakEquivalenceClassMonoidAbstract(MaximalOrder(K)) eq 1;
+    assert Random(W) in W;
+    assert Seqset(Idempotents(W)) eq {W!T:T in OverOrders(E)};
+    assert #W eq &*[#Localization(W,P) : P in SingularPrimes(E)];
+    assert WeakEquivalenceClassMonoidAbstract(MaximalOrder(K)) eq Localization(W,PrimesAbove(11*E)[1]); // 11 is regular
+    assert not IsGeneratingSet(W,Idempotents(W));
+    assert Max([CohenMacaulayType(T):T in OverOrders(E)]) eq 2; //this implies the following line
+    assert IsGeneratingSet(W,Idempotents(W) cat [W!TraceDualIdeal(T):T in OverOrders(E)]);
+
+    SetAssertions(1);
+    printf " all good!"; 
+printf "	time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
+
 
     printf "### Testing ICM:";
 	SetAssertions(2);

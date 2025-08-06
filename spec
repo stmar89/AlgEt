@@ -27,6 +27,7 @@ PrimesAttributes.m
 LowCohenMacaulayType.m
 WkClasses.m
 WkTesting.m
+WkAbstract.m
 IdealClassMonoid.m
 TotRealTotPos.m
 PrintSave.m

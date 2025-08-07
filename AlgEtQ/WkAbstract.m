@@ -198,14 +198,17 @@ intrinsic '*'(x::AlgEtQWECMElt,y::AlgEtQWECMElt)->AlgEtQWECMElt
     return z;
 end intrinsic;
  
-// TODO change with multipliation table
 intrinsic '^'(x::AlgEtQWECMElt,n::RngIntElt)->AlgEtQWECMElt
 {Given a weak equivalence class x and a non-negative integer n, returns the weak equivalence class x^n.}
     require n ge 0 : "The integer must be non-negative.";
     if n eq 0 then
         return One(Parent(x));
+    elif n eq 1 then
+        return x;
     elif assigned x`IsIdempotent and IsIdempotent(x) then
         return x;
+    elif n eq 2 then
+        return x*x; //using the multiplication table
     else
         return Parent(x)!(Ideal(x)^n);
     end if;

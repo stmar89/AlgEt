@@ -41,9 +41,10 @@ declare attributes AlgEtQWECMElt : Parent,
                                    IsOne,
                                    IsIdempotent;
 
-///////////////////////////////////
-// Creation of elements and wkcm //
-///////////////////////////////////
+
+///////////////////
+// AlgEtQWECMElt //
+///////////////////
 
 function CreateAlgEtQWECMElt(W,I)
 // a the weak equiv class monoid of an order R, of type AlgEtQWECM and a fractional R-ideal, it creates an element of the monoid
@@ -53,42 +54,6 @@ function CreateAlgEtQWECMElt(W,I)
     x`Ideal:=I;
     return x;
 end function;
-
-intrinsic WeakEquivalenceClassMonoidAbstract(R::AlgEtQOrd : Method:="Auto") -> AlgEtQWECM,Map
-{Returns the weak equivalence class monoid W of R together with a map w (with preimages) sending each class of W to a representative (determined by WeakEquivalenceClassMonoid).}
-    if not assigned R`WKICMAbstractRep then
-        if (not assigned R`OverOrders) or exists{T:T in R`OverOrders|not assigned T`WKICM_bar} then
-            // this populates everything faster than computing separately the overorders and the wk_icm_bar's 
-            _:=WeakEquivalenceClassMonoid(R);
-        end if;
-        oo:=OverOrders(R);
-        W:=New(AlgEtQWECM);
-        W`Order:=R;
-
-        arr:=AssociativeArray();
-        for T in oo do 
-            arr[T]:=[CreateAlgEtQWECMElt(W,R!!I) : I in WKICM_bar(T)];
-        end for;
-        W`Array:=arr;
-        // we now defined the map
-        dlp:=function(y)
-            assert Order(y) eq R ;
-            T:=MultiplicatorRing(y);
-            assert exists(I){w:w in arr[T]|IsWeaklyEquivalent(Ideal(w),y)};
-            return I;
-        end function;
-
-        w:=map<W->PowerStructure(AlgEtQIdl)|x:->Ideal(x),
-                                            y:->dlp(y)>;
-        W`Map:=w;
-        R`WKICMAbstractRep:=W;
-    end if;
-    return R`WKICMAbstractRep,R`WKICMAbstractRep`Map;
-end intrinsic;
-
-///////////////////
-// AlgEtQWECMElt //
-///////////////////
 
 intrinsic Print(x::AlgEtQWECMElt)
 {Print the element.}
@@ -160,7 +125,7 @@ end intrinsic;
 ///////////////////////////////////////
 
 intrinsic MultiplicationTable(W::AlgEtQWECM)->Assoc
-{Computes the multiplication table of W.}
+{Computes the multiplication table of W. It is returned as an associative array where, given two classes x and y of W, the value at the key {x,y} is x*y.}
     if not assigned W`MultiplicationTable then
         W`MultiplicationTable:=AssociativeArray();
     end if;
@@ -232,6 +197,41 @@ intrinsic IsIdempotent(x::AlgEtQWECMElt)->BoolElt
     return x`IsIdempotent;
 end intrinsic;
 
+///////////////////////////////////////
+// AlgEtQWECM : computation/creation //
+///////////////////////////////////////
+
+intrinsic WeakEquivalenceClassMonoidAbstract(R::AlgEtQOrd : Method:="Auto") -> AlgEtQWECM,Map
+{Returns the weak equivalence class monoid W of R together with a map w (with preimages) sending each class of W to a representative (determined by WeakEquivalenceClassMonoid). The vararg Methods is passed to WeakEquivalenceClassMonoid.}
+    if not assigned R`WKICMAbstractRep then
+        if (not assigned R`OverOrders) or exists{T:T in R`OverOrders|not assigned T`WKICM_bar} then
+            // this populates everything faster than computing separately the overorders and the wk_icm_bar's 
+            _:=WeakEquivalenceClassMonoid(R);
+        end if;
+        oo:=OverOrders(R);
+        W:=New(AlgEtQWECM);
+        W`Order:=R;
+
+        arr:=AssociativeArray();
+        for T in oo do 
+            arr[T]:=[CreateAlgEtQWECMElt(W,R!!I) : I in WKICM_bar(T)];
+        end for;
+        W`Array:=arr;
+        // we now defined the map
+        preimg:=function(y)
+            assert Order(y) eq R ;
+            T:=MultiplicatorRing(y);
+            assert exists(I){w:w in arr[T]|IsWeaklyEquivalent(Ideal(w),y)};
+            return I;
+        end function;
+
+        w:=map<W->PowerStructure(AlgEtQIdl)|x:->Ideal(x),
+                                            y:->preimg(y)>;
+        W`Map:=w;
+        R`WKICMAbstractRep:=W;
+    end if;
+    return R`WKICMAbstractRep,R`WKICMAbstractRep`Map;
+end intrinsic;
 //////////////////////////////////////////////////
 // AlgEtQWECM : attributes and basic properties //
 /////////////////////////////////////////////////
@@ -323,9 +323,9 @@ end intrinsic;
 intrinsic IsGeneratingSet(W::AlgEtQWECM,seq::SeqEnum[AlgEtQWECMElt])->BoolElt
 {Given the weak equivalence class monoid of R and a sequence of classes in W, returns whether the sequence is a generating set of W.}
     cl:=Seqset(seq);
+    Include(~cl,One(W));
     require forall{w:w in seq|w in W} : "The sequence does not consists of elements of W.";
     submonoid_old:=cl;
-    // TODO I am redoing the same multiplication over and over
     repeat
         submonoid_new:=submonoid_old;
         N:=#submonoid_old;
@@ -344,11 +344,10 @@ intrinsic IsGeneratingSet(W::AlgEtQWECM,seq::SeqEnum[AlgEtQIdl])->BoolElt
 end intrinsic;
 
 /* TESTS
-TODO Test on QxQ or KxK
 
     printf "### Testing WkAbstract:";
-	AttachSpec("~/AlgEt/spec");
-	SetAssertions(2);
+	//AttachSpec("~/AlgEt/spec");
+	//SetAssertions(2);
     SetClassGroupBounds("GRH");
 	_<x>:=PolynomialRing(Integers());
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
@@ -397,9 +396,12 @@ TODO Test on QxQ or KxK
     assert Seqset(Idempotents(W)) eq {W!T:T in OverOrders(E)};
     assert #W eq &*[#Localization(W,P) : P in SingularPrimes(E)];
     assert WeakEquivalenceClassMonoidAbstract(MaximalOrder(K)) eq Localization(W,PrimesAbove(11*E)[1]); // 11 is regular
+    _:=Random(W)*Random(W);
+    assert assigned W`MultiplicationTable;
     assert not IsGeneratingSet(W,Idempotents(W));
     assert Max([CohenMacaulayType(T):T in OverOrders(E)]) eq 2; //this implies the following line
     assert IsGeneratingSet(W,Idempotents(W) cat [W!TraceDualIdeal(T):T in OverOrders(E)]);
+    _:=MultiplicationTable(W);
 
 	_<x>:=PolynomialRing(Integers());
     f:=x^3+31*x^2+43*x+77;
@@ -420,9 +422,34 @@ TODO Test on QxQ or KxK
     assert Seqset(Idempotents(W)) eq {W!T:T in OverOrders(E)};
     assert #W eq &*[#Localization(W,P) : P in SingularPrimes(E)];
     assert WeakEquivalenceClassMonoidAbstract(MaximalOrder(K)) eq Localization(W,PrimesAbove(11*E)[1]); // 11 is regular
+    _:=Random(W)*Random(W);
+    assert assigned W`MultiplicationTable;
     assert not IsGeneratingSet(W,Idempotents(W));
     assert Max([CohenMacaulayType(T):T in OverOrders(E)]) eq 2; //this implies the following line
     assert IsGeneratingSet(W,Idempotents(W) cat [W!TraceDualIdeal(T):T in OverOrders(E)]);
+    _:=MultiplicationTable(W);
+
+    L:=RationalsAsNumberField();
+    K:=EtaleAlgebra([L,L,L]);
+    a:=PrimitiveElement(K);
+    E:=Order([a]);
+    W:=WeakEquivalenceClassMonoidAbstract(E);
+    O:=MaximalOrder(K);
+    assert #WeakEquivalenceClassMonoidAbstract(O) eq 1;
+    assert not IsMaximal(E);
+    assert One(W) eq W!OneIdeal(E);
+    assert IsOne(W!(Random(K)*OneIdeal(E)));
+    assert IsIdempotent(W!MaximalOrder(K));
+    assert #WeakEquivalenceClassMonoidAbstract(MaximalOrder(K)) eq 1;
+    assert Random(W) in W;
+    assert Seqset(Idempotents(W)) eq {W!T:T in OverOrders(E)};
+    assert #W eq &*[#Localization(W,P) : P in SingularPrimes(E)];
+    assert WeakEquivalenceClassMonoidAbstract(MaximalOrder(K)) eq Localization(W,PrimesAbove(11*E)[1]); // 11 is regular
+    _:=Random(W)*Random(W);
+    assert assigned W`MultiplicationTable;
+    assert IsBass(E);
+    assert IsGeneratingSet(W,Idempotents(W));
+    _:=MultiplicationTable(W);
 
     SetAssertions(1);
     printf " all good!"; 

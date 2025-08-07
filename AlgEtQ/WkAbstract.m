@@ -56,31 +56,34 @@ end function;
 
 intrinsic WeakEquivalenceClassMonoidAbstract(R::AlgEtQOrd : Method:="Auto") -> AlgEtQWECM,Map
 {Returns the weak equivalence class monoid W of R together with a map w (with preimages) sending each class of W to a representative (determined by WeakEquivalenceClassMonoid).}
-    if (not assigned R`OverOrders) or exists{T:T in R`OverOrders|not assigned T`WKICM_bar} then
-        // this populates everything faster than computing separately the overorders and the wk_icm_bar's 
-        _:=WeakEquivalenceClassMonoid(R);
+    if not assigned R`WKICMAbstractRep then
+        if (not assigned R`OverOrders) or exists{T:T in R`OverOrders|not assigned T`WKICM_bar} then
+            // this populates everything faster than computing separately the overorders and the wk_icm_bar's 
+            _:=WeakEquivalenceClassMonoid(R);
+        end if;
+        oo:=OverOrders(R);
+        W:=New(AlgEtQWECM);
+        W`Order:=R;
+
+        arr:=AssociativeArray();
+        for T in oo do 
+            arr[T]:=[CreateAlgEtQWECMElt(W,R!!I) : I in WKICM_bar(T)];
+        end for;
+        W`Array:=arr;
+        // we now defined the map
+        dlp:=function(y)
+            assert Order(y) eq R ;
+            T:=MultiplicatorRing(y);
+            assert exists(I){w:w in arr[T]|IsWeaklyEquivalent(Ideal(w),y)};
+            return I;
+        end function;
+
+        w:=map<W->PowerStructure(AlgEtQIdl)|x:->Ideal(x),
+                                            y:->dlp(y)>;
+        W`Map:=w;
+        R`WKICMAbstractRep:=W;
     end if;
-    oo:=OverOrders(R);
-    W:=New(AlgEtQWECM);
-    W`Order:=R;
-
-    arr:=AssociativeArray();
-    for T in oo do 
-        arr[T]:=[CreateAlgEtQWECMElt(W,R!!I) : I in WKICM_bar(T)];
-    end for;
-    W`Array:=arr;
-    // we now defined the map
-    dlp:=function(y)
-        assert Order(y) eq R ;
-        T:=MultiplicatorRing(y);
-        assert exists(I){w:w in arr[T]|IsWeaklyEquivalent(Ideal(w),y)};
-        return I;
-    end function;
-
-    w:=map<W->PowerStructure(AlgEtQIdl)|x:->Ideal(x),
-                                        y:->dlp(y)>;
-    W`Map:=w;
-    return W,w;
+    return R`WKICMAbstractRep,R`WKICMAbstractRep`Map;
 end intrinsic;
 
 ///////////////////

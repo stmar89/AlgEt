@@ -1,4 +1,5 @@
 *.sig
+*.swp
 tmp_*
 deprecated/
 Graphs_0.1.m

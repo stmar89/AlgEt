@@ -581,6 +581,18 @@ intrinsic PicardGroup( S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
     return P,p;
 end intrinsic;
 
+intrinsic ExtensionHomPicardGroups(S::AlgEtQOrd,T::AlgEtQOrd : GRH:="false")->Map
+{Given orders S subseteq T, it returns the surjective extension map from PicardGroup(S) to PicardGroup(T). The vararg GRH, default false, is passed to PicardGroup.}
+    require S subset T : "The second order is not an overorder of the first.";
+    PS,pS:=PicardGroup(S:GRH:=GRH);
+    PT,pT:=PicardGroup(T:GRH:=GRH);
+    if S eq T then
+        return IdentityHomomorphism(PS);
+    else
+        return hom<PS->PT|[(T!!(PS.i@pS))@@pT : i in [1..Ngens(PS)]]>;
+    end if;
+end intrinsic;
+
 UnitGroup_prod_internal:=function(O, GRH)
 	//returns the UnitGroup of a order which is a produc of orders
 	if assigned O`UnitGroup then 
@@ -736,5 +748,23 @@ end intrinsic;
     assert #ResidueRingUnits(P) eq Index(E,P)-1;
     assert forall{ i : i in [1..20] | #ResidueRingUnits(Pi) eq Index(E,Pi) - Index(P,Pi) where Pi:=P^i};
 
+    AttachSpec("~/AlgEt/spec");
+    _<x>:=PolynomialRing(Integers());
+    f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
+    SetAssertions(1);
+    SetVerbose("AlgEtQPicardGroup",1);
+    SetVerbose("AlgEtQIdl",1);
+    SetVerbose("ShortEltSmallRep",1);
+    A:=EtaleAlgebra(f);
+    E:=EquationOrder(A);
+    P,p:=PicardGroup(E : GRH:=true);
+    O:=MaximalOrder(A);
+    C,c:=PicardGroup(O);
+    ext:=ExtensionHomPicardGroups(E,O);
+    for i in [1..100] do
+        printf ".";
+        x:=Random(P); y:=Random(P); 
+        assert ext(x+y) eq ext(x)+ext(y);
+    end for;
     printf " all good!"; 
 */

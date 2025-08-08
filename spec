@@ -29,6 +29,7 @@ WkClasses.m
 WkTesting.m
 WkAbstract.m
 IdealClassMonoid.m
+ICMAbstract.m
 TotRealTotPos.m
 PrintSave.m
 }

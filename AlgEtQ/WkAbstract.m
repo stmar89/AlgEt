@@ -76,7 +76,7 @@ intrinsic IsCoercible(W::AlgEtQWECM, x::.) -> BoolElt, .
 end intrinsic;
 
 intrinsic '!'(W::AlgEtQWECM, x::.) -> AlgEtQWECMElt
-{Coerce x into W.}
+{Coerce x into W, when possible.}
     bool,x:=IsCoercible(W,x);
     require bool : "The element cannot be coerced in the weak equivalence class monoid.";
     return x;
@@ -125,7 +125,7 @@ end intrinsic;
 ///////////////////////////////////////
 
 intrinsic MultiplicationTable(W::AlgEtQWECM)->Assoc
-{Computes the multiplication table of W. It is returned as an associative array where, given two classes x and y of W, the value at the key {x,y} is x*y.}
+{Computes the multiplication table of W. It is returned as an associative array where, given two classes x and y of W, the value at the key \{x,y\} is x*y.}
     if not assigned W`MultiplicationTable then
         W`MultiplicationTable:=AssociativeArray();
     end if;
@@ -186,7 +186,10 @@ end intrinsic;
 
 intrinsic IsOne(x::AlgEtQWECMElt)->BoolElt
 {Returns whether x is the neutral element of the weak equivalence class monoid it belongs to.}
-    return x eq One(Parent(x));
+    if not assigned x`IsOne then
+        x`IsOne:=x eq One(Parent(x));
+    end if;
+    return x`IsOne;
 end intrinsic;
 
 intrinsic IsIdempotent(x::AlgEtQWECMElt)->BoolElt
@@ -232,6 +235,7 @@ intrinsic WeakEquivalenceClassMonoidAbstract(R::AlgEtQOrd : Method:="Auto") -> A
     end if;
     return R`WKICMAbstractRep,R`WKICMAbstractRep`Map;
 end intrinsic;
+
 //////////////////////////////////////////////////
 // AlgEtQWECM : attributes and basic properties //
 /////////////////////////////////////////////////
@@ -306,7 +310,7 @@ end intrinsic;
 ////////////////////////////////
 
 intrinsic Localization(W::AlgEtQWECM,P::AlgEtQIdl)->AlgEtQWECM
-{Given a weak equivalence class monoid of an order R in the etale algebra K and a maximal ideal P of R, returns the weak equivalance class monoid of the unique overorder of R which is locally equal to R at P and locally maxiaml at every other maximal ideal. This order is R+P^kO, where O is the maximal order of K and k is a non-negative integer big enough.}
+{Given the weak equivalence class monoid of an order R in the etale algebra K and a maximal ideal P of R, returns the weak equivalance class monoid of the unique overorder of R which is locally equal to R at P and locally maximal at every other maximal ideal. This order is R+P^kO, where O is the maximal order of K and k is a non-negative integer big enough.}
     R:=Order(W);
     require Order(P) eq R and IsPrime(P) : "P needs to be a maximal ideal of the underlying order of W";
     O:=MaximalOrder(Algebra(R));
@@ -356,14 +360,14 @@ end intrinsic;
     W,w:=WeakEquivalenceClassMonoidAbstract(E);
     x:=Random(W);
     xx:=x;
-    SetRepresentative(x,Random(K)*Ideal(x));
+    SetRepresentative(x,RandomUnit(K)*Ideal(x));
     assert x eq xx;
     wk:=WKICM(E);
-    wk1:=[w*Random(K):w in wk];
+    wk1:=[w*RandomUnit(K):w in wk];
     assert #W eq 25;
     assert Seqset(Classes(W)) eq {x@@w : x in wk1};
     assert One(W) eq W!OneIdeal(E);
-    assert IsOne(W!(Random(K)*OneIdeal(E)));
+    assert IsOne(W!(RandomUnit(K)*OneIdeal(E)));
     assert IsIdempotent(W!MaximalOrder(K));
     assert #WeakEquivalenceClassMonoidAbstract(MaximalOrder(K)) eq 1;
     assert Random(W) in W;
@@ -389,7 +393,7 @@ end intrinsic;
     assert #W eq 20;
     assert Seqset(Classes(W)) eq {x@@w : x in wk1};
     assert One(W) eq W!OneIdeal(E);
-    assert IsOne(W!(Random(K)*OneIdeal(E)));
+    assert IsOne(W!(RandomUnit(K)*OneIdeal(E)));
     assert IsIdempotent(W!MaximalOrder(K));
     assert #WeakEquivalenceClassMonoidAbstract(MaximalOrder(K)) eq 1;
     assert Random(W) in W;
@@ -415,7 +419,7 @@ end intrinsic;
     assert #W eq 23;
     assert Seqset(Classes(W)) eq {x@@w : x in wk1};
     assert One(W) eq W!OneIdeal(E);
-    assert IsOne(W!(Random(K)*OneIdeal(E)));
+    assert IsOne(W!(RandomUnit(K)*OneIdeal(E)));
     assert IsIdempotent(W!MaximalOrder(K));
     assert #WeakEquivalenceClassMonoidAbstract(MaximalOrder(K)) eq 1;
     assert Random(W) in W;
@@ -438,7 +442,7 @@ end intrinsic;
     assert #WeakEquivalenceClassMonoidAbstract(O) eq 1;
     assert not IsMaximal(E);
     assert One(W) eq W!OneIdeal(E);
-    assert IsOne(W!(Random(K)*OneIdeal(E)));
+    assert IsOne(W!(RandomUnit(K)*OneIdeal(E)));
     assert IsIdempotent(W!MaximalOrder(K));
     assert #WeakEquivalenceClassMonoidAbstract(MaximalOrder(K)) eq 1;
     assert Random(W) in W;

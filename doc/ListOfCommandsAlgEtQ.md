@@ -17,7 +17,7 @@ Returns the defining polynomial of A, if the corresponding number fields are dis
 <pre><b> Components</b>(A::AlgEtQ) -> SeqEnum,SeqEnum,SeqEnum</pre>
 Returns the number fields of which A is a product of, together with embeddings and projections.
 <pre><b> Dimension</b>(A::AlgEtQ)->RngInt</pre>
-Dimension of A.
+ Returns the dimension of A over the base field, which in this case is $\mathbb{Q}$.
 <pre><b> AbsoluteDimension</b>(A::AlgEtQ)->RngInt</pre>
 Dimension of A over the prime field.
 <pre><b> HasBaseField</b>(A::AlgEtQ) -> BoolElt,FldNum</pre>

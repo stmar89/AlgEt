@@ -23,7 +23,6 @@
 /////////////////////////////////////////////////////
 
 freeze;
-declare verbose AlgEtQ, 1;
 
 //------------
 // Printing
@@ -58,8 +57,9 @@ intrinsic Components(A::AlgEtQ) -> SeqEnum,SeqEnum,SeqEnum
     return Explode(A`Components);
 end intrinsic;
 
+/// Returns the dimension of A over the base field, which in this case is $\mathbb{Q}$.
 intrinsic Dimension(A::AlgEtQ)->RngInt
-{Dimension of A.}    
+{Returns the dimension of A over the base field, which in this case is the rational field.}    
     if not assigned A`Dimension then
         nf:=Components(A);
         require HasBaseField(A) : "The number fields of A shoud all be defined over the same base ring.";
@@ -68,14 +68,16 @@ intrinsic Dimension(A::AlgEtQ)->RngInt
     return A`Dimension;
 end intrinsic;
 
+/// Returns the dimension of A over the prime field, which in this case is $\mathbb{Q}$.
 intrinsic AbsoluteDimension(A::AlgEtQ)->RngInt
-{Dimension of A over the prime field.}    
+{Returns the dimension of A over the prime field, which in this case is the rational field.}    
     if not assigned A`AbsoluteDimension then
         A`AbsoluteDimension:=&+[AbsoluteDegree(E) : E in Components(A)];
     end if;
     return A`AbsoluteDimension;
 end intrinsic;
 
+/// TODO WARNING: this does not make sense. I should remove it. In the creationg function, I should check that the number fields are all "absolute". Do I need to update the tests?
 intrinsic HasBaseField(A::AlgEtQ) -> BoolElt,FldNum
 {Returns whether A has common base field. If this is the case it returns it.}
     if not assigned A`HasBaseField then

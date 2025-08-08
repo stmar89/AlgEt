@@ -178,6 +178,11 @@ intrinsic RandomUnit(A::AlgEtQ , bd::RngIntElt) -> AlgEtQElt
     return num/den;
 end intrinsic;
 
+intrinsic RandomUnit(A::AlgEtQ : bd:=3) -> AlgEtQElt
+{Random element of A. The Coefficients are bounded by the VarArg bd (default 3).}   
+    return RandomUnit(A,bd);
+end intrinsic;
+
 //------------
 // Equality and Operations
 //------------

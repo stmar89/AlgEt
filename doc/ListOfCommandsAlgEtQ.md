@@ -1,7 +1,7 @@
 ## List of instrinsics in AlgEtQ/AlgEt.m:
 
 > <pre><b>EtaleAlgebra</b>(seq::SeqEnum[FldNum]) -> AlgEtQ</pre>
-<em>Given a sequence of number fields returns the étale algebra corresponding to the direct product. Note: the number fields with DefiningPolynomial of degree one should be created with the vararg DoLinearExtention set to true.</em>
+<em>Given a sequence of number fields returns the étale algebra corresponding to the direct product. Note: the number fields with DefiningPolynomial of degree one should be created with the vararg DoLinearExtension set to true.</em>
 
 > <pre><b>EtaleAlgebra</b>(f::RngUPolElt[RngInt]) -> AlgEtQ</pre>
 <em>Given a squarefree polynomial over the integers returns the product of the number fields defined by the irreducible factors.</em>
@@ -89,6 +89,9 @@
 
 > <pre><b>RandomUnit</b>(A::AlgEtQ , bd::RngIntElt) -> AlgEtQElt</pre>
 <em>Random unit of A. The Coefficients are bounded by the positive integer bd.</em>
+
+> <pre><b>RandomUnit</b>(A::AlgEtQ : bd:=3) -> AlgEtQElt</pre>
+<em>Random element of A. The Coefficients are bounded by the VarArg bd (default 3).</em>
 
 > <pre><b>'eq'</b>(x1::AlgEtQElt,x2::AlgEtQElt) -> BoolElt</pre>
 <em>Is x1=x2 ?</em>
@@ -235,7 +238,10 @@
 <em>Evaluate the polynomial f at the element a.</em>
 
 > <pre><b>PrimitiveElement</b>(A::AlgEtQ) -> AlgEtQElt</pre>
-<em>Returns the primitive element of the étale algebra A. Note that A has a primitive element only if it is the product of distinct number fields.</em>
+<em>Returns a primitive element of the étale algebra A, that is, an element of A whose minimal polynomial over Q has degree equal to the dimension of A over Q. The output is deterministically computed using the following procedure. Let N be the number of components of A, each one having primitive element a_i. Set b_1 = a_1. For i=2,..,N, set b_i = a_i+j where j is the smallest non-negative integer such that the minimal polynomial of a_i+j is not in the set of minimal polynomials of the elements b_1,...,b_(i-1). The output is the element of A whose components are b_1,...,b_N. In particular, if A is a product of number fields with different defining polynomials, then the output is the element of A whose components are the primitive elements of the components.</em>
+
+> <pre><b>SetPrimitiveElement</b>(a::AlgEtQElt)</pre>
+<em>Given an element a in an étale algebra A such that the minimal polynomial of a over Q has degree equal to the Q-dimension of A, it sets a to be the primitive element of A.</em>
 
 > <pre><b>PowerBasis</b>(A::AlgEtQ) -> SeqEnum[AlgEtQElt]</pre>
 <em>Returns the power basis of the étale algebra A, consisting of powers of the PrimitiveElement of A.</em>
@@ -801,8 +807,8 @@ The output is produced by a recursive use of MaximalIntermediateIdeals.</em>
 > <pre><b>ChineseRemainderTheorem</b>(Is::SeqEnum[AlgEtQIdl],as::SeqEnum[AlgEtQElt])-> AlgEtQElt</pre>
 <em>Given a sequence `Is` of ideals of S, pairwise coprime, and a sequence `as` of elements of S, it returns an element e such that e-as[i] in Is[i] for every i.</em>
 
-> <pre><b>ChineseRemainderTheoremFunctions</b>(Is::SeqEnum[AlgEtQIdl])-> AlgEtQElt</pre>
-<em>Given a sequence `Is` of N ideals of S, pairwise coprime, returns a function S->S^N representing the natural isomorphism S/&\*(Is) -> \prod_(I in Is) S/I and a function S^N-S representing the inverse.</em>
+> <pre><b>ChineseRemainderTheoremFunctions</b>(Is::SeqEnum[AlgEtQIdl])-> Map,Map</pre>
+<em>Given a sequence `Is` of N ideals of S, pairwise coprime, returns a function S->S^N representing the natural isomorphism S/&\*(Is) -> \prod_(I in Is) S/I and a function S^N->S representing the inverse.</em>
 
 
 ## List of instrinsics in AlgEtQ/PicardGroup.m:
@@ -821,6 +827,9 @@ The output is produced by a recursive use of MaximalIntermediateIdeals.</em>
 
 > <pre><b>PicardGroup</b>( S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map</pre>
 <em>Return the PicardGroup of the order S, which is not required to be maximal, and a map from the PicardGroup to a set of representatives of the ideal classes. The optional argument "GRH" decides the bound for the computations of the ClassGroup and UnitGroup of the maximal order. The default value is "false".</em>
+
+> <pre><b>ExtensionHomPicardGroups</b>(S::AlgEtQOrd,T::AlgEtQOrd : GRH:="false")->Map</pre>
+<em>Given orders S subseteq T, it returns the surjective extension map from PicardGroup(S) to PicardGroup(T). The vararg GRH, default false, is passed to PicardGroup.</em>
 
 > <pre><b>UnitGroup</b>(S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map</pre>
 <em>Return the unit group of a order in a etale algebra. The optional argument "GRH" decides the bound for the computation of the unit group of the maximal order. The default value is "false".</em>
@@ -900,14 +909,20 @@ The output is produced by a recursive use of MaximalIntermediateIdeals.</em>
 
 ## List of instrinsics in AlgEtQ/WkClasses.m:
 
-> <pre><b>WKICM_bar</b>(S::AlgEtQOrd : Method:="Auto") -> SeqEnum[AlgEtQIdl]</pre>
-<em>Returns all the weak eq classes I, such that (I:I)=S. The VarArg Method (default "Auto") is not used and kept for retrocompatibility.</em>
+> <pre><b>s //
+//////////////////////////////////
+
+intrinsic WKICM_bar</b>(S::AlgEtQOrd : Method:="Auto") -> SeqEnum[AlgEtQIdl]</pre>
+<em>Returns representatives I of all weak equivalence classes, such that (I:I)=S. The VarArg Method (default "Auto") is not used and kept for retrocompatibility.</em>
 
 > <pre><b>WeakEquivalenceClassesWithPrescribedMultiplicatorRing</b>(S::AlgEtQOrd : Method:="Auto") -> SeqEnum[AlgEtQIdl]</pre>
-<em>Returns all the weak eq classes I, such that (I:I)=S. The VarArg Method (default "Auto") is not used and kept for retrocompatibility.</em>
+<em>Returns representatives I of all weak equivalence classes, such that (I:I)=S. The VarArg Method (default "Auto") is not used and kept for retrocompatibility.</em>
 
 > <pre><b>WKICM</b>(E::AlgEtQOrd : Method:="Auto")->SeqEnum[AlgEtQIdl]</pre>
-<em>Computes the weak equivalence class monoid of E. The VarArg Method (default "Auto") is not used and kept for retrocompatibility.</em>
+<em>Returns a set of representatives of the weak equivalence class monoid of E. The VarArg Method (default "Auto") is not used and kept for retrocompatibility.</em>
+
+> <pre><b>WeakEquivalenceClassMonoid</b>(E::AlgEtQOrd : Method:="Auto")->SeqEnum[AlgEtQIdl]</pre>
+<em>Returns a set of representatives of the weak equivalence class monoid of E. The VarArg Method (default "Auto") is not used and kept for retrocompatibility.</em>
 
 
 ## List of instrinsics in AlgEtQ/WkTesting.m:
@@ -924,6 +939,108 @@ The output is produced by a recursive use of MaximalIntermediateIdeals.</em>
 > <pre><b>IsWeakEquivalent</b>(J::AlgEtQIdl,O::AlgEtQOrd)->BoolElt</pre>
 <em>Checks if the ideal J is weakly equivalent to order O, that is, if J is invertible in O.</em>
 
+> <pre><b>IsWeaklyEquivalent</b>(I::AlgEtQIdl,J::AlgEtQIdl)->BoolElt</pre>
+<em>Checks if I and J are weakly equivalent, that is, if 1 \in (I:J)\*(J:I), or equivalently, if I and J are locally equivalent at all prime of their common multiplicator ring. This function does not require that the ideals are defined over the same order.</em>
+
+> <pre><b>IsWeaklyEquivalent</b>(O1::AlgEtQOrd,O2::AlgEtQOrd)->BoolElt</pre>
+<em>Check if the two orders are weakly equivalent, that is equal.</em>
+
+> <pre><b>IsWeaklyEquivalent</b>(O::AlgEtQOrd,J::AlgEtQIdl)->BoolElt</pre>
+<em>Checks if the ideal J is weakly equivalent to order O, that is, if J is invertible in O.</em>
+
+> <pre><b>IsWeaklyEquivalent</b>(J::AlgEtQIdl,O::AlgEtQOrd)->BoolElt</pre>
+<em>Checks if the ideal J is weakly equivalent to order O, that is, if J is invertible in O.</em>
+
+
+## List of instrinsics in AlgEtQ/WkAbstract.m:
+
+> <pre><b>Print</b>(x::AlgEtQWECMElt)</pre>
+<em>Print the element.</em>
+
+> <pre><b>IsCoercible</b>(W::AlgEtQWECM, x::.) -> BoolElt, .</pre>
+<em>Return whether the element is coercible into W and the result of the coercion if so.</em>
+
+> <pre><b>'!'</b>(W::AlgEtQWECM, x::.) -> AlgEtQWECMElt</pre>
+<em>Coerce x into W, when possible.</em>
+
+> <pre><b>'in'</b>(x::AlgEtQWECMElt,W::AlgEtQWECM) -> BoolElt</pre>
+<em>Returns whether x is in W.</em>
+
+> <pre><b>Parent</b>(x::AlgEtQWECMElt)->AlgEtQWECM</pre>
+<em>Returns the parent of x, that is, the weak equivalence class monoid it belongs to.</em>
+
+> <pre><b>Ideal</b>(x::AlgEtQWECMElt)->AlgEtQIdl</pre>
+<em>Returns the ideal representing x.</em>
+
+> <pre><b>MultiplicatorRing</b>(x::AlgEtQWECMElt)->AlgEtQOrd</pre>
+<em>Returns the multiplicator ring of x.</em>
+
+> <pre><b>'eq'</b>(x::AlgEtQWECMElt,y::AlgEtQWECMElt)->BoolElt</pre>
+<em>Returns whether the two elements define the same class.</em>
+
+> <pre><b>SetRepresentative</b>(x::AlgEtQWECMElt,J::AlgEtQIdl)</pre>
+<em>It changes the Ideal attribute of x which consisits of the ideal representing the weak equivalence class to J, which must be weakly equivalent to the one of x.</em>
+
+> <pre><b>MultiplicationTable</b>(W::AlgEtQWECM)->Assoc</pre>
+<em>Computes the multiplication table of W. It is returned as an associative array where, given two classes x and y of W, the value at the key \{x,y\</em>
+
+> <pre><b>'*'</b>(x::AlgEtQWECMElt,y::AlgEtQWECMElt)->AlgEtQWECMElt</pre>
+<em>Returns weak equivalence class corresponding to the product.</em>
+
+> <pre><b>'^'</b>(x::AlgEtQWECMElt,n::RngIntElt)->AlgEtQWECMElt</pre>
+<em>Given a weak equivalence class x and a non-negative integer n, returns the weak equivalence class x^n.</em>
+
+> <pre><b>IsOne</b>(x::AlgEtQWECMElt)->BoolElt</pre>
+<em>Returns whether x is the neutral element of the weak equivalence class monoid it belongs to.</em>
+
+> <pre><b>IsIdempotent</b>(x::AlgEtQWECMElt)->BoolElt</pre>
+<em>Returns whether x is an idempotent of weak equivalence class monoid it belongs to.</em>
+
+> <pre><b>WeakEquivalenceClassMonoidAbstract</b>(R::AlgEtQOrd : Method:="Auto") -> AlgEtQWECM,Map</pre>
+<em>Returns the weak equivalence class monoid W of R together with a map w (with preimages) sending each class of W to a representative (determined by WeakEquivalenceClassMonoid). The vararg Methods is passed to WeakEquivalenceClassMonoid.</em>
+
+> <pre><b>Print</b>(W::AlgEtQWECM)</pre>
+<em>Print the weak equivalence class monoid.</em>
+
+> <pre><b>Order</b>(W::AlgEtQWECM)->AlgEtQOrd</pre>
+<em>Returns the order of W.</em>
+
+> <pre><b>Array</b>(W::AlgEtQWECM)->Assoc</pre>
+<em>Return the underlying associative array of W, which is indexed by the overorder of R and values given by the weak equivalence classes with prescribed multiplicator ring.</em>
+
+> <pre><b>Map</b>(W::AlgEtQWECM)->Map</pre>
+<em>Returns the map from W to the set of ideals which returns the representative of each class.</em>
+
+> <pre><b>'eq'</b>(W::AlgEtQWECM,WW::AlgEtQWECM)->BoolElt</pre>
+<em>Returns whether the two weak equivalence class monoid are the same, that is, if the underlying orders are.</em>
+
+> <pre><b>'#'</b>(W::AlgEtQWECM)->RngInt</pre>
+<em>Returns the size of W.</em>
+
+> <pre><b>Classes</b>(W::AlgEtQWECM)->SeqEnum[AlgEtQWECMElt]</pre>
+<em>Returns the sequence of the classes in W.</em>
+
+> <pre><b>Representatives</b>(W::AlgEtQWECM)->SeqEnum[AlgEtQIdl]</pre>
+<em>Returns the sequence of representatives of the classes in W.</em>
+
+> <pre><b>One</b>(W::AlgEtQWECM)->AlgEtQWECMElt</pre>
+<em>Returns the neutral element of W.</em>
+
+> <pre><b>Random</b>(W::AlgEtQWECM)->AlgEtQWECMElt</pre>
+<em>Returns a random element of W.</em>
+
+> <pre><b>Idempotents</b>(W::AlgEtQWECM)->SeqEnum[AlgEtQWECMElt]</pre>
+<em>Returns the sequence of the classes in W which are idempotent.</em>
+
+> <pre><b>Localization</b>(W::AlgEtQWECM,P::AlgEtQIdl)->AlgEtQWECM</pre>
+<em>Given the weak equivalence class monoid of an order R in the etale algebra K and a maximal ideal P of R, returns the weak equivalance class monoid of the unique overorder of R which is locally equal to R at P and locally maximal at every other maximal ideal. This order is R+P^kO, where O is the maximal order of K and k is a non-negative integer big enough.</em>
+
+> <pre><b>IsGeneratingSet</b>(W::AlgEtQWECM,seq::SeqEnum[AlgEtQWECMElt])->BoolElt</pre>
+<em>Given the weak equivalence class monoid of R and a sequence of classes in W, returns whether the sequence is a generating set of W.</em>
+
+> <pre><b>IsGeneratingSet</b>(W::AlgEtQWECM,seq::SeqEnum[AlgEtQIdl])->BoolElt</pre>
+<em>Given the weak equivalence class monoid of R and a sequence of fractional R-ideals, returns whether the sequence represents a generating set of W.</em>
+
 
 ## List of instrinsics in AlgEtQ/IdealClassMonoid.m:
 
@@ -932,6 +1049,81 @@ The output is produced by a recursive use of MaximalIntermediateIdeals.</em>
 
 > <pre><b>ICM</b>(S::AlgEtQOrd : GRH:=false ) -> SeqEnum</pre>
 <em>Returns the ideal class monoid of the order, that is, a set of representatives for the isomorphism classes of the fractional S-ideals.</em>
+
+
+## List of instrinsics in AlgEtQ/ICMAbstract.m:
+
+> <pre><b>Print</b>(x::AlgEtQICMElt)</pre>
+<em>Print the element.</em>
+
+> <pre><b>IsCoercible</b>(icm::AlgEtQICM, x::.) -> BoolElt, .</pre>
+<em>Return whether the element is coercible into icm and the result of the coercion if so.</em>
+
+> <pre><b>'!'</b>(icm::AlgEtQICM, x::.) -> AlgEtQICMElt</pre>
+<em>Coerce x into icm, when possible.</em>
+
+> <pre><b>'in'</b>(x::AlgEtQICMElt,icm::AlgEtQICM) -> BoolElt</pre>
+<em>Returns whether x is in icm.</em>
+
+> <pre><b>Parent</b>(x::AlgEtQICMElt)->AlgEtQICM</pre>
+<em>Returns the parent of x, that is, the ideal class monoid it belongs to.</em>
+
+> <pre><b>WEClass</b>(x::AlgEtQICMElt)->AlgEtQWECMElt</pre>
+<em>Returns the weak equivalence class of x.</em>
+
+> <pre><b>PicClass</b>(x::AlgEtQICMElt)->GrpAbElt,Map</pre>
+<em>Returns the elements of the PicardGroup Pic(T) of the multiplicator ring T of x together with the map from Pic(T) to the set of ideals corresponding to x.</em>
+
+> <pre><b>Ideal</b>(x::AlgEtQICMElt)->AlgEtQIdl</pre>
+<em>Returns a deterministically computed ideal representing the ideal class. This is not stored in an attribute to save memory.</em>
+
+> <pre><b>MultiplicatorRing</b>(x::AlgEtQICMElt)->AlgEtQOrd</pre>
+<em>Returns the multiplicator ring of x.</em>
+
+> <pre><b>'eq'</b>(x::AlgEtQICMElt,y::AlgEtQICMElt)->BoolElt</pre>
+<em>Returns whether the two elements define the same class.</em>
+
+> <pre><b>'*'</b>(x::AlgEtQICMElt,y::AlgEtQICMElt)->AlgEtQICMElt</pre>
+<em>Returns ideal class corresponding to the product.</em>
+
+> <pre><b>'^'</b>(x::AlgEtQICMElt,n::RngIntElt)->AlgEtQICMElt</pre>
+<em>Given an ideal class x and a non-negative integer n, returns the ideal class x^n.</em>
+
+> <pre><b>IdealClassMonoidAbstract</b>(R::AlgEtQOrd : Method:="Auto") -> AlgEtQICM,Map</pre>
+<em>Returns the ideal class monoid icm of R together with a map m (with preimages) sending each class of icm to a representative (determined by WeakEquivalenceClassMonoid and PicardGroup). The vararg Methods is passed to WeakEquivalenceClassMonoid.</em>
+
+> <pre><b>IsOne</b>(x::AlgEtQICMElt)->BoolElt</pre>
+<em>Returns whether x is the neutral element of the ideal class monoid it belongs to.</em>
+
+> <pre><b>IsInvertibleInMultiplicatorRing</b>(x::AlgEtQICMElt)->BoolElt</pre>
+<em>Returns whether x the ideal class is invertible in its own multiplicator ring.</em>
+
+> <pre><b>Print</b>(W::AlgEtQICM)</pre>
+<em>Print the ideal class monoid.</em>
+
+> <pre><b>Order</b>(icm::AlgEtQICM)->AlgEtQOrd</pre>
+<em>Returns the order of icm.</em>
+
+> <pre><b>Map</b>(W::AlgEtQICM)->Map</pre>
+<em>Returns the map from W to the set of ideals which returns the representative of each class.</em>
+
+> <pre><b>'eq'</b>(icm1::AlgEtQICM,icm2::AlgEtQICM)->BoolElt</pre>
+<em>Returns whether the two ideal class monoid are the same, that is, if the underlying orders are.</em>
+
+> <pre><b>'#'</b>(icm::AlgEtQICM)->RngInt</pre>
+<em>Returns the size of W.</em>
+
+> <pre><b>Classes</b>(icm::AlgEtQICM)->SeqEnum[AlgEtQICMElt]</pre>
+<em>Returns the sequence of the classes in icm.</em>
+
+> <pre><b>Representatives</b>(icm::AlgEtQICM)->SeqEnum[AlgEtQIdl]</pre>
+<em>Returns the sequence of representatives of the classes in icm.</em>
+
+> <pre><b>One</b>(icm::AlgEtQICM)->AlgEtQICMElt</pre>
+<em>Returns the neutral element of W.</em>
+
+> <pre><b>Random</b>(icm::AlgEtQICM)->AlgEtQICMElt</pre>
+<em>Returns a random element of W.</em>
 
 
 ## List of instrinsics in AlgEtQ/TotRealTotPos.m:

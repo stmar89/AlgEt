@@ -1,125 +1,80 @@
-## List of instrinsics in AlgEtQMod/IntermediateModules.m:
-
-> <pre><b>MinimalIntermediateModules</b>(I::AlgEtQMod,J::AlgEtQMod)->SetIndx[AlgEtQMod]</pre>
-<em>Given S-modules J subset I, returns the minimal (with respect to inclusion) S-modules M such that J subset M subset I.</em>
-
-> <pre><b>IntermediateModules</b>(I::AlgEtQMod,J::AlgEtQMod)->SetIndx[AlgEtQMod]</pre>
-<em>Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that J subset K subset I. They are produced recursively using from the minimal ones.</em>
-
-> <pre><b>MaximalIntermediateModules</b>(I::AlgEtQMod,J::AlgEtQMod)->SetIndx[AlgEtQMod]</pre>
-<em>Given S-modules J subset I, returns the maximal (with respect to inclusion) S-modules K such that J subset K subset I.</em>
-
-> <pre><b>IntermediateModulesWithTrivialExtension</b>(I::AlgEtQMod,J::AlgEtQMod,O::AlgEtQOrd)->SetIndx[AlgEtQMod]</pre>
-<em>Given S-modules J subset I, and overorder O of S, it returns all the S-modules N such that J subset N subset I and NO=I. Note: we need O!!I eq I. They are produced recursively using from the maximal ones</em>
-
-
-## List of instrinsics in AlgEtQMod/IsomModules.m:
-
-> <pre><b>IsIsomorphic</b>(I::AlgEtQMod,J::AlgEtQMod : Method:="Magma",UseSpecializedMethod:=true) -> BoolElt</pre>
-<em>Given two modules I and J returns wheater they are isomorphic.
+<pre><b> MinimalIntermediateModules</b>(I::AlgEtQMod,J::AlgEtQMod)->SetIndx[AlgEtQMod]</pre>
+Given S-modules J subset I, returns the minimal (with respect to inclusion) S-modules M such that J subset M subset I.
+<pre><b> IntermediateModules</b>(I::AlgEtQMod,J::AlgEtQMod)->SetIndx[AlgEtQMod]</pre>
+Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that J subset K subset I. They are produced recursively using from the minimal ones.
+<pre><b> MaximalIntermediateModules</b>(I::AlgEtQMod,J::AlgEtQMod)->SetIndx[AlgEtQMod]</pre>
+Given S-modules J subset I, returns the maximal (with respect to inclusion) S-modules K such that J subset K subset I.
+<pre><b> IntermediateModulesWithTrivialExtension</b>(I::AlgEtQMod,J::AlgEtQMod,O::AlgEtQOrd)->SetIndx[AlgEtQMod]</pre>
+Given S-modules J subset I, and overorder O of S, it returns all the S-modules N such that J subset N subset I and NO=I. Note: we need O!!I eq I. They are produced recursively using from the maximal ones
+<pre><b> IsIsomorphic</b>(I::AlgEtQMod,J::AlgEtQMod : Method:="Magma",UseSpecializedMethod:=true) -> BoolElt</pre>
+Given two modules I and J returns wheater they are isomorphic.
 The vararg UseSpecializedMethod (default true) triggers the use of specialized code in the following two special cases: when I and J are fractional ideals, or when they are modules in V over a Bass order S in K with V = K^s for some s.
 The vararg Method allows to choose if the isomorphism testing is done with "Magma", very slow, or with the Hecke/Nemo package for julia, which is much faster.
 To use the latter option, install julia, add the package Hecke and build the package.
 Detailed instructions are provided in the example file in the GitHub repository.
-Method should be of the form "julia -J /tmp/Hecke.so ~/path/to/AlgEt/" (the ".so" might be different according to your SO, according to the output of the julia command "Hecke.build()").</em>
-
-> <pre><b>IsomorphismClasses</b>(R::AlgEtQOrd,m::Map : Method:="Magma", UseSpecializedMethod:=true) -> SeqEnum[AlgEtQMod]</pre>
-<em>Given an order R in some AlgEtQ K, where K acts on some V, by m:K->V, returns representatives of the isomorphism classes of the S-module lattices in V.
+Method should be of the form "julia -J /tmp/Hecke.so ~/path/to/AlgEt/" (the ".so" might be different according to your SO, according to the output of the julia command "Hecke.build()").
+<pre><b> IsomorphismClasses</b>(R::AlgEtQOrd,m::Map : Method:="Magma", UseSpecializedMethod:=true) -> SeqEnum[AlgEtQMod]</pre>
+Given an order R in some AlgEtQ K, where K acts on some V, by m:K->V, returns representatives of the isomorphism classes of the S-module lattices in V.
 The vararg UseSpecializedMethod (default true) triggers the use of specialized code in the following two special cases: when K=V by using IdealClassMonoid, or when V = K^s for some s and R is Bass, by using IsomorphismClassesOverBassOrder.
 The vararg Method allows to choose if the isomorphism testing is done with "Magma", very slow, or with the Hecke/Nemo package for julia, which is much faster.
 To use the latter option, install julia, add the package Hecke and build the package.
 Detailed instructions are provided in the example file in the GitHub repository.
-Method should be of the form "julia -J /tmp/Hecke.so ~/path/to/AlgEt/" (the ".so" might be different according to your SO, according to the output of the julia command "Hecke.build()").</em>
-
-
-## List of instrinsics in AlgEtQMod/Modules.m:
-
-> <pre><b>Module</b>(S::AlgEtQOrd, m::Map, gens::SeqEnum) -> AlgEtQMod</pre>
-<em>Let K and V be AlgEtQ such that m:K->V is a K-module. Given an order S in K, returns the sub-S-module of V generated by gens.</em>
-
-> <pre><b>Module</b>(S::AlgEtQOrd,m::Map,idls::Tup) -> AlgEtQMod</pre>
-<em>Let K and V be AlgEtQ such that m:K->V is a K-module. Given an order S in K, and a tuple of ideals idls in Components(V), returns the sub-S-module of V generated by the direct sum of the ideals.</em>
-
-> <pre><b>ModuleFromDirectSum</b>(R::AlgEtQOrd,m::Map,seq::SeqEnum[Tup])->AlgEtQMod</pre>
-<em>Let R be an order and a map m:Algebra(R)->A, where A is an algebra isomorphic to Algebra(R)^s. Let seq be a sequence of pairs <J,v> where J is a fractional R ideal and v is either an element of A or a map v:Algebra(J)->A. It returns the AlgEtQMod M=J1v1+J2v2+...Jsvs (in the first case) or J1v1(1)+...+Jsvs(1) (in the second case).</em>
-
-> <pre><b>Print</b>(I::AlgEtQMod)</pre>
-<em>Prints the module.</em>
-
-> <pre><b>UniverseAlgebra</b>(I::AlgEtQMod) -> AlgEtQ,Map</pre>
-<em>Returns the étale algebra in which the module lives, together with the action map:Algebra(Order(I))->UniverseAlgebra(I).</em>
-
-> <pre><b>Order</b>(I::AlgEtQMod) -> AlgEtQOrd</pre>
-<em>Returns the order of definition of the module.</em>
-
-> <pre><b>Generators</b>(I::AlgEtQMod) -> SeqEnum[AlgEtQElt]</pre>
-<em>Returns the generators of the module.</em>
-
-> <pre><b>ZBasis</b>(I::AlgEtQMod)->SeqEnum[AlgEtQElt]</pre>
-<em>Returns a Z-basis of the module.</em>
-
-> <pre><b>myHash</b>(I::AlgEtQMod)->RngInt</pre>
-<em>Hash function.</em>
-
-> <pre><b>'eq'</b>(I::AlgEtQMod,J::AlgEtQMod) -> BoolElt</pre>
-<em>Equality testing.</em>
-
-> <pre><b>'ne'</b>(I::AlgEtQMod , J::AlgEtQMod ) -> BoolElt</pre>
-<em>Disequality testing.</em>
-
-> <pre><b>AbsoluteCoordinates</b>(seq::SeqEnum[AlgEtQElt],I::AlgEtQMod) -> SeqEnum</pre>
-<em>AbsoluteCoordiantes with respect to the ZBasis.</em>
-
-> <pre><b>'in'</b>(x::AlgEtQElt , I::AlgEtQMod ) -> BoolElt</pre>
-<em>Returns if x is in I.</em>
-
-> <pre><b>'in'</b>(x::RngIntElt , I::AlgEtQMod ) -> BoolElt</pre>
-<em>Returns if x is in I.</em>
-
-> <pre><b>'in'</b>(x::FldRatElt , I::AlgEtQMod ) -> BoolElt</pre>
-<em>Returns if x is in I.</em>
-
-> <pre><b>'subset'</b>(I1 :: AlgEtQMod, I2 :: AlgEtQMod) -> BoolElt</pre>
-<em>Checks if the first argument is inside the second.</em>
-
-> <pre><b>Index</b>(T::AlgEtQMod) -> FldRatElt</pre>
-<em>Given an ideal T computes its index with respect to the basis of the algebra of T as a free Z-module.</em>
-
-> <pre><b>Index</b>(J::AlgEtQMod, I::AlgEtQMod) -> Any</pre>
-<em>Given modules J and I defined over the same order returns [J:I] = [J:J cap I]/[I : J cap I].</em>
-
-> <pre><b>'!!'</b>(T::AlgEtQOrd,I::AlgEtQMod) -> AlgEtQMod</pre>
-<em>Given an S-module I and an order T, returns the extension IT as a T-module. Note that if T is in S, then IT=I.</em>
-
-> <pre><b>Quotient</b>(I::AlgEtQMod, J::AlgEtQMod) -> GrpAb, Map</pre>
-<em>Given S-modules J subset I, returns the abelian group Q=I/J together with the quotient map q:I->J.</em>
-
-
-## List of instrinsics in AlgEtQMod/PowerBass.m:
-
-> <pre><b>compute_multiplicator_overorder</b>(M::AlgEtQMod)->AlgEtQOrd</pre>
-<em>given an AlgEtQMod over the order R, it returns the biggest overorder S of R such that S\*M=M</em>
-
-> <pre><b>DirectSumRepresentation</b>(M::AlgEtQMod)->SeqEnum[Tup]</pre>
-<em>Given an R-module M in V=K^s, with R Bass, it returns a sequence of pairs <J,m> where J is a practional R ideal and m:Algebra(R)->UniverseAlgebra, such that M =  J1\*m1(One(R))+...+Js\*ms(One(R)) where the sum is direct. Also (Ji:Ji) subseteq (Ji+1:Ji+1).</em>
-
-> <pre><b>IsomorphismClassesOverBassOrder</b>(R::AlgEtQOrd, r::RngIntElt)->SeqEnum[AlgEtQMod]</pre>
-<em>Given a Bass order R and a rank r, it returns representatives of all the isormorphism classes of torsion-free R modules of rank r.</em>
-
-> <pre><b>IsomorphismClassesOverBassOrder</b>(R::AlgEtQOrd, map::Map )->SeqEnum[AlgEtQMod]</pre>
-<em>Given a Bass order R and a map:Algebra(R)->UA, it returns representatives of all the isormorphism classes of torsion-free R modules inside R. We need UA to be isomorphic to a power of Algebra(R).</em>
-
-> <pre><b>SteinitzClass</b>(M::AlgEtQMod)->AlgEtQOrdIdl</pre>
-<em>returns the product of the fractional ideals in the input</em>
-
-> <pre><b>StandardDirectSumRepresentation</b>(M::AlgEtQMod)->SeqEnum[Tup],Map</pre>
-<em>Returns seq,map, where seq is a sequence of pairs <Si,ei> with:
+Method should be of the form "julia -J /tmp/Hecke.so ~/path/to/AlgEt/" (the ".so" might be different according to your SO, according to the output of the julia command "Hecke.build()").
+<pre><b> Module</b>(S::AlgEtQOrd, m::Map, gens::SeqEnum) -> AlgEtQMod</pre>
+Let K and V be AlgEtQ such that m:K->V is a K-module. Given an order S in K, returns the sub-S-module of V generated by gens.
+<pre><b> Module</b>(S::AlgEtQOrd,m::Map,idls::Tup) -> AlgEtQMod</pre>
+Let K and V be AlgEtQ such that m:K->V is a K-module. Given an order S in K, and a tuple of ideals idls in Components(V), returns the sub-S-module of V generated by the direct sum of the ideals.
+<pre><b> ModuleFromDirectSum</b>(R::AlgEtQOrd,m::Map,seq::SeqEnum[Tup])->AlgEtQMod</pre>
+Let R be an order and a map m:Algebra(R)->A, where A is an algebra isomorphic to Algebra(R)^s. Let seq be a sequence of pairs <J,v> where J is a fractional R ideal and v is either an element of A or a map v:Algebra(J)->A. It returns the AlgEtQMod M=J1v1+J2v2+...Jsvs (in the first case) or J1v1(1)+...+Jsvs(1) (in the second case).
+<pre><b> Print</b>(I::AlgEtQMod)</pre>
+Prints the module.
+<pre><b> UniverseAlgebra</b>(I::AlgEtQMod) -> AlgEtQ,Map</pre>
+Returns the étale algebra in which the module lives, together with the action map:Algebra(Order(I))->UniverseAlgebra(I).
+<pre><b> Order</b>(I::AlgEtQMod) -> AlgEtQOrd</pre>
+Returns the order of definition of the module.
+<pre><b> Generators</b>(I::AlgEtQMod) -> SeqEnum[AlgEtQElt]</pre>
+Returns the generators of the module.
+<pre><b> ZBasis</b>(I::AlgEtQMod)->SeqEnum[AlgEtQElt]</pre>
+Returns a Z-basis of the module.
+<pre><b> myHash</b>(I::AlgEtQMod)->RngInt</pre>
+Hash function.
+<pre><b> 'eq'</b>(I::AlgEtQMod,J::AlgEtQMod) -> BoolElt</pre>
+Equality testing.
+<pre><b> 'ne'</b>(I::AlgEtQMod , J::AlgEtQMod ) -> BoolElt</pre>
+Disequality testing.
+<pre><b> AbsoluteCoordinates</b>(seq::SeqEnum[AlgEtQElt],I::AlgEtQMod) -> SeqEnum</pre>
+AbsoluteCoordiantes with respect to the ZBasis.
+<pre><b> 'in'</b>(x::AlgEtQElt , I::AlgEtQMod ) -> BoolElt</pre>
+Returns if x is in I.
+<pre><b> 'in'</b>(x::RngIntElt , I::AlgEtQMod ) -> BoolElt</pre>
+Returns if x is in I.
+<pre><b> 'in'</b>(x::FldRatElt , I::AlgEtQMod ) -> BoolElt</pre>
+Returns if x is in I.
+<pre><b> 'subset'</b>(I1 :: AlgEtQMod, I2 :: AlgEtQMod) -> BoolElt</pre>
+Checks if the first argument is inside the second.
+<pre><b> Index</b>(T::AlgEtQMod) -> FldRatElt</pre>
+Given an ideal T computes its index with respect to the basis of the algebra of T as a free Z-module.
+<pre><b> Index</b>(J::AlgEtQMod, I::AlgEtQMod) -> Any</pre>
+Given modules J and I defined over the same order returns [J:I] = [J:J cap I]/[I : J cap I].
+<pre><b> '!!'</b>(T::AlgEtQOrd,I::AlgEtQMod) -> AlgEtQMod</pre>
+Given an S-module I and an order T, returns the extension IT as a T-module. Note that if T is in S, then IT=I.
+<pre><b> Quotient</b>(I::AlgEtQMod, J::AlgEtQMod) -> GrpAb, Map</pre>
+Given S-modules J subset I, returns the abelian group Q=I/J together with the quotient map q:I->J.
+<pre><b> compute_multiplicator_overorder</b>(M::AlgEtQMod)->AlgEtQOrd</pre>
+given an AlgEtQMod over the order R, it returns the biggest overorder S of R such that S*M=M
+<pre><b> DirectSumRepresentation</b>(M::AlgEtQMod)->SeqEnum[Tup]</pre>
+Given an R-module M in V=K^s, with R Bass, it returns a sequence of pairs <J,m> where J is a practional R ideal and m:Algebra(R)->UniverseAlgebra, such that M =  J1*m1(One(R))+...+Js*ms(One(R)) where the sum is direct. Also (Ji:Ji) subseteq (Ji+1:Ji+1).
+<pre><b> IsomorphismClassesOverBassOrder</b>(R::AlgEtQOrd, r::RngIntElt)->SeqEnum[AlgEtQMod]</pre>
+Given a Bass order R and a rank r, it returns representatives of all the isormorphism classes of torsion-free R modules of rank r.
+<pre><b> IsomorphismClassesOverBassOrder</b>(R::AlgEtQOrd, map::Map )->SeqEnum[AlgEtQMod]</pre>
+Given a Bass order R and a map:Algebra(R)->UA, it returns representatives of all the isormorphism classes of torsion-free R modules inside R. We need UA to be isomorphic to a power of Algebra(R).
+<pre><b> SteinitzClass</b>(M::AlgEtQMod)->AlgEtQOrdIdl</pre>
+returns the product of the fractional ideals in the input
+<pre><b> StandardDirectSumRepresentation</b>(M::AlgEtQMod)->SeqEnum[Tup],Map</pre>
+Returns seq,map, where seq is a sequence of pairs <Si,ei> with:
     - ei:Algebra(R)->UA that sends 1_R to the ith orthogonal idempotent of the UniverseAlgebra UA, and
     - Si is the multiplicator ring of Ji (from the DirectSumRepresentation) for i = 1,...,s-1 and Ss is the SteinitzClass.
       [ note : S1 in S2 in ... in Ss-1 in (Ss:Ss) ].
-    - map:UA->UA is an R-linear morphism that sends the DirectSumRepresentation into seq.</em>
-
-> <pre><b>IsIsomorphicOverBassOrder</b>( M1::AlgEtQMod, M2::AlgEtQMod )->BoolElt,Map</pre>
-<em>Returns wheter two AlgEtQMods M1 and M2 are isomorphic and if so it returns also a map from the common universe algebra that sends M1 into M2.</em>
-
-
+    - map:UA->UA is an R-linear morphism that sends the DirectSumRepresentation into seq.
+<pre><b> IsIsomorphicOverBassOrder</b>( M1::AlgEtQMod, M2::AlgEtQMod )->BoolElt,Map</pre>
+Returns wheter two AlgEtQMods M1 and M2 are isomorphic and if so it returns also a map from the common universe algebra that sends M1 into M2.

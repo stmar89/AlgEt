@@ -37,6 +37,14 @@ declare attributes AlgEtQ : DefiningPolynomial,
                            Components; //a tup of 3 sequences: the first are the NF, 
                                          //the second are embeddings and the third are projections
 
+
+///# Étale algebras over $\mathbb{Q}$.
+///## Introduction
+/// An étale algebra $A$ over $\mathbb{Q}$ is a finite product of number fields.
+/// Typical examples are:
+/// - $A = K\times K$ where $K$ is a number field.
+/// - $A = \dfrac{\mathbb{Q}[x]}{f(x)}$ where $f(x)$ is a polynomial with rational coefficients and no repeated complex roots.
+
 //------------
 // Creation for AlgEtQ
 //------------

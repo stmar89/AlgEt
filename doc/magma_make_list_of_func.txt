@@ -1,15 +1,160 @@
 /* vim: set syntax=magma : */
 
 /*
-
-    magma script to automatically create a .md file with the documentation for all intrinsics.
+    Magma script to automatically create a .md file with the documentation for all intrinsics.
+    It is inspireed by cjdoris magdoc package.
 
     input:
         - input: = a spec file containing a folder and a sequence of .m files to be scanned
-        - output_file:= an output file
+        - output_file:= name of the file returned. It should have extension .md
+    
+    /// TEXT is markdown formatted documentation (note the space before TEXT). 
+        If they appear immediately after a sectioning command (with no intervening space) then they document the section; otherwise they document the next definition (usually an intrinsic).
+    ///# NAME define sections. Additional #s give deeper sections.
+    ///ditto groups this intrinsic with the previous one; typically they have similar inputs and the same return types; when the return types are the same, they are merged in the documentation.
 
 */
 
+    is_doc_line:=function(line)
+        if #line ge 4 and line[1..3] eq "///" and line[4] ne "/" then
+            if line[4] eq " " then
+                type:="text";
+                cnt:=line[4..#line] cat "\n";
+                return true,type,cnt;
+            elif line[4] eq "#" then
+                type:="sec";
+                cnt:=line[4..#line] cat "\n";
+                return true,type,cnt;
+            else
+                text:=line[4..#line];
+                n:=Index(text," ");
+                n:=n eq 0 select #text else n;
+                type:=text[1..n];
+                assert type in {"hide-all","hide-none","ditto"}; // only these are implemented
+                return true,type,_;
+            end if;
+        else
+            return false,_,_;
+        end if;
+    end function;
+   
+    is_intrinsic:=function(line)
+        return #line ge 9 and line[1..9] eq "intrinsic";
+    end function;
+
+    is_end_intrinsic:=function(line)
+        return #line ge 13 and line[1..13] eq "end intrinsic";
+    end function;
+
+    parse_intrisic:=function(lines)
+        name:=lines[1][Index(lines[1]," ")..Index(lines[1],"(")-1];
+        name_in_out:="<pre><b>" cat name cat "</b>" cat lines[1][Index(lines[1],"(")..#lines[1]] cat "</pre>\n";
+        rest:=Join(lines[2..#lines],"\n");
+        rest:=rest[Index(rest,"{")+1..#rest];
+        e:=0;
+        for i in [1..#rest] do
+            if rest[i] eq "}" and i gt 1 and rest[i-1] ne "\\" then
+                e:=i-1;
+                break i;
+            end if;
+        end for;
+        braces:=Trim(rest[1..e]) cat "\n";
+        return name_in_out,braces;
+    end function;
+
+    spec:=Split(Read(input),"{\n}");
+    fld:=spec[1];
+    output:="";
+    braces:="";
+    for dot_m in spec[2..#spec] do
+        path_dot_m:=fld cat "/" cat dot_m;
+        lines:=Split(Read("../" cat path_dot_m));
+        i:=1; 
+        last:=#lines;
+        repeat
+            use_in_braces_for_next_intrinsic:=true; // this will be turned to false if ditto or 
+                                                    // external doc is found
+            is_doc,type,cnt:=is_doc_line(lines[i]);
+            if is_doc then
+                if type eq "hide-all" then
+                    // we ignore everything until hide-none
+                    repeat
+                        i+:=1;
+                        is_doc,type,cnt:=is_doc_line(lines[i]);
+                    until is_doc and type eq "hide-none";
+                elif type eq "sec" then
+                    output cat:=cnt;
+                    // it might be followed by a bunch of doc_lines of type text
+                    doc:=true;
+                    repeat
+                        i+:=1;
+                        is_doc,type,cnt:=is_doc_line(lines[i]);
+                        if is_doc and type in {"text","sec"} then
+                            output cat:=cnt;
+                        else 
+                            // end of doc
+                            doc:=false;
+                        end if;
+                    until not doc;
+                elif type eq "ditto" then
+                    use_in_braces_for_next_intrinsic:=false;
+                    // remove the previous description from output
+                    num_lines_to_remove:=#Split(braces);
+                    output:=Split(output);
+                    output:=Join(output[1..#output-num_lines_to_remove],"\n");
+                    doc_next_intrinisc:=braces;
+                    i+:=1;
+                    //TODO
+                elif type eq "text" then
+                    doc_next_intrinisc:=cnt;
+                    use_in_braces_for_next_intrinsic:=false;
+                    repeat
+                        i+:=1;
+                        is_doc,type,cnt:=is_doc_line(lines[i]);
+                        if is_doc and type eq "text" then
+                            doc_next_intrinisc cat:=cnt;
+                        else 
+                            // end of doc
+                            doc:=false;
+                        end if;
+                    until not doc;
+                    assert is_intrinsic(lines[i]);
+                end if;
+            end if;
+            is_intr:=is_intrinsic(lines[i]);
+            if is_intr then
+                lines_intrisic:=[ lines[i] ];
+                repeat
+                    i+:=1;
+                    Append(~lines_intrisic,lines[i]);
+                until is_end_intrinsic(lines[i]);
+                name_in_out,braces:=parse_intrisic(lines_intrisic); // already formatted
+                output cat:=name_in_out;
+                if not use_in_braces_for_next_intrinsic then
+                    braces:=doc_next_intrinisc;
+                end if;
+                output cat:=braces;
+            end if;
+            i+:=1;
+        until i gt last;
+    end for;
+
+
+    output:=SubstituteString(output,"*","\*");
+    //TODO check for characters to escape
+    //print output;
+    fprintf output_file,"%o",output;
+    quit;
+
+
+
+
+
+
+
+
+
+/* OLD stuff
 
     clean:=function(str0)
     // removes "\n" and " " from the beginning and the end of the string;
@@ -84,5 +229,3 @@
         fprintf output_file,"## List of instrinsics in %o:\n\n%o\n",input_file,out;
     end for;
      
-    quit;
-

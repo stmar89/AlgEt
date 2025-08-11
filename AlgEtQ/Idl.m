@@ -726,6 +726,13 @@ intrinsic MultiplicatorRing(I::AlgEtQIdl) -> AlgEtQOrd
     return I`MultiplicatorRing;
 end intrinsic;
 
+intrinsic MultiplicatorRing(R::AlgEtQOrd) -> AlgEtQOrd
+{Returns the multiplicator ring of an order R, that is R itself.}
+    return R;
+end intrinsic;
+
+// TODO example with products
+
 //----------
 // IsProductOfIdeals
 //----------

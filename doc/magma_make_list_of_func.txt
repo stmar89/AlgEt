@@ -136,17 +136,16 @@
                     repeat
                         i+:=1;
                         is_doc,type,cnt:=is_doc_line(lines[i]);
-//i,is_doc;
+i,is_doc;
                         if is_doc and type eq "text" then
                             doc_next_intrinisc cat:=cnt;
-//doc_next_intrinisc;
+doc_next_intrinisc;
                         else 
                             // end of doc
                             doc:=false;
                             i-:=1;
                         end if;
                     until not doc;
-//i;
                     assert is_intrinsic(lines[i+1]);
                 end if;
             elif is_intrinsic(lines[i]) then

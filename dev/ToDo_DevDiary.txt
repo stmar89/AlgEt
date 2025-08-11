@@ -1,8 +1,6 @@
 List of TODOs:
     ### Priority ###
     * publishing AlgEtQ:
-      - add 'in' to AlgEt
-      - Implement ICM in an `abstract way' (generators and relations plus map)
       - Go through WKICM.m and add references to papers.
       - PrimesAttributes.m is missing TESTS
       - Doc: 

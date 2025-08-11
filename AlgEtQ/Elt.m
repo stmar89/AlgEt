@@ -727,6 +727,7 @@ end intrinsic;
 /// ```
 
 ///# Example 2
+/// ```
 /// //We now consider the étale algebra consisting of two copies of the rational field.
 /// _<x>:=PolynomialRing(Integers());
 /// QQ:=NumberField(x-1:DoLinearExtension);
@@ -734,6 +735,7 @@ end intrinsic;
 /// a:=PrimitiveElement(A); a;
 /// b:=A!<2,10>;
 /// SetPrimitiveElement(b);
+/// ```
 
 /* TESTS
 

@@ -137,11 +137,31 @@ Returns whether the element is integral (over the integers).
  _<x>:=PolynomialRing(Integers());
  f:=(x^8+16)*(x^8+81);
  A:=EtaleAlgebra(f);
- a:=PrimitiveElement(A);
- K1,K2:=Explode(Components(A));
- Components(a);
+ // We compute the `canonical` primitive element, which is the class of the variable x in A.
+ a:=PrimitiveElement(A); a;
+ 
+ // The algebra A has two components:
+ comps,embeddings,projections:=Components(A);
+ K1,K2:=Explode(comps);
+ // The unit elemenet of each component corresponds to an orthogonal idempotent of A:
+ [ embeddings[1](K1!1),embeddings[2](K2!1) ] eq OrthogonalIdempotents(A);
+ 
+ // We conclude this example by showing the use of SumOfProducts and its timings advantages:
+ N:=10^5;
+ elts1:=[ a+i : i in [1..N] ];
+ elts2:=[ a-i : i in [1..N] ];
+ time s1:=&+[ elts1[i]*elts2[i] : i in [1..N] ];
+ time s2:=SumOfProducts(elts1,elts2);
+ s1 eq s2;
  ```
 # Example 2
+ //We now consider the étale algebra consisting of two copies of the rational field.
+ _<x>:=PolynomialRing(Integers());
+ QQ:=NumberField(x-1:DoLinearExtension);
+ A:=EtaleAlgebra([QQ,QQ]);
+ a:=PrimitiveElement(A); a;
+ b:=A!<2,10>;
+ SetPrimitiveElement(b);
 <pre><b> HomsToC</b>(A::AlgEtQ : Prec:=Precision(GetDefaultRealField()))->SeqEnum[Map]</pre>
 Returns the sequence of homomorphisms from A to the complex field CC. The precision of CC is given by the optional parameter "Prec". Default value is 30
 <pre><b> Hom</b>(A::AlgEtQ , B::AlgEtQ , img::SeqEnum[AlgEtQElt] : CheckMultiplicative:=false, CheckUnital:=false, ComputeInverse:=true)->Map</pre>

@@ -7,15 +7,30 @@
     input:
         - input: = a spec file containing a folder and a sequence of .m files to be scanned
         - output_file:= name of the file returned. It should have extension .md
-    
+
+    It parses the file an looks for "doc-lines".
+    These lines are always introduced by /// and followed by either a space, or a specific character/keyword which determines the "type" of the doc-line.
+    Here the allowed types, their functions and their formatting:
+
+    type "text":
     /// TEXT is markdown formatted documentation (note the space before TEXT). 
-        If they appear immediately after a sectioning command (with no intervening space) then they document the section; otherwise they document the next definition (usually an intrinsic).
+        It has two possible functions:
+        - If they appear immediately after a sectioning command (with no intervening space) then they document the section.
+        - Otherwise they must be followed by an intrinsic which they document. In this case the parser will ignore the documentation included between braces {xxx}.
+
+    type "sec":    
     ///# NAME define sections. Additional #s give deeper sections.
-    ///ditto groups this intrinsic with the previous one; typically they have similar inputs and the same return types; when the return types are the same, they are merged in the documentation.
+
+    type "ditto":
+    ///ditto groups this intrinsic with the previous one; typically they have similar inputs and the same return types; when the return types are the same, they are merged in the documentation. The documentation of the "parent" intrinsic can either be specified by a doc-line of type "text" or withing braces {xxx}.
+
+    types "hide-all" and "hide-non":
+    all the code between this commands is ignred by the parser.
 
 */
 
     is_doc_line:=function(line)
+    //returns whether the input line is a doc string. If so, it returns also which type (text, sec, ditto, hide-all,hide-none) and the conten of the line (TEXT when of type "text" or NAME when of type "sec")
         if #line ge 4 and line[1..3] eq "///" and line[4] ne "/" then
             if line[4] eq " " then
                 type:="text";
@@ -31,22 +46,25 @@
                 n:=n eq 0 select #text else n;
                 type:=text[1..n];
                 assert type in {"hide-all","hide-none","ditto"}; // only these are implemented
-                return true,type,_;
+                return true,type,"";
             end if;
         else
-            return false,_,_;
+            return false,"","";
         end if;
     end function;
    
     is_intrinsic:=function(line)
+    // determines whether the line is an intrinsc.
         return #line ge 9 and line[1..9] eq "intrinsic";
     end function;
 
     is_end_intrinsic:=function(line)
+    // determines whether the line is the end of an intrinsc.
         return #line ge 13 and line[1..13] eq "end intrinsic";
     end function;
 
     parse_intrisic:=function(lines)
+    // given a sequnce of lines containing the code of an intrinsic (the first one starts with "intrinsic" while the last one is "end intrinsc"), returns two strings in markdown formatting: the first is the name in bold plus input and ouput types; the second is the description of the intrinsic contained between the braces.
         name:=lines[1][Index(lines[1]," ")..Index(lines[1],"(")-1];
         name_in_out:="<pre><b>" cat name cat "</b>" cat lines[1][Index(lines[1],"(")..#lines[1]] cat "</pre>\n";
         rest:=Join(lines[2..#lines],"\n");
@@ -68,12 +86,12 @@
     braces:="";
     for dot_m in spec[2..#spec] do
         path_dot_m:=fld cat "/" cat dot_m;
-        lines:=Split(Read("../" cat path_dot_m));
+        lines:=Split(Read("../" cat path_dot_m):IncludeEmpty);
         i:=1; 
         last:=#lines;
+        use_in_braces_for_next_intrinsic:=true; // this will be turned to false if ditto or 
+                                                // external doc is found
         repeat
-            use_in_braces_for_next_intrinsic:=true; // this will be turned to false if ditto or 
-                                                    // external doc is found
             is_doc,type,cnt:=is_doc_line(lines[i]);
             if is_doc then
                 if type eq "hide-all" then
@@ -84,7 +102,9 @@
                     until is_doc and type eq "hide-none";
                 elif type eq "sec" then
                     output cat:=cnt;
-                    // it might be followed by a bunch of doc_lines of type text
+                    // it might be followed by a bunch of doc_lines of type text.
+                    // if so, we read the doc and place the counter an the last line of the doc.
+                    // otherwise we do nothing.
                     doc:=true;
                     repeat
                         i+:=1;
@@ -94,35 +114,42 @@
                         else 
                             // end of doc
                             doc:=false;
+                            i-:=1;
                         end if;
                     until not doc;
                 elif type eq "ditto" then
+                    // it must be followed by an intrinsic
+                    // while parsing the following intrinsc, we ignore the doc in braces and use the 
+                    // previously stroed one, which is in the variable "braces".
+                    assert is_intrinsic(lines[i+1]);
+                    assert braces ne "";
                     use_in_braces_for_next_intrinsic:=false;
                     // remove the previous description from output
                     num_lines_to_remove:=#Split(braces);
                     output:=Split(output);
                     output:=Join(output[1..#output-num_lines_to_remove],"\n");
                     doc_next_intrinisc:=braces;
-                    i+:=1;
-                    //TODO
                 elif type eq "text" then
-                    doc_next_intrinisc:=cnt;
                     use_in_braces_for_next_intrinsic:=false;
+                    doc_next_intrinisc:=cnt;
+                    doc:=true;
                     repeat
                         i+:=1;
                         is_doc,type,cnt:=is_doc_line(lines[i]);
+//i,is_doc;
                         if is_doc and type eq "text" then
                             doc_next_intrinisc cat:=cnt;
+//doc_next_intrinisc;
                         else 
                             // end of doc
                             doc:=false;
+                            i-:=1;
                         end if;
                     until not doc;
-                    assert is_intrinsic(lines[i]);
+//i;
+                    assert is_intrinsic(lines[i+1]);
                 end if;
-            end if;
-            is_intr:=is_intrinsic(lines[i]);
-            if is_intr then
+            elif is_intrinsic(lines[i]) then
                 lines_intrisic:=[ lines[i] ];
                 repeat
                     i+:=1;
@@ -134,7 +161,11 @@
                     braces:=doc_next_intrinisc;
                 end if;
                 output cat:=braces;
+                use_in_braces_for_next_intrinsic:=true; // this will be turned to false if ditto or 
+                                                        // external doc is found
             end if;
+
+            // we move to the next line
             i+:=1;
         until i gt last;
     end for;

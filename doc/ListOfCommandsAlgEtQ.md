@@ -1,57 +1,71 @@
-# Étale algebras over $\mathbb{Q}$.
-## Introduction
- An étale algebra $A$ over $\mathbb{Q}$ is a finite product of number fields.
+# Étale algebras
+ An `étale algebra` $A$ over a field $K$ is a finite product of finite separable extensions $K_1,\ldots,K_n$ of $K$.
  Typical examples are:
  - $A = K\times K$ where $K$ is a number field.
- - $A = \dfrac{\mathbb{Q}[x]}{f(x)}$ where $f(x)$ is a polynomial with rational coefficients and no repeated complex roots.
+ - $A = \dfrac{\mathbb{K}[x]}{f(x)}$ where $f(x)$ is a polynomial with in $K[x]$ and no repeated roots over $\overline{K}$.
+ We will refer to the field $K$ as the `prime field` of $A$ and to the fields $K_1,\ldots,K_n$  as the `components` of $A$. 
+ If $F$ is a finite extension of $K$ such that $K_1,\ldots,K_n$ are all defined as relative extensions of $F$, we call $F$ the `base field` of $A$.
+ If the components $K_1,\ldots,K_n$ of $A$ have distinct defining polynomials, say $f_1(x),\ldots,f_n(x) \in F[x]$ then $A$ is isomorphic to the étale algebra $F[x]/(f(x)$ where $f(x) = f_1(x)\cdot \cdots \cdot f_n(x)$. The polynomial $f(x)$ is then referred to as the `defining polynomial` of $A$.
+# Étale algebras over $\mathbb{Q}$
+ Currently we have implemented in MAGMA the type `AlgEtQ` which corresponds to étale algebras over the rational field $\mathbb{Q}$. 
+ An étale algebra over $\mathbb{Q}$ of type `AlgEtQ` can be created using either a sequence of number fields, given as absolute extensions of $\mathbb{Q}$, or a polynomial in $\mathbb{Z}[x]$ or $\mathbb{Q}[x]$ with no repeated complex roots. 
+ For such an algebra, the base field coincides with the prime field $\mathbb{Q}$.
 <pre><b> EtaleAlgebra</b>(seq::SeqEnum[FldNum]) -> AlgEtQ</pre>
-Given a sequence of number fields returns the étale algebra corresponding to the direct product. Note: the number fields with DefiningPolynomial of degree one should be created with the vararg DoLinearExtension set to true.
-<pre><b> EtaleAlgebra</b>(f::RngUPolElt[RngInt]) -> AlgEtQ</pre>
-Given a squarefree polynomial over the integers returns the product of the number fields defined by the irreducible factors.
-<pre><b> EtaleAlgebra</b>(f::RngUPolElt[FldRat]) -> AlgEtQ</pre>
-Given a squarefree polynomial over the rationals returns the product of the number fields defined by the irreducible factors.
-<pre><b> Print</b>(A::AlgEtQ)</pre>
-Prints the defining polynomial or the components defining A.
-<pre><b> DefiningPolynomial</b>(A::AlgEtQ) -> RngUPolElt</pre>
-Returns the defining polynomial of A, if the corresponding number fields are distinct.
+Given a sequence of number fields which are absolute extensions of the rational field, returns the étale algebra corresponding to the direct product. The number fields with DefiningPolynomial of degree one need to created with DoLinearExtension set to true.
+<pre><b> EtaleAlgebra</b>(f::RngUPolElt[RngInt]) -> AlgEtQ</pre><pre><b> EtaleAlgebra</b>(f::RngUPolElt[FldRat]) -> AlgEtQ</pre>
+ Given a polynomial with integer of rational coefficients, which is squarefree, that is, with no repeated complex roots, returns the étale algebra which is the product of the number fields defined by the irreducible factors of the polynomial.
+## Direct products
+<pre><b> DirectProduct</b>(seq::SeqEnum[AlgEtQ]) -> AlgEtQ,SeqEnum[Map],SeqEnum[Map]</pre>
+ Given a sequence of étale algebras over $\mathbb{Q}$, returns the direct product, together with sequences of inclusions and projections.
+## Conversion to a number field
+<pre><b> IsNumberField</b>(A::AlgEtQ) -> BoolElt,FldNum,Map </pre>
+ Given an étale algebra $A$ over $\mathbb{Q}$, returns wheter $A$ is a number field, that is, has only one component.  If this is the case, then returns also the number field itself together an isomorphism from $A$ to the number field.
+## Attributes
+### Components, equality testing and defining polynomial
+ Two étale algebras are defined to be equal if the ordered sequence of their components are the same.
 <pre><b> Components</b>(A::AlgEtQ) -> SeqEnum,SeqEnum,SeqEnum</pre>
-Returns the number fields of which A is a product of, together with embeddings and projections.
+ Returns the number fields of which $A$ is a product of, together with embeddings and projections.
+<pre><b> 'eq'</b>(A1::AlgEtQ,A2::AlgEtQ) -> BoolElt</pre>
+Two étale algebras are defined to be equal if they have the same components.
+<pre><b> DefiningPolynomial</b>(A::AlgEtQ) -> RngUPolElt</pre>
+ Returns the defining polynomial of $A$, if the components are distinct number fields.
+### Base field and prime field
+<pre><b> HasBaseField</b>(A::AlgEtQ) -> BoolElt</pre>
+ Returns whether the components of $A$ all have the same base field.
+<pre><b> BaseField</b>(A::AlgEtQ) -> FldNum,Map</pre>
+ Returns whether the common base field of the components of $A$ if it exists.
+<pre><b> PrimeField</b>(A::AlgEtQ) -> FldNum</pre>
+Returns the prime field of the étale algebra.
+### Dimension
 <pre><b> Dimension</b>(A::AlgEtQ)->RngInt</pre>
  Returns the dimension of A over the base field, which in this case is $\mathbb{Q}$.
 <pre><b> AbsoluteDimension</b>(A::AlgEtQ)->RngInt</pre>
-Dimension of A over the prime field.
-<pre><b> HasBaseField</b>(A::AlgEtQ) -> BoolElt,FldNum</pre>
-Returns whether A has common base field. If this is the case it returns it.
-<pre><b> BaseField</b>(A::AlgEtQ) -> FldNum</pre>
-Returns the common base field of the Algebra, if it exists.
-<pre><b> PrimeField</b>(A::AlgEtQ) -> FldNum</pre>
-Returns the prime field of the Algebra.
-<pre><b> 'eq'</b>(A1::AlgEtQ,A2::AlgEtQ) -> BoolElt</pre>
-Equality testing.
-<pre><b> IsNumberField</b>(A::AlgEtQ) -> BoolElt,FldNum,Map </pre>
-Given an étale algebra over Q returns wheter it is a number field, and if so the number field and an isomorphism from the étale algebra to the number field.
-<pre><b> Print</b>(x::AlgEtQElt)</pre>
-Print the element.
+ Returns the dimension of $A$ over the prime field.
+# Elements of étale algebras over $\mathbb{Q}$
+ An element $x$ of an étale algebra $A$ over $\mathbb{Q}$ with components $K_1,\ldots,K_n$ is stored as a tuple ofelements of the number fields.
+ Operations and equality testing are all performed componentwise.
+## Creation and coercion
+<pre><b> '!'</b>(A::AlgEtQ, x::.) -> AlgEtQElt</pre>
+ Let $A$ be an étale algebra over $\mathbb{Q}$ with components $K_1,\ldots,K_n$.
+ Elements of $A$ are created using the operator `!` by giving either
+ - a sequence, a tuple, or a list containing $n$ elements $x_1,\ldots,x_n$ with each $x_i$ coercible in $K_i$, or
+ - an integer or a rational number.
 <pre><b> Parent</b>(x::AlgEtQElt) -> AlgEtQ</pre>
 Returns the algebra to which the element belongs to.
 <pre><b> Algebra</b>(x::AlgEtQElt) -> AlgEtQ</pre>
 Returns the algebra to which the element belongs to.
-<pre><b> Components</b>(x::AlgEtQElt) -> SeqEnum</pre>
+<pre><b> Components</b>(x::AlgEtQElt) -> Tup</pre>
 Given an element, returns its components, which are elements of number fields.
 <pre><b> AbsoluteCoordinates</b>(x::AlgEtQElt) -> SeqEnum</pre>
 Given an element, returns the coordinates relative to the absolute basis, which are elements of the prime rational field.
-<pre><b> IsCoercible</b>(A::AlgEtQ, x::.) -> BoolElt, .</pre>
-Return whether the element is coercible into A and the result of the coercion if so.
-<pre><b> '!'</b>(A::AlgEtQ, x::.) -> AlgEtQElt</pre>
-Coerce x into A.
 <pre><b> One</b>(A::AlgEtQ) -> AlgEtQElt</pre>
 The multiplicative neutral element of A.
 <pre><b> Zero</b>(A::AlgEtQ) -> AlgEtQElt</pre>
 The additive neutral element of A.
 <pre><b> IsUnit</b>(x::AlgEtQElt) -> BoolElt</pre>
-Returns wheter x is a unit in A.
+Returns whether x is a unit in A.
 <pre><b> IsZeroDivisor</b>(x::AlgEtQElt) -> BoolElt</pre>
-Returns wheter x is a not unit in A.
+Returns whether x is a not unit in A.
 <pre><b> Random</b>(A::AlgEtQ , bd::RngIntElt) -> AlgEtQElt</pre>
 Random element of A. The Coefficients are bounded by the positive integer bd.
 <pre><b> Random</b>(A::AlgEtQ : bd:=3) -> AlgEtQElt</pre>
@@ -180,8 +194,6 @@ Given two étale algebras A and B and a sequence img of elements of B, returns t
 Let K=K1x...Kn be a product of distinct number fields, and s1,...,sn be strinctly positive integers. Put V=K1^s1x...xKn^sn. It returns the natural action of K on V, that is, the componentwise diagonal.
 <pre><b> DiagonalEmbedding</b>(K::AlgEtQ, V::AlgEtQ)->Map</pre>
 Let K=K1x...Kn be a product of distinct number fields, and s1,...,sn be strinctly positive integers. Put V=K1^s1x...xKn^sn. It returns the natural action of K on V, that is, the componentwise diagonal.
-<pre><b> DirectProduct</b>(seq::SeqEnum[AlgEtQ]) -> AlgEtQ,SeqEnum[Map],SeqEnum[Map]</pre>
-Given a sequence of étale algebras, it returns the direct product,togheter with canonical inclusions and projections.
 <pre><b> Print</b>(A::AlgEtQOrd)</pre>
 Print the order.
 <pre><b> IsCoercible</b>(S::AlgEtQOrd, x::.) -> BoolElt, Any</pre>

@@ -26,12 +26,11 @@ freeze;
 
 declare attributes AlgEtQ : IsNumberField;
 
-//------------
-// Creation for AlgEtQ
-//------------
+///## Conversion to a number field
 
+/// Given an étale algebra $A$ over $\mathbb{Q}$, returns wheter $A$ is a number field, that is, has only one component.  If this is the case, then returns also the number field itself together an isomorphism from $A$ to the number field.
 intrinsic IsNumberField(A::AlgEtQ) -> BoolElt,FldNum,Map 
-{Given an étale algebra over Q returns wheter it is a number field, and if so the number field and an isomorphism from the étale algebra to the number field.}
+{Given an étale algebra over Q returns whether it is a number field, and if so the number field and an isomorphism from the étale algebra to the number field.}
    if not assigned A`IsNumberField then
         Ks,embs,projs:=Components(A);
         if #Ks gt 1 then

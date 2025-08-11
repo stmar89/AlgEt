@@ -37,56 +37,31 @@ declare attributes AlgEtQ : Basis,
                            OrthogonalIdempotents,
                            Idempotents;
 
-//------------
-// Printing 
-//------------
-
+///hide-all
 intrinsic Print(x::AlgEtQElt)
 {Print the element.}
     printf "%o", Components(x);
 end intrinsic;
+///hide-none
 
-//------------
-// Access attributes
-//------------
 
-intrinsic Parent(x::AlgEtQElt) -> AlgEtQ
-{Returns the algebra to which the element belongs to.}
-  return x`Algebra;
-end intrinsic;
+///# Elements of étale algebras over $\mathbb{Q}$
+/// An element $x$ of an étale algebra $A$ over $\mathbb{Q}$ with components $K_1,\ldots,K_n$ is stored as a tuple ofelements of the number fields.
+/// Operations and equality testing are all performed componentwise.
 
-intrinsic Algebra(x::AlgEtQElt) -> AlgEtQ
-{Returns the algebra to which the element belongs to.}
-  return x`Algebra;
-end intrinsic;
-
-intrinsic Components(x::AlgEtQElt) -> SeqEnum
-{Given an element, returns its components, which are elements of number fields.}
-  return x`Components;
-end intrinsic;
-
-intrinsic AbsoluteCoordinates(x::AlgEtQElt) -> SeqEnum
-{Given an element, returns the coordinates relative to the absolute basis, which are elements of the prime rational field.}
-    if not assigned x`AbsoluteCoordinates then
-        x`AbsoluteCoordinates:=&cat[ Flat(c) : c in Components(x) ];
-    end if;
-    return x`AbsoluteCoordinates;
-end intrinsic;
-
-//------------
-// Coercion
-//------------
+///## Creation 
 
 function CreateAlgEtQElt(A,comp)
-// given an AlgEtQ A and a Tup comp containing the components in the number fields of A, returns the corresponding elemnt
+// given an AlgEtQ A and a Tup comp containing the components in the number fields of A, returns the corresponding element
     x1:=New(AlgEtQElt);
     x1`Algebra:=A;
     x1`Components:=comp;
     return x1;
 end function;
 
+///hide-all
 intrinsic IsCoercible(A::AlgEtQ, x::.) -> BoolElt, .
-{Return whether the element is coercible into A and the result of the coercion if so.}
+{Return whether the element is coercible into A and, if so, the result of the coercion.}
     if Parent(x) cmpeq A then
         return true,x;
     elif Type(x) in {List,Tup,SeqEnum} then
@@ -115,12 +90,35 @@ intrinsic IsCoercible(A::AlgEtQ, x::.) -> BoolElt, .
         return false,"";
     end if;
 end intrinsic;
+///hide-none
 
+/// Let $A$ be an étale algebra over $\mathbb{Q}$ with components $K_1,\ldots,K_n$.
+/// Elements of $A$ are created using the operator `!` by giving either
+/// - a sequence, a tuple, or a list containing $n$ elements $x_1,\ldots,x_n$ with each $x_i$ coercible in $K_i$, or
+/// - an integer or a rational number.
 intrinsic '!'(A::AlgEtQ, x::.) -> AlgEtQElt
 {Coerce x into A.}
     bool,x:=IsCoercible(A,x);
     require bool : "The element cannot be coerced in the algebra.";
     return x;
+end intrinsic;
+
+///## Attributes
+
+intrinsic Parent(x::AlgEtQElt) -> AlgEtQ
+{Returns the algebra to which the element belongs to.}
+  return x`Algebra;
+end intrinsic;
+
+//ditto
+intrinsic Algebra(x::AlgEtQElt) -> AlgEtQ
+{Returns the algebra to which the element belongs to.}
+  return x`Algebra;
+end intrinsic;
+
+intrinsic Components(x::AlgEtQElt) -> Tup
+{Returns the components of the element.}
+  return x`Components;
 end intrinsic;
 
 //------------
@@ -138,12 +136,12 @@ intrinsic Zero(A::AlgEtQ) -> AlgEtQElt
 end intrinsic;
 
 intrinsic IsUnit(x::AlgEtQElt) -> BoolElt
-{Returns wheter x is a unit in A.}   
+{Returns whether x is a unit in A.}   
     return forall{ c : c in Components(x) | c ne 0};
 end intrinsic;
 
 intrinsic IsZeroDivisor(x::AlgEtQElt) -> BoolElt
-{Returns wheter x is a not unit in A.}   
+{Returns whether x is a not unit in A.}   
     return not IsUnit(x);
 end intrinsic;
 
@@ -623,6 +621,14 @@ intrinsic AbsoluteBasis(A::AlgEtQ) -> SeqEnum
         A`AbsoluteBasis := [ A ! c : c in cc ];
     end if;
     return A`AbsoluteBasis;
+end intrinsic;
+
+intrinsic AbsoluteCoordinates(x::AlgEtQElt) -> SeqEnum
+{Given an element, returns the coordinates relative to the absolute basis, which are elements of the prime rational field.}
+    if not assigned x`AbsoluteCoordinates then
+        x`AbsoluteCoordinates:=&cat[ Flat(c) : c in Components(x) ];
+    end if;
+    return x`AbsoluteCoordinates;
 end intrinsic;
 
 intrinsic AbsoluteCoordinates(seq::SeqEnum[AlgEtQElt] , basis::SeqEnum[AlgEtQElt]) -> SeqEnum

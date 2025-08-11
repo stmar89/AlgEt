@@ -1,11 +1,11 @@
 AlgEtQ
 {
 AlgEt.m
-AlgEtAttributes.m
+DirectProduct.m
 NF.m
+AlgEtAttributes.m
 Elt.m
 Homs.m
-DirectProduct.m
 Ord.m
 Idl.m
 ZBasisLLL.m

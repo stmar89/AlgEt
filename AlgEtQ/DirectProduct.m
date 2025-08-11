@@ -30,8 +30,11 @@ declare verbose AlgEtQ, 1;
 // DirectProduct of AlgEtQ
 //------------
 
+///## Direct products
+
+/// Given a sequence of étale algebras over $\mathbb{Q}$, returns the direct product, together with sequences of inclusions and projections.
 intrinsic DirectProduct(seq::SeqEnum[AlgEtQ]) -> AlgEtQ,SeqEnum[Map],SeqEnum[Map]
-{Given a sequence of étale algebras, it returns the direct product,togheter with canonical inclusions and projections.}
+{Given a sequence of étale algebras over the rational field, returns the direct product, together with sequences of inclusions and projections.}
     all_comps:=[ Components(K) : K in seq ];
     tot_num_comps:=&+[#c : c in all_comps];
     D:=EtaleAlgebra(&cat(all_comps));

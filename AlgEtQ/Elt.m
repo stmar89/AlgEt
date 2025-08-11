@@ -48,6 +48,7 @@ end intrinsic;
 ///# Elements of étale algebras over $\mathbb{Q}$
 /// An element $x$ of an étale algebra $A$ over $\mathbb{Q}$ with components $K_1,\ldots,K_n$ is stored as a tuple of elements of the number fields. Such a tuple is referred to as the `components` of the element.
 /// Note that $x$ is a `unit` of $A$, that is, an invertible element, if all its components are non-zero. Otherwise is a `zero-divisor` of $A$.
+/// Elements of étale algebra of type `AlgEtQ` have type `AlgEtQIdl`.
 
 ///## Creation 
 

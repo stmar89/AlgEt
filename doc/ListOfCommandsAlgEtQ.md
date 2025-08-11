@@ -155,6 +155,7 @@ Returns whether the element is integral (over the integers).
  s1 eq s2;
  ```
 # Example 2
+ ```
  //We now consider the étale algebra consisting of two copies of the rational field.
  _<x>:=PolynomialRing(Integers());
  QQ:=NumberField(x-1:DoLinearExtension);
@@ -162,14 +163,18 @@ Returns whether the element is integral (over the integers).
  a:=PrimitiveElement(A); a;
  b:=A!<2,10>;
  SetPrimitiveElement(b);
+ ```
+# Homomorphisms of étale algebras over $\mathbb{Q}$
+ Let $A$ be an étale algebra over $\mathbb{Q}$. By an `homomorphism` from $A$ to some $\mathbb{Q}$-algbra, we mean a unital $\mathbb{Q}$-algbra homomorphisms. 
+## Homomorphisms to the complex numbers
+ The set of homomorphisms from an étale algebra $A$ to the field of complex numbers consists of the homomorphisms acting as an embedding on a single compoenent and zero on every other component. Such a homomorphism is injective if and only if $A$ has a unique component, that is, is a number field.
 <pre><b> HomsToC</b>(A::AlgEtQ : Prec:=Precision(GetDefaultRealField()))->SeqEnum[Map]</pre>
-Returns the sequence of homomorphisms from A to the complex field CC. The precision of CC is given by the optional parameter "Prec". Default value is 30
+Returns the sequence of homomorphisms from the étale algebra to the complex field. The precision of the target can be set by the vararg "Prec".
+## Homomorphisms between étale algebras over $\mathbb{Q}$
 <pre><b> Hom</b>(A::AlgEtQ , B::AlgEtQ , img::SeqEnum[AlgEtQElt] : CheckMultiplicative:=false, CheckUnital:=false, ComputeInverse:=true)->Map</pre>
-Given two étale algebras A and B and a sequence img of elements of B, returns the Q-algebra homomorphism defined by sending the AbsoluteBasis of A to img. The VarArg CheckMultiplicative determines if the multiplicativity of the defined map is checked, while the VarArg CheckUnital determines wheter One(A) is sent to One(B). If the VarArg ComputeInverse is true, it checkes whether the map is invertible and, if so, it defines also the inverse (by assigning preimages).
-<pre><b> NaturalAction</b>(K::AlgEtQ, V::AlgEtQ)->Map</pre>
-Let K=K1x...Kn be a product of distinct number fields, and s1,...,sn be strinctly positive integers. Put V=K1^s1x...xKn^sn. It returns the natural action of K on V, that is, the componentwise diagonal.
-<pre><b> DiagonalEmbedding</b>(K::AlgEtQ, V::AlgEtQ)->Map</pre>
-Let K=K1x...Kn be a product of distinct number fields, and s1,...,sn be strinctly positive integers. Put V=K1^s1x...xKn^sn. It returns the natural action of K on V, that is, the componentwise diagonal.
+ Given two étale algebras $A$ and $B$ and a sequence of elements $img$ of $B$, returns the homomorphism defined by sending the AbsoluteBasis of A to $img$. The parameter CheckMultiplicative (default false) determines if the multiplicativity of the defined map is checked, while the parameter CheckUnital (default false) determines whether it is unital. If the parameter ComputeInverse (default true) is true, it checkes whether the map is invertible and, if so, it defines also the inverse (by assigning preimages).}
+<pre><b> DiagonalEmbedding</b>(K::AlgEtQ, V::AlgEtQ)->Map</pre><pre><b> NaturalAction</b>(K::AlgEtQ, V::AlgEtQ)->Map</pre>
+ Given an étale algebra $K$ of the form $K_1\times \cdots \times K_n$ and an ´étale algebra $V$ of the form $K_1^{s_1} \times \cdots \times K_n^{s_n}$, returns the natural componentwise diagonal embedding $K\to V$. 
 <pre><b> Print</b>(A::AlgEtQOrd)</pre>
 Print the order.
 <pre><b> IsCoercible</b>(S::AlgEtQOrd, x::.) -> BoolElt, Any</pre>

@@ -29,18 +29,20 @@ printf "	time %o
 time_start_local:=Cputime();
 
 
-    printf "### Testing Attributes and Equality:";
-    //AttachSpec("~/packages_github/AlgEt/spec");
+    printf "### Testing DirectProduct:";
+    //AttachSpec("~/AlgEt/spec");
     SetAssertions(2);
     _<x>:=PolynomialRing(Integers());
-    f:=(x^8+16)*(x^8+81);
-    A:=EtaleAlgebra(f);
-    B:=EtaleAlgebra(f);
-    assert not A eq B;
-    assert A ne B;
-    assert A eq A;
-    assert A cmpeq A;
-    assert not A cmpeq B;
+    seq:=[x^2-5,x^2-7,x^2-5,x^2-11,x^3+x+1];
+    seq:=[NumberField(f) : f in seq];
+    A:=EtaleAlgebra(seq);
+    _,_,_:=DirectProduct([A,A,A]);
+    printf ".";
+
+    B:=EtaleAlgebra([NumberField(x^8+16),NumberField(x^3+x+1)]);
+    _,_,_:=DirectProduct([A,B]);
+    printf ".";
+    
     SetAssertions(1);
     printf " all good!";
 printf "	time %o
@@ -85,6 +87,25 @@ printf "	time %o
 time_start_local:=Cputime();
 
 
+    printf "### Testing Attributes and Equality:";
+    //AttachSpec("~/packages_github/AlgEt/spec");
+    SetAssertions(2);
+    _<x>:=PolynomialRing(Integers());
+    f:=(x^8+16)*(x^8+81);
+    A:=EtaleAlgebra(f);
+    B:=EtaleAlgebra(f);
+    assert not A eq B;
+    assert A ne B;
+    assert A eq A;
+    assert A cmpeq A;
+    assert not A cmpeq B;
+    SetAssertions(1);
+    printf " all good!";
+printf "	time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
+
+
     printf "### Testing Elements:";
     //AttachSpec("~/AlgEt/spec");
     SetVerbose("AlgEtQElt",2);
@@ -104,6 +125,7 @@ time_start_local:=Cputime();
     _:=Random(A);
     assert not IsIntegral(A!1/2);
     assert IsIntegral(A!2);
+    _:=A.3;
 
     ort:=OrthogonalIdempotents(A);
     idem:=Idempotents(A);
@@ -237,27 +259,6 @@ time_start_local:=Cputime();
     assert m(One(A)) eq One(B) and Inverse(m)(One(B)) eq One(A);
     printf ".";
     printf " all good!"; 
-printf "	time %o
-",Cputime(time_start_local);
-time_start_local:=Cputime();
-
-
-    printf "### Testing DirectProduct:";
-    //AttachSpec("~/AlgEt/spec");
-    SetAssertions(2);
-    _<x>:=PolynomialRing(Integers());
-    seq:=[x^2-5,x^2-7,x^2-5,x^2-11,x^3+x+1];
-    seq:=[NumberField(f) : f in seq];
-    A:=EtaleAlgebra(seq);
-    _,_,_:=DirectProduct([A,A,A]);
-    printf ".";
-
-    B:=EtaleAlgebra([NumberField(x^8+16),NumberField(x^3+x+1)]);
-    _,_,_:=DirectProduct([A,B]);
-    printf ".";
-    
-    SetAssertions(1);
-    printf " all good!";
 printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
@@ -1131,14 +1132,14 @@ time_start_local:=Cputime();
     W,w:=WeakEquivalenceClassMonoidAbstract(E);
     x:=Random(W);
     xx:=x;
-    SetRepresentative(x,Random(K)*Ideal(x));
+    SetRepresentative(x,RandomUnit(K)*Ideal(x));
     assert x eq xx;
     wk:=WKICM(E);
-    wk1:=[w*Random(K):w in wk];
+    wk1:=[w*RandomUnit(K):w in wk];
     assert #W eq 25;
     assert Seqset(Classes(W)) eq {x@@w : x in wk1};
     assert One(W) eq W!OneIdeal(E);
-    assert IsOne(W!(Random(K)*OneIdeal(E)));
+    assert IsOne(W!(RandomUnit(K)*OneIdeal(E)));
     assert IsIdempotent(W!MaximalOrder(K));
     assert #WeakEquivalenceClassMonoidAbstract(MaximalOrder(K)) eq 1;
     assert Random(W) in W;
@@ -1164,7 +1165,7 @@ time_start_local:=Cputime();
     assert #W eq 20;
     assert Seqset(Classes(W)) eq {x@@w : x in wk1};
     assert One(W) eq W!OneIdeal(E);
-    assert IsOne(W!(Random(K)*OneIdeal(E)));
+    assert IsOne(W!(RandomUnit(K)*OneIdeal(E)));
     assert IsIdempotent(W!MaximalOrder(K));
     assert #WeakEquivalenceClassMonoidAbstract(MaximalOrder(K)) eq 1;
     assert Random(W) in W;
@@ -1190,7 +1191,7 @@ time_start_local:=Cputime();
     assert #W eq 23;
     assert Seqset(Classes(W)) eq {x@@w : x in wk1};
     assert One(W) eq W!OneIdeal(E);
-    assert IsOne(W!(Random(K)*OneIdeal(E)));
+    assert IsOne(W!(RandomUnit(K)*OneIdeal(E)));
     assert IsIdempotent(W!MaximalOrder(K));
     assert #WeakEquivalenceClassMonoidAbstract(MaximalOrder(K)) eq 1;
     assert Random(W) in W;
@@ -1213,7 +1214,7 @@ time_start_local:=Cputime();
     assert #WeakEquivalenceClassMonoidAbstract(O) eq 1;
     assert not IsMaximal(E);
     assert One(W) eq W!OneIdeal(E);
-    assert IsOne(W!(Random(K)*OneIdeal(E)));
+    assert IsOne(W!(RandomUnit(K)*OneIdeal(E)));
     assert IsIdempotent(W!MaximalOrder(K));
     assert #WeakEquivalenceClassMonoidAbstract(MaximalOrder(K)) eq 1;
     assert Random(W) in W;
@@ -1256,55 +1257,50 @@ time_start_local:=Cputime();
 
     printf "### Testing ICMAbstract:";
 	AttachSpec("~/AlgEt/spec");
+    SetClassGroupBounds("GRH");
 
 	_<x>:=PolynomialRing(Integers());
     f:=x^4+291*x^3-988*x^2-1000*x-1000;
     K:=EtaleAlgebra(f);
     E:=EquationOrder(K);
     icm,w:=IdealClassMonoidAbstract(E);
-    wk:=ICM(E);
-    P,p:=PicardGroup(E);
-    inv:=[p(x):x in P];
-    icm1:=[w*Random(inv):w in icm];
-    assert Seqset(Classes(ICM)) eq {x@@w : x in icm1};
+    assert forall{x:x in Classes(icm)| (w(x)*RandomUnit(K))@@w eq x};
     assert One(icm) eq icm!OneIdeal(E);
-    assert IsOne(icm!(Random(K)*OneIdeal(E)));
-    assert forall{T:T in OverOrders(E) | IsInvertibleInMultiplicatorRing(T@@w)};
+    assert IsOne(icm!(RandomUnit(K)*OneIdeal(E)));
+    assert forall{T:T in OverOrders(E) | IsInvertibleInMultiplicatorRing(icm!T)};
     assert #IdealClassMonoidAbstract(MaximalOrder(K)) eq #PicardGroup(MaximalOrder(K));
     assert Random(icm) in icm;
-    assert #icm eq &*[#Localization(icm,P) : P in SingularPrimes(E)];
-    assert IdealClassMonoidAbstract(MaximalOrder(K)) eq Localization(icm,PrimesAbove(11*E)[1]); // 11 is regular
     _:=Random(icm)*Random(icm);
+    _:=[Random(icm)^i:i in [1..100]];
 
 	_<x>:=PolynomialRing(Integers());
     f:=x^3+31*x^2+43*x+77;
     K:=EtaleAlgebra(f);
     E:=EquationOrder(K);
     icm,w:=IdealClassMonoidAbstract(E);
-    wk:=ICM(E);
-    P,p:=PicardGroup(E);
-    inv:=[p(x):x in P];
-    icm1:=[w*Random(inv):w in icm];
-    assert Seqset(Classes(ICM)) eq {x@@w : x in icm1};
+    assert forall{x:x in Classes(icm)| (w(x)*RandomUnit(K))@@w eq x};
     assert One(icm) eq icm!OneIdeal(E);
-    assert IsOne(icm!(Random(K)*OneIdeal(E)));
-    assert forall{T:T in OverOrders(E) | IsInvertibleInMultiplicatorRing(T@@w)};
+    assert IsOne(icm!(RandomUnit(K)*OneIdeal(E)));
+    assert forall{T:T in OverOrders(E) | IsInvertibleInMultiplicatorRing(icm!T)};
     assert #IdealClassMonoidAbstract(MaximalOrder(K)) eq #PicardGroup(MaximalOrder(K));
     assert Random(icm) in icm;
-    assert #icm eq &*[#Localization(icm,P) : P in SingularPrimes(E)];
-    assert IdealClassMonoidAbstract(MaximalOrder(K)) eq Localization(icm,PrimesAbove(11*E)[1]); // 11 is regular
     _:=Random(icm)*Random(icm);
+    _:=[Random(icm)^i:i in [1..100]];
+    _:=[x*y:x,y in Classes(icm)];
 
     L:=RationalsAsNumberField();
     K:=EtaleAlgebra([L,L,L]);
     a:=PrimitiveElement(K);
     E:=Order([a]);
-    W:=IdealClassMonoidAbstract(E);
+    icm:=IdealClassMonoidAbstract(E);
     O:=MaximalOrder(K);
     assert #IdealClassMonoidAbstract(O) eq 1;
     assert not IsMaximal(E);
-    assert One(W) eq W!OneIdeal(E);
-    assert IsOne(W!(Random(K)*OneIdeal(E)));
+    assert One(icm) eq icm!OneIdeal(E);
+    assert IsOne(icm!(RandomUnit(K)*OneIdeal(E)));
+    _:=Random(icm)*Random(icm);
+    _:=[Random(icm)^i:i in [1..100]];
+    _:=[x*y:x,y in Classes(icm)];
 
     SetAssertions(1);
     printf " all good!"; 

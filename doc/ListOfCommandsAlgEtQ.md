@@ -42,150 +42,106 @@ Returns the prime field of the étale algebra.
 <pre><b> AbsoluteDimension</b>(A::AlgEtQ)->RngInt</pre>
  Returns the dimension of $A$ over the prime field.
 # Elements of étale algebras over $\mathbb{Q}$
- An element $x$ of an étale algebra $A$ over $\mathbb{Q}$ with components $K_1,\ldots,K_n$ is stored as a tuple ofelements of the number fields.
- Operations and equality testing are all performed componentwise.
-## Creation and coercion
+ An element $x$ of an étale algebra $A$ over $\mathbb{Q}$ with components $K_1,\ldots,K_n$ is stored as a tuple of elements of the number fields. Such a tuple is referred to as the `components` of the element.
+ Note that $x$ is a `unit` of $A$, that is, an invertible element, if all its components are non-zero. Otherwise is a `zero-divisor` of $A$.
+## Creation 
 <pre><b> '!'</b>(A::AlgEtQ, x::.) -> AlgEtQElt</pre>
  Let $A$ be an étale algebra over $\mathbb{Q}$ with components $K_1,\ldots,K_n$.
  Elements of $A$ are created using the operator `!` by giving either
  - a sequence, a tuple, or a list containing $n$ elements $x_1,\ldots,x_n$ with each $x_i$ coercible in $K_i$, or
  - an integer or a rational number.
-<pre><b> Parent</b>(x::AlgEtQElt) -> AlgEtQ</pre>
-Returns the algebra to which the element belongs to.
-<pre><b> Algebra</b>(x::AlgEtQElt) -> AlgEtQ</pre>
+## Attributes
+<pre><b> Parent</b>(x::AlgEtQElt) -> AlgEtQ</pre><pre><b> Algebra</b>(x::AlgEtQElt) -> AlgEtQ</pre>
 Returns the algebra to which the element belongs to.
 <pre><b> Components</b>(x::AlgEtQElt) -> Tup</pre>
-Given an element, returns its components, which are elements of number fields.
+Returns the components of the element.
+## Basis and coordinates
+<pre><b> Basis</b>(A::AlgEtQ) -> SeqEnum</pre>
+Returns a basis of the algebra over the base field.
+<pre><b> AbsoluteBasis</b>(A::AlgEtQ) -> SeqEnum</pre>
+Returns a basis of the algebra over the prime field.
+<pre><b> '.'</b>(A::AlgEtQ,i::RngIntElt)->AlgEtQElt</pre>
+ Returns the $i$-th element of the absolute basis.
 <pre><b> AbsoluteCoordinates</b>(x::AlgEtQElt) -> SeqEnum</pre>
 Given an element, returns the coordinates relative to the absolute basis, which are elements of the prime rational field.
+<pre><b> AbsoluteCoordinates</b>(seq::SeqEnum[AlgEtQElt] , basis::SeqEnum[AlgEtQElt]) -> SeqEnum</pre>
+Given a sequence of elements and a basis over the prime field, returns a sequence whose entries are the coordinates with respect to the given basis.
+## Special elements
 <pre><b> One</b>(A::AlgEtQ) -> AlgEtQElt</pre>
-The multiplicative neutral element of A.
+The multiplicative neutral element.
 <pre><b> Zero</b>(A::AlgEtQ) -> AlgEtQElt</pre>
-The additive neutral element of A.
-<pre><b> IsUnit</b>(x::AlgEtQElt) -> BoolElt</pre>
-Returns whether x is a unit in A.
-<pre><b> IsZeroDivisor</b>(x::AlgEtQElt) -> BoolElt</pre>
-Returns whether x is a not unit in A.
-<pre><b> Random</b>(A::AlgEtQ , bd::RngIntElt) -> AlgEtQElt</pre>
-Random element of A. The Coefficients are bounded by the positive integer bd.
-<pre><b> Random</b>(A::AlgEtQ : bd:=3) -> AlgEtQElt</pre>
-Random element of A. The Coefficients are bounded by the VarArg bd (default 3).
-<pre><b> RandomUnit</b>(A::AlgEtQ , bd::RngIntElt) -> AlgEtQElt</pre>
-Random unit of A. The Coefficients are bounded by the positive integer bd.
-<pre><b> RandomUnit</b>(A::AlgEtQ : bd:=3) -> AlgEtQElt</pre>
-Random element of A. The Coefficients are bounded by the VarArg bd (default 3).
-<pre><b> 'eq'</b>(x1::AlgEtQElt,x2::AlgEtQElt) -> BoolElt</pre>
-Is x1=x2 ?
-<pre><b> 'eq'</b>(x1::RngIntElt,x2::AlgEtQElt) -> BoolElt</pre>
-Is x1=x2 ?
-<pre><b> 'eq'</b>(x1::FldRatElt,x2::AlgEtQElt) -> BoolElt</pre>
-Is x1=x2 ?
-<pre><b> 'eq'</b>(x1::AlgEtQElt,x2::RngIntElt) -> BoolElt</pre>
-Is x1=x2 ?
-<pre><b> 'eq'</b>(x1::AlgEtQElt,x2::FldRatElt) -> BoolElt</pre>
-Is x1=x2 ?
-<pre><b> '+'</b>(x1::AlgEtQElt,x2::AlgEtQElt) -> AlgEtQElt</pre>
-x1+x2.
-<pre><b> '+'</b>(x1::.,x2::AlgEtQElt) -> AlgEtQElt</pre>
-x1+x2.
-<pre><b> '+'</b>(x1::AlgEtQElt,x2::.) -> AlgEtQElt</pre>
-x1+x2.
-<pre><b> '+'</b>(x1::RngIntElt,x2::AlgEtQElt) -> AlgEtQElt</pre>
-x1+x2.
-<pre><b> '+'</b>(x1::FldRatElt,x2::AlgEtQElt) -> AlgEtQElt</pre>
-x1+x2.
-<pre><b> '+'</b>(x1::AlgEtQElt,x2::RngIntElt) -> AlgEtQElt</pre>
-x1+x2.
-<pre><b> '+'</b>(x1::AlgEtQElt,x2::FldRatElt) -> AlgEtQElt</pre>
-x1+x2.
-<pre><b> '-'</b>(x::AlgEtQElt) -> AlgEtQElt</pre>
--x.
-<pre><b> '-'</b>(x1::AlgEtQElt,x2::AlgEtQElt) -> AlgEtQElt</pre>
-x1-x2.
-<pre><b> '-'</b>(x1::.,x2::AlgEtQElt) -> AlgEtQElt</pre>
-x1-x2.
-<pre><b> '-'</b>(x1::AlgEtQElt,x2::.) -> AlgEtQElt</pre>
-x1-x2.
-<pre><b> '-'</b>(x1::RngIntElt,x2::AlgEtQElt) -> AlgEtQElt</pre>
-x1-x2.
-<pre><b> '-'</b>(x1::FldRatElt,x2::AlgEtQElt) -> AlgEtQElt</pre>
-x1-x2.
-<pre><b> '-'</b>(x1::AlgEtQElt,x2::RngIntElt) -> AlgEtQElt</pre>
-x1-x2.
-<pre><b> '-'</b>(x1::AlgEtQElt,x2::FldRatElt) -> AlgEtQElt</pre>
-x1-x2.
-<pre><b> '*'</b>(x1::AlgEtQElt,x2::AlgEtQElt) -> AlgEtQElt</pre>
-x1*x2.
-<pre><b> '*'</b>(x1::.,x2::AlgEtQElt) -> AlgEtQElt</pre>
-x1*x2.
-<pre><b> '*'</b>(x1::AlgEtQElt,x2::.) -> AlgEtQElt</pre>
-x1*x2.
-<pre><b> '*'</b>(x1::RngIntElt,x2::AlgEtQElt) -> AlgEtQElt</pre>
-x1*x2.
-<pre><b> '*'</b>(x1::FldRatElt,x2::AlgEtQElt) -> AlgEtQElt</pre>
-x1*x2.
-<pre><b> '*'</b>(x1::AlgEtQElt,x2::RngIntElt) -> AlgEtQElt</pre>
-x1*x2.
-<pre><b> '*'</b>(x1::AlgEtQElt,x2::FldRatElt) -> AlgEtQElt</pre>
-x1*x2.
-<pre><b> Inverse</b>(x::AlgEtQElt) -> AlgEtQElt</pre>
-1/x.
-<pre><b> '^'</b>(x::AlgEtQElt,n::RngIntElt) -> AlgEtQElt</pre>
-x^n.
-<pre><b> '/'</b>(x1::AlgEtQElt,x2::AlgEtQElt) -> AlgEtQElt</pre>
-x1/x2.
-<pre><b> '/'</b>(x1::.,x2::AlgEtQElt) -> AlgEtQElt</pre>
-x1/x2.
-<pre><b> '/'</b>(x1::AlgEtQElt,x2::.) -> AlgEtQElt</pre>
-x1/x2.
-<pre><b> '/'</b>(x1::RngIntElt,x2::AlgEtQElt) -> AlgEtQElt</pre>
-x1/x2.
-<pre><b> '/'</b>(x1::FldRatElt,x2::AlgEtQElt) -> AlgEtQElt</pre>
-x1/x2.
-<pre><b> '/'</b>(x1::AlgEtQElt,x2::RngIntElt) -> AlgEtQElt</pre>
-x1/x2.
-<pre><b> '/'</b>(x1::AlgEtQElt,x2::FldRatElt) -> AlgEtQElt</pre>
-x1/x2.
-<pre><b> '&+'</b>(seq::SeqEnum[AlgEtQElt]) -> AlgEtQElt</pre>
-Given a sequence of AlgEtQElt returns the sum of the entries.
-<pre><b> '&*'</b>(seq::SeqEnum[AlgEtQElt]) -> AlgEtQElt</pre>
-Given a sequence of AlgEtQElt returns the product of the entries.
-<pre><b> SumOfProducts</b>(as::SeqEnum[AlgEtQElt],bs::SeqEnum[AlgEtQElt]) -> AlgEtQElt</pre>
-Given sequences as and bs, such that #as eq #bs, returns &+[as[i]*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.
-<pre><b> SumOfProducts</b>(as::SeqEnum[RngIntElt],bs::SeqEnum[AlgEtQElt]) -> AlgEtQElt</pre>
-Given sequences as and bs, such that #as eq #bs, returns &+[as[i]*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.
-<pre><b> SumOfProducts</b>(as::SeqEnum[FldRatElt],bs::SeqEnum[AlgEtQElt]) -> AlgEtQElt</pre>
-Given sequences as and bs, such that #as eq #bs, returns &+[as[i]*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.
-<pre><b> SumOfProducts</b>(as::SeqEnum[AlgEtQElt],bs::SeqEnum[RngIntElt]) -> AlgEtQElt</pre>
-Given sequences as and bs, such that #as eq #bs, returns &+[as[i]*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.
-<pre><b> SumOfProducts</b>(as::SeqEnum[AlgEtQElt],bs::SeqEnum[FldRatElt]) -> AlgEtQElt</pre>
-Given sequences as and bs, such that #as eq #bs, returns &+[as[i]*bs[i] : i in [1..#as]]. This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.
-<pre><b> MinimalPolynomial</b>(x::AlgEtQElt) -> RngUPolElt</pre>
-Returns the minimal polynommial over the common base ring of the number fields defining A of the element x.
-<pre><b> MinimalPolynomial</b>(x::AlgEtQElt, F::Rng) -> RngUPolElt</pre>
-Returns the minimal polynommial over the ring F of the element x.
-<pre><b> AbsoluteMinimalPolynomial</b>(x::AlgEtQElt) -> RngUPolElt</pre>
-Returns the minimal polynommial over the prime field of the element x.
-<pre><b> IsIntegral</b>(x::AlgEtQElt) -> BoolElt</pre>
-Returns whether the element x is integral (over the integers).
-<pre><b> Evaluate</b>(f::RngUPolElt,a::AlgEtQElt) -> AlgEtQElt</pre>
-Evaluate the polynomial f at the element a.
+The additive neutral element.
+<pre><b> Idempotents</b>(A::AlgEtQ) -> SeqEnum</pre>
+Returns the idempotents of the étale algebra.
+<pre><b> OrthogonalIdempotents</b>(A::AlgEtQ) -> SeqEnum</pre>
+Returns the orthogonal idempotent elements of the étale algebra, which are the unit elements of the components.
+## Primitive element
+ Given an étale algebra $A$ over $\mathbb{Q}$ there exists an element $a\in A$ such that $A = \mathbb{Q}[a]$, that is, every element can be written as a polynomial with rational coefficients in $a$. Such an element is called a `primitive element` of $A$. It is characterized by having a minimal polynomial whose degree equals the absolute dimension of $A$.
+ The intrinsic `SetPrimitiveElement` allows to specify a primitive element, which is then stored in an attribute of the algebra.
+ The intrinsic `PrimitiveElement` produces such an element of the étale algebra $A$ using a deterministic procedure which we now describe:
+ Let $N$ be the number of components of $A$, each one having primitive element $a_i$. Set $b_1$ = $a_1$. For $i=2,\ldots,N$, set $b_i = a_i+j$ where $j$ is the smallest non-negative integer such that the minimal polynomial of $a_i+j$ is not in the set of minimal polynomials of the elements $b_1,\ldots,b_{i-1}$. The output is the element of $A$ whose components are $b_1,...,b_N$. In particular, if $A$ is a product of number fields with different defining polynomials, then the output is the element of $A$ whose components are the primitive elements of the components.
 <pre><b> PrimitiveElement</b>(A::AlgEtQ) -> AlgEtQElt</pre>
-Returns a primitive element of the étale algebra A, that is, an element of A whose minimal polynomial over Q has degree equal to the dimension of A over Q. The output is deterministically computed using the following procedure. Let N be the number of components of A, each one having primitive element a_i. Set b_1 = a_1. For i=2,..,N, set b_i = a_i+j where j is the smallest non-negative integer such that the minimal polynomial of a_i+j is not in the set of minimal polynomials of the elements b_1,...,b_(i-1). The output is the element of A whose components are b_1,...,b_N. In particular, if A is a product of number fields with different defining polynomials, then the output is the element of A whose components are the primitive elements of the components.
+ Returns a primitive element of the étale algebra, produced with a deterministic algorithm. If the components of algebra are distinct number fields, then the output is the element whose components are the primitive elements of the components.
 <pre><b> SetPrimitiveElement</b>(a::AlgEtQElt)</pre>
 Given an element a in an étale algebra A such that the minimal polynomial of a over Q has degree equal to the Q-dimension of A, it sets a to be the primitive element of A.
 <pre><b> PowerBasis</b>(A::AlgEtQ) -> SeqEnum[AlgEtQElt]</pre>
-Returns the power basis of the étale algebra A, consisting of powers of the PrimitiveElement of A.
-<pre><b> Basis</b>(A::AlgEtQ) -> SeqEnum</pre>
-Returns a basis of the algebra over the common base field.
-<pre><b> AbsoluteBasis</b>(A::AlgEtQ) -> SeqEnum</pre>
-Returns a basis of the algebra over the prime field.
-<pre><b> AbsoluteCoordinates</b>(seq::SeqEnum[AlgEtQElt] , basis::SeqEnum[AlgEtQElt]) -> SeqEnum</pre>
-Given a sequence of elements and a basis over the PrimeField returns a sequence whose entries are the coordinates in the PrimeField with respect to the given basis.
-<pre><b> OrthogonalIdempotents</b>(A::AlgEtQ) -> SeqEnum</pre>
-Returns the orthogonal ideampotent element of the étale algebra A.
-<pre><b> Idempotents</b>(A::AlgEtQ) -> SeqEnum</pre>
-Returns the ideampotent element of the étale algebra A.
+ Returns the basis consisting of powers of the element stored as the primitive element.
+## Units and zero divisors
+<pre><b> IsUnit</b>(x::AlgEtQElt) -> BoolElt</pre>
+Returns whether the element is a unit.
+<pre><b> IsZeroDivisor</b>(x::AlgEtQElt) -> BoolElt</pre>
+Returns whether the element is a zero-divisor.
+## Random elements
+<pre><b> Random</b>(A::AlgEtQ , bd::RngIntElt) -> AlgEtQElt</pre><pre><b> Random</b>(A::AlgEtQ : bd:=3) -> AlgEtQElt</pre>
+Returns a random element of the étale algebra with coefficients are bounded by the positive integer bd.
+<pre><b> RandomUnit</b>(A::AlgEtQ , bd::RngIntElt) -> AlgEtQElt</pre><pre><b> RandomUnit</b>(A::AlgEtQ : bd:=3) -> AlgEtQElt</pre>
+Returns a random unit of the étale algebra with coefficients are bounded by the positive integer bd.
+## Equality and operations on elements
+ Equality testing and operations are performed component-wise, that is, at the level of the components.
+<pre><b> 'eq'</b>(x1::AlgEtQElt,x2::AlgEtQElt) -> BoolElt</pre><pre><b> 'eq'</b>(x1::RngIntElt,x2::AlgEtQElt) -> BoolElt</pre><pre><b> 'eq'</b>(x1::FldRatElt,x2::AlgEtQElt) -> BoolElt</pre><pre><b> 'eq'</b>(x1::AlgEtQElt,x2::RngIntElt) -> BoolElt</pre><pre><b> 'eq'</b>(x1::AlgEtQElt,x2::FldRatElt) -> BoolElt</pre>
+ Returns whether the two elements are equal.
+<pre><b> '+'</b>(x1::AlgEtQElt,x2::AlgEtQElt) -> AlgEtQElt</pre><pre><b> '+'</b>(x1::.,x2::AlgEtQElt) -> AlgEtQElt</pre><pre><b> '+'</b>(x1::AlgEtQElt,x2::.) -> AlgEtQElt</pre><pre><b> '+'</b>(x1::RngIntElt,x2::AlgEtQElt) -> AlgEtQElt</pre><pre><b> '+'</b>(x1::FldRatElt,x2::AlgEtQElt) -> AlgEtQElt</pre><pre><b> '+'</b>(x1::AlgEtQElt,x2::RngIntElt) -> AlgEtQElt</pre><pre><b> '+'</b>(x1::AlgEtQElt,x2::FldRatElt) -> AlgEtQElt</pre>
+ Returns the sum of the two elements.
+<pre><b> '-'</b>(x::AlgEtQElt) -> AlgEtQElt</pre>
+ Returns the opposite element.
+<pre><b> '-'</b>(x1::AlgEtQElt,x2::AlgEtQElt) -> AlgEtQElt</pre><pre><b> '-'</b>(x1::.,x2::AlgEtQElt) -> AlgEtQElt</pre><pre><b> '-'</b>(x1::AlgEtQElt,x2::.) -> AlgEtQElt</pre><pre><b> '-'</b>(x1::RngIntElt,x2::AlgEtQElt) -> AlgEtQElt</pre><pre><b> '-'</b>(x1::FldRatElt,x2::AlgEtQElt) -> AlgEtQElt</pre><pre><b> '-'</b>(x1::AlgEtQElt,x2::RngIntElt) -> AlgEtQElt</pre><pre><b> '-'</b>(x1::AlgEtQElt,x2::FldRatElt) -> AlgEtQElt</pre>
+ Returns the difference of two elements.
+<pre><b> '*'</b>(x1::AlgEtQElt,x2::AlgEtQElt) -> AlgEtQElt</pre><pre><b> '*'</b>(x1::.,x2::AlgEtQElt) -> AlgEtQElt</pre><pre><b> '*'</b>(x1::AlgEtQElt,x2::.) -> AlgEtQElt</pre><pre><b> '*'</b>(x1::RngIntElt,x2::AlgEtQElt) -> AlgEtQElt</pre><pre><b> '*'</b>(x1::FldRatElt,x2::AlgEtQElt) -> AlgEtQElt</pre><pre><b> '*'</b>(x1::AlgEtQElt,x2::RngIntElt) -> AlgEtQElt</pre><pre><b> '*'</b>(x1::AlgEtQElt,x2::FldRatElt) -> AlgEtQElt</pre>
+ Returns the product of two elements.
+<pre><b> Inverse</b>(x::AlgEtQElt) -> AlgEtQElt</pre>
+ Returns the multiplicative inverse of an unit element of the étale algebra.
+<pre><b> '^'</b>(x::AlgEtQElt,n::RngIntElt) -> AlgEtQElt</pre>
+ Given an element $x$ and an integer $n$ returns $x^n$.
+<pre><b> '/'</b>(x1::AlgEtQElt,x2::AlgEtQElt) -> AlgEtQElt</pre><pre><b> '/'</b>(x1::.,x2::AlgEtQElt) -> AlgEtQElt</pre><pre><b> '/'</b>(x1::AlgEtQElt,x2::.) -> AlgEtQElt</pre><pre><b> '/'</b>(x1::RngIntElt,x2::AlgEtQElt) -> AlgEtQElt</pre><pre><b> '/'</b>(x1::FldRatElt,x2::AlgEtQElt) -> AlgEtQElt</pre><pre><b> '/'</b>(x1::AlgEtQElt,x2::RngIntElt) -> AlgEtQElt</pre><pre><b> '/'</b>(x1::AlgEtQElt,x2::FldRatElt) -> AlgEtQElt</pre>
+ Returns the division of an element $x_1$ by the unit $x_2$.
+## Operations on sequences of elements.
+<pre><b> '&+'</b>(seq::SeqEnum[AlgEtQElt]) -> AlgEtQElt</pre>
+Returns the sum of the elements of the sequence.
+<pre><b> '&*'</b>(seq::SeqEnum[AlgEtQElt]) -> AlgEtQElt</pre>
+Returns the product of the elements of the sequence.
+<pre><b> SumOfProducts</b>(as::SeqEnum[AlgEtQElt],bs::SeqEnum[AlgEtQElt]) -> AlgEtQElt</pre><pre><b> SumOfProducts</b>(as::SeqEnum[RngIntElt],bs::SeqEnum[AlgEtQElt]) -> AlgEtQElt</pre><pre><b> SumOfProducts</b>(as::SeqEnum[FldRatElt],bs::SeqEnum[AlgEtQElt]) -> AlgEtQElt</pre><pre><b> SumOfProducts</b>(as::SeqEnum[AlgEtQElt],bs::SeqEnum[RngIntElt]) -> AlgEtQElt</pre><pre><b> SumOfProducts</b>(as::SeqEnum[AlgEtQElt],bs::SeqEnum[FldRatElt]) -> AlgEtQElt</pre>
+ Given two sequences of $n$ elements $[a_1,\ldots,a_n]$ and $[b_1,\ldots,b_n]$ returns $\sum_{i=1}^n a_i\cdot b_i$.
+## Minimal polynomials and integrality testing.
+ Given an element $a$ of an étale algebra over $\mathbb{Q}$, the `minimal polynomial` is the polynomial $f(x)$ in $\mathbb{Q}[x]$ of minimal degree such that $f(a)=0$. It is the least common multiple of the minimal polynomials of the components of $a$.
+ An element $a$ is called `integral` if its minimal polynomial is monic and has integer coefficients.
+<pre><b> MinimalPolynomial</b>(x::AlgEtQElt) -> RngUPolElt</pre>
+Returns the minimal polynomial of the element over the base field.
+<pre><b> AbsoluteMinimalPolynomial</b>(x::AlgEtQElt) -> RngUPolElt</pre>
+Returns the minimal polynomial of the element over the prime field.
+<pre><b> IsIntegral</b>(x::AlgEtQElt) -> BoolElt</pre>
+Returns whether the element is integral (over the integers).
+<pre><b> Evaluate</b>(f::RngUPolElt,a::AlgEtQElt) -> AlgEtQElt</pre>
+ Evaluate the polynomial $f(x)$ at the element $a$.
+# Example 1
+ ```
+ _<x>:=PolynomialRing(Integers());
+ f:=(x^8+16)*(x^8+81);
+ A:=EtaleAlgebra(f);
+ a:=PrimitiveElement(A);
+ K1,K2:=Explode(Components(A));
+ Components(a);
+ ```
+# Example 2
 <pre><b> HomsToC</b>(A::AlgEtQ : Prec:=Precision(GetDefaultRealField()))->SeqEnum[Map]</pre>
 Returns the sequence of homomorphisms from A to the complex field CC. The precision of CC is given by the optional parameter "Prec". Default value is 30
 <pre><b> Hom</b>(A::AlgEtQ , B::AlgEtQ , img::SeqEnum[AlgEtQElt] : CheckMultiplicative:=false, CheckUnital:=false, ComputeInverse:=true)->Map</pre>

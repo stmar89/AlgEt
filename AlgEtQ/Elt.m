@@ -39,7 +39,7 @@ declare attributes AlgEtQ : Basis,
 
 ///hide-all
 intrinsic Print(x::AlgEtQElt)
-{Print the element.}
+{Print the components of the element.}
     printf "%o", Components(x);
 end intrinsic;
 ///hide-none
@@ -121,9 +121,59 @@ intrinsic Components(x::AlgEtQElt) -> Tup
   return x`Components;
 end intrinsic;
 
-//------------
-// Basic and Random elements
-//------------
+//TODO CONTINUE FROM HERE
+//TODO ADD '.'
+
+///## Basis and coordinates
+
+intrinsic Basis(A::AlgEtQ) -> SeqEnum
+{Returns a basis of the algebra over the common base field.}
+    if not assigned A`Basis then
+        nf,embs:=Components(A);
+        require HasBaseField(A) : "The number fields do not have a common base field.";
+        cc:= &cat[ [embs[i](b) : b in Basis(nf[i])] : i in [1..#nf]]; 
+        A`Basis := [ A ! c : c in cc ];
+    end if;
+    return A`Basis;
+end intrinsic;
+
+intrinsic AbsoluteBasis(A::AlgEtQ) -> SeqEnum
+{Returns a basis of the algebra over the prime field.}
+    if not assigned A`AbsoluteBasis then
+        nf,embs:=Components(A);
+        cc:= &cat[ [embs[i](b) : b in AbsoluteBasis(nf[i])] : i in [1..#nf]]; 
+        A`AbsoluteBasis := [ A ! c : c in cc ];
+    end if;
+    return A`AbsoluteBasis;
+end intrinsic;
+
+intrinsic '.'(A::AlgEtQ,i::RngIntElt)->AlgEtQElt
+{Returns the i-th element of the absolute basis.}
+    return AbsoluteBasis(A)[i];
+end intrinsic;
+
+intrinsic AbsoluteCoordinates(x::AlgEtQElt) -> SeqEnum
+{Given an element, returns the coordinates relative to the absolute basis, which are elements of the prime rational field.}
+    if not assigned x`AbsoluteCoordinates then
+        x`AbsoluteCoordinates:=&cat[ Flat(c) : c in Components(x) ];
+    end if;
+    return x`AbsoluteCoordinates;
+end intrinsic;
+
+intrinsic AbsoluteCoordinates(seq::SeqEnum[AlgEtQElt] , basis::SeqEnum[AlgEtQElt]) -> SeqEnum
+{Given a sequence of elements and a basis over the PrimeField returns a sequence whose entries are the coordinates in the PrimeField with respect to the given basis.}
+    A:=Algebra(seq[1]);
+    require #basis eq AbsoluteDimension(A) : "the elements given do not form a basis";
+    Mbasis:=Matrix([ AbsoluteCoordinates(b) : b in basis ]);
+    Mseq:=[ Matrix([AbsoluteCoordinates(b)]) : b in seq ];
+    Mcoeff:=[ Solution(Mbasis,S) : S in Mseq ];
+    out:=[ Eltseq(C) : C in Mcoeff ];
+    vprintf AlgEtQElt,3 : "Mbasis=\n%o\nMseq=\n%o\nMcoeff=\n%o\nout=\n%o\n",Mbasis,Mseq,Mcoeff,out;
+    assert2 forall{i : i in [1..#seq] | seq[i] eq &+[out[i][j]*basis[j] : j in [1..#basis]]};
+    return out;
+end intrinsic;
+
+///## Special elements
 
 intrinsic One(A::AlgEtQ) -> AlgEtQElt
 {The multiplicative neutral element of A.}   
@@ -135,6 +185,29 @@ intrinsic Zero(A::AlgEtQ) -> AlgEtQElt
     return A![0 : i in [1..#Components(A)]];
 end intrinsic;
 
+intrinsic OrthogonalIdempotents(A::AlgEtQ) -> SeqEnum
+{Returns the orthogonal ideampotent element of the étale algebra A.}
+    if not assigned A`OrthogonalIdempotents then
+        nf,embs:=Components(A);
+        A`OrthogonalIdempotents := [embs[i](One(nf[i])) : i in [1..#nf]];
+    end if;
+    return A`OrthogonalIdempotents;
+end intrinsic;
+
+intrinsic Idempotents(A::AlgEtQ) -> SeqEnum
+{Returns the ideampotent element of the étale algebra A.}
+    if not assigned A`Idempotents then
+        ortid:=Seqset(OrthogonalIdempotents(A));
+        ss:=Subsets(ortid);
+        id:=[ Zero(A) + &+(Setseq(S)) : S in ss ];
+        assert One(A) in id;
+        A`Idempotents := id;
+    end if;
+    return A`Idempotents;
+end intrinsic;
+
+///## Units and zero divisors
+
 intrinsic IsUnit(x::AlgEtQElt) -> BoolElt
 {Returns whether x is a unit in A.}   
     return forall{ c : c in Components(x) | c ne 0};
@@ -144,6 +217,8 @@ intrinsic IsZeroDivisor(x::AlgEtQElt) -> BoolElt
 {Returns whether x is a not unit in A.}   
     return not IsUnit(x);
 end intrinsic;
+
+///## Random elements
 
 intrinsic Random(A::AlgEtQ , bd::RngIntElt) -> AlgEtQElt
 {Random element of A. The Coefficients are bounded by the positive integer bd.}   
@@ -180,6 +255,7 @@ intrinsic RandomUnit(A::AlgEtQ : bd:=3) -> AlgEtQElt
 {Random element of A. The Coefficients are bounded by the VarArg bd (default 3).}   
     return RandomUnit(A,bd);
 end intrinsic;
+
 
 //------------
 // Equality and Operations
@@ -598,76 +674,6 @@ intrinsic PowerBasis(A::AlgEtQ) -> SeqEnum[AlgEtQElt]
     return A`PowerBasis;
 end intrinsic;
 
-//------------
-// Basis and Vector Representations
-//------------
-
-intrinsic Basis(A::AlgEtQ) -> SeqEnum
-{Returns a basis of the algebra over the common base field.}
-    if not assigned A`Basis then
-        nf,embs:=Components(A);
-        require HasBaseField(A) : "The number fields do not have a common base field.";
-        cc:= &cat[ [embs[i](b) : b in Basis(nf[i])] : i in [1..#nf]]; 
-        A`Basis := [ A ! c : c in cc ];
-    end if;
-    return A`Basis;
-end intrinsic;
-
-intrinsic AbsoluteBasis(A::AlgEtQ) -> SeqEnum
-{Returns a basis of the algebra over the prime field.}
-    if not assigned A`AbsoluteBasis then
-        nf,embs:=Components(A);
-        cc:= &cat[ [embs[i](b) : b in AbsoluteBasis(nf[i])] : i in [1..#nf]]; 
-        A`AbsoluteBasis := [ A ! c : c in cc ];
-    end if;
-    return A`AbsoluteBasis;
-end intrinsic;
-
-intrinsic AbsoluteCoordinates(x::AlgEtQElt) -> SeqEnum
-{Given an element, returns the coordinates relative to the absolute basis, which are elements of the prime rational field.}
-    if not assigned x`AbsoluteCoordinates then
-        x`AbsoluteCoordinates:=&cat[ Flat(c) : c in Components(x) ];
-    end if;
-    return x`AbsoluteCoordinates;
-end intrinsic;
-
-intrinsic AbsoluteCoordinates(seq::SeqEnum[AlgEtQElt] , basis::SeqEnum[AlgEtQElt]) -> SeqEnum
-{Given a sequence of elements and a basis over the PrimeField returns a sequence whose entries are the coordinates in the PrimeField with respect to the given basis.}
-    A:=Algebra(seq[1]);
-    require #basis eq AbsoluteDimension(A) : "the elements given do not form a basis";
-    Mbasis:=Matrix([ AbsoluteCoordinates(b) : b in basis ]);
-    Mseq:=[ Matrix([AbsoluteCoordinates(b)]) : b in seq ];
-    Mcoeff:=[ Solution(Mbasis,S) : S in Mseq ];
-    out:=[ Eltseq(C) : C in Mcoeff ];
-    vprintf AlgEtQElt,3 : "Mbasis=\n%o\nMseq=\n%o\nMcoeff=\n%o\nout=\n%o\n",Mbasis,Mseq,Mcoeff,out;
-    assert2 forall{i : i in [1..#seq] | seq[i] eq &+[out[i][j]*basis[j] : j in [1..#basis]]};
-    return out;
-end intrinsic;
-
-//------------
-// Idempotents
-//------------
-
-intrinsic OrthogonalIdempotents(A::AlgEtQ) -> SeqEnum
-{Returns the orthogonal ideampotent element of the étale algebra A.}
-    if not assigned A`OrthogonalIdempotents then
-        nf,embs:=Components(A);
-        A`OrthogonalIdempotents := [embs[i](One(nf[i])) : i in [1..#nf]];
-    end if;
-    return A`OrthogonalIdempotents;
-end intrinsic;
-
-intrinsic Idempotents(A::AlgEtQ) -> SeqEnum
-{Returns the ideampotent element of the étale algebra A.}
-    if not assigned A`Idempotents then
-        ortid:=Seqset(OrthogonalIdempotents(A));
-        ss:=Subsets(ortid);
-        id:=[ Zero(A) + &+(Setseq(S)) : S in ss ];
-        assert One(A) in id;
-        A`Idempotents := id;
-    end if;
-    return A`Idempotents;
-end intrinsic;
 
 /* TESTS
 
@@ -690,6 +696,7 @@ end intrinsic;
     _:=Random(A);
     assert not IsIntegral(A!1/2);
     assert IsIntegral(A!2);
+    _:=A.3;
 
     ort:=OrthogonalIdempotents(A);
     idem:=Idempotents(A);

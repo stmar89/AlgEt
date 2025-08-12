@@ -118,11 +118,14 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQ
         end if;
         // we check if any of these orders was already computed
         assert2 forall{S : S in output | ColonIdeal(R,R!!OneIdeal(S)) eq P};
+        output:=Isetseq(output);
         for i in [1..#output] do
             S:=output[i];
             IsKnownOrder(~S);
             ZBasisLLL(S);
+            output[i]:=S;
         end for;
+        output:=SequenceToIndexedSet(output);
         if not assigned R`MinimalOverOrders then
             R`MinimalOverOrders:=[<P,output>];
         else

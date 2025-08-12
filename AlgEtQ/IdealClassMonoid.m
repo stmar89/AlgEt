@@ -80,6 +80,7 @@ end intrinsic;
         K:=EtaleAlgebra(f);
         E:=EquationOrder(K);
         _:=ICM(E);
+        printf ".";
     end for;
     SetAssertions(1);
     printf " all good!";

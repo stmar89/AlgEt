@@ -1,6 +1,7 @@
 List of TODOs:
     ### Priority ###
     * publishing AlgEtQ:
+      - CONTINUE WITH DOC from OverOrders.m
       - Go through WKICM.m and add references to papers.
       - PrimesAttributes.m is missing TESTS
       - Doc: 

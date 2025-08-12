@@ -410,6 +410,22 @@ Returns the smallest integer contained in the given fractional ideal, which must
  We provide the intrinsic `ZBasisLLL` which is a procedure changing the stored $\mathbb{Z}$-basis to an LLL-reduced one, if this has not been done before. The attribute `inclusion_matrix` is also deleted, since it depends on the stored $\mathbb{Z}$-basis.
 <pre><b> ZBasisLLL</b>(S::AlgEtQOrd)</pre><pre><b> ZBasisLLL</b>(S::AlgEtQIdl)</pre>
  A procedure that replaces the stored $\mathbb{Z}$-basis with an LLL-reduced one. 
+## Two-generating set
+<pre><b> TwoGeneratingSet</b>(I::AlgEtQIdl)</pre>
+ A procedure that given an invertible fractional ideal $I$, stores in the attibute `Generators` of $I$ one or two non-zerodivisors in $I$ generating $I$. The elements are chosen by a non-deterministic process.
+## Chinese remainder theorem
+ Let $I$ and $J$ be integral fractional ideals over the same order $S$ in an étale algebra.
+ Assume that $I$ and $J$ are coprime, that is, $I+J=S$.
+ Then $I \cap J = I\cdot J$ and we have a canonical $S$-linear isomorphism
+ ```math
+ \frac{S}{I \cap J} \simeq \frac{S}{I} \times \frac{S}{J}.
+ ```
+<pre><b> ChineseRemainderTheorem</b>(I::AlgEtQIdl,J::AlgEtQIdl,a::AlgEtQElt,b::AlgEtQElt)-> AlgEtQElt</pre>
+ Given two integral fractional $S$-ideals $I$ and $J$ which are coprime, two elements $a,b \in S$, returns $e$ such that $(e-a) \in I$ and $(e-b) \in J$.
+<pre><b> ChineseRemainderTheorem</b>(Is::SeqEnum[AlgEtQIdl],as::SeqEnum[AlgEtQElt])-> AlgEtQElt</pre>
+ Given a sequence `Is` of integral fractional $S$-ideals, pairwise coprime, and a sequence `as` of elements of $S$, it returns an element $e$ such that, for every index $i$, if $a$ is the $i$-th ideal of `as` and $I$ is the $i$-th ideal of `Is` then $e-a \in I$.
+<pre><b> ChineseRemainderTheoremFunctions</b>(Is::SeqEnum[AlgEtQIdl])-> Map,Map</pre>
+ Given a sequence `Is` of $N$ integral fractional $S$-ideals $I_1,\ldots,I_N$, pairwise coprime, returns a map $S \to S^N$ representing the natural isomorphism $S/I \to \frac{S}{I_1}\times \cdots \times \frac{S}{I_N}$, where $I=\prod_i I_i$, and a map $S^N \to S$ representing the inverse.
 # Primes, factorization and completions
 ## Primes
  Let $S$ be an order in an étale algebra $A$. A `prime` of $S$ is a maximal ideal of $S$, that is, an integral fractional ideal $\mathfrak{p}$ such that $S/\mathfrak{p}$ is a field. 
@@ -461,53 +477,27 @@ Returns the non-invertible primes of the order.
      iP,[ Valuation(mP(t)) : t in unifs ];
  end for;
  ```
-## Chinese remainder theorem
- Let $I$ and $J$ be integral fractional ideals over the same order $S$ in an étale algebra.
- Assume that $I$ and $J$ are coprime, that is, $I+J=S$.
- Then $I \cap J = I\cdot J$ and we have a canonical $S$-linear isomorphism
- ```math
- \frac{S}{I \cap J} \simeq \frac{S}{I} \times \frac{S}{J}.
- ```
-<pre><b> ChineseRemainderTheorem</b>(I::AlgEtQIdl,J::AlgEtQIdl,a::AlgEtQElt,b::AlgEtQElt)-> AlgEtQElt</pre>
- Given two integral fractional $S$-ideals $I$ and $J$ which are coprime, two elements $a,b \in S$, returns $e$ such that $(e-a) \in I$ and $(e-b) \in J$.
-<pre><b> ChineseRemainderTheorem</b>(Is::SeqEnum[AlgEtQIdl],as::SeqEnum[AlgEtQElt])-> AlgEtQElt</pre>
- Given a sequence `Is` of integral fractional $S$-ideals, pairwise coprime, and a sequence `as` of elements of $S$, it returns an element $e$ such that, for every index $i$, if $a$ is the $i$-th ideal of `as` and $I$ is the $i$-th ideal of `Is` then $e-a \in I$.
-<pre><b> ChineseRemainderTheoremFunctions</b>(Is::SeqEnum[AlgEtQIdl])-> Map,Map</pre>
- Given a sequence `Is` of $N$ integral fractional $S$-ideals $I_1,\ldots,I_N$, pairwise coprime, returns a map $S \to S^N$ representing the natural isomorphism $S/I \to \frac{S}{I_1}\times \cdots \times \frac{S}{I_N}$, where $I=\prod_i I_i$, and a map $S^N \to S$ representing the inverse.
-<pre><b> TwoGeneratingSet</b>(I::AlgEtQIdl)</pre>
-A procedure that given an invertible ideal I put in the attibute Generators of I two non-zerodivisors in I that generate I. If I is known to be principal nothing is done.
+# Quotients
+ Let $I$ and $J$ be orders or fractional ideals such that $I\subseteq J$.
+ Then the quotient $J/I$ is finite.
+ We represent this quotient as a finite abelian group, a finite field, or a finite dimensional vector space over a finite field, depending on the properties of $I$ and $J$.
 <pre><b> Quotient</b>(I::AlgEtQIdl, zbJ::SeqEnum[AlgEtQElt]) -> GrpAb, Map</pre>
-Given an ideal I and the ZBasis of an ideal or order J such that  J subset I, returns the abelian group Q=I/J together with the quotient map q:I->J.
+ Given a fractional ideal $I$ and the $\mathbb{Z}$-basis of an ideal or order $J$ such that $J \subseteq I$, returns the abelian group $Q=I/J$ together with the quotient map $q:I\to Q$. 
 <pre><b> Quotient</b>(I::AlgEtQIdl, J::AlgEtQIdl) -> GrpAb, Map</pre>
-Given fractional ideals J subset I, returns the abelian group Q=I/J together with the quotient map q:I->J.
+ Given fractional ideals $I$ and $J$ such that $J \subseteq I$, returns the abelian group $Q=I/J$ together with the quotient map $q:I \to Q$. 
 <pre><b> Quotient</b>(S::AlgEtQOrd, zbJ::SeqEnum[AlgEtQElt]) -> GrpAb, Map</pre>
-Given an order S and the ZBasis of an ideal J such that  J subset S, returns the abelian group Q=S/J together with the quotient map q:S->J. J can also be an order.
+ Given an order $S$ and the $\mathbb{Z}$-basis of an ideal or order $J$ such that $J \subseteq S$, returns the abelian group $Q=S/J$ together with the quotient map $q:S\to Q$. 
 <pre><b> ResidueRing</b>(S::AlgEtQOrd,I::AlgEtQIdl) -> GrpAb , Map</pre>
-Given an integral ideal I of S, returns the abelian group S/I and the quotient map q:S -> S/I (with preimages). Important: the domain of q is the Algebra of S, since the elements of S are expressed as elements of A. We stress that the output is a group and does not have a multiplication. This can be obtained by first taking preimages, doing the multiplication, and then applying the projection.
+ Given an order $S$ and integral fractional $S$-ideal $I$, returns the abelian group $S/I$ and the quotient map $q:S \to S/I$ (with preimages). Important: the domain of $q$ is the parent algebra of $S$, since the elements of $S$ are expressed as elements of $A$. We stress that the output is a group and does not have a multiplication. This can be obtained by first taking preimages, doing the multiplication, and then applying the projection.
 <pre><b> ResidueField</b>(P::AlgEtQIdl) -> FldFin, Map</pre>
-Given P a prime of S, returns a finite field F isomorphic to S/P and a surjection (with inverse) S->F.
+ Given a prime $P$ of $S$, returns a finite field $F$ isomorphic to $S/P$ and a surjection (with inverse) $S \to F$.
 <pre><b> PrimitiveElementResidueField</b>(P::AlgEtQIdl)->AlgEtQElt</pre>
-Returns an element of P that maps to the primitive element of the residue field S/P, that is a multiplicative generator of (S/P)^*.
-<pre><b> QuotientVS</b>(I::AlgEtQOrd, J::AlgEtQOrd, P::AlgEtQIdl) -> ModRng, Map</pre>
-Let I, J be orders, P a fractional R-ideals such that:
- - P is prime of of some order R, with residue field K;
- - J in I and I/J is a vector space V over K, say of dimension d.
- The function returns the KModule K^d=V and the natural surjection I->V (with preimages).
-<pre><b> QuotientVS</b>(I::AlgEtQOrd, J::AlgEtQIdl, P::AlgEtQIdl) -> ModRng, Map</pre>
-Let I be an order, J and  P be fractional R-ideals such that:
- - P is prime of of some order R, with residue field K;
- - J in I and I/J is a vector space V over K, say of dimension d.
- The function returns the KModule K^d=V and the natural surjection I->V (with preimages).
-<pre><b> QuotientVS</b>(I::AlgEtQIdl, J::AlgEtQOrd, P::AlgEtQIdl) -> ModRng, Map</pre>
-Let J be an order, I and  P be fractional R-ideals such that:
- - P is prime of of some order R, with residue field K;
- - J in I and I/J is a vector space V over K, say of dimension d.
- The function returns the KModule K^d=V and the natural surjection I->V (with preimages).
-<pre><b> QuotientVS</b>(I::AlgEtQIdl, J::AlgEtQIdl, P::AlgEtQIdl) -> ModRng, Map</pre>
-Let I, J, P be fractional R-ideals such that:
- - P is prime of of some order R;
- - J in I and I/J is a vector space over R/P, say of dimension d;
- the function returns the KModule K^d=V and the natural surjection I->V (with preimages).
+ Returns an element of the given prime $P$ of $S$ that maps to the primitive element of the residue field $S/P$, that is, a generator of the multiplicative group $(S/P)^*$.
+<pre><b> QuotientVS</b>(I::AlgEtQOrd, J::AlgEtQOrd, P::AlgEtQIdl) -> ModRng, Map</pre><pre><b> QuotientVS</b>(I::AlgEtQOrd, J::AlgEtQIdl, P::AlgEtQIdl) -> ModRng, Map</pre><pre><b> QuotientVS</b>(I::AlgEtQIdl, J::AlgEtQOrd, P::AlgEtQIdl) -> ModRng, Map</pre><pre><b> QuotientVS</b>(I::AlgEtQIdl, J::AlgEtQIdl, P::AlgEtQIdl) -> ModRng, Map</pre>
+ Let $I$, $J$ be orders or fractional ideals, $P$ a fractional $R$-ideals such that:
+ - $P$ is prime of some order $R$, with residue field $K$;
+ - $J \subseteq I$ and $I/J$ is a vector space $V$ over $K$, say of dimension $d$.
+ The intrinsic returns the $K$-vector space $K^d=V$ and the natural surjection $I \to V$ (with preimages).
 <pre><b> IsMaximalAtPrime</b>(R::AlgEtQOrd, P::AlgEtQIdl) -> BoolElt</pre>
 Returns whether R is maximal at the prime P, that is, if (R:O) is not contained in P, where O is the maximal order.
 <pre><b> MinimalOverOrdersAtPrime</b>(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQOrd]</pre>

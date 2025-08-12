@@ -451,96 +451,55 @@ printf "	time %o
 time_start_local:=Cputime();
 
 
-    printf "### Testing Primes and Factorizaton:";
-    //AttachSpec("~/packages_github/AlgEt/spec");
-    SetAssertions(2);
+    printf "### Testing MinimalGenerators:";
+	//AttachSpec("~/packages_github/AlgEt/spec");
+    SetClassGroupBounds("GRH");
+	_<x>:=PolynomialRing(Integers());
+    f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
+    K:=EtaleAlgebra(f);
+    E:=EquationOrder(K);
+    P,p:=PicardGroup(E : GRH:=true); //~10 secs
 
-    _<x>:=PolynomialRing(Integers());
-    f:=(x^8+16);
-    A:=EtaleAlgebra(f);
-    E1:=EquationOrder(A);
-    ff:=Conductor(E1);
-    assert PrimesAbove(Conductor(E1)) eq SingularPrimes(E1);
-    printf ".";
-
-    f:=x^6 + 8*x^5 + 50*x^4 + 200*x^3 + 1250*x^2 + 5000*x + 15625;
-    A:=EtaleAlgebra(f);
-    assert #SingularPrimes(MaximalOrder(A)) eq 0;
-    R:=EquationOrder(A);
-    assert #SingularPrimes(R) eq 5;
-    assert #NonInvertiblePrimes(R) eq 5;
-    printf ".";
-
-    f:=(x^8+16)*(x^8+81);
-    A:=EtaleAlgebra(f);
-    E1:=EquationOrder(A);
-    E2:=ProductOfEquationOrders(A);
-    
-    _:=PrimesAbove(Conductor(E1));
-    _:=PrimesAbove(Conductor(E2));
-    assert IsGorenstein(E1);
-    assert IsGorenstein(E2);
-
-    ids:=[ Ideal(E1,[Random(E1) : i in [1..10]]) : i in [1..100]];
-    ids0:=[ I : I in ids | I ne OneIdeal(E1) and IsInvertible(I) ];
-    ids:=[];
-    for I in ids0 do
-        _,J:=CoprimeRepresentative(I,Conductor(E1));
-        Append(~ids,J);
-    end for;
-    facs:=[ Factorization(I) : I in ids ];
-    printf ".";
-    SetAssertions(1);
-    printf " all good!"; 
-printf "	time %o
-",Cputime(time_start_local);
-time_start_local:=Cputime();
-
-printf "	time %o
-",Cputime(time_start_local);
-time_start_local:=Cputime();
-
-    
-    printf "### Testing Completion:";
-    //AttachSpec("~/packages_github/AlgEt/spec");
-    PP<x>:=PolynomialRing(Integers());
-    polys:=[
-        x^6+3*x^4-10*x^3+15*x^2+125,
-        (x^2+5)*(x^4-4*x^3+5*x^2-20*x+25),
-        (x^4-5*x^3+15*x^2-25*x+25)*(x^4+5*x^3+15*x^2+25*x+25)
-        ];
-    for h in polys do
-        L:=EtaleAlgebra(h);
-        a:=PrimitiveElement(L);
-        O:=MaximalOrder(L);
-        p:=5;
-        pp:=PrimesAbove(p*O);
-        for P in pp do
-            C,mC:=Completion(P);
-        end for;
+    for g in Generators(P) do 
+        I:=p(g);
+        TwoGeneratingSet(I);
+        assert #Generators(I) le 2;
         printf ".";
     end for;
 
-    _<x>:=PolynomialRing(Integers());
-    f:=(x^8+16)*(x^8+81);
-    A:=EtaleAlgebra(f);
-    O:=MaximalOrder(A);
-    // Consider a bunch of prime of O and their uniformizers in O.
-    pp:=PrimesAbove(2*3*5*7*O);
-    unifs:=Uniformizers(pp);
-    // We now verify that each element is a uniformizer at the correct prime and a unit everywhere else
-    for iP->P in pp do
-        AP,mP:=Completion(P);
-        for it->t in unifs do
-            if iP eq it then
-                assert Valuation(mP(t)) eq 1;
-            else
-                assert Valuation(mP(t)) eq 0;
-            end if;
-        end for;
-    end for;
 
-    printf " all good!";
+    // test if TwoGeneratingSet makes the power faster
+    // Conlcusion: yes. By quite a bit!
+    f:=x^4-100*x^3-100*x^2-100*x-100;
+    A:=EtaleAlgebra(f);
+	E:=EquationOrder(A);
+    P,p:=PicardGroup(E : GRH:=true);
+    repeat
+        Ii:=Random(P);
+    until Ii ne Zero(P);
+    I:=p(Ii);
+
+    delete I`IsInvertible;
+    exp:=[ Random(2,30) : i in [1..100]];
+    l1:=[ I^i : i in exp ];
+    printf ".";
+
+    assert IsInvertible(I);
+    TwoGeneratingSet(I);
+    assert #Generators(I) eq 2;
+    l2:=[ I^i : i in exp ];
+    assert l1 eq l2;
+    printf ".";
+
+    I:=SmallRepresentative(I);
+    delete I`IsInvertible;
+    l1:=[ I^i : i in exp ];
+
+    assert IsInvertible(I);
+    TwoGeneratingSet(I);
+    l2:=[ I^i : i in exp ];
+    assert l1 eq l2;
+    printf " all good!"; 
 printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
@@ -634,55 +593,96 @@ printf "	time %o
 time_start_local:=Cputime();
 
 
-    printf "### Testing MinimalGenerators:";
-	//AttachSpec("~/packages_github/AlgEt/spec");
-    SetClassGroupBounds("GRH");
-	_<x>:=PolynomialRing(Integers());
-    f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
-    K:=EtaleAlgebra(f);
-    E:=EquationOrder(K);
-    P,p:=PicardGroup(E : GRH:=true); //~10 secs
+    printf "### Testing Primes and Factorizaton:";
+    //AttachSpec("~/packages_github/AlgEt/spec");
+    SetAssertions(2);
 
-    for g in Generators(P) do 
-        I:=p(g);
-        TwoGeneratingSet(I);
-        assert #Generators(I) le 2;
+    _<x>:=PolynomialRing(Integers());
+    f:=(x^8+16);
+    A:=EtaleAlgebra(f);
+    E1:=EquationOrder(A);
+    ff:=Conductor(E1);
+    assert PrimesAbove(Conductor(E1)) eq SingularPrimes(E1);
+    printf ".";
+
+    f:=x^6 + 8*x^5 + 50*x^4 + 200*x^3 + 1250*x^2 + 5000*x + 15625;
+    A:=EtaleAlgebra(f);
+    assert #SingularPrimes(MaximalOrder(A)) eq 0;
+    R:=EquationOrder(A);
+    assert #SingularPrimes(R) eq 5;
+    assert #NonInvertiblePrimes(R) eq 5;
+    printf ".";
+
+    f:=(x^8+16)*(x^8+81);
+    A:=EtaleAlgebra(f);
+    E1:=EquationOrder(A);
+    E2:=ProductOfEquationOrders(A);
+    
+    _:=PrimesAbove(Conductor(E1));
+    _:=PrimesAbove(Conductor(E2));
+    assert IsGorenstein(E1);
+    assert IsGorenstein(E2);
+
+    ids:=[ Ideal(E1,[Random(E1) : i in [1..10]]) : i in [1..100]];
+    ids0:=[ I : I in ids | I ne OneIdeal(E1) and IsInvertible(I) ];
+    ids:=[];
+    for I in ids0 do
+        _,J:=CoprimeRepresentative(I,Conductor(E1));
+        Append(~ids,J);
+    end for;
+    facs:=[ Factorization(I) : I in ids ];
+    printf ".";
+    SetAssertions(1);
+    printf " all good!"; 
+printf "	time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
+
+printf "	time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
+
+    
+    printf "### Testing Completion:";
+    //AttachSpec("~/packages_github/AlgEt/spec");
+    PP<x>:=PolynomialRing(Integers());
+    polys:=[
+        x^6+3*x^4-10*x^3+15*x^2+125,
+        (x^2+5)*(x^4-4*x^3+5*x^2-20*x+25),
+        (x^4-5*x^3+15*x^2-25*x+25)*(x^4+5*x^3+15*x^2+25*x+25)
+        ];
+    for h in polys do
+        L:=EtaleAlgebra(h);
+        a:=PrimitiveElement(L);
+        O:=MaximalOrder(L);
+        p:=5;
+        pp:=PrimesAbove(p*O);
+        for P in pp do
+            C,mC:=Completion(P);
+        end for;
         printf ".";
     end for;
 
-
-    // test if TwoGeneratingSet makes the power faster
-    // Conlcusion: yes. By quite a bit!
-    f:=x^4-100*x^3-100*x^2-100*x-100;
+    _<x>:=PolynomialRing(Integers());
+    f:=(x^8+16)*(x^8+81);
     A:=EtaleAlgebra(f);
-	E:=EquationOrder(A);
-    P,p:=PicardGroup(E : GRH:=true);
-    repeat
-        Ii:=Random(P);
-    until Ii ne Zero(P);
-    I:=p(Ii);
+    O:=MaximalOrder(A);
+    // Consider a bunch of prime of O and their uniformizers in O.
+    pp:=PrimesAbove(2*3*5*7*O);
+    unifs:=Uniformizers(pp);
+    // We now verify that each element is a uniformizer at the correct prime and a unit everywhere else
+    for iP->P in pp do
+        AP,mP:=Completion(P);
+        for it->t in unifs do
+            if iP eq it then
+                assert Valuation(mP(t)) eq 1;
+            else
+                assert Valuation(mP(t)) eq 0;
+            end if;
+        end for;
+    end for;
 
-    delete I`IsInvertible;
-    exp:=[ Random(2,30) : i in [1..100]];
-    l1:=[ I^i : i in exp ];
-    printf ".";
-
-    assert IsInvertible(I);
-    TwoGeneratingSet(I);
-    assert #Generators(I) eq 2;
-    l2:=[ I^i : i in exp ];
-    assert l1 eq l2;
-    printf ".";
-
-    I:=SmallRepresentative(I);
-    delete I`IsInvertible;
-    l1:=[ I^i : i in exp ];
-
-    assert IsInvertible(I);
-    TwoGeneratingSet(I);
-    l2:=[ I^i : i in exp ];
-    assert l1 eq l2;
-    printf " all good!"; 
+    printf " all good!";
 printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();

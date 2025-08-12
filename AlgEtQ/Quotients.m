@@ -30,12 +30,18 @@ declare verbose Quotients, 1;
 
 declare attributes AlgEtQIdl : ResidueField,PrimitiveElementResidueField;
 
+///# Quotients
+/// Let $I$ and $J$ be orders or fractional ideals such that $I\subseteq J$.
+/// Then the quotient $J/I$ is finite.
+/// We represent this quotient as a finite abelian group, a finite field, or a finite dimensional vector space over a finite field, depending on the properties of $I$ and $J$.
+
 //------------
 // Quotients
 //------------
 
+/// Given a fractional ideal $I$ and the $\mathbb{Z}$-basis of an ideal or order $J$ such that $J \subseteq I$, returns the abelian group $Q=I/J$ together with the quotient map $q:I\to Q$. 
 intrinsic Quotient(I::AlgEtQIdl, zbJ::SeqEnum[AlgEtQElt]) -> GrpAb, Map
-{Given an ideal I and the ZBasis of an ideal or order J such that  J subset I, returns the abelian group Q=I/J together with the quotient map q:I->J.} 
+{Given a fractional ideal I and the ZBasis of an ideal or order J such that  J subset I, returns the abelian group Q=I/J together with the quotient map q:I->Q.} 
     // if J is not inside I, an error occurs while forming Q. so no need to check in advance
     A:=Algebra(I);
     zbI:=ZBasis(I);
@@ -50,13 +56,15 @@ intrinsic Quotient(I::AlgEtQIdl, zbJ::SeqEnum[AlgEtQElt]) -> GrpAb, Map
     return Q,q;
 end intrinsic;
 
+/// Given fractional ideals $I$ and $J$ such that $J \subseteq I$, returns the abelian group $Q=I/J$ together with the quotient map $q:I \to Q$. 
 intrinsic Quotient(I::AlgEtQIdl, J::AlgEtQIdl) -> GrpAb, Map
-{Given fractional ideals J subset I, returns the abelian group Q=I/J together with the quotient map q:I->J.} 
+{Given fractional ideals I and J such that J subset I, returns the abelian group Q=I/J together with the quotient map q:I->Q.} 
     return Quotient(I,ZBasis(J));
 end intrinsic;
 
+/// Given an order $S$ and the $\mathbb{Z}$-basis of an ideal or order $J$ such that $J \subseteq S$, returns the abelian group $Q=S/J$ together with the quotient map $q:S\to Q$. 
 intrinsic Quotient(S::AlgEtQOrd, zbJ::SeqEnum[AlgEtQElt]) -> GrpAb, Map
-{Given an order S and the ZBasis of an ideal J such that  J subset S, returns the abelian group Q=S/J together with the quotient map q:S->J. J can also be an order.} 
+{Given an order S and the ZBasis of an ideal or order J such that J subset S, returns the abelian group Q=S/J together with the quotient map q:S->Q.} 
     // if J is not inside S, an error occurs while forming Q. so no need to check in advance
     A:=Algebra(S);
     zbS:=ZBasis(S);
@@ -71,14 +79,16 @@ intrinsic Quotient(S::AlgEtQOrd, zbJ::SeqEnum[AlgEtQElt]) -> GrpAb, Map
     return Q,q;
 end intrinsic;
 
+/// Given an order $S$ and integral fractional $S$-ideal $I$, returns the abelian group $S/I$ and the quotient map $q:S \to S/I$ (with preimages). Important: the domain of $q$ is the parent algebra of $S$, since the elements of $S$ are expressed as elements of $A$. We stress that the output is a group and does not have a multiplication. This can be obtained by first taking preimages, doing the multiplication, and then applying the projection.
 intrinsic ResidueRing(S::AlgEtQOrd,I::AlgEtQIdl) -> GrpAb , Map
-{Given an integral ideal I of S, returns the abelian group S/I and the quotient map q:S -> S/I (with preimages). Important: the domain of q is the Algebra of S, since the elements of S are expressed as elements of A. We stress that the output is a group and does not have a multiplication. This can be obtained by first taking preimages, doing the multiplication, and then applying the projection.}
+{Given an order S and integral fractional S-ideal I, returns the abelian group S/I and the quotient map q:S -> S/I (with preimages). Important: the domain of q is the Algebra of S, since the elements of S are expressed as elements of A. We stress that the output is a group and does not have a multiplication. This can be obtained by first taking preimages, doing the multiplication, and then applying the projection.}
     require Order(I) eq S : "wrong order";
     return Quotient(S,ZBasis(I));
 end intrinsic;
 
+/// Given a prime $P$ of $S$, returns a finite field $F$ isomorphic to $S/P$ and a surjection (with inverse) $S \to F$.
 intrinsic ResidueField(P::AlgEtQIdl) -> FldFin, Map
-{Given P a prime of S, returns a finite field F isomorphic to S/P and a surjection (with inverse) S->F.}
+{Given a prime P of S, returns a finite field F isomorphic to S/P and a surjection (with inverse) S->F.}
     if not assigned P`ResidueField then
         assert IsPrime(P);
         S := Order(P);
@@ -104,8 +114,9 @@ intrinsic ResidueField(P::AlgEtQIdl) -> FldFin, Map
     return Explode(P`ResidueField);
 end intrinsic;
 
+/// Returns an element of the given prime $P$ of $S$ that maps to the primitive element of the residue field $S/P$, that is, a generator of the multiplicative group $(S/P)^*$.
 intrinsic PrimitiveElementResidueField(P::AlgEtQIdl)->AlgEtQElt
-{Returns an element of P that maps to the primitive element of the residue field S/P, that is a multiplicative generator of (S/P)^*.}
+{Returns an element of the prime P of S that maps to the primitive element of the residue field S/P, that is, a generator of the multiplicative group (S/P)^*.}
     if not assigned P`PrimitiveElementResidueField then
         F,f:=ResidueField(P);
         P`PrimitiveElementResidueField:=PrimitiveElement(F)@@f;
@@ -113,36 +124,43 @@ intrinsic PrimitiveElementResidueField(P::AlgEtQIdl)->AlgEtQElt
     return P`PrimitiveElementResidueField;
 end intrinsic;
 
+/// Let $I$, $J$ be orders or fractional ideals, $P$ a fractional $R$-ideals such that:
+/// - $P$ is prime of some order $R$, with residue field $K$;
+/// - $J \subseteq I$ and $I/J$ is a vector space $V$ over $K$, say of dimension $d$.
+/// The intrinsic returns the $K$-vector space $K^d=V$ and the natural surjection $I \to V$ (with preimages).
 intrinsic QuotientVS(I::AlgEtQOrd, J::AlgEtQOrd, P::AlgEtQIdl) -> ModRng, Map
 {Let I, J be orders, P a fractional R-ideals such that:
- - P is prime of of some order R, with residue field K;
- - J in I and I/J is a vector space V over K, say of dimension d.
+ - P is prime of some order R, with residue field K;
+ - J subset I and I/J is a vector space V over K, say of dimension d.
  The function returns the KModule K^d=V and the natural surjection I->V (with preimages).}
 	S := Order(P);
     return QuotientVS(S!!OneIdeal(I),S!!OneIdeal(J),P);
 end intrinsic;
 
+///ditto
 intrinsic QuotientVS(I::AlgEtQOrd, J::AlgEtQIdl, P::AlgEtQIdl) -> ModRng, Map
 {Let I be an order, J and  P be fractional R-ideals such that:
- - P is prime of of some order R, with residue field K;
+ - P is prime of some order R, with residue field K;
  - J in I and I/J is a vector space V over K, say of dimension d.
  The function returns the KModule K^d=V and the natural surjection I->V (with preimages).}
 	S := Order(P);
     return QuotientVS(S!!OneIdeal(I),S!!J,P);
 end intrinsic;
 
+///ditto
 intrinsic QuotientVS(I::AlgEtQIdl, J::AlgEtQOrd, P::AlgEtQIdl) -> ModRng, Map
 {Let J be an order, I and  P be fractional R-ideals such that:
- - P is prime of of some order R, with residue field K;
+ - P is prime of some order R, with residue field K;
  - J in I and I/J is a vector space V over K, say of dimension d.
  The function returns the KModule K^d=V and the natural surjection I->V (with preimages).}
 	S := Order(P);
     return QuotientVS(S!!I,S!!OneIdeal(J),P);
 end intrinsic;
 
+///ditto
 intrinsic QuotientVS(I::AlgEtQIdl, J::AlgEtQIdl, P::AlgEtQIdl) -> ModRng, Map
 {Let I, J, P be fractional R-ideals such that:
- - P is prime of of some order R;
+ - P is prime of some order R;
  - J in I and I/J is a vector space over R/P, say of dimension d;
  the function returns the KModule K^d=V and the natural surjection I->V (with preimages).}
 	S := Order(P);

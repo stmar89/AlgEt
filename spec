@@ -9,11 +9,11 @@ Homs.m
 Ord.m
 Idl.m
 ZBasisLLL.m
+MinimalGenerators.m
 CRT.m
 FactPrimes.m
 PrimesAttributes.m
 Completion.m
-MinimalGenerators.m
 Quotients.m
 OverOrders.m
 GraphOverOrders.m

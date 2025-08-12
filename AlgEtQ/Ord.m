@@ -209,11 +209,11 @@ end intrinsic;
 /// If $a$ is the stored primitive element of $A$ then we refer to the order $\mathbb{Z}[a]$ as the `equation order` of $A$.
 
 intrinsic EquationOrder(A::AlgEtQ) -> AlgEtQOrd
-{Given an étale algebra defined by a polynomial, returns the monogenic order defined by the same polynomial.}
+{Returns the monogenic orded of the étale algebra, which depends on the stored primitive element.}
     if not assigned A`EquationOrder then
         require PrimeField(A) eq BaseField(A) : "Defined only for algebras over the Rationals()";
         pow:=PowerBasis(A);
-        E:=Order(pow : Check:=0); //the PowerBasis genertes a mutliplicativelyclosed lattice
+        E:=Order(pow : Check:=0); //the PowerBasis generates a multiplicatively closed lattice
         assert2 E eq Order([pow[2]]);
         E`Generators:=[pow[2]]; // I want the genertor set to be small, so I put only the primitive element
         A`EquationOrder:=E;
@@ -451,11 +451,10 @@ intrinsic Index(T::AlgEtQOrd) -> FldRatElt
   return T`Index;
 end intrinsic;
 
-/// Given two orders $S$ and $T$ returns the ration of the indices. If $T subset S$ the outputs is the index of the inclusion, that is, it equals $[S:T] = \#S/T$.}
+/// Given two orders $S$ and $T$ returns the ratio of their indices. If $T subset S$ the outputs is the index of the inclusion, that is, it equals $[S:T] = \#S/T$.}
 intrinsic Index(S::AlgEtQOrd, T::AlgEtQOrd) -> Any
-{Given two orders T subset S, returns [S:T] = #S/T.}
+{Given two orders S and T returns the ratio of their indices. If T subset S the outputs is the index of the inclusion, that is, it equals [S:T] = \#S/T.}
   assert Algebra(T) cmpeq Algebra(S);
-  assert2 T subset S;
   elt := Index(T)/Index(S);
   if IsCoercible(Integers(), elt) then
     elt := Integers() ! elt;
@@ -636,7 +635,6 @@ end intrinsic;
 /// EA:=EquationOrder(A);
 /// IsProductOfOrdersInFactorAlgebras(EA);
 /// // Now we construct an order that is a product of an order in B and one in C, but does not admit further splittings.
-/// // TODO CONTINUE FROM HERE
 /// a:=PrimitiveElement(A);
 /// e1:=A![1,0,0];
 /// e2:=A![0,1,1];
@@ -647,7 +645,7 @@ end intrinsic;
 /* TESTS
     
     printf "### Testing Orders:";
-	//AttachSpec("~/packages_github/AlgEt/spec");
+	//AttachSpec("~/AlgEt/spec");
     SetVerbose("AlgEtQOrd",1);
     SetAssertions(2);
 
@@ -677,7 +675,6 @@ end intrinsic;
     assert assigned T`IsMaximal and assigned T`IsProductOfOrders; //these two attributes are assigned when we created OA above.
                                                                   // hence T points to the same memory spot of OA
     printf ".";
-
 
     O:=Order(ZBasis(OA));
     assert IsProductOfOrders(O);
@@ -723,4 +720,8 @@ end intrinsic;
     assert E1 subset E3;
     assert E3*E4 eq OA;
     assert OA meet E1 eq E1;
-    assert not E2 meet E1 eq E2
+    assert not E2 meet E1 eq E2;
+
+    SetAssertions(1);
+    printf "all good!";
+*/

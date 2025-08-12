@@ -922,7 +922,6 @@ intrinsic CoprimeRepresentative(I::AlgEtQIdl,J::AlgEtQIdl) -> AlgEtQElt,AlgEtQId
     return x,xI;
 end intrinsic;
 
-
 /* TESTS
 
     printf "### Testing Ideals:";

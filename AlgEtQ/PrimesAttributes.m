@@ -27,10 +27,15 @@ declare attributes AlgEtQIdl : InertiaDegree,
 
 declare verbose nice_unif,3;
 
+// we continue the doc of FactPrimes.m
+
+///## Primes of the maximal order
+
+/// Given an element $x$ and a primes $P$  of the maximal order, it returns the valuation of $x$ at $P$.
 intrinsic Valuation(x::AlgEtQElt,P::AlgEtQIdl)->RngIntElt
-{Given an element x and a maximal ideal P of the maximal order, it returns the valuation of x at P.}
+{Given an element x and a primes P of the maximal order, it returns the valuation of x at P.}
     OO:=Order(P);
-    require IsMaximal(OO) and IsPrime(P): "The input needs to be a maximal ideal of the maximal order.";
+    require IsMaximal(OO) and IsPrime(P): "The input needs to be a primes of the maximal order.";
     _,comp:=IsProductOfIdeals(P);
     ind:=[ i : i in [1..#comp] | not One(NumberField(Order(comp[i]))) in comp[i] ];
     assert #ind eq 1;
@@ -38,10 +43,11 @@ intrinsic Valuation(x::AlgEtQElt,P::AlgEtQIdl)->RngIntElt
     return Valuation(Components(x)[ind],comp[ind]);
 end intrinsic;
 
+/// Given a fractional ideal $I$ and a primes $P$, both of the maximal order, it returns the valuation of $I$ at $P$.
 intrinsic Valuation(I::AlgEtQIdl,P::AlgEtQIdl)->RngIntElt
-{Given a fractional ideal I and a maximal ideal P, both of the maximal order, it returns the valuation of I at P.}
+{Given a fractional ideal I and a primes P, both of the maximal order, it returns the valuation of I at P.}
     OO:=Order(P);
-    require IsMaximal(OO) and IsPrime(P): "The input needs to be a maximal ideal of the maximal order.";
+    require IsMaximal(OO) and IsPrime(P): "The input needs to be a primes of the maximal order.";
     _,compI:=IsProductOfIdeals(I);
     _,compP:=IsProductOfIdeals(P);
     ind:=[ i : i in [1..#compP] | not One(NumberField(Order(compP[i]))) in compP[i] ];
@@ -50,11 +56,12 @@ intrinsic Valuation(I::AlgEtQIdl,P::AlgEtQIdl)->RngIntElt
     return Valuation(compI[ind],compP[ind]);
 end intrinsic;
 
+/// Given a primes $P$ of the maximal order $\mathcal{O}$ above the rational prime $p$, it returns the inertia degree of $P$, that is, the index of the finite field extension $\mathbb{F}_p->\mathcal{O}/P$.
 intrinsic InertiaDegree(P::AlgEtQIdl)->RngIntElt
-{Given a maximal ideal P of the maximal order O above the rational prime p, it returns the inertia degree of P, that is, the index of the finite field extension GF(p)->O/P.}
+{Given a primes P of the maximal order O above the rational prime p, it returns the inertia degree of P, that is, the index of the finite field extension GF(p)->O/P.}
     if not assigned P`InertiaDegree then
         OO:=Order(P);
-        require IsMaximal(OO) and IsPrime(P): "The input needs to be a maximal ideal of the maximal order.";
+        require IsMaximal(OO) and IsPrime(P): "The input needs to be a primes of the maximal order.";
         q:=Index(OO,P);
         t,p,f:=IsPrimePower(q);
         assert t;
@@ -63,11 +70,12 @@ intrinsic InertiaDegree(P::AlgEtQIdl)->RngIntElt
     return P`InertiaDegree;
 end intrinsic;
 
+/// Given a primes $P$ of the maximal order $\mathcal{O}$, it returns the ramification index of $P$.
 intrinsic RamificationIndex(P::AlgEtQIdl)->RngIntElt
-{Given a maximal ideal P of the maximal order O, it returns the reamification index of P.}
+{Given a primes P of the maximal order O, it returns the ramification index of P.}
     if not assigned P`RamificationIndex then
         OO:=Order(P);
-        require IsMaximal(OO) and IsPrime(P): "The input needs to be a maximal ideal of the maximal order.";
+        require IsMaximal(OO) and IsPrime(P): "The input needs to be a primes of the maximal order.";
         q:=Index(OO,P);
         t,p:=IsPrimePower(q);
         assert t;
@@ -76,10 +84,11 @@ intrinsic RamificationIndex(P::AlgEtQIdl)->RngIntElt
     return P`RamificationIndex;
 end intrinsic;
 
+/// Given a sequence of primes $P$ of the maximal order, it returns a sequence of elements $t_P$ such that $t_P$ is a uniformizer at $P$ and a unit at every other prime in the sequence.
 intrinsic Uniformizers(PPs::SeqEnum[AlgEtQIdl])->SeqEnum
-{Given a sequence of maximal ideals P of the maximal order, it returns a sequence of elements t_P such that t_P is a uniformizer of P and a unit at every other prime in the sequence.}
+{Given a sequence of primess P of the maximal order, it returns a sequence of elements t_P such that t_P is a uniformizer at P and a unit at every other prime in the sequence.}
     OO:=Order(PPs[1]);
-    require IsMaximal(OO) and forall{P : P in PPs | IsPrime(P)} : "The input needs to be a sequenc of maximal ideals of the maximal order.";
+    require IsMaximal(OO) and forall{P : P in PPs | IsPrime(P)} : "The input needs to be a sequenc of primess of the maximal order.";
     vprintf nice_unif,2 : "nice_uniformizers: %o primes\n",#PPs;
     one:=One(Algebra(PPs[1]));
     nice_unifs:=[];

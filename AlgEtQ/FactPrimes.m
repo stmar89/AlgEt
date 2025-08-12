@@ -28,76 +28,43 @@ declare verbose FactPrimes, 3;
 
 declare attributes AlgEtQOrd : SingularPrimes;
 
-//----------
-// Factorization and Prime
-//----------
+///# Primes, factorization and completions
 
-function factorizationMaximalOrder(I)
-//given an ideal of the maximal order of an étale algebra, returns the factorization into a product of prime ideals
-    O:=Order(I);
-    assert IsMaximal(O);
-    test,OasProd:=IsProductOfOrders(O);
-    assert test; //since we assume that O is maximal
-    A:=Algebra(O);
-    test,IasProd:=IsProductOfIdeals(I);
-    assert test;
-    fac:=[]; //this will be the factorization of I
-    nf,embs:=Components(A);
-    tup_one_ideals:=< 1*O : O in OasProd >;
-    for i in [1..#nf] do
-        IL:=IasProd[i];
-        if not One(Order(IL)) in IL then
-            facL:=Factorization(IL); // < <P,e> : ... >;
-            assert #facL gt 0;
-            for p in facL do
-                tup_p:=tup_one_ideals;
-                tup_p[i]:=p[1]; // we replace the i-th ideal with P
-                assert2 tup_p ne tup_one_ideals;
-                P:=Ideal(O,tup_p);
-                ZBasisLLL(P);
-                assert2 P ne OneIdeal(O);
-                P`IsPrime:=true; //we know P is prime
-                assert2 IsPrimePower(Integers() ! Index(O,P));
-                Append(~fac,<P,p[2]>);
-            end for;
-         end if;
-    end for;
-    assert2 I eq &*[p[1]^p[2] : p in fac];
-    return fac;
-end function;
+///## Primes
+/// Let $S$ be an order in an étale algebra $A$. A `prime` of $S$ is a maximal ideal of $S$, that is, an integral fractional ideal $\mathfrak{p}$ such that $S/\mathfrak{p}$ is a field. 
+/// It is well-known that a prime $\mathfrak{p}$ of $S$ is invertible if and only if $\mathfrak{p}$ does not contain the conductor of $S$. Such primes are also called `regular`. A prime which in non-invertible is also called `singular`.
+/// In particular, there is only finitely many singular primes.
 
-intrinsic Factorization(I::AlgEtQIdl) -> Tup
-{Given an integral S-ideal I coprime with the conductor of S (hence invertible in S), returns its factorization into a product of primes of S.}
-    S:=Order(I);
-    require IsIntegral(I) and I ne OneIdeal(S): "the argument must be a proper integral ideal";
-    if not assigned I`Factorization then    
-        if IsMaximal(S) then
-            I`Factorization:=factorizationMaximalOrder(I);
+intrinsic IsPrime(I::AlgEtQIdl) -> BoolElt
+{Returns whether the given integral fractional ideal is a prime of its order of definition.}
+    require IsIntegral(I): "the ideal must be integral";
+    if not assigned I`IsPrime then
+        prim:=PrimesAbove(I);
+        if #prim eq 1 and I eq prim[1] then
+            bool:=true;
         else
-            fS:=Conductor(S);
-            require IsCoprime(fS,I): "the ideal must be coprime with the conductor of the order of definition";
-            O:=MaximalOrder(Algebra(I));
-            IO:=O !! I;
-            facO:=factorizationMaximalOrder(IO);
-            primesO:=[ p[1] : p in facO ];
-            primesS:=Setseq({ OneIdeal(S) meet (S!!PO) : PO in primesO }); //cancel the doubles
-            facS:=<>;
-            for i in [1..#primesS] do
-                P:=primesS[i];
-                ZBasisLLL(P);
-                P`IsPrime:=true;
-                expP:=&+([ pO[2] : pO in facO | (S meet (S!!pO[1])) eq P ]);
-                Append(~facS, <P,expP>);
-            end for;
-            assert2 I eq &*([ p[1]^p[2] : p in facS ]);
-            I`Factorization:=facS;
+            bool:=false;
         end if;
-     end if;
-     return I`Factorization;
+        I`IsPrime:=bool;
+    end if;
+    return I`IsPrime;
 end intrinsic;
 
+///ditto
+intrinsic IsMaximal(I::AlgEtQIdl) -> BoolElt
+{Returns whether the given integral fractional ideal is a prime of its order of definition.}
+    return IsPrime(I);
+end intrinsic;
+
+///ditto
+intrinsic IsMaximalIdeal(I::AlgEtQIdl) -> BoolElt
+{Returns whether the given integral fractional ideal is a prime of its order of definition.}
+    return IsPrime(I);
+end intrinsic;
+
+/// Given an integral fractional $S$-ideal $I$, returns the sequence of primes of $S$ containing $I$.
 intrinsic PrimesAbove(I::AlgEtQIdl) -> SeqEnum[AlgEtQOrdIdl]
-{Given an integral S-ideal, returns the sequence of maximal ideals P of S above I.}
+{Given an integral fractional S-ideal I, returns the sequence of primes of S containing I.}
     require IsIntegral(I): "the ideal must be integral";
     if not assigned I`PrimesAbove then
         S:=Order(I);
@@ -134,7 +101,7 @@ intrinsic PrimesAbove(I::AlgEtQIdl) -> SeqEnum[AlgEtQOrdIdl]
 end intrinsic;
 
 intrinsic PlacesAboveRationalPrime(E::AlgEtQ,p::RngIntElt)->SeqEnum[AlgEtQIdl]
-{Returns the maximal ideals of maximal order of the algebra E above the rational prime p.}
+{Given an étale algebra and a rational prime, returns the primes of maximal order of the algebra containing the rational prime.}
     if not assigned E`PlacesAboveRationalPrime then
         E`PlacesAboveRationalPrime:=AssociativeArray();
     end if;
@@ -153,106 +120,86 @@ intrinsic SingularPrimes(R::AlgEtQOrd) -> SeqEnum[AlgEtQOrdIdl]
     return R`SingularPrimes;
 end intrinsic;
 
+///ditto
 intrinsic NonInvertiblePrimes(R::AlgEtQOrd) -> SetIndx
 {Returns the non-invertible primes of the order.}
     return SingularPrimes(R);
 end intrinsic;
 
-intrinsic IsPrime(I::AlgEtQIdl) -> BoolElt
-{Given an integral S-ideal, returns if the ideal is a prime fractional ideal of S, that is, a maximal S ideal.}
-    require IsIntegral(I): "the ideal must be integral";
-    if not assigned I`IsPrime then
-        prim:=PrimesAbove(I);
-        if #prim eq 1 and I eq prim[1] then
-            bool:=true;
+///## Factorization
+/// Every integral fractional $S$-ideal which is coprime to the conductor of $S$ can be written as a product of invertible primes of $S$.
+/// This factorization is unique up to permutation of the factors.
+/// 
+/// Consider the decomposition $K_1\times \cdots \times K_n$ of $A$ into the direct product of its components.
+/// Then every prime $\mathfrak{P}$ of the maximal order $\mathcal{O}_A$ of $A$ is generated by a maximal ideal in exactly one component and by $1$ in every other component.
+/// It follows that the factorization problem for fractional ideals over the maximal order can be immediately reduced to the number field case.
+/// We deal the case of non-maximal orders by taking intersections.
+
+function factorizationMaximalOrder(I)
+//given an ideal of the maximal order of an étale algebra, returns the factorization into a product of prime ideals
+    O:=Order(I);
+    assert IsMaximal(O);
+    test,OasProd:=IsProductOfOrders(O);
+    assert test; //since we assume that O is maximal
+    A:=Algebra(O);
+    test,IasProd:=IsProductOfIdeals(I);
+    assert test;
+    fac:=[]; //this will be the factorization of I
+    nf,embs:=Components(A);
+    tup_one_ideals:=< 1*O : O in OasProd >;
+    for i in [1..#nf] do
+        IL:=IasProd[i];
+        if not One(Order(IL)) in IL then
+            facL:=Factorization(IL); // < <P,e> : ... >;
+            assert #facL gt 0;
+            for p in facL do
+                tup_p:=tup_one_ideals;
+                tup_p[i]:=p[1]; // we replace the i-th ideal with P
+                assert2 tup_p ne tup_one_ideals;
+                P:=Ideal(O,tup_p);
+                ZBasisLLL(P);
+                assert2 P ne OneIdeal(O);
+                P`IsPrime:=true; //we know P is prime
+                assert2 IsPrimePower(Integers() ! Index(O,P));
+                Append(~fac,<P,p[2]>);
+            end for;
+         end if;
+    end for;
+    assert2 I eq &*[p[1]^p[2] : p in fac];
+    return fac;
+end function;
+
+/// Given an integral fractional $S$-ideal $I$ coprime with the conductor of $S$ (hence invertible in $S$), returns its factorization into a product of primes of $S$.
+intrinsic Factorization(I::AlgEtQIdl) -> Tup
+{Given an integral fractional S-ideal I coprime with the conductor of S (hence invertible in S), returns its factorization into a product of primes of S.}
+    S:=Order(I);
+    require IsIntegral(I) and I ne OneIdeal(S): "the argument must be a proper integral ideal";
+    if not assigned I`Factorization then    
+        if IsMaximal(S) then
+            I`Factorization:=factorizationMaximalOrder(I);
         else
-            bool:=false;
+            fS:=Conductor(S);
+            require IsCoprime(fS,I): "the ideal must be coprime with the conductor of the order of definition";
+            O:=MaximalOrder(Algebra(I));
+            IO:=O !! I;
+            facO:=factorizationMaximalOrder(IO);
+            primesO:=[ p[1] : p in facO ];
+            primesS:=Setseq({ OneIdeal(S) meet (S!!PO) : PO in primesO }); //cancel the doubles
+            facS:=<>;
+            for i in [1..#primesS] do
+                P:=primesS[i];
+                ZBasisLLL(P);
+                P`IsPrime:=true;
+                expP:=&+([ pO[2] : pO in facO | (S meet (S!!pO[1])) eq P ]);
+                Append(~facS, <P,expP>);
+            end for;
+            assert2 I eq &*([ p[1]^p[2] : p in facS ]);
+            I`Factorization:=facS;
         end if;
-        I`IsPrime:=bool;
-    end if;
-    return I`IsPrime;
+     end if;
+     return I`Factorization;
 end intrinsic;
 
-intrinsic IsMaximal(I::AlgEtQIdl) -> BoolElt
-{Given an integral S-ideal, returns if the ideal is a prime fractional ideal of S, that is, a maximal S ideal.}
-    return IsPrime(I);
-end intrinsic;
-
-intrinsic IsMaximalIdeal(I::AlgEtQIdl) -> BoolElt
-{Given an integral S-ideal, returns if the ideal is a prime fractional ideal of S, that is, a maximal S ideal.}
-    return IsPrime(I);
-end intrinsic;
-
-intrinsic IsBassAtPrime(S::AlgEtQOrd,P::AlgEtQIdl) -> BoolElt
-{Check if the order is Bass at the prime ideal P, that is, if every overorder of S is Gorenstein at the primes above P.}
-// we compute the maximal order O and check if O/PO is at most 2-dimensional over S/P
-// see Hofman,Sircana, On the computations of over-orders, Definition 5.23
-    if assigned S`IsBass and S`IsBass then
-        return true;
-    end if;
-    if IsMaximal(S) then // we need to compute the maximal order in any case.
-        return true;
-    else
-        O:=MaximalOrder(Algebra(S));
-        k:=Integers() ! Index(S,P);
-        OS:=S!!OneIdeal(O);
-        N:=Integers() ! Index(OS,P*OS);
-        //N = k^(dim_P)
-        assert N mod k eq 0;
-        dim_P:=Ilog(k,N);
-        return dim_P le 2;
-    end if;
-end intrinsic;
-
-intrinsic IsBass(S::AlgEtQOrd) -> BoolElt
-{Check if the order is Bass, that is, if every overorder of S is Gorenstein.}
-// we compute the maximal order O and check if O/PO is at most 2-dimensional over S/P for every singular prime P
-// This coincides with the usual definition since O has the maximal number of generators as a fractional S ideal and S is Bass iff every ideal can be generated by at most 2-elements.
-// see Hofman,Sircana, On the computations of over-orders, Definition 5.23
-    if not assigned S`IsBass then
-        if IsMaximal(S) then 
-            S`IsBass:=true;
-        else
-            O:=MaximalOrder(Algebra(S));
-            sing:=SingularPrimes(S);
-            S`IsBass:=forall{P:P in sing | IsBassAtPrime(S,P)};
-        end if;
-    end if;
-    return S`IsBass;
-end intrinsic;
-
-intrinsic IsGorensteinAtPrime(S::AlgEtQOrd,P::AlgEtQIdl) -> BoolElt
-{Check if the order is Gorenstein at the prime ideal P, that is, if every fractional ideal I with (I:I)=S is locally principal at P.}
-// Let St be the trace dual ideal of S. We check if St/PSt is one dimensional over S/P
-    if assigned S`IsGorenstein and S`IsGorenstein then
-        return true;
-    end if;
-    if assigned S`IsMaximal and S`IsMaximal then //we dont want to trigger the computation of the maximal order
-        return true;
-    else
-        k:=Integers() ! Index(S,P);
-        St:=TraceDualIdeal(S);
-        N:=Integers() ! Index(St,P*St);
-        //N = k^(dim_P)
-        assert N mod k eq 0;
-        dim_P:=Ilog(k,N);
-        return dim_P eq 1;
-    end if;
-end intrinsic;
-
-
-intrinsic IsGorenstein(O::AlgEtQOrd)->BoolElt
-{Checks if the order O is Gorenstein, that is if the TraceDualIdeal of O is invertible, or equivalently, if all fractional ideals I with (I:I)=O are invertible.}
-    if not assigned O`IsGorenstein then
-        if assigned O`IsMaximal and O`IsMaximal then
-            O`IsGorenstein:=true;
-        else
-            T:=TraceDualIdeal(O);
-            O`IsGorenstein:=IsInvertible(T);
-        end if;
-    end if;
-    return O`IsGorenstein;
-end intrinsic
 
 /* TESTS
 

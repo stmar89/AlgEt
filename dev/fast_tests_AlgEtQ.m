@@ -451,6 +451,243 @@ printf "	time %o
 time_start_local:=Cputime();
 
 
+    printf "### Testing Primes and Factorizaton:";
+    //AttachSpec("~/packages_github/AlgEt/spec");
+    SetAssertions(2);
+
+    _<x>:=PolynomialRing(Integers());
+    f:=(x^8+16);
+    A:=EtaleAlgebra(f);
+    E1:=EquationOrder(A);
+    ff:=Conductor(E1);
+    assert PrimesAbove(Conductor(E1)) eq SingularPrimes(E1);
+    printf ".";
+
+    f:=x^6 + 8*x^5 + 50*x^4 + 200*x^3 + 1250*x^2 + 5000*x + 15625;
+    A:=EtaleAlgebra(f);
+    assert #SingularPrimes(MaximalOrder(A)) eq 0;
+    R:=EquationOrder(A);
+    assert #SingularPrimes(R) eq 5;
+    assert #NonInvertiblePrimes(R) eq 5;
+    printf ".";
+
+    f:=(x^8+16)*(x^8+81);
+    A:=EtaleAlgebra(f);
+    E1:=EquationOrder(A);
+    E2:=ProductOfEquationOrders(A);
+    
+    _:=PrimesAbove(Conductor(E1));
+    _:=PrimesAbove(Conductor(E2));
+    assert IsGorenstein(E1);
+    assert IsGorenstein(E2);
+
+    ids:=[ Ideal(E1,[Random(E1) : i in [1..10]]) : i in [1..100]];
+    ids0:=[ I : I in ids | I ne OneIdeal(E1) and IsInvertible(I) ];
+    ids:=[];
+    for I in ids0 do
+        _,J:=CoprimeRepresentative(I,Conductor(E1));
+        Append(~ids,J);
+    end for;
+    facs:=[ Factorization(I) : I in ids ];
+    printf ".";
+    SetAssertions(1);
+    printf " all good!"; 
+printf "	time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
+
+printf "	time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
+
+    
+    printf "### Testing Completion:";
+    //AttachSpec("~/packages_github/AlgEt/spec");
+    PP<x>:=PolynomialRing(Integers());
+    polys:=[
+        x^6+3*x^4-10*x^3+15*x^2+125,
+        (x^2+5)*(x^4-4*x^3+5*x^2-20*x+25),
+        (x^4-5*x^3+15*x^2-25*x+25)*(x^4+5*x^3+15*x^2+25*x+25)
+        ];
+    for h in polys do
+        L:=EtaleAlgebra(h);
+        a:=PrimitiveElement(L);
+        O:=MaximalOrder(L);
+        p:=5;
+        pp:=PrimesAbove(p*O);
+        for P in pp do
+            C,mC:=Completion(P);
+        end for;
+        printf ".";
+    end for;
+
+    _<x>:=PolynomialRing(Integers());
+    f:=(x^8+16)*(x^8+81);
+    A:=EtaleAlgebra(f);
+    O:=MaximalOrder(A);
+    // Consider a bunch of prime of O and their uniformizers in O.
+    pp:=PrimesAbove(2*3*5*7*O);
+    unifs:=Uniformizers(pp);
+    // We now verify that each element is a uniformizer at the correct prime and a unit everywhere else
+    for iP->P in pp do
+        AP,mP:=Completion(P);
+        for it->t in unifs do
+            if iP eq it then
+                assert Valuation(mP(t)) eq 1;
+            else
+                assert Valuation(mP(t)) eq 0;
+            end if;
+        end for;
+    end for;
+
+    printf " all good!";
+printf "	time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
+
+
+    printf "### Testing CRT:";
+    //AttachSpec("~/packages_github/AlgEt/spec");
+    SetVerbose("CRT",1);
+    SetAssertions(2);
+
+    _<x>:=PolynomialRing(Integers());
+    f:=(x^8+16)*(x^8+81);
+    A:=EtaleAlgebra(f);
+    E1:=EquationOrder(A);
+    
+    pp:=PrimesAbove(Conductor(E1));
+    pp13:=[ P : P in pp | MinimalInteger(P) eq 13 ];
+
+    pairs:=[];
+    for i in [1..10000] do
+        repeat
+            a:=Random(E1);
+        until not a in pp13[1];
+        repeat
+            b:=Random(E1);
+        until not b in pp13[2];
+        Append(~pairs,[a,b]);
+    end for;
+    printf ".";
+    // test 1
+    
+    out1:=[];
+    for pair in pairs do
+        a:=pair[1];
+        b:=pair[2];
+        e:=ChineseRemainderTheorem(pp13[1],pp13[2],a,b);
+        Append(~out1,e);
+    end for;
+    printf ".";
+    // old code ~14 secs. new code ~7 secs. w/o profiler
+
+    // test 2
+    out2:=[];
+    e1:=ChineseRemainderTheorem(pp13[1],pp13[2],A!1,A!0);
+    e2:=ChineseRemainderTheorem(pp13[1],pp13[2],A!0,A!1);
+    for pair in pairs do
+        a:=pair[1];
+        b:=pair[2];
+        e:=a*e1+b*e2;
+        Append(~out2,e);
+    end for;
+    printf ".";
+    pp13:=pp13[1]*pp13[2];
+    assert forall{i : i in [1..#out1] | (out1[i] - out2[i]) in pp13};
+
+    // test 3 : >2 primes
+    tuples:=[]; 
+    for i in [1..1000] do
+        i_tup:=[];
+        for j in [1..#pp] do
+            repeat
+                a:=Random(E1);
+            until not a in pp[j];
+            Append(~i_tup,a);
+        end for;
+        Append(~tuples,i_tup);
+    end for;
+
+    out3:=[];
+    out4:=[];
+    for tup in tuples do
+        e:=ChineseRemainderTheorem(pp,tup);
+        Append(~out3,e);
+    end for;
+    
+    f,g:=ChineseRemainderTheoremFunctions(pp);
+    for tup in tuples do
+        e:=g(tup);
+        Append(~out4,e);
+    end for;
+
+    I:=&meet(pp);
+    assert forall{i : i in [1..#out3] | (out3[i] - out4[i]) in I};
+
+    printf ".";
+
+    SetAssertions(1);    
+    printf " all good!"; 
+printf "	time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
+
+
+    printf "### Testing MinimalGenerators:";
+	//AttachSpec("~/packages_github/AlgEt/spec");
+    SetClassGroupBounds("GRH");
+	_<x>:=PolynomialRing(Integers());
+    f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
+    K:=EtaleAlgebra(f);
+    E:=EquationOrder(K);
+    P,p:=PicardGroup(E : GRH:=true); //~10 secs
+
+    for g in Generators(P) do 
+        I:=p(g);
+        TwoGeneratingSet(I);
+        assert #Generators(I) le 2;
+        printf ".";
+    end for;
+
+
+    // test if TwoGeneratingSet makes the power faster
+    // Conlcusion: yes. By quite a bit!
+    f:=x^4-100*x^3-100*x^2-100*x-100;
+    A:=EtaleAlgebra(f);
+	E:=EquationOrder(A);
+    P,p:=PicardGroup(E : GRH:=true);
+    repeat
+        Ii:=Random(P);
+    until Ii ne Zero(P);
+    I:=p(Ii);
+
+    delete I`IsInvertible;
+    exp:=[ Random(2,30) : i in [1..100]];
+    l1:=[ I^i : i in exp ];
+    printf ".";
+
+    assert IsInvertible(I);
+    TwoGeneratingSet(I);
+    assert #Generators(I) eq 2;
+    l2:=[ I^i : i in exp ];
+    assert l1 eq l2;
+    printf ".";
+
+    I:=SmallRepresentative(I);
+    delete I`IsInvertible;
+    l1:=[ I^i : i in exp ];
+
+    assert IsInvertible(I);
+    TwoGeneratingSet(I);
+    l2:=[ I^i : i in exp ];
+    assert l1 eq l2;
+    printf " all good!"; 
+printf "	time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
+
+
     printf "### Testing Quotients:";
     //AttachSpec("~/packages_github/AlgEt/spec");
 	SetAssertions(2);
@@ -546,93 +783,6 @@ time_start_local:=Cputime();
         assert Norm(a)*Norm(b) eq Norm(a*b);
     end for;
     printf " all good!"; 
-printf "	time %o
-",Cputime(time_start_local);
-time_start_local:=Cputime();
-
-    
-    printf "### Testing Completion:";
-    //AttachSpec("~/packages_github/AlgEt/spec");
-    PP<x>:=PolynomialRing(Integers());
-    polys:=[
-        x^6+3*x^4-10*x^3+15*x^2+125,
-        (x^2+5)*(x^4-4*x^3+5*x^2-20*x+25),
-        (x^4-5*x^3+15*x^2-25*x+25)*(x^4+5*x^3+15*x^2+25*x+25)
-        ];
-    for h in polys do
-        L:=EtaleAlgebra(h);
-        a:=PrimitiveElement(L);
-        O:=MaximalOrder(L);
-        p:=5;
-        pp:=PrimesAbove(p*O);
-        for P in pp do
-            C,mC:=Completion(P);
-        end for;
-        printf ".";
-    end for;
-    printf " all good!";
-printf "	time %o
-",Cputime(time_start_local);
-time_start_local:=Cputime();
-
-
-    printf "### Testing Complex Conjugation:";
-    //AttachSpec("~/packages_github/AlgEt/spec");
-    _<x>:=PolynomialRing(Integers());
-    f:=x^4 + 6*x^2 + 25;
-    K:=EtaleAlgebra(f);
-    pi:=PrimitiveElement(K);
-    pib:=ComplexConjugate(pi);
-    assert pib eq 5/pi;
-    R:=Order([pi,pib]);
-    oo:=FindOverOrders(R);
-    O:=MaximalOrder(K);
-    S:=[ S : S in oo | Index(O,S) eq 8 ][1]; //there is only one order of index 8, so conjugate stable
-    assert IsConjugateStable(R);
-    assert IsConjugateStable(TraceDualIdeal(R));
-    assert IsConjugateStable(O);
-    assert IsConjugateStable(TraceDualIdeal(O));
-    assert IsConjugateStable(S);
-    assert IsConjugateStable(TraceDualIdeal(S));
-    assert not IsConjugateStable(EquationOrder(K));
-    printf ".";
-    printf " all good!\n";
-printf "	time %o
-",Cputime(time_start_local);
-time_start_local:=Cputime();
-
-
-    printf "### Testing CM-types:";
-    //AttachSpec("~/packages_github/AlgEt/spec");
-    _<x>:=PolynomialRing(Integers());
-    polys:=[
-    x^4+x^2+529,
-    x^4+11*x^3+73*x^2+319*x+841,
-    x^4-4*x^3+8*x^2-116*x+841,
-    x^4+4*x^3+8*x^2+116*x+841,
-    x^4-17*x^2+841,
-    x^4-x^3+26*x^2-31*x+961,
-    x^4-6*x^3+43*x^2-186*x+961,
-    x^4-4*x^3+8*x^2-124*x+961,
-    x^4+2*x^3+52*x^2+62*x+961,
-    x^4+x^3+26*x^2+31*x+961
-    ];
-
-    for f in polys do
-        A:=EtaleAlgebra(f);
-        all:=AllCMTypes(A);
-        _:=[ CMPositiveElement(PHI) : PHI in all ];
-        for i,j in [1..#all] do
-            assert (i eq j) eq (all[i] eq all[j]);
-        end for;
-        for i,j in [1..#all] do
-            assert (i eq j) eq (all[i] eq ChangePrecision(all[j],2*Precision(all[j])));
-        end for; 
-        ChangePrecision(~all[1],60);
-        assert Precision(all[1]) eq 60;
-        printf ".";
-    end for;
-    printf " all good!";
 printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
@@ -789,148 +939,6 @@ printf "	time %o
 time_start_local:=Cputime();
 
 
-    printf "### Testing MinimalGenerators:";
-	//AttachSpec("~/packages_github/AlgEt/spec");
-    SetClassGroupBounds("GRH");
-	_<x>:=PolynomialRing(Integers());
-    f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
-    K:=EtaleAlgebra(f);
-    E:=EquationOrder(K);
-    P,p:=PicardGroup(E : GRH:=true); //~10 secs
-
-    for g in Generators(P) do 
-        I:=p(g);
-        TwoGeneratingSet(I);
-        assert #Generators(I) le 2;
-        printf ".";
-    end for;
-
-
-    // test if TwoGeneratingSet makes the power faster
-    // Conlcusion: yes. By quite a bit!
-    f:=x^4-100*x^3-100*x^2-100*x-100;
-    A:=EtaleAlgebra(f);
-	E:=EquationOrder(A);
-    P,p:=PicardGroup(E : GRH:=true);
-    repeat
-        Ii:=Random(P);
-    until Ii ne Zero(P);
-    I:=p(Ii);
-
-    delete I`IsInvertible;
-    exp:=[ Random(2,30) : i in [1..100]];
-    l1:=[ I^i : i in exp ];
-    printf ".";
-
-    assert IsInvertible(I);
-    TwoGeneratingSet(I);
-    assert #Generators(I) eq 2;
-    l2:=[ I^i : i in exp ];
-    assert l1 eq l2;
-    printf ".";
-
-    I:=SmallRepresentative(I);
-    delete I`IsInvertible;
-    l1:=[ I^i : i in exp ];
-
-    assert IsInvertible(I);
-    TwoGeneratingSet(I);
-    l2:=[ I^i : i in exp ];
-    assert l1 eq l2;
-    printf " all good!"; 
-printf "	time %o
-",Cputime(time_start_local);
-time_start_local:=Cputime();
-
-
-    printf "### Testing CRT:";
-    //AttachSpec("~/packages_github/AlgEt/spec");
-    SetVerbose("CRT",1);
-    SetAssertions(2);
-
-    _<x>:=PolynomialRing(Integers());
-    f:=(x^8+16)*(x^8+81);
-    A:=EtaleAlgebra(f);
-    E1:=EquationOrder(A);
-    
-    pp:=PrimesAbove(Conductor(E1));
-    pp13:=[ P : P in pp | MinimalInteger(P) eq 13 ];
-
-    pairs:=[];
-    for i in [1..10000] do
-        repeat
-            a:=Random(E1);
-        until not a in pp13[1];
-        repeat
-            b:=Random(E1);
-        until not b in pp13[2];
-        Append(~pairs,[a,b]);
-    end for;
-    printf ".";
-    // test 1
-    
-    out1:=[];
-    for pair in pairs do
-        a:=pair[1];
-        b:=pair[2];
-        e:=ChineseRemainderTheorem(pp13[1],pp13[2],a,b);
-        Append(~out1,e);
-    end for;
-    printf ".";
-    // old code ~14 secs. new code ~7 secs. w/o profiler
-
-    // test 2
-    out2:=[];
-    e1:=ChineseRemainderTheorem(pp13[1],pp13[2],A!1,A!0);
-    e2:=ChineseRemainderTheorem(pp13[1],pp13[2],A!0,A!1);
-    for pair in pairs do
-        a:=pair[1];
-        b:=pair[2];
-        e:=a*e1+b*e2;
-        Append(~out2,e);
-    end for;
-    printf ".";
-    pp13:=pp13[1]*pp13[2];
-    assert forall{i : i in [1..#out1] | (out1[i] - out2[i]) in pp13};
-
-    // test 3 : >2 primes
-    tuples:=[]; 
-    for i in [1..1000] do
-        i_tup:=[];
-        for j in [1..#pp] do
-            repeat
-                a:=Random(E1);
-            until not a in pp[j];
-            Append(~i_tup,a);
-        end for;
-        Append(~tuples,i_tup);
-    end for;
-
-    out3:=[];
-    out4:=[];
-    for tup in tuples do
-        e:=ChineseRemainderTheorem(pp,tup);
-        Append(~out3,e);
-    end for;
-    
-    f,g:=ChineseRemainderTheoremFunctions(pp);
-    for tup in tuples do
-        e:=g(tup);
-        Append(~out4,e);
-    end for;
-
-    I:=&meet(pp);
-    assert forall{i : i in [1..#out3] | (out3[i] - out4[i]) in I};
-
-    printf ".";
-
-    SetAssertions(1);    
-    printf " all good!"; 
-printf "	time %o
-",Cputime(time_start_local);
-time_start_local:=Cputime();
-
-
     printf "### Testing PicardGroup and UnitGroup:";
     //AttachSpec("~/packages_github/AlgEt/spec");
 	SetAssertions(2);
@@ -994,56 +1002,6 @@ time_start_local:=Cputime();
         assert ext(x+y) eq ext(x)+ext(y);
     end for;
     printf " all good!"; 
-printf "	time %o
-",Cputime(time_start_local);
-time_start_local:=Cputime();
-
-
-    printf "### Testing Primes and Factorizaton:";
-    //AttachSpec("~/packages_github/AlgEt/spec");
-    SetAssertions(2);
-
-    _<x>:=PolynomialRing(Integers());
-    f:=(x^8+16);
-    A:=EtaleAlgebra(f);
-    E1:=EquationOrder(A);
-    ff:=Conductor(E1);
-    assert PrimesAbove(Conductor(E1)) eq SingularPrimes(E1);
-    printf ".";
-
-    f:=x^6 + 8*x^5 + 50*x^4 + 200*x^3 + 1250*x^2 + 5000*x + 15625;
-    A:=EtaleAlgebra(f);
-    assert #SingularPrimes(MaximalOrder(A)) eq 0;
-    R:=EquationOrder(A);
-    assert #SingularPrimes(R) eq 5;
-    assert #NonInvertiblePrimes(R) eq 5;
-    printf ".";
-
-    f:=(x^8+16)*(x^8+81);
-    A:=EtaleAlgebra(f);
-    E1:=EquationOrder(A);
-    E2:=ProductOfEquationOrders(A);
-    
-    _:=PrimesAbove(Conductor(E1));
-    _:=PrimesAbove(Conductor(E2));
-    assert IsGorenstein(E1);
-    assert IsGorenstein(E2);
-
-    ids:=[ Ideal(E1,[Random(E1) : i in [1..10]]) : i in [1..100]];
-    ids0:=[ I : I in ids | I ne OneIdeal(E1) and IsInvertible(I) ];
-    ids:=[];
-    for I in ids0 do
-        _,J:=CoprimeRepresentative(I,Conductor(E1));
-        Append(~ids,J);
-    end for;
-    facs:=[ Factorization(I) : I in ids ];
-    printf ".";
-    SetAssertions(1);
-    printf " all good!"; 
-printf "	time %o
-",Cputime(time_start_local);
-time_start_local:=Cputime();
-
 printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();
@@ -1325,6 +1283,68 @@ time_start_local:=Cputime();
     end for;
     SetAssertions(1);
     printf " all good!"; 
+printf "	time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
+
+
+    printf "### Testing Complex Conjugation:";
+    //AttachSpec("~/packages_github/AlgEt/spec");
+    _<x>:=PolynomialRing(Integers());
+    f:=x^4 + 6*x^2 + 25;
+    K:=EtaleAlgebra(f);
+    pi:=PrimitiveElement(K);
+    pib:=ComplexConjugate(pi);
+    assert pib eq 5/pi;
+    R:=Order([pi,pib]);
+    oo:=FindOverOrders(R);
+    O:=MaximalOrder(K);
+    S:=[ S : S in oo | Index(O,S) eq 8 ][1]; //there is only one order of index 8, so conjugate stable
+    assert IsConjugateStable(R);
+    assert IsConjugateStable(TraceDualIdeal(R));
+    assert IsConjugateStable(O);
+    assert IsConjugateStable(TraceDualIdeal(O));
+    assert IsConjugateStable(S);
+    assert IsConjugateStable(TraceDualIdeal(S));
+    assert not IsConjugateStable(EquationOrder(K));
+    printf ".";
+    printf " all good!\n";
+printf "	time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
+
+
+    printf "### Testing CM-types:";
+    //AttachSpec("~/packages_github/AlgEt/spec");
+    _<x>:=PolynomialRing(Integers());
+    polys:=[
+    x^4+x^2+529,
+    x^4+11*x^3+73*x^2+319*x+841,
+    x^4-4*x^3+8*x^2-116*x+841,
+    x^4+4*x^3+8*x^2+116*x+841,
+    x^4-17*x^2+841,
+    x^4-x^3+26*x^2-31*x+961,
+    x^4-6*x^3+43*x^2-186*x+961,
+    x^4-4*x^3+8*x^2-124*x+961,
+    x^4+2*x^3+52*x^2+62*x+961,
+    x^4+x^3+26*x^2+31*x+961
+    ];
+
+    for f in polys do
+        A:=EtaleAlgebra(f);
+        all:=AllCMTypes(A);
+        _:=[ CMPositiveElement(PHI) : PHI in all ];
+        for i,j in [1..#all] do
+            assert (i eq j) eq (all[i] eq all[j]);
+        end for;
+        for i,j in [1..#all] do
+            assert (i eq j) eq (all[i] eq ChangePrecision(all[j],2*Precision(all[j])));
+        end for; 
+        ChangePrecision(~all[1],60);
+        assert Precision(all[1]) eq 60;
+        printf ".";
+    end for;
+    printf " all good!";
 printf "	time %o
 ",Cputime(time_start_local);
 time_start_local:=Cputime();

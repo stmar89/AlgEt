@@ -263,6 +263,8 @@ intrinsic FindOverOrders(R::AlgEtQOrd : populateoo_in_oo:=false) -> SetIndx[AlgE
     return OverOrders(R : populateoo_in_oo:=populateoo_in_oo);
 end intrinsic;
 
+//TODO add an example where we show that every fractional ideals has power which is invertible in its own multiplicator ring
+
 /* TESTS
 
     printf "### Testing OverOrders:";

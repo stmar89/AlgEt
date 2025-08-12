@@ -31,6 +31,14 @@ declare attributes AlgEtQIdl : CRT_data;
 
 import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQtoA , meet_zbasis ;
 
+///## Chinese remainder theorem
+/// Let $I$ and $J$ be integral fractional ideals over the same order $S$ in an étale algebra.
+/// Assume that $I$ and $J$ are coprime, that is, $I+J=S$.
+/// Then $I \cap J = I\cdot J$ and we have a canonical $S$-linear isomorphism
+/// ```math
+/// \frac{S}{I \cap J} \simeq \frac{S}{I} \times \frac{S}{J}.
+/// ```
+
 // Let z1,..,zn be ZBasis(S) and let c1,...,cn be the coefficients such that 1=c1z1+...+cnzn.
 // Let cc = (c1,...,cn, 0 , ... , 0 ).
 // Let zS be the matrix whose rows are given by z1,...,zn.
@@ -46,7 +54,6 @@ import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQ
 // 1 = a1zI11+..+anzI1n + b1I21 + ... + bnzI2n.
 // Set c1 = a1zI11+..+anzI1n and b1I21 + ... + bnzI2n.
 // Then c1 in I1, c2 in I2 and c1+c2 = 1.
-
 
 CRT_data_order:=function(S)
     if not assigned S`CRT_data then
@@ -78,8 +85,9 @@ CRT_data_ideal:=function(I)
      return Explode(I`CRT_data);
 end function;
 
+/// Given two integral fractional $S$-ideals $I$ and $J$ which are coprime, two elements $a,b \in S$, returns $e$ such that $(e-a) \in I$ and $(e-b) \in J$.
 intrinsic ChineseRemainderTheorem(I::AlgEtQIdl,J::AlgEtQIdl,a::AlgEtQElt,b::AlgEtQElt)-> AlgEtQElt
-{Given two coprime ideals I and J of S, two elements a,b in S, finds e such that (e-a) in I and (e-b) in J.}
+{Given two integral fractional S-ideals I and J which are coprime, two elements a,b in S, returns e such that (e-a) in I and (e-b) in J.}
     Is:=[I,J];
     as:=[a,b];
     ashat:=[b,a];
@@ -121,8 +129,9 @@ intrinsic ChineseRemainderTheorem(I::AlgEtQIdl,J::AlgEtQIdl,a::AlgEtQElt,b::AlgE
     return e;
 end intrinsic;
 
+/// Given a sequence `Is` of integral fractional $S$-ideals, pairwise coprime, and a sequence `as` of elements of $S$, it returns an element $e$ such that, for every index $i$, if $a$ is the $i$-th ideal of `as` and $I$ is the $i$-th ideal of `Is` then $e-a \in I$.
 intrinsic ChineseRemainderTheorem(Is::SeqEnum[AlgEtQIdl],as::SeqEnum[AlgEtQElt])-> AlgEtQElt
-{Given a sequence `Is` of ideals of S, pairwise coprime, and a sequence `as` of elements of S, it returns an element e such that e-as[i] in Is[i] for every i.}
+{Given a sequence Is of integral fractional S-ideals, pairwise coprime, and a sequence as of elements of S, it returns an element e such that e-as[i] in Is[i] for every i.}
     N:=#as;
     S:=Order(Is[1]);
     require #Is eq N: "The number of ideals is not the same as the number of elements";
@@ -136,8 +145,9 @@ intrinsic ChineseRemainderTheorem(Is::SeqEnum[AlgEtQIdl],as::SeqEnum[AlgEtQElt])
     end if;
 end intrinsic;
 
+/// Given a sequence `Is` of $N$ integral fractional $S$-ideals $I_1,\ldots,I_N$, pairwise coprime, returns a map $S \to S^N$ representing the natural isomorphism $S/I \to \frac{S}{I_1}\times \cdots \times \frac{S}{I_N}$, where $I=\prod_i I_i$, and a map $S^N \to S$ representing the inverse.
 intrinsic ChineseRemainderTheoremFunctions(Is::SeqEnum[AlgEtQIdl])-> Map,Map
-{Given a sequence `Is` of N ideals of S, pairwise coprime, returns a function S->S^N representing the natural isomorphism S/&*(Is) -> \prod_(I in Is) S/I and a function S^N->S representing the inverse.}
+{Given a sequence Is of N fractional S-ideals I1,...,IN, pairwise coprime, returns a map S->S^N representing the natural isomorphism S/I -> S/I1 x ... x S/IN, where I is the product of Ii's, and a map S^N->S representing the inverse.}
     S:=Order(Is[1]);
     N:=#Is;
     require forall{i : i in [2..N] | Order(Is[i]) eq S}:"the ideals must be of the same order";

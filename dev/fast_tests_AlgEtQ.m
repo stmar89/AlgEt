@@ -211,12 +211,6 @@ time_start_local:=Cputime();
     assert Degree(MinimalPolynomial(a)) eq AbsoluteDimension(A);
     _:=PowerBasis(A);
 
-    b:=A!<1,2,3,7>;
-    SetPrimitiveElement(b);
-    assert PrimitiveElement(A) eq b;
-    SetPrimitiveElement(a);
-    assert PrimitiveElement(A) eq a;
-
     printf " all good!"; 
 printf "	time %o
 ",Cputime(time_start_local);

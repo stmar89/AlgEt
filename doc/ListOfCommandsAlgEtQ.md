@@ -78,13 +78,10 @@ Returns the idempotents of the étale algebra.
 Returns the orthogonal idempotent elements of the étale algebra, which are the unit elements of the components.
 ## Primitive element
  Given an étale algebra $A$ over $\mathbb{Q}$ there exists an element $a\in A$ such that $A = \mathbb{Q}[a]$, that is, every element can be written as a polynomial with rational coefficients in $a$. Such an element is called a `primitive element` of $A$. It is characterized by having a minimal polynomial whose degree equals the absolute dimension of $A$.
- The intrinsic `SetPrimitiveElement` allows to specify a primitive element, which is then stored in an attribute of the algebra.
  The intrinsic `PrimitiveElement` produces such an element of the étale algebra $A$ using a deterministic procedure which we now describe:
  Let $N$ be the number of components of $A$, each one having primitive element $a_i$. Set $b_1$ = $a_1$. For $i=2,\ldots,N$, set $b_i = a_i+j$ where $j$ is the smallest non-negative integer such that the minimal polynomial of $a_i+j$ is not in the set of minimal polynomials of the elements $b_1,\ldots,b_{i-1}$. The output is the element of $A$ whose components are $b_1,...,b_N$. In particular, if $A$ is a product of number fields with different defining polynomials, then the output is the element of $A$ whose components are the primitive elements of the components.
 <pre><b> PrimitiveElement</b>(A::AlgEtQ) -> AlgEtQElt</pre>
  Returns a primitive element of the étale algebra, produced with a deterministic algorithm. If the components of algebra are distinct number fields, then the output is the element whose components are the primitive elements of the components.
-<pre><b> SetPrimitiveElement</b>(a::AlgEtQElt)</pre>
-Given an element a in an étale algebra A such that the minimal polynomial of a over Q has degree equal to the Q-dimension of A, it sets a to be the primitive element of A.
 <pre><b> PowerBasis</b>(A::AlgEtQ) -> SeqEnum[AlgEtQElt]</pre>
  Returns the basis consisting of powers of the element stored as the primitive element.
 ## Units and zero divisors
@@ -162,8 +159,6 @@ Returns whether the element is integral (over the integers).
  QQ:=NumberField(x-1:DoLinearExtension);
  A:=EtaleAlgebra([QQ,QQ]);
  a:=PrimitiveElement(A); a;
- b:=A!<2,10>;
- SetPrimitiveElement(b);
  ```
 # Homomorphisms of étale algebras over $\mathbb{Q}$
  Let $A$ be an étale algebra over $\mathbb{Q}$. By an `homomorphism` from $A$ to some $\mathbb{Q}$-algbra, we mean a unital $\mathbb{Q}$-algbra homomorphisms. 

@@ -33,8 +33,28 @@ declare attributes AlgEtQOrd: PicardGroup,
 declare attributes AlgEtQIdl: residue_class_ring_unit_subgroup_generators,
                               ResidueRingUnits;
 
+///# Picard group and unit group
+/// Let $R$ be an order in an étale algebra $A$ over $\mathbb{Q}$ with maximal order $\mathcal{O}_A$.
+/// We say that two fractional $R$-ideals $I$ and $J$ are `isomorphic` if there exists a unit $a\in A$ such that $I=aJ$. Observe that this happens if and only if $I$ and $J$ are isomorphic as $R$-modules. 
+/// We refer to the isomorphism class $[I]$ of $I$ as its `ideal class`.
+///   
+/// The set of ideal classes of invertible fractional $R$-ideals forms a group under the operation induced by ideal multiplication. This group is called the `Picard group` of $R$ and denoted $\mathrm{Pic}(R)$.
+///   
+/// If $K_1\times \ldots \times K_n$ are the components of $A$ then $\mathrm{Pic}(\mathcal{O}_A) = \prod_{i=1}^n\mathrm{Cl}(\mathcal{O}_{K_i})$, where $\mathrm{Cl}(\mathcal{O}_{K_i})$ is the class group of the number field $K_i$.
+/// Also, the unit group $\mathcal{O}_A^\times$ of $\mathcal{O}_A$ satisfies $\mathcal{O}_A^\times = \mathcal{O}_{K_1}^\times \times \ldots \times \mathcal{O}_{K_n}^\times$.
+///   
+/// The Picard group and the unit group of the order $R$ can be computed using the well-known exact sequence:
+/// ```math
+/// 1 \to R^\times \to \mathcal{O}_A^\times \to \dfrac{\left( \mathcal{O}/\mathfrak{f} \right)^\times}{\left( \mathcal{O}/\mathfrak{f} \right)^\times} \to \mathrm{Pic}(R)\to \mathrm{Pic}(\mathcal{O}_A) \to 1,
+/// ```
+/// where the first, second and third map are the natural maps, the fourth is induced by $a \mapsto (a\mathcal{O}_A \cap R)$ and the last one is induced by the extension map $I \mapsto I\mathcal{O}_A$.
+///   
+/// The following intrinsics allow to compute all the elements of the sequence.
+/// If one wants to perform the computation under the GRH bound one can either use the appropriate parameters of use `SetClassGroupBounds("GRH")` as for number fields.
+
+/// Given an order $S$ and a fractional $S$-ideal $I$, returns the group $(S/I)^\times$ and a map $(S/I)^\times \to  S$ giving representatives. This is implemented only when $S$ is the maximal order.
 intrinsic ResidueRingUnits(S::AlgEtQOrd,I::AlgEtQIdl) -> GrpAb,Map
-{Returns the group (S/I)^* and a map (S/I)^* -> S. The MultiplicatorRing(I) must be the maximal order.}
+{Given an order S and a fractional S-ideal, returns the group (S/I)^* and a map (S/I)^* -> S giving representatives. This is implemented only when S is the maximal order.}
     if not assigned I`ResidueRingUnits then
         require Order(I) eq S and I subset OneIdeal(S) : "I is not a proper S-ideal.";
         require IsMaximal(MultiplicatorRing(I)) : "the ideals needs to have maximal multiplicator ring.";
@@ -102,13 +122,15 @@ intrinsic ResidueRingUnits(S::AlgEtQOrd,I::AlgEtQIdl) -> GrpAb,Map
     return Explode(I`ResidueRingUnits);
 end intrinsic;
 
+///ditto
 intrinsic ResidueRingUnits(I::AlgEtQIdl) -> GrpAb,Map
 {Returns the group (S/I)^* and a map (S/I)^* -> S, where S=Order(I) and the multiplicator ring of I is maximal.}
     return ResidueRingUnits(Order(I),I);
 end intrinsic;
 
+/// Given a fractional $S$-ideal $F$, returns generators of $(S/F)^\times$.
 intrinsic ResidueRingUnitsSubgroupGenerators(F::AlgEtQIdl) -> SeqEnum[AlgEtQElt]
-{Returns generators of (S/F)^* where F is an ideal of the order S.}
+{Given a fractional S-ideal F, returns generators of (S/F)^*.}
     if not assigned F`residue_class_ring_unit_subgroup_generators then
         S:=Order(F);
         A:=Algebra(S);
@@ -243,8 +265,9 @@ IsPrincipal_prod_internal:=function( II , GRH )
     return true,gen;
 end function;
 
+/// Returns whethere the given fractional ideals is a principal ideal (over its order of definition), and, if so, also a generator.  The parameter `GRH` (default false) can be set to true determines if the test is done under GRH.
 intrinsic IsPrincipal(I1::AlgEtQIdl : GRH:=false )->BoolElt, AlgEtQElt
-{Return if the argument is a principal ideal; if so the function returns also the generator. The optional argument "GRH" decides wheter the bound for the IsPrincipal test should be conditional. The default value is "false".}
+{Returns whethere the given fractional ideals is a principal ideal (over its order of definition), and, if so, also a generator.  The parameter GRH (default false) can be set to true determines if the test is done under GRH.}
     if not IsInvertible(I1) then return false,_; end if;
     if #Generators(I1) eq 1 then return true,Generators(I1)[1]; end if;
     // we try with LLL
@@ -385,8 +408,9 @@ PicardGroup_prod_internal:=function( O , GRH )
     return Explode(O`PicardGroup);
 end function;
 
+/// Returns the Picard group $\mathrm{Pic}(S)$ of the order $S$, which is not required to be maximal, and a map from the group to a set of representatives of the ideal classes.  The parameter `GRH` (default false) can be set to true determines if the test is done under GRH.
 intrinsic PicardGroup( S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
-{Return the PicardGroup of the order S, which is not required to be maximal, and a map from the PicardGroup to a set of representatives of the ideal classes. The optional argument "GRH" decides the bound for the computations of the ClassGroup and UnitGroup of the maximal order. The default value is "false".}
+{Returns the Picard group of the order S, which is not required to be maximal, and a map from the group to a set of representatives of the ideal classes.  The parameter GRH (default false) can be set to true determines if the test is done under GRH.}
     if assigned S`PicardGroup then 
         return Explode(S`PicardGroup); 
     end if;
@@ -581,8 +605,9 @@ intrinsic PicardGroup( S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
     return P,p;
 end intrinsic;
 
+/// Given orders $S$ and $T$ such that $S \subseteq T$, returns the surjective extension map $\mathrm{Pic}(S) \to \mathrm{Pic}(T)$. The parameter `GRH`, default false, is passed to `PicardGroup`.
 intrinsic ExtensionHomPicardGroups(S::AlgEtQOrd,T::AlgEtQOrd : GRH:="false")->Map
-{Given orders S subseteq T, it returns the surjective extension map from PicardGroup(S) to PicardGroup(T). The vararg GRH, default false, is passed to PicardGroup.}
+{Given orders S and T such that S subseteq T, returns the surjective extension map from PicardGroup(S) to PicardGroup(T). The vararg GRH, default false, is passed to PicardGroup.}
     require S subset T : "The second order is not an overorder of the first.";
     PS,pS:=PicardGroup(S:GRH:=GRH);
     PT,pT:=PicardGroup(T:GRH:=GRH);
@@ -634,8 +659,9 @@ UnitGroup_prod_internal:=function(O, GRH)
     return Udp,maptoA;
 end function;
 
+/// Returns the unit group of the given order. The parameter `GRH` (default false) can be set to true determines if the test is done under GRH.
 intrinsic UnitGroup(S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
-{Return the unit group of a order in a etale algebra. The optional argument "GRH" decides the bound for the computation of the unit group of the maximal order. The default value is "false".}
+{Returns the unit group of the given order. The parameter GRH (default false) can be set to true determines if the test is done under GRH.}
     if assigned S`UnitGroup then 
         return Explode(S`UnitGroup);
     end if;
@@ -682,8 +708,9 @@ intrinsic UnitGroup(S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
     return P,p;
 end intrinsic;
 
+/// Given two fractional ideals $I$ and $J$ over the same order, checks whether $I=x\cdot J$, for some unit $x$. If so, $x$ is also returned. The parameter `GRH` (default false) can be set to true determines if the test is done under GRH.
 intrinsic IsIsomorphic(I::AlgEtQIdl, J::AlgEtQIdl : GRH:=false ) -> BoolElt, AlgEtQElt
-{Checks if I=x*J, for some x. If so, also x is returned. The optional argument "GRH" decides wheter the bound for the IsPrincipal test should be conditional. The default value is "false".}
+{Given two fractional ideals I and J over the same order, checks whether I=x*J, for some unit x. If so, x is also returned. The parameter GRH (default false) can be set to true determines if the test is done under GRH.}
     test:=IsWeakEquivalent(I,J); //if so I=(I:J)*J and (I:J) is invertible in its MultiplicatorRing
     if test then
         S:=MultiplicatorRing(I);

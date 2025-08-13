@@ -555,41 +555,46 @@ Returns the (absolute) norm of the element.
  - $(I\cap J)^t = I^t + J^t$;
  - $(I:J)^t = I^t\cdot J$.
 <pre><b> TraceDualIdeal</b>(I::AlgEtQIdl) -> AlgEtQIdl</pre>
-Returns the trace dual ideal of the ideal I, that is, the set of elements x of the algebra such that Trace(x*I) is integer-valued.
+Returns the trace dual ideal of the given fractional ideal.
 <pre><b> TraceDualIdeal</b>(O::AlgEtQOrd) -> AlgEtQIdl</pre>
-Returns the trace dual ideal of an order in an etale algebra, that is, the set of elements x of the algebra such that Trace(x*O) is integer-valued.
+Returns the trace dual ideal of the given order.
+# Intermediate fractional ideals
+ Let $I$ and $J$ be orders or fractional ideals in an étale algebra over $\mathbb{Q}$ satisfying $J subseteq I$.
+ Since the quotient $I/J$ is finite, there are finitely many fractional ideals $K$ (over a fixed order) such that $J \subseteq K \subseteq I$.
+ The following intrinsic allow to compute them.
 <pre><b> MinimalIntermediateIdeals</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]</pre>
-Given fractional S-ideals J subseteq I, returns the minimal (with respect to inclusion) fractional S-ideals K such that J subsetneq K subseteq I. Note J is never in the output.
+ Given fractional $S$-ideals $I$ and $J$ such that $J \subseteq I$, returns the minimal (with respect to inclusion) fractional $S$-ideals $K$ such that $J \subsetneq K \subseteq I$. Note that $J$ is never in the output.
 <pre><b> IntermediateIdeals</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]</pre>
-Given fractional S-ideals J subseteq I, returns all the fractional S-ideals K such that J subseteq K subseteq I. They are produced recursively from the minimal ones. The output includes I and J.
+ Given fractional $S$-ideals $I$ and $J$ such that $J$ \subseteq $I$, returns all the fractional $S$-ideals $K$ such that $J \subseteq K \subseteq I$. They are produced recursively from the minimal ones. The output includes $I$ and $J$.
 <pre><b> IntermediateIdealsWithPrescribedMultiplicatorRing</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]</pre>
-Given fractional S-ideals J subseteq I, returns all the fractional S-ideals K such that J subseteq K subseteq I and (K:K)=S. They are produced recursively from the minimal ones. The output includes I, if (I:I)=S, and J, if (J:J)=S.
+ Given fractional $S$-ideals $I$ and $J$ such that $J \subseteq I$, returns all the fractional $S$-ideals $K$ such that $J \subseteq K \subseteq I$ and $(K:K)=S$. They are produced recursively from the minimal ones. The output includes $I$, if $(I:I)=S$, and $J$, if $(J:J)=S$.
 <pre><b> MaximalIntermediateIdeals</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]</pre>
-Given fractional S-ideals J subseteq I, returns the maximal (with respect to inclusion) fractional S-ideals K such that J subseteq K subsetneq I. Note I is never in the output, while J is in the output if and only if the S-module I/J is simple, in which case the output consists only of J.
+ Given fractional $S$-ideals $I$ and $J$ such that $J \subseteq I$, returns the maximal (with respect to inclusion) fractional $S$-ideals $K$ such that $J \subseteq K \subsetneq I$. Note that $I$ is never in the output, while $J$ is in the output if and only if the $S$-module $I/J$ is simple, in which case the output consists only of $J$.
 <pre><b> IntermediateIdealsWithTrivialExtension</b>(I::AlgEtQIdl,J::AlgEtQIdl, O::AlgEtQOrd)->SetIndx[AlgEtQIdl]</pre>
-Given fractional S-ideals I and J and an order O such that 
-- S subset O,  
-- J subseteq I, and 
-- O subset (I:I),
-returns all the fractional S-ideals K such that 
-- J subseteq K subseteq I, and 
-- O!!K = I. 
-Note that the output always contains I. The output is produced by a recursiv use of MaximalIntermediateIdeals.
+ Given fractional $S$-ideals $I$ and $J$ and an order $O$ such that 
+ - $S \subseteq O$,  
+ - $J \subseteq I$, and 
+ - $O \subseteq (I:I)$,
+ returns all the fractional $S$-ideals $K$ such that 
+ - $J \subseteq K \subseteq I$, and 
+ - $O\cdot K = I$. 
+ Note that the output always contains $I$. 
+ The output is produced by recursively computing maximal intermediate ideals.
 <pre><b> IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing</b>(I::AlgEtQIdl,J::AlgEtQIdl, O::AlgEtQOrd)->SetIndx[AlgEtQIdl]</pre>
-Given fractional S-ideals I and J and an order O such that 
-- S subseteq O,  
-- J subseteq I, and 
-- O subseteq (I:I), 
-returns all the fractional S-ideals K satisfying
-- J subseteq K subseteq I, 
-- O!!K = I, and 
-- (K:K) eq S. 
-In particular, the output contains I if and only if O = (I:I) = S. The output is produced by a recursive use of MaximalIntermediateIdeals.
+ Given fractional $S$-ideals $I$ and $J$ and an order $O$ such that 
+ - $S \subseteq O$,  
+ - $J \subseteq I$, and 
+ - $O \subseteq (I:I)$, 
+ returns all the fractional $S$-ideals $K$ satisfying
+ - $J \subseteq K \subseteq I$, 
+ - $O\cdot K = I$, and 
+ - $(K:K) = S$. 
+ In particular, the output contains $I$ if and only if $O = (I:I) = S$. The output is produced by recursively computing maximal intermediate ideals.
 <pre><b> IntermediateIdealsOfIndex</b>(I::AlgEtQIdl,J::AlgEtQIdl,N::RngIntElt)->SetIndx[AlgEtQIdl]</pre>
-Given ideals J subseteq I over the same order, and a positive integer N, it returns all the ideals K such that 
-- J subseteq K subseteq I, and 
-- [I:K]=N. 
-The output is produced by a recursive use of MaximalIntermediateIdeals.
+ Given fractional $S$-ideals $I$ and $J$ satisfying $J \subseteq I$, and a positive integer $N$, returns all the fractional $S$-ideals $K$ such that:
+ - $J \subseteq K \subseteq I$, and 
+ - $[I:K]=N$. 
+ The output is produced by recursively computing the maximal ones.
 <pre><b> IdealsOfIndex</b>(O::RngOrd, N::RngIntElt) -> SeqEnum[RngOrdIdl]</pre>
 Given an order O in a number field and a positive integer N, returns all the ideals I of index [O:I]=N.
 <pre><b> IdealsOfIndex</b>(I::RngOrdIdl, N::RngIntElt) -> SeqEnum[RngOrdIdl]</pre>

@@ -26,8 +26,14 @@ freeze;
 
 declare verbose IntermediateIdeals, 2;
 
+///# Intermediate fractional ideals
+/// Let $I$ and $J$ be orders or fractional ideals in an étale algebra over $\mathbb{Q}$ satisfying $J subseteq I$.
+/// Since the quotient $I/J$ is finite, there are finitely many fractional ideals $K$ (over a fixed order) such that $J \subseteq K \subseteq I$.
+/// The following intrinsic allow to compute them.
+
+/// Given fractional $S$-ideals $I$ and $J$ such that $J \subseteq I$, returns the minimal (with respect to inclusion) fractional $S$-ideals $K$ such that $J \subsetneq K \subseteq I$. Note that $J$ is never in the output.
 intrinsic MinimalIntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]
-{Given fractional S-ideals J subseteq I, returns the minimal (with respect to inclusion) fractional S-ideals K such that J subsetneq K subseteq I. Note J is never in the output.}
+{Given fractional S-ideals I and J such that J subseteq I, returns the minimal (with respect to inclusion) fractional S-ideals K such that J subsetneq K subseteq I. Note that J is never in the output.}
     assert2 J subset I; // "the ideal J needs to be inside I";
     S:=Order(I);
     assert2 S eq Order(J); // "The ideals must be over the same order";
@@ -68,8 +74,9 @@ intrinsic MinimalIntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQId
     end if;
 end intrinsic;
 
+/// Given fractional $S$-ideals $I$ and $J$ such that $J$ \subseteq $I$, returns all the fractional $S$-ideals $K$ such that $J \subseteq K \subseteq I$. They are produced recursively from the minimal ones. The output includes $I$ and $J$.
 intrinsic IntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]
-{Given fractional S-ideals J subseteq I, returns all the fractional S-ideals K such that J subseteq K subseteq I. They are produced recursively from the minimal ones. The output includes I and J.}
+{Given fractional S-ideals I and J such that J subseteq I, returns all the fractional S-ideals K such that J subseteq K subseteq I. They are produced recursively from the minimal ones. The output includes I and J.}
     require J subset I : "The ideal J needs to be inside I";
     require Order(I) eq Order(J) : "The ideals must be over the same order";
     queue:={@ J @};
@@ -84,8 +91,9 @@ intrinsic IntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]
     return output;
 end intrinsic;
 
+/// Given fractional $S$-ideals $I$ and $J$ such that $J \subseteq I$, returns all the fractional $S$-ideals $K$ such that $J \subseteq K \subseteq I$ and $(K:K)=S$. They are produced recursively from the minimal ones. The output includes $I$, if $(I:I)=S$, and $J$, if $(J:J)=S$.
 intrinsic IntermediateIdealsWithPrescribedMultiplicatorRing(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]
-{Given fractional S-ideals J subseteq I, returns all the fractional S-ideals K such that J subseteq K subseteq I and (K:K)=S. They are produced recursively from the minimal ones. The output includes I, if (I:I)=S, and J, if (J:J)=S.}
+{Given fractional S-ideals I and J such that J subseteq I, returns all the fractional S-ideals K such that J subseteq K subseteq I and (K:K)=S. They are produced recursively from the minimal ones. The output includes I, if (I:I)=S, and J, if (J:J)=S.}
     require J subset I : "The ideal J needs to be inside I";
     S:=Order(I);
     require S eq Order(J) : "The ideals must be over the same order";
@@ -105,8 +113,9 @@ intrinsic IntermediateIdealsWithPrescribedMultiplicatorRing(I::AlgEtQIdl,J::AlgE
     return output;
 end intrinsic;
 
+/// Given fractional $S$-ideals $I$ and $J$ such that $J \subseteq I$, returns the maximal (with respect to inclusion) fractional $S$-ideals $K$ such that $J \subseteq K \subsetneq I$. Note that $I$ is never in the output, while $J$ is in the output if and only if the $S$-module $I/J$ is simple, in which case the output consists only of $J$.
 intrinsic MaximalIntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]
-{Given fractional S-ideals J subseteq I, returns the maximal (with respect to inclusion) fractional S-ideals K such that J subseteq K subsetneq I. Note I is never in the output, while J is in the output if and only if the S-module I/J is simple, in which case the output consists only of J.}
+{Given fractional S-ideals I and J such that J subseteq I, returns the maximal (with respect to inclusion) fractional S-ideals K such that J subseteq K subsetneq I. Note I is never in the output, while J is in the output if and only if the S-module I/J is simple, in which case the output consists only of J.}
     assert2 J subset I; // "the ideal J needs to be inside I";
     S:=Order(I);
     assert2 S eq Order(J); // "The ideals must be over the same order";
@@ -142,15 +151,24 @@ intrinsic MaximalIntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQId
     end if;
 end intrinsic;
 
+/// Given fractional $S$-ideals $I$ and $J$ and an order $O$ such that 
+/// - $S \subseteq O$,  
+/// - $J \subseteq I$, and 
+/// - $O \subseteq (I:I)$,
+/// returns all the fractional $S$-ideals $K$ such that 
+/// - $J \subseteq K \subseteq I$, and 
+/// - $O\cdot K = I$. 
+/// Note that the output always contains $I$. 
+/// The output is produced by recursively computing maximal intermediate ideals.
 intrinsic IntermediateIdealsWithTrivialExtension(I::AlgEtQIdl,J::AlgEtQIdl, O::AlgEtQOrd)->SetIndx[AlgEtQIdl]
 {Given fractional S-ideals I and J and an order O such that 
-- S subset O,  
+- S subseteq O,  
 - J subseteq I, and 
-- O subset (I:I),
+- O subseteq (I:I),
 returns all the fractional S-ideals K such that 
 - J subseteq K subseteq I, and 
 - O!!K = I. 
-Note that the output always contains I. The output is produced by a recursiv use of MaximalIntermediateIdeals.}
+Note that the output always contains I. The output is produced by recursively computing maximal intermediate ideals.}
     require J subset I : "The ideal J needs to be inside I";
     S:=Order(I);
     require S eq Order(J) : "The ideals must be over the same order";
@@ -172,6 +190,15 @@ Note that the output always contains I. The output is produced by a recursiv use
     return output;
 end intrinsic;
 
+/// Given fractional $S$-ideals $I$ and $J$ and an order $O$ such that 
+/// - $S \subseteq O$,  
+/// - $J \subseteq I$, and 
+/// - $O \subseteq (I:I)$, 
+/// returns all the fractional $S$-ideals $K$ satisfying
+/// - $J \subseteq K \subseteq I$, 
+/// - $O\cdot K = I$, and 
+/// - $(K:K) = S$. 
+/// In particular, the output contains $I$ if and only if $O = (I:I) = S$. The output is produced by recursively computing maximal intermediate ideals.
 intrinsic IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing(I::AlgEtQIdl,J::AlgEtQIdl, O::AlgEtQOrd)->SetIndx[AlgEtQIdl]
 {Given fractional S-ideals I and J and an order O such that 
 - S subseteq O,  
@@ -180,8 +207,8 @@ intrinsic IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing(I
 returns all the fractional S-ideals K satisfying
 - J subseteq K subseteq I, 
 - O!!K = I, and 
-- (K:K) eq S. 
-In particular, the output contains I if and only if O = (I:I) = S. The output is produced by a recursive use of MaximalIntermediateIdeals.}
+- (K:K) = S. 
+In particular, the output contains I if and only if O = (I:I) = S. The output is produced by recursively computing maximal intermediate ideals.}
     require J subset I : "The ideal J needs to be inside I";
     S:=Order(I);
     require S eq Order(J) : "The ideals must be over the same order";
@@ -207,11 +234,15 @@ In particular, the output contains I if and only if O = (I:I) = S. The output is
     return output;
 end intrinsic;
 
+/// Given fractional $S$-ideals $I$ and $J$ satisfying $J \subseteq I$, and a positive integer $N$, returns all the fractional $S$-ideals $K$ such that:
+/// - $J \subseteq K \subseteq I$, and 
+/// - $[I:K]=N$. 
+/// The output is produced by recursively computing the maximal ones.
 intrinsic IntermediateIdealsOfIndex(I::AlgEtQIdl,J::AlgEtQIdl,N::RngIntElt)->SetIndx[AlgEtQIdl]
-{Given ideals J subseteq I over the same order, and a positive integer N, it returns all the ideals K such that 
+{Given fractional S-ideals I and J satisfying J subseteq I, and a positive integer N, returns all the fractional S-ideals K such that 
 - J subseteq K subseteq I, and 
 - [I:K]=N. 
-The output is produced by a recursive use of MaximalIntermediateIdeals.}
+The output is produced by recursively computing the maximal ones.}
     require J subset I : "The ideal J needs to be inside I";
     require N gt 0 : "N must be a strictly positive integer";
     S:=Order(I);

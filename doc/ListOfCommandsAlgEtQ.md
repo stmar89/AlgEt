@@ -633,37 +633,63 @@ Given an order O and a positive integer N, returns all the O-ideals J with index
    
  The following intrinsics allow to compute all the elements of the sequence.
  If one wants to perform the computation under the GRH bound one can either use the appropriate parameters of use `SetClassGroupBounds("GRH")` as for number fields.
-<pre><b> ResidueRingUnits</b>(S::AlgEtQOrd,I::AlgEtQIdl) -> GrpAb,Map</pre>
+<pre><b> ResidueRingUnits</b>(S::AlgEtQOrd,I::AlgEtQIdl) -> GrpAb,Map</pre><pre><b> ResidueRingUnits</b>(I::AlgEtQIdl) -> GrpAb,Map</pre>
  Given an order $S$ and a fractional $S$-ideal $I$, returns the group $(S/I)^\times$ and a map $(S/I)^\times \to  S$ giving representatives. This is implemented only when $S$ is the maximal order.
-<pre><b> ResidueRingUnits</b>(I::AlgEtQIdl) -> GrpAb,Map</pre>
-Returns the group (S/I)^* and a map (S/I)^* -> S, where S=Order(I) and the multiplicator ring of I is maximal.
 <pre><b> ResidueRingUnitsSubgroupGenerators</b>(F::AlgEtQIdl) -> SeqEnum[AlgEtQElt]</pre>
-Returns generators of (S/F)^* where F is an ideal of the order S.
+ Given a fractional $S$-ideal $F$, returns generators of $(S/F)^\times$.
 <pre><b> IsPrincipal</b>(I1::AlgEtQIdl : GRH:=false )->BoolElt, AlgEtQElt</pre>
-Return if the argument is a principal ideal; if so the function returns also the generator. The optional argument "GRH" decides wheter the bound for the IsPrincipal test should be conditional. The default value is "false".
+ Returns whethere the given fractional ideals is a principal ideal (over its order of definition), and, if so, also a generator.  The parameter `GRH` (default false) can be set to true determines if the test is done under GRH.
 <pre><b> PicardGroup</b>( S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map</pre>
-Return the PicardGroup of the order S, which is not required to be maximal, and a map from the PicardGroup to a set of representatives of the ideal classes. The optional argument "GRH" decides the bound for the computations of the ClassGroup and UnitGroup of the maximal order. The default value is "false".
+ Returns the Picard group $\mathrm{Pic}(S)$ of the order $S$, which is not required to be maximal, and a map from the group to a set of representatives of the ideal classes.  The parameter `GRH` (default false) can be set to true determines if the test is done under GRH.
 <pre><b> ExtensionHomPicardGroups</b>(S::AlgEtQOrd,T::AlgEtQOrd : GRH:="false")->Map</pre>
-Given orders S subseteq T, it returns the surjective extension map from PicardGroup(S) to PicardGroup(T). The vararg GRH, default false, is passed to PicardGroup.
+ Given orders $S$ and $T$ such that $S \subseteq T$, returns the surjective extension map $\mathrm{Pic}(S) \to \mathrm{Pic}(T)$. The parameter `GRH`, default false, is passed to `PicardGroup`.
 <pre><b> UnitGroup</b>(S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map</pre>
-Return the unit group of a order in a etale algebra. The optional argument "GRH" decides the bound for the computation of the unit group of the maximal order. The default value is "false".
+ Returns the unit group of the given order. The parameter `GRH` (default false) can be set to true determines if the test is done under GRH.
 <pre><b> IsIsomorphic</b>(I::AlgEtQIdl, J::AlgEtQIdl : GRH:=false ) -> BoolElt, AlgEtQElt</pre>
-Checks if I=x*J, for some x. If so, also x is returned. The optional argument "GRH" decides wheter the bound for the IsPrincipal test should be conditional. The default value is "false".
+ Given two fractional ideals $I$ and $J$ over the same order, checks whether $I=x\cdot J$, for some unit $x$. If so, $x$ is also returned. The parameter `GRH` (default false) can be set to true determines if the test is done under GRH.
 # Gorenstein, Bass and Cohen-Macaulay
-<pre><b> IsBassAtPrime</b>(S::AlgEtQOrd,P::AlgEtQIdl) -> BoolElt</pre>
-Check if the order is Bass at the prime ideal P, that is, if every overorder of S is Gorenstein at the primes above P.
-<pre><b> IsBass</b>(S::AlgEtQOrd) -> BoolElt</pre>
-Check if the order is Bass, that is, if every overorder of S is Gorenstein.
-<pre><b> IsGorensteinAtPrime</b>(S::AlgEtQOrd,P::AlgEtQIdl) -> BoolElt</pre>
-Check if the order is Gorenstein at the prime ideal P, that is, if every fractional ideal I with (I:I)=S is locally principal at P.
-<pre><b> IsGorenstein</b>(O::AlgEtQOrd)->BoolElt</pre>
-Checks if the order O is Gorenstein, that is if the TraceDualIdeal of O is invertible, or equivalently, if all fractional ideals I with (I:I)=O are invertible.
-<pre><b> NonGorensteinPrimes</b>(S::AlgEtQOrd)->SeqEnum,SeqEnum</pre>
-Given an order S it returns two sequences: the first containis the primes at which S is locally not Gorenstein; the second containis the CohenMacaulay types of S at these primes, that is, the dimension of S^t/PS^t over S/P, where S^t is the TraceDualIdeal of S.
+ Let $R$ be an order in an étale algebra $A$ over $\mathbb{Q}$.
+ The `(Cohen-Macaulay) type` of $R$ `at a prime` $\mathfrak{p}$ is defined as minimal number of generators at $\mathfrak{p}$ of the trace dual ideal $R^t$, that is, the dimension $\dim_{R/\mathfrak{p}}(R^t/\mathfrak{p}R^t$.
+ The `(Cohen-Macaulay) type` of $R$ is the maximum of all the local types.
+  
+ If the type of $R$ at $\mathfrak{p}$ is one, we say that $R$ is `Gorenstein at the prime` $\mathfrak{p}$.
+ It follows that if $\mathfrak{p}$ is invertible then $R$ is Gorenstein at $\mathfrak{p}$.
+ Moreover, $R$ is Gorenstein at $\mathfrak{p}$ if and only if every ideal with multiplicator ring $R$ is locally principal at $\mathfrak{p}$.
+ The order $R$ is said to be `Gorenstein` if it is so at all its (singular) primes.
+ This is equivalent to every fractional $R$-ideal $I$ with $(I:I)=R$ being invertible.
+  
+ The order $R$ is `Bass at the prime` $\mathfrak{p}$ if every overorder $S$ of $R$ is Gorenstein at the finitely many primes above $\mathfrak{p}$. The order $R$ is `Bass` if it is so at all (singular) primes.
+ One can show that $R$ is Bass at $\mathfrak{p}$ if and only if $\dim_{R/\mathfrak{p}}(\mathcal{O_A}/\mathfrak{p}\mathcal{O}_A)\leq 2$, where $\mathcal{O}_A$ is the maximal order of $A$.
+ 
+ Reference: Stefano Marseglia, "Cohen-Macaulay type of orders, generators and ideal classes" (Journal of Algebra 658 (2024), 247-276.)
 <pre><b> CohenMacaulayTypeAtPrime</b>(S::AlgEtQOrd,P::AlgEtQIdl)->RngIntElt</pre>
-Given an order S and a prime ideal P, it returns its Cohen-Macaulay Type at P. This integer equals the dimension of S^t/P*S^t where S^t is the trace dual of S.
+ Given an order $S$ and a prime $P$, returns the Cohen-Macaulay type of $S$ at $P$.
 <pre><b> CohenMacaulayType</b>(S::AlgEtQOrd)->RngIntElt</pre>
-Given an order S returns its Cohen-Macaulay Type. This integer equals the max dimension of S^t/P*S^t where S^t is the trace dual of S and P runs over all (non-Gorenstein) primes of S.
+ Given an order $S$, returns its Cohen-Macaulay type.
+<pre><b> IsGorensteinAtPrime</b>(S::AlgEtQOrd,P::AlgEtQIdl) -> BoolElt</pre>
+ Given an order $S$ and a prime $P$, returns whether $S$ is Gorenstein at $P$.
+<pre><b> IsGorenstein</b>(O::AlgEtQOrd)->BoolElt</pre>
+ Returns whether the given order is Gorenstein.
+<pre><b> IsBassAtPrime</b>(S::AlgEtQOrd,P::AlgEtQIdl) -> BoolElt</pre>
+ Given an order $S$ and prime $P$ of $S$, returns whether $S$ is Bass at $P$.
+<pre><b> IsBass</b>(S::AlgEtQOrd) -> BoolElt</pre>
+ Returns whether the given order is Bass.
+<pre><b> NonGorensteinPrimes</b>(S::AlgEtQOrd)->SeqEnum,SeqEnum</pre>
+ Given an order $S$, returns two sequences: the first containis the primes at which $S$ is locally not Gorenstein; the second containis the Cohen-Macaulay types of $S$ at these primes.
+# Example 6
+ ```
+ // Given an étale algebra A of dimension n over Q, the maximum Cohen-Macaulay type that an order can have is n-1.
+ // An order with such maximal Cohen-Macaualay type can be found among the overorders of the order Z+p*O_A where p an arbitrary rational prime. We verify this statement in an example.
+ _<x>:=PolynomialRing(Integers());
+ f:=x^4+8;
+ A:=EtaleAlgebra(f);
+ O:=MaximalOrder(A);
+ p:=7;
+ E:=Order([p*z:z in ZBasis(O)]);
+ n:=Dimension(A);
+ oo:=OverOrders(E);
+ exists{S:S in oo|CohenMacaulayType(S) eq n-1};
+ ```
 <pre><b> WKICM_bar</b>(S::AlgEtQOrd : Method:="Auto") -> SeqEnum[AlgEtQIdl]</pre>
 Returns representatives I of all weak equivalence classes, such that (I:I)=S. The VarArg Method (default "Auto") is not used and kept for retrocompatibility.
 <pre><b> WeakEquivalenceClassesWithPrescribedMultiplicatorRing</b>(S::AlgEtQOrd : Method:="Auto") -> SeqEnum[AlgEtQIdl]</pre>

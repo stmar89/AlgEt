@@ -1,7 +1,7 @@
 List of TODOs:
     ### Priority ###
     * publishing AlgEtQ:
-      - CONTINUE WITH DOC from OverOrders.m
+      - CONTINUE WITH DOC WKICM.m
       - Go through WKICM.m and add references to papers.
       - Doc: 
         + https://github.com/cjdoris/magdoc Check for inspiration

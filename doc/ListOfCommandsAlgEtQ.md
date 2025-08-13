@@ -531,16 +531,29 @@ Given an order R and prime P of R, returns R and the overorders S of R with cond
      [ IsInvertible(Ti!!Ci) where Ti:=MultiplicatorRing(Ci) where Ci:=C^i : i in [1..10]];
  end for;
  ```
+## Lattice of inclusions of the overorders
 <pre><b> GraphOverOrders</b>(R:AlgEtQOrd) -> GrphDir</pre>
-Given an order R returns the graph G of minimal inclusions of the overorders of R. More precisely, the vertices of G are integers between 1 and the number of OverOrders(R), and there is an edge [i,j] if and only if OverOrder(R)[j] is a minimal overorder of OverOrders(R)[i].
-<pre><b> Trace</b>(x::AlgEtQElt) -> Any</pre>
-Returns the trace of the element x of an étale algebra.
-<pre><b> Norm</b>(x::AlgEtQElt) -> Any</pre>
-Returns the norm of the element x of an étale algebra.
-<pre><b> AbsoluteTrace</b>(x::AlgEtQElt) -> Any</pre>
-Returns the absolute trace of the element x of an étale algebra. Since the étale algebra is over the rationals this is the same as Trace.
-<pre><b> AbsoluteNorm</b>(x::AlgEtQElt) -> Any</pre>
-Returns the absolute norm of the element x of an étale algebra. Since the étale algebra is over the rationals this is the same as Norm.
+ Given an order $R$, returns the graph $G$ of minimal inclusions of the overorders of $R$. The vertices of $G$ are integers between $1$ and the number of overorders of $R$, and there is an edge $[i,j]$ if and only if $j$-th overorder of $R$ is a minimal overorder of the $i$-th.
+# Trace and norm
+ Let $A$ be an étale algebra over $\mathbb{Q}$, with components $K_1\times\cdots\times K_n$. 
+ We define the `(absolute) trace` on $A$ as the additive map $\mathrm{Tr_{A/\mathbb{Q}}}\colon A\to \mathbb{Q}$ that sends an element $a\in A$ to $\sum_{i=1}^n \mathrm{Tr}_{K_i/\mathbb{Q}}(a)$.
+ Let $m_a$ be the matrix representing the multipliction-by-$a$ on $A$ with respect to any basis of $A$ over $\mathbb{Q}$. Then $\mathrm{Tr}_{A/\mathbb{Q}}(a)$ equals the trace of $m_a$.
+  
+ We define the `(absolute) norm` on $A$ as the multiplicative map $\mathrm{N}_{A/\mathbb{Q}}\colon A \to \mathbb{Q}$ by sending a unit $a \in A$ to $\prod_{i=1}^n \mathrm{N}_{K_i/\mathbb{Q}}(a)$ and every zero-divisor to $0$.
+ We have $N_{A/\mathbb{Q}}(a)$ equals the derminant of the matrix $m_a$.
+<pre><b> Trace</b>(x::AlgEtQElt) -> FldRatElt</pre><pre><b> AbsoluteTrace</b>(x::AlgEtQElt) -> FldRatElt</pre>
+Returns the (absolute) trace of the element.
+<pre><b> Norm</b>(x::AlgEtQElt) -> FldRatElt</pre><pre><b> AbsoluteNorm</b>(x::AlgEtQElt) -> FldRatElt</pre>
+Returns the (absolute) norm of the element.
+## Trace dual ideals
+ Let $I$ be an order or a fractional ideal in an étale algebra $A$ over $\mathbb{Q}$.
+ We defined the `trace dual ideal` of $I$ as $I^t=\{ a\in A : \mathrm{Tr}_{A/\mathbb{Q}}(a\cdot I) \subseteq \mathbb{Z} \}$.
+ For fractional ideals $I$ and $J$ and a unit $a\in A$, we have:
+ - if $I \subseteq J$ then $J^t \subseteq I^t$ and $\#(J/I) = \#(I^t/J^t)$;
+ - $(aI)^t = \frac{1}{a}I^t$;
+ - $(I+J)^t = I^t \cap J^t$;
+ - $(I\cap J)^t = I^t + J^t$;
+ - $(I:J)^t = I^t\cdot J$.
 <pre><b> TraceDualIdeal</b>(I::AlgEtQIdl) -> AlgEtQIdl</pre>
 Returns the trace dual ideal of the ideal I, that is, the set of elements x of the algebra such that Trace(x*I) is integer-valued.
 <pre><b> TraceDualIdeal</b>(O::AlgEtQOrd) -> AlgEtQIdl</pre>

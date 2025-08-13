@@ -26,40 +26,57 @@ freeze;
 
 declare verbose AlgEtQTraceNorm, 3;
 
+///# Trace and norm
+/// Let $A$ be an étale algebra over $\mathbb{Q}$, with components $K_1\times\cdots\times K_n$. 
+/// We define the `(absolute) trace` on $A$ as the additive map $\mathrm{Tr_{A/\mathbb{Q}}}\colon A\to \mathbb{Q}$ that sends an element $a\in A$ to $\sum_{i=1}^n \mathrm{Tr}_{K_i/\mathbb{Q}}(a)$.
+/// Let $m_a$ be the matrix representing the multipliction-by-$a$ on $A$ with respect to any basis of $A$ over $\mathbb{Q}$. Then $\mathrm{Tr}_{A/\mathbb{Q}}(a)$ equals the trace of $m_a$.
+///  
+/// We define the `(absolute) norm` on $A$ as the multiplicative map $\mathrm{N}_{A/\mathbb{Q}}\colon A \to \mathbb{Q}$ by sending a unit $a \in A$ to $\prod_{i=1}^n \mathrm{N}_{K_i/\mathbb{Q}}(a)$ and every zero-divisor to $0$.
+/// We have $N_{A/\mathbb{Q}}(a)$ equals the derminant of the matrix $m_a$.
 
 //------------
 // Trace and Norm
 //------------
 
-intrinsic Trace(x::AlgEtQElt) -> Any
-{Returns the trace of the element x of an étale algebra.}
-    require HasBaseField(Algebra(x)) : "The numeber fields are not all defined over the same BaseField.";
-    return &+[Trace(y) : y in Components(x)];
+intrinsic Trace(x::AlgEtQElt) -> FldRatElt
+{Returns the (absolute) trace of the element.}
+    return AbsoluteTrace(x);
 end intrinsic;
 
-intrinsic Norm(x::AlgEtQElt) -> Any
-{Returns the norm of the element x of an étale algebra.}
-    require HasBaseField(Algebra(x)) : "The numeber fields are not all defined over the same BaseField.";
-    return &*[Norm(y) : y in Components(x)];
-end intrinsic;
-
-intrinsic AbsoluteTrace(x::AlgEtQElt) -> Any
-{Returns the absolute trace of the element x of an étale algebra. Since the étale algebra is over the rationals this is the same as Trace.}
+///ditto
+intrinsic AbsoluteTrace(x::AlgEtQElt) -> FldRatElt
+{Returns the (absolute) trace of the element.}
     return &+[AbsoluteTrace(y) : y in Components(x)];
 end intrinsic;
 
-intrinsic AbsoluteNorm(x::AlgEtQElt) -> Any
-{Returns the absolute norm of the element x of an étale algebra. Since the étale algebra is over the rationals this is the same as Norm.}
+intrinsic Norm(x::AlgEtQElt) -> FldRatElt
+{Returns the (absolute) norm of the element.}
+    return AbsoluteNorm(x);
+end intrinsic;
+
+///ditto
+intrinsic AbsoluteNorm(x::AlgEtQElt) -> FldRatElt
+{Returns the (absolute) norm of the element.}
     return &*[AbsoluteNorm(y) : y in Components(x)];
 end intrinsic;
 
+
+///## Trace dual ideals
+/// Let $I$ be an order or a fractional ideal in an étale algebra $A$ over $\mathbb{Q}$.
+/// We defined the `trace dual ideal` of $I$ as $I^t=\{ a\in A : \mathrm{Tr}_{A/\mathbb{Q}}(a\cdot I) \subseteq \mathbb{Z} \}$.
+/// For fractional ideals $I$ and $J$ and a unit $a\in A$, we have:
+/// - if $I \subseteq J$ then $J^t \subseteq I^t$ and $\#(J/I) = \#(I^t/J^t)$;
+/// - $(aI)^t = \frac{1}{a}I^t$;
+/// - $(I+J)^t = I^t \cap J^t$;
+/// - $(I\cap J)^t = I^t + J^t$;
+/// - $(I:J)^t = I^t\cdot J$.
 
 //------------
 // Trace dual ideal
 //------------
 
 intrinsic TraceDualIdeal(I::AlgEtQIdl) -> AlgEtQIdl
-{Returns the trace dual ideal of the ideal I, that is, the set of elements x of the algebra such that Trace(x*I) is integer-valued.}
+{Returns the trace dual ideal of the given fractional ideal.}
     if not assigned I`TraceDualIdeal then
         A:=Algebra(I);
         require PrimeField(A) eq BaseField(A) : "implementend only for algebras over the prime field";
@@ -87,7 +104,7 @@ intrinsic TraceDualIdeal(I::AlgEtQIdl) -> AlgEtQIdl
 end intrinsic;
 
 intrinsic TraceDualIdeal(O::AlgEtQOrd) -> AlgEtQIdl
-{Returns the trace dual ideal of an order in an etale algebra, that is, the set of elements x of the algebra such that Trace(x*O) is integer-valued.}
+{Returns the trace dual ideal of the given order.}
     if not assigned O`TraceDualIdeal then
         Ot:=TraceDualIdeal(OneIdeal(O));
         O`TraceDualIdeal := Ot;

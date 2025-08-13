@@ -608,10 +608,13 @@ Returns the trace dual ideal of the given order.
  Given a fractional $O$-ideal $I$ and a positive integer $N$, returns all the fractional $O$-ideals $J$ satisfying $J \subseteq I$ and $[I:J]=N$. The intrinsic is very fast if $N$ is coprime to the conductor of $O$. If this condition is not satisfied, a slower algorithm is used. One can force the slow algorithm by setting the parameter `Method:="Slow"`.
 <pre><b> IdealsOfIndex</b>(O::AlgEtQOrd, N::RngIntElt : Method := "Default") -> SeqEnum[AlgEtQIdl]</pre>
 Given an order O and a positive integer N, returns all the O-ideals J with index [O:J]=N. The function is very fast if N is coprime to the conductor of O. If this conditions are not satisfied a slow algorithm is used which doesn't require additional hypothesis. One can force the slow-naive by setting the vararg Method:="Slow".
+# Short Elements
+ Let $I$ be a fractional ideal in an étale algebra $A$ over $\mathbb{Q}$.
+ By LLL-reducing with respect to the T2-norm a $\mathbb{Z}$-basis of $I$ and then picking an element with small coefficients with respect to that basis allows to produce elements with small coefficients with respect to the absolute basis of $A$.
 <pre><b> ShortElement</b>(I::AlgEtQIdl) ->AlgEtQElt</pre>
-Given an ideal I returns a non-zerodivisor in I with small coefficients (in the LLL sense). This is achieved by randomly picking an element with small coefficients in a LLL-reduced basis (wrt the T2 norm as a Z-lattice).
+ Given a fractional ideal $I$, returns a non-zerodivisor in $I$ with small coefficients (in the LLL sense). This is achieved by randomly picking an element with small coefficients in a LLL-reduced $\mathbb{Z}$-basis (wrt the T2 norm).
 <pre><b> SmallRepresentative</b>(I::AlgEtQIdl) ->AlgEtQIdl,AlgEtQElt</pre>
-Given a fractional R-ideal I, it returns an isomorphic ideal a*I, and the element a, such that a*I is a subset of R, and the cardinality of R/aI is small. This is achieved by computing the ShortElement a of (R:I). Note that if I is invertible R/aI is isomorphic to (R:I)/aR.
+ Given a fractional $R$-ideal $I$, returns an the fractional $R$-ideal $a*I$, and the element $a$, where $a$ is a non-zero divisor chosen such that $a\cdot I \subseteq  R$, and the cardinality of $R/aI$ is small. More precisely, $a$ is the output of `ShortElement` when applied to $(R:I)$. Note that if $I$ is invertible then $R/aI$ is isomorphic to $(R:I)/aR$.
 <pre><b> ResidueRingUnits</b>(S::AlgEtQOrd,I::AlgEtQIdl) -> GrpAb,Map</pre>
 Returns the group (S/I)^* and a map (S/I)^* -> S. The MultiplicatorRing(I) must be the maximal order.
 <pre><b> ResidueRingUnits</b>(I::AlgEtQIdl) -> GrpAb,Map</pre>

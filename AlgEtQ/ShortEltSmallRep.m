@@ -29,12 +29,17 @@ import "Ord.m" : MatrixQtoA,MatrixAtoQ,MatrixAtoZ;
 
 declare attributes AlgEtQIdl : ShortElement, SmallRepresentative;
 
+///# Short Elements
+/// Let $I$ be a fractional ideal in an étale algebra $A$ over $\mathbb{Q}$.
+/// By LLL-reducing with respect to the T2-norm a $\mathbb{Z}$-basis of $I$ and then picking an element with small coefficients with respect to that basis allows to produce elements with small coefficients with respect to the absolute basis of $A$.
+
 //------------
 // ShortElement
 //------------
 
+/// Given a fractional ideal $I$, returns a non-zerodivisor in $I$ with small coefficients (in the LLL sense). This is achieved by randomly picking an element with small coefficients in a LLL-reduced $\mathbb{Z}$-basis (wrt the T2 norm).
 intrinsic ShortElement(I::AlgEtQIdl) ->AlgEtQElt
-{Given an ideal I returns a non-zerodivisor in I with small coefficients (in the LLL sense). This is achieved by randomly picking an element with small coefficients in a LLL-reduced basis (wrt the T2 norm as a Z-lattice).}
+{Given a fractional ideal I, returns a non-zerodivisor in I with small coefficients (in the LLL sense). This is achieved by randomly picking an element with small coefficients in a LLL-reduced Z-basis (wrt the T2 norm).}
     if not assigned I`ShortElement then
         ZBasisLLL(I);
         B := ZBasis(I);
@@ -78,8 +83,9 @@ end intrinsic;
 // SmallRepresentative
 //------------
 
+/// Given a fractional $R$-ideal $I$, returns an the fractional $R$-ideal $a*I$, and the element $a$, where $a$ is a non-zero divisor chosen such that $a\cdot I \subseteq  R$, and the cardinality of $R/aI$ is small. More precisely, $a$ is the output of `ShortElement` when applied to $(R:I)$. Note that if $I$ is invertible then $R/aI$ is isomorphic to $(R:I)/aR$.
 intrinsic SmallRepresentative(I::AlgEtQIdl) ->AlgEtQIdl,AlgEtQElt
-{Given a fractional R-ideal I, it returns an isomorphic ideal a*I, and the element a, such that a*I is a subset of R, and the cardinality of R/aI is small. This is achieved by computing the ShortElement a of (R:I). Note that if I is invertible R/aI is isomorphic to (R:I)/aR.}
+{Given a fractional R-ideal I, returns the fractional R-ideal a*I, and the element a, where a is chose so that  a*I is a subset of R, and the cardinality of R/aI is small. More precisely, a is the output of ShortElement when applied to (R:I). Note that if I is invertible R/aI is isomorphic to (R:I)/aR.}
     if not assigned I`SmallRepresentative then                                            
         R:=Order(I);
         cRI:=ColonIdeal(R,I);

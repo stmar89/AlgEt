@@ -493,18 +493,44 @@ Returns the non-invertible primes of the order.
  - $P$ is prime of some order $R$, with residue field $K$;
  - $J \subseteq I$ and $I/J$ is a vector space $V$ over $K$, say of dimension $d$.
  The intrinsic returns the $K$-vector space $K^d=V$ and the natural surjection $I \to V$ (with preimages).
+# Overorders
+ Let $R$ be an order in an étale algebra $A$ over $\mathbb{Q}$ with maximal order $\mathcal{O}_A$.
+ Since the quotient $\mathcal{O}_A/R$ is finite, it follows that there are only finitely many overorders of $R$.
+ The intrinsic `OverOrders` is an implementeation of the Hofmann-Sircana algorithm contained in "On the computation of overorders" (Int. J. Number Theory 16, No. 4, 857-879 (2020)).
+ Recall that if $\mathfrak{p}$ is a prime of $R$, then an overorder $S$ of $R$ is a $\mathfrak{p}$-overorder of $R$ if the colon ideal $(R:S)$ is a $\mathfrak{p}$-primary ideal, or, equivalently, the finite $R$-module $S/R$ is only supported at $\mathfrak{p}$.
+ The algorithm can be summarized in two steps.
+ The first one builds on the observation that the lattice of inclusions of the overorders of $R$ is a the product of the lattice of inclusions of the $\mathfrak{p}$-overorders of $R$, where $\mathfrak{p}$ runs over the singular primes of $R$.
+ The second step consits of computing the $\mathfrak{p}$-overorders of $R$ by recursively constructing minimal $\mathfrak{p}$-overorders.
 <pre><b> IsMaximalAtPrime</b>(R::AlgEtQOrd, P::AlgEtQIdl) -> BoolElt</pre>
-Returns whether R is maximal at the prime P, that is, if (R:O) is not contained in P, where O is the maximal order.
+ Returns whether the order $R$ is maximal at the prime $P$, that is, if $(R:O)$ is not contained in $P$, where $O$ is the maximal order.
 <pre><b> MinimalOverOrdersAtPrime</b>(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQOrd]</pre>
-Given an order R and prime P of R, it returns the minimal overorders S of R with conductor (R:S) which is P-primary. The minimality assumption forces the conductor (R:S) to be exactly P. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.
+ Given an order $R$ and prime $P$ of $R$, returns the minimal overorders $S$ of R whose conductor $(R:S)$ is a $P$-primary ideal of $R$. The minimality assumption forces the conductor $(R:S)$ to be exactly $P$.
 <pre><b> MinimalOverOrders</b>(R::AlgEtQOrd) -> SetIndx[AlgEtQOrd]</pre>
-Computes the minimal overorders of R.
+ Computes the minimal overorders of the order $R$.
 <pre><b> OverOrdersAtPrime</b>(R::AlgEtQOrd, P::AlgEtQIdl) -> SeqEnum[AlgEtQOrd]</pre>
-Given an order R and prime P of R, it returns R and the overorders S of R with conductor (R:S) which is P-primary. We recursively produce the minimal PP-overorders where PP are primes above P. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.
-<pre><b> OverOrders</b>(R::AlgEtQOrd : populateoo_in_oo:=false) -> SeqEnum[AlgEtQOrd]</pre>
-We compute all the overorders of R. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana. The Vararg "populateoo_in_oo" (default false) determines whether we should fill the attribute T`OverOrders for every overorder T of R.
-<pre><b> FindOverOrders</b>(R::AlgEtQOrd : populateoo_in_oo:=false) -> SetIndx[AlgEtQOrd]</pre>
-We compute all the overorders of R. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana. The Vararg "populateoo_in_oo" (default false) determines whether we should fill the attribute T`OverOrders for every overorder T of R.
+Given an order R and prime P of R, returns R and the overorders S of R with conductor (R:S) which is P-primary. We recursively produce the minimal PP-overorders where PP are primes above P. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.
+<pre><b> OverOrders</b>(R::AlgEtQOrd : populateoo_in_oo:=false) -> SeqEnum[AlgEtQOrd]</pre><pre><b> FindOverOrders</b>(R::AlgEtQOrd : populateoo_in_oo:=false) -> SetIndx[AlgEtQOrd]</pre>
+ Returns the overorders of $R$. The parameter `populateoo_in_oo` (default false) determines whether th algorithms fills the attribute `OverOrders` for each overorder of $R$.
+# Example 5
+ ```
+ _<x>:=PolynomialRing(Integers());
+ f:=(x^4+16)*(x^4+81);
+ A:=EtaleAlgebra(f);
+ E:=EquationOrder(A);
+ oo:=OverOrders(E);
+ #oo;
+ pp:=SingularPrimes(E);
+ // We see that the size of the lattice of inclusions of the overorders is the product of the sizes of local component of the lattice.
+ #oo eq &*[ #OverOrdersAtPrime(E,P) : P in pp ];
+ // Now we consider only the P-overorders S for the first singular prime P.
+ // We verify that there is always a positive integer i such that (R:S)^i is invertible in its multiplicator ring.
+ ooP:=OverOrdersAtPrime(E,pp[1]);
+ #ooP;
+ for S in ooP do
+     C:=ColonIdeal(E,E!!OneIdeal(S));
+     [ IsInvertible(Ti!!Ci) where Ti:=MultiplicatorRing(Ci) where Ci:=C^i : i in [1..10]];
+ end for;
+ ```
 <pre><b> GraphOverOrders</b>(R:AlgEtQOrd) -> GrphDir</pre>
 Given an order R returns the graph G of minimal inclusions of the overorders of R. More precisely, the vertices of G are integers between 1 and the number of OverOrders(R), and there is an edge [i,j] if and only if OverOrder(R)[j] is a minimal overorder of OverOrders(R)[i].
 <pre><b> Trace</b>(x::AlgEtQElt) -> Any</pre>

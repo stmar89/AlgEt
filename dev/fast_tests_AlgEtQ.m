@@ -741,7 +741,8 @@ time_start_local:=Cputime();
     
     printf "### Testing GraphOverOrders:";
     //AttachSpec("~/packages_github/AlgEt/spec");
-    P<x>:=PolynomialRing(Integers());
+    SetAssertions(2);
+    _<x>:=PolynomialRing(Integers());
     fs:=[ 
           x^8 + 16, //1 sing prime
           x^4-10000*x^3-10000*x^2-10000*x-10000, //2 sing primes
@@ -753,7 +754,6 @@ time_start_local:=Cputime();
         _:=GraphOverOrders(MaximalOrder(A));
         R:=EquationOrder(A); 
         _:=OverOrders(R);
-        SetAssertions(2);
         _:=GraphOverOrders(R);
         SetAssertions(1);
     end for;

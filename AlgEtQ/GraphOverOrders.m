@@ -28,12 +28,15 @@ declare verbose GraphOverOrders, 1;
 
 declare attributes AlgEtQOrd : GraphOverOrders;
 
+///## Lattice of inclusions of the overorders
+
 //------------
 // GraphOverOrders : the graph of (minimal) inclusions of overorders of R
 //------------
 
+/// Given an order $R$, returns the graph $G$ of minimal inclusions of the overorders of $R$. The vertices of $G$ are integers between $1$ and the number of overorders of $R$, and there is an edge $[i,j]$ if and only if $j$-th overorder of $R$ is a minimal overorder of the $i$-th.
 intrinsic GraphOverOrders(R:AlgEtQOrd) -> GrphDir
-{Given an order R returns the graph G of minimal inclusions of the overorders of R. More precisely, the vertices of G are integers between 1 and the number of OverOrders(R), and there is an edge [i,j] if and only if OverOrder(R)[j] is a minimal overorder of OverOrders(R)[i].}
+{Given an order R, returns the graph G of minimal inclusions of the overorders of R. The vertices of G are integers between 1 and the number of OverOrders(R), and there is an edge [i,j] if and only if OverOrder(R)[j] is a minimal overorder of OverOrders(R)[i].}
     if not assigned R`GraphOverOrders then
         if IsMaximal(R) then
             G:=Digraph< 1 | >;
@@ -110,7 +113,8 @@ end intrinsic;
     
     printf "### Testing GraphOverOrders:";
     //AttachSpec("~/packages_github/AlgEt/spec");
-    P<x>:=PolynomialRing(Integers());
+    SetAssertions(2);
+    _<x>:=PolynomialRing(Integers());
     fs:=[ 
           x^8 + 16, //1 sing prime
           x^4-10000*x^3-10000*x^2-10000*x-10000, //2 sing primes
@@ -122,7 +126,6 @@ end intrinsic;
         _:=GraphOverOrders(MaximalOrder(A));
         R:=EquationOrder(A); 
         _:=OverOrders(R);
-        SetAssertions(2);
         _:=GraphOverOrders(R);
         SetAssertions(1);
     end for;

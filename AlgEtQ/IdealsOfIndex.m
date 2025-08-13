@@ -26,8 +26,15 @@ freeze;
 
 declare verbose IdealsOfIndex, 2;
 
+///# Ideals with prescribed index
+/// Let $I$ be a fractional ideal or an order in an étale algebra over $\mathbb{Q}$.
+/// If $N$ is a positive integer, then there are finitely many fractional ideals $J$ (over the same order) such that $J \subseteq I$ and $[I:J]=N$.
+/// The following intrinsics allow to compute them.
+/// If the order is the maximal order, one an use the unique factorization to speed up the computation.
+
+/// Given an order $O$ in a number field and a positive integer $N$, returns all the integral fractional $O$-ideals $I$ of index $[O:I]=N$.
 intrinsic IdealsOfIndex(O::RngOrd, N::RngIntElt) -> SeqEnum[RngOrdIdl]
-{Given an order O in a number field and a positive integer N, returns all the ideals I of index [O:I]=N.}
+{Given an order O in a number field and a positive integer N, returns all the integral fractional O-ideals I of index [O:I]=N.}
   vprintf IdealsOfIndex,2 : "IdealsOfIndex RngOrd Int\n";
   require N gt 0 : "N must be a strictly positive integer";
   if N eq 1 then
@@ -36,8 +43,9 @@ intrinsic IdealsOfIndex(O::RngOrd, N::RngIntElt) -> SeqEnum[RngOrdIdl]
   return [ J : J in IdealsUpTo(N, O) | Norm(J) eq N ];
 end intrinsic;
 
+/// Given a fractional $O$-ideal $I$ in a number field and a positive integer $N$, with $N$ coprime with the conductor, returns all the fractional $O$-ideals $J$ contained in $I$ with index $[I:J]=N$.
 intrinsic IdealsOfIndex(I::RngOrdIdl, N::RngIntElt) -> SeqEnum[RngOrdIdl]
-{Given an ideal I in an order O in a number field and a positive integer N, with N coprime with the conductor, returns all the ideals J contained in I with index [I:J]=N.}
+{Given a fractional O-ideal I in a number field and a positive integer N, with N coprime with the conductor, returns all the fractional O-ideals J contained in I with index [I:J]=N.}
     vprintf IdealsOfIndex,2 : "IdealsOfIndex RngOrdIdl\n";
     require N gt 0 : "N must be a strictly positive integer";
     if N eq 1 then
@@ -59,8 +67,9 @@ intrinsic IdealsOfIndex(I::RngOrdIdl, N::RngIntElt) -> SeqEnum[RngOrdIdl]
     return result;
 end intrinsic;
 
+///ditto
 intrinsic IdealsOfIndex(I::RngOrdFracIdl, N::RngIntElt) -> SeqEnum[RngOrdFracIdl]
-{Given an ideal I in an order O in a number field and a positive integer N, with N coprime with the conductor, returns all the ideals J contained in I with index [I:J]=N.}
+{Given a fractional O-ideal I in a number field and a positive integer N, with N coprime with the conductor, returns all the fractional O-ideals J contained in I with index [I:J]=N.}
     vprintf IdealsOfIndex,2 : "IdealsOfIndex RngOrdFracIdl\n";
     require N gt 0 : "N must be a strictly positive integer";
     if N eq 1 then
@@ -93,8 +102,9 @@ ideals_of_index_product:=function(Is, N)
     return result;
 end function;
 
+/// Given a fractional $O$-ideal $I$ and a positive integer $N$, returns all the fractional $O$-ideals $J$ satisfying $J \subseteq I$ and $[I:J]=N$. The intrinsic is very fast if $N$ is coprime to the conductor of $O$. If this condition is not satisfied, a slower algorithm is used. One can force the slow algorithm by setting the parameter `Method:="Slow"`.
 intrinsic IdealsOfIndex(I::AlgEtQIdl, N::RngIntElt : Method := "Default") -> SeqEnum[AlgEtQIdl]
-{Given an O-ideal I in O and a positive integer N, returns all the subideals J of I with index [I:J]=N. The function is very fast if N is coprime to the conductor of O. If this conditions are not satisfied a slow algorithm is used which doesn't require additional hypothesis. One can force the slow by setting the vararg Method:="Slow".}
+{Given a fractional O-ideal I and a positive integer N, returns all the fractional O-ideals J satisfying  J subseteq I and [I:J]=N. The intrinsic is very fast if N is coprime to the conductor of O. If this condition is not satisfied a slower algorithm. One can force the slow algorithm by setting the parameter Method:="Slow".}
     require Method in {"Default","Slow"} : "The method is not recognized. It should be either Default or Slow"; 
     require N gt 0 : "N must be a strictly positive integer";
     if N eq 1 then

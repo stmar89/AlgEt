@@ -595,14 +595,17 @@ Returns the trace dual ideal of the given order.
  - $J \subseteq K \subseteq I$, and 
  - $[I:K]=N$. 
  The output is produced by recursively computing the maximal ones.
+# Ideals with prescribed index
+ Let $I$ be a fractional ideal or an order in an étale algebra over $\mathbb{Q}$.
+ If $N$ is a positive integer, then there are finitely many fractional ideals $J$ (over the same order) such that $J \subseteq I$ and $[I:J]=N$.
+ The following intrinsics allow to compute them.
+ If the order is the maximal order, one an use the unique factorization to speed up the computation.
 <pre><b> IdealsOfIndex</b>(O::RngOrd, N::RngIntElt) -> SeqEnum[RngOrdIdl]</pre>
-Given an order O in a number field and a positive integer N, returns all the ideals I of index [O:I]=N.
-<pre><b> IdealsOfIndex</b>(I::RngOrdIdl, N::RngIntElt) -> SeqEnum[RngOrdIdl]</pre>
-Given an ideal I in an order O in a number field and a positive integer N, with N coprime with the conductor, returns all the ideals J contained in I with index [I:J]=N.
-<pre><b> IdealsOfIndex</b>(I::RngOrdFracIdl, N::RngIntElt) -> SeqEnum[RngOrdFracIdl]</pre>
-Given an ideal I in an order O in a number field and a positive integer N, with N coprime with the conductor, returns all the ideals J contained in I with index [I:J]=N.
+ Given an order $O$ in a number field and a positive integer $N$, returns all the integral fractional $O$-ideals $I$ of index $[O:I]=N$.
+<pre><b> IdealsOfIndex</b>(I::RngOrdIdl, N::RngIntElt) -> SeqEnum[RngOrdIdl]</pre><pre><b> IdealsOfIndex</b>(I::RngOrdFracIdl, N::RngIntElt) -> SeqEnum[RngOrdFracIdl]</pre>
+ Given a fractional $O$-ideal $I$ in a number field and a positive integer $N$, with $N$ coprime with the conductor, returns all the fractional $O$-ideals $J$ contained in $I$ with index $[I:J]=N$.
 <pre><b> IdealsOfIndex</b>(I::AlgEtQIdl, N::RngIntElt : Method := "Default") -> SeqEnum[AlgEtQIdl]</pre>
-Given an O-ideal I in O and a positive integer N, returns all the subideals J of I with index [I:J]=N. The function is very fast if N is coprime to the conductor of O. If this conditions are not satisfied a slow algorithm is used which doesn't require additional hypothesis. One can force the slow by setting the vararg Method:="Slow".
+ Given a fractional $O$-ideal $I$ and a positive integer $N$, returns all the fractional $O$-ideals $J$ satisfying $J \subseteq I$ and $[I:J]=N$. The intrinsic is very fast if $N$ is coprime to the conductor of $O$. If this condition is not satisfied, a slower algorithm is used. One can force the slow algorithm by setting the parameter `Method:="Slow"`.
 <pre><b> IdealsOfIndex</b>(O::AlgEtQOrd, N::RngIntElt : Method := "Default") -> SeqEnum[AlgEtQIdl]</pre>
 Given an order O and a positive integer N, returns all the O-ideals J with index [O:J]=N. The function is very fast if N is coprime to the conductor of O. If this conditions are not satisfied a slow algorithm is used which doesn't require additional hypothesis. One can force the slow-naive by setting the vararg Method:="Slow".
 <pre><b> ShortElement</b>(I::AlgEtQIdl) ->AlgEtQElt</pre>

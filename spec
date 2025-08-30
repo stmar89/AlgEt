@@ -23,8 +23,8 @@ IdealsOfIndex.m
 ShortEltSmallRep.m
 PicardGroup.m
 LowCohenMacaulayType.m
-WkClasses.m
 WkTesting.m
+WkClasses.m
 WkAbstract.m
 IdealClassMonoid.m
 ICMAbstract.m

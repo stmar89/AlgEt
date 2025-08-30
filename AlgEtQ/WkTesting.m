@@ -26,9 +26,16 @@ freeze;
 
 declare verbose AlgEtQIdlWkClasses,3;
 
-//----------
-// Weak Equiv testing
-//----------
+///# Weak equivalence classes
+/// Let $R$ be an order $I$ and $J$ be fractional $R$-ideals in an étale algebra $A$ over $\mathbb{Q}$. Then the following statments are equivalent:
+/// - $I_{\mathfrak{p}} \simeq J_{\mathfrak{p}}$ as $R_{\mathfrak{p}}$- modules for every maximal ideal $\mathfrak{p}$ of $R$.
+/// - $I_p \simeq J_p$ as $R_p$- modules for every rational prime $p$. 
+/// - $1 \in (I:J)(J:I)$.
+/// - $I$ and $J$ have the same multiplicator ring, say $S$, and $(I:J)$ is an invertible fractional $S$-ideal.
+/// - $I$ and $J$ have the same multiplicator ring, say $S$, and $(J:I)$ is an invertible fractional $S$-ideal.
+/// If the previous conditions hold, one says that $I$ and $J$ are `weakly equivalent` or `locally isomorphic`.
+
+// TODO add reference
 
 intrinsic IsWeakEquivalent(I::AlgEtQIdl,J::AlgEtQIdl)->BoolElt
 {Checks if I and J are weakly equivalent, that is, if 1 \in (I:J)*(J:I), or equivalently, if I and J are locally equivalent at all prime of their common multiplicator ring. This function does not require that the ideals are defined over the same order.}

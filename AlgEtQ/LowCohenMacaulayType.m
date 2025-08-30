@@ -24,9 +24,6 @@
 
 freeze;
 
-// Reference: S. Marseglia, "Cohen-Macaulay type of orders, generators and ideal classes".
-// https://arxiv.org/abs/2206.03758
-
 declare attributes AlgEtQOrd:NonGorensteinPrimes, CohenMacaulayType;
 
 ///# Gorenstein, Bass and Cohen-Macaulay
@@ -130,7 +127,6 @@ end intrinsic;
 
 
 /// Given an order $S$ and prime $P$ of $S$, returns whether $S$ is Bass at $P$.
-intrinsic IsBassAtPrime(S::AlgEtQOrd,P::AlgEtQIdl) -> BoolElt
 {Check if the order is Bass at the prime ideal P, that is, if every overorder of S is Gorenstein at the primes above P.}
 // we compute the maximal order O and check if O/PO is at most 2-dimensional over S/P
 // see Hofman,Sircana, On the computations of over-orders, Definition 5.23

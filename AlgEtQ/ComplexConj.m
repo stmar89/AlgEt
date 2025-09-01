@@ -32,8 +32,11 @@ declare attributes AlgEtQIdl : IsConjugateStable;
 
 ///# Complex Conjugation and CM-étale algebras
 /// Let $A$ be an étale algebra over $\mathbb{Q}$ with components $K_1\times\cdots\times K_n$.
-/// We say that $A$ is a `CM-étale algebra` if every component $K_i$ is a CM-field, that is, $K_i$ has involution that acts as applying complex conjugation after applying any homomorphism to the complex numbers. If $A$ is a CM-étale algebra, then it has an involution with the same property. For this reason, we call this involution `complex conjugation`.
+/// We say that $A$ is a `CM-étale algebra` if every component $K_i$ is a CM-field, that is, $K_i$ has involution that acts as applying complex conjugation after applying any homomorphism to the complex numbers. If $A$ is a CM-étale algebra, then it has an involution with the same property. For this reason, we call this involution `complex conjugation` and denote as $\overline{\cdot}$.
+/// 
 /// Given an element of $A$, an order or a fractional ideal in $A$, we say that it is `conjugate stable` if it equals it complex conjugate.
+/// An element $x$ of $A$ is called `totally real` if $a=\overline{a}$ and totally imaginary if $a=-\overline{a}$.
+/// A totally real element $a$ is called `totally positive (resp. negative)` if $\varphi(a) > 0$ (resp. $\varphi(a)<0$) for every homomorphism $\varphi:A\to \mathbb{C}$.
 
 intrinsic HasComplexConjugate(A::AlgEtQ) -> BoolElt
 {Returns if the algebra is the product of CM fields.}

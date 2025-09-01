@@ -32,7 +32,7 @@ declare verbose nice_unif,3;
 ///## Primes of the maximal order
 
 /// Given an element $x$ and a prime $P$ of the maximal order, returns the valuation of $x$ at $P$.
-intrinsic Valuation(x::AlgEtQElt,P::AlgEtQIdl)->RngIntElt
+intrinsic Valuation(x::AlgEtQElt,P::AlgEtQIdl) -> RngIntElt
 {Given an element x and a prime P of the maximal order, returns the valuation of x at P.}
     OO:=Order(P);
     require IsMaximal(OO) and IsPrime(P): "The input needs to be a prime of the maximal order.";
@@ -44,7 +44,7 @@ intrinsic Valuation(x::AlgEtQElt,P::AlgEtQIdl)->RngIntElt
 end intrinsic;
 
 /// Given a fractional ideal $I$ and a prime $P$, both of the maximal order, returns the valuation of $I$ at $P$.
-intrinsic Valuation(I::AlgEtQIdl,P::AlgEtQIdl)->RngIntElt
+intrinsic Valuation(I::AlgEtQIdl,P::AlgEtQIdl) -> RngIntElt
 {Given a fractional ideal I and a prime P, both of the maximal order, returns the valuation of I at P.}
     OO:=Order(P);
     require IsMaximal(OO) and IsPrime(P): "The input needs to be a prime of the maximal order.";
@@ -56,8 +56,8 @@ intrinsic Valuation(I::AlgEtQIdl,P::AlgEtQIdl)->RngIntElt
     return Valuation(compI[ind],compP[ind]);
 end intrinsic;
 
-/// Given a prime $P$ of the maximal order $\mathcal{O}$ above the rational prime $p$, it returns the inertia degree of $P$, that is, the index of the finite field extension $\mathbb{F}_p->\mathcal{O}/P$.
-intrinsic InertiaDegree(P::AlgEtQIdl)->RngIntElt
+/// Given a prime $P$ of the maximal order $\mathcal{O}$ above the rational prime $p$, it returns the inertia degree of $P$, that is, the index of the finite field extension $\mathbb{F}_p \to \mathcal{O}/P$.
+intrinsic InertiaDegree(P::AlgEtQIdl) -> RngIntElt
 {Given a prime P of the maximal order O above the rational prime p, it returns the inertia degree of P, that is, the index of the finite field extension GF(p)->O/P.}
     if not assigned P`InertiaDegree then
         OO:=Order(P);
@@ -71,7 +71,7 @@ intrinsic InertiaDegree(P::AlgEtQIdl)->RngIntElt
 end intrinsic;
 
 /// Given a prime $P$ of the maximal order $\mathcal{O}$, it returns the ramification index of $P$.
-intrinsic RamificationIndex(P::AlgEtQIdl)->RngIntElt
+intrinsic RamificationIndex(P::AlgEtQIdl) -> RngIntElt
 {Given a prime P of the maximal order O, it returns the ramification index of P.}
     if not assigned P`RamificationIndex then
         OO:=Order(P);
@@ -85,7 +85,7 @@ intrinsic RamificationIndex(P::AlgEtQIdl)->RngIntElt
 end intrinsic;
 
 /// Given a sequence of primes $P$ of the maximal order, it returns a sequence of elements $t_P$ such that $t_P$ is a uniformizer at $P$ and a unit at every other prime in the sequence.
-intrinsic Uniformizers(PPs::SeqEnum[AlgEtQIdl])->SeqEnum
+intrinsic Uniformizers(PPs::SeqEnum[AlgEtQIdl]) -> SeqEnum
 {Given a sequence of primess P of the maximal order, it returns a sequence of elements t_P such that t_P is a uniformizer at P and a unit at every other prime in the sequence.}
     OO:=Order(PPs[1]);
     require IsMaximal(OO) and forall{P : P in PPs | IsPrime(P)} : "The input needs to be a sequenc of primess of the maximal order.";

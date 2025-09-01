@@ -91,12 +91,12 @@ intrinsic HasBaseField(A::AlgEtQ) -> BoolElt
     return A`HasBaseField;
 end intrinsic;
 
-/// Returns whether the common base field of the components of $A$ if it exists.
+/// Returns whether the common base field of the components of $A$ if it exists, together with the diagonal embedding.
 intrinsic BaseField(A::AlgEtQ) -> FldNum,Map
 {Returns the common base field of the components of the étale algebra, if it exists, together with the diagonal embedding.}
     if not assigned A`BaseField then
         require HasBaseField(A) : "The number fields should all be defined over the same Base ring/field.";
-        // if HasBaseField is true, then it is assiged
+        // if HasBaseField is true, then it is assigned
     end if;
     return Explode(A`BaseField);
 end intrinsic;

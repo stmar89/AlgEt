@@ -1,20 +1,10 @@
 List of TODOs:
     ### Priority ###
     * publishing AlgEtQ:
+      - Make a script/description of the steps to publish/update in magma
       - Add example 7 (WEICM and ICM)
-      - Doc: 
-        + https://github.com/cjdoris/magdoc Check for inspiration
-        + lists are nicely done in md.
-        + might want to replace subset, subseteq, etc with Latex symbols.
       - since 2.28-18 you can use SetWarnIntrinsicOverride(true)
       - How to licence ??? Note requirements from MCSA ... Need CC-By at least
-      - Check if Types of the outputs are correct.
-      - Check descriptions, especially for typos.
-      - Some advanced functionalities like GraphOverorders need some-worked out examples.
-      - DONE How independent are the AlgEtQ, AlgEtQMtrx, AlgEtQMod? : AlgEtQMod depends on AlgEtQMtrx which depends on AlgEtQ. No other dependencies.
-      - Future projects:
-        + implement the new OverOrder function from Kirschmer and Kluener's paper (currently their theorem works only for NumberFields)
-        + add functions to convert an AlgEt to an AlgAssV
 
     ### Optimization ###
 
@@ -38,6 +28,8 @@ List of TODOs:
     ### Various ###
     - Improve saving and printing MinimalGenerator (that is after CRT) to get smaller output.
     - add MaxCMTypeOverOrders
+    - implement the new OverOrder function from Kirschmer and Kluener's paper (currently their theorem works only for NumberFields)
+    - add functions to convert an AlgEt to an AlgAssV
 
     #### CRT ####
     - Make a CRT for modules : I/P1*...*Ps*I -> \prod_i (I/Pi*I)

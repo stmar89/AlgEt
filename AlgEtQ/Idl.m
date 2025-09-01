@@ -263,7 +263,7 @@ end intrinsic;
 /// This hashing method has no collisions and it is independent of the choice of $\mathbb{Z}-basis$ from which we start the procedure.
 /// We observed that applying the in-built Hash function to the sequence defined above, while giving a smaller hash, it often leads to collisions.
 
-intrinsic myHash(I::AlgEtQIdl)->RngInt
+intrinsic myHash(I::AlgEtQIdl)->SeqEnum[RngInt]
 {Hash function.}
     if not assigned I`Hash then
         dim:=AbsoluteDimension(Algebra(I));
@@ -409,7 +409,7 @@ intrinsic Index(I::AlgEtQIdl) -> FldRatElt
 end intrinsic;
 
 /// Given fractional ideals $J$ and $I$ defined over the same order returns $[J:I] = [J:J \cap I]/[I : J \cap I]$.
-intrinsic Index(J::AlgEtQIdl, I::AlgEtQIdl) -> Any
+intrinsic Index(J::AlgEtQIdl, I::AlgEtQIdl) -> FldRatElt
 {Given fractional ideals J and I defined over the same order returns [J:I] = [J:J meet I]/[I : J meet I].}
   require Order(I) eq Order(J): "the ideals must be of the same order";
   out:=Index(I)/Index(J);
@@ -420,7 +420,7 @@ intrinsic Index(J::AlgEtQIdl, I::AlgEtQIdl) -> Any
 end intrinsic;
 
 /// Given an order $S$ and a fractional $S$-ideal $I$ returns $[S:I] = [S:S \cap I]/[I : S \cap I]$.
-intrinsic Index(S::AlgEtQOrd, I::AlgEtQIdl) -> Any
+intrinsic Index(S::AlgEtQOrd, I::AlgEtQIdl) -> FldRatElt
 {Given an ideal I of an order S returns [S:I] = [S:S cap I]/[I : S cap I].}
     require Order(I) eq S: "the ideal must be of the appropriate order";
     return Index(OneIdeal(S), I);

@@ -455,8 +455,8 @@ intrinsic Index(T::AlgEtQOrd) -> FldRatElt
   return T`Index;
 end intrinsic;
 
-/// Given two orders $S$ and $T$ returns the ratio of their indices. If $T subset S$ the outputs is the index of the inclusion, that is, it equals $[S:T] = \#S/T$.}
-intrinsic Index(S::AlgEtQOrd, T::AlgEtQOrd) -> Any
+/// Given two orders $S$ and $T$ returns the ratio of their indices. If $T subset S$ the outputs is the index of the inclusion, that is, it equals $[S:T] = \#S/T$.
+intrinsic Index(S::AlgEtQOrd, T::AlgEtQOrd) -> FldRatElt
 {Given two orders S and T returns the ratio of their indices. If T subset S the outputs is the index of the inclusion, that is, it equals [S:T] = \#S/T.}
   assert Algebra(T) cmpeq Algebra(S);
   elt := Index(T)/Index(S);
@@ -569,7 +569,7 @@ intrinsic IsProductOfOrders(O::AlgEtQOrd)->BoolElt, Tup
     return Explode(O`IsProductOfOrders);
 end intrinsic;
 
-intrinsic IsProductOfOrdersInFactorAlgebras(S::AlgEtQOrd)->BoolElt,SeqEnum[AlgEtQElt],SeqEnum
+intrinsic IsProductOfOrdersInFactorAlgebras(S::AlgEtQOrd)->BoolElt,SeqEnum[AlgEtQElt]
 {Returns whether the given order is a product of orders living in some factor algebras of the parent algebra. 
 This is equivalent for the given order to contain some idempotents of the algebra other than 0 and 1. If this is the case, it returns also the idempotents.}
     if not assigned S`IsProductOfOrdersInFactorAlgebras then

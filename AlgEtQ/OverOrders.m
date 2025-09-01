@@ -1,8 +1,6 @@
 /////////////////////////////////////////////////////
 // Stefano Marseglia, stefano.marseglia89@gmail.com
 // https://stmar89.github.io/index.html
-// We are grateful to Edgar Costa (MIT) who helped 
-// with a preliminary version of this code
 // 
 // Distributed under the terms of the GNU Lesser General Public License (L-GPL)
 //      http://www.gnu.org/licenses/
@@ -21,6 +19,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA
 // 
+// Copyright 2025, Stefano Marseglia
+/////////////////////////////////////////////////////
+
 // Copyright 2023, S. Marseglia
 /////////////////////////////////////////////////////
 

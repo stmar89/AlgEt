@@ -4,7 +4,6 @@ List of TODOs:
       - Make a script/description of the steps to publish/update in magma
       - Add example 7 (WEICM and ICM)
       - since 2.28-18 you can use SetWarnIntrinsicOverride(true)
-      - How to licence ??? Note requirements from MCSA ... Need CC-By at least
 
     ### Optimization ###
 

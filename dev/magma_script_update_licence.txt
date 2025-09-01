@@ -1,0 +1,37 @@
+/* vim: set syntax=magma : */
+
+/*
+
+    this magma script collects all the fast tests from the various .m files in AlgEtQ/ and puts them in a file fast_tests_AlgEtQ.txt which can then be run.
+
+    input:
+        - input: = a spec file containing a folder and a sequence of .m files to be scanned
+        - output_file:= fast_tests_AlgEtQ.txt
+
+*/
+licence_text:=
+"/////////////////////////////////////////////////////
+// Copyright 2025.
+// Stefano Marseglia, stefano.marseglia89@gmail.com
+// https://stmar89.github.io/index.html
+// 
+// Distributed under the terms of the CC-BY 4.0 licence.
+// https://creativecommons.org/licenses/by/4.0/
+/////////////////////////////////////////////////////\n\n";
+
+num_lines_old_licence:=8; //update this value
+
+input:="~/AlgEt/spec";
+input:=Split(Read(input),"{\n}");
+fld:="~/AlgEt/AlgEtQ";
+for input_file0 in input[2..#input] do
+    input_file:=fld cat "/" cat input_file0;
+    input_file;
+    lines:=Split(Read(input_file):IncludeEmpty);
+    new_content:=licence_text cat Join([l:l in lines[num_lines_old_licence+1..#lines]],"\n");
+    // remove old version of the file
+    Pipe("rm " cat input_file,"r");
+    fprintf input_file,"%o",new_content;
+end for;
+
+quit;

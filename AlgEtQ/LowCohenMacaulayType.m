@@ -127,7 +127,8 @@ end intrinsic;
 
 
 /// Given an order $S$ and prime $P$ of $S$, returns whether $S$ is Bass at $P$.
-{Check if the order is Bass at the prime ideal P, that is, if every overorder of S is Gorenstein at the primes above P.}
+intrinsic IsBassAtPrime(S::AlgEtQOrd,P::AlgEtQIdl) -> BoolElt
+{Check if the order S is Bass at the prime ideal P, that is, if every overorder of S is Gorenstein at the primes above P.}
 // we compute the maximal order O and check if O/PO is at most 2-dimensional over S/P
 // see Hofman,Sircana, On the computations of over-orders, Definition 5.23
     if assigned S`IsBass and S`IsBass then

@@ -1027,6 +1027,24 @@ printf "	time %o
 time_start_local:=Cputime();
 
 
+    printf "### Testing WKEq:";
+	//AttachSpec("~/packages_github/AlgEt/spec");
+	SetAssertions(2);
+	_<x>:=PolynomialRing(Integers());
+    f:=x^4-100*x^3-100*x^2-100*x-100;
+    K:=EtaleAlgebra(f);
+    E:=EquationOrder(K);
+    assert not IsWeakEquivalent(E,Conductor(E));
+    assert not IsWeakEquivalent(OneIdeal(E),Conductor(E));
+    assert not IsWeakEquivalent(E,MaximalOrder(K));
+    assert IsWeakEquivalent(OneIdeal(MaximalOrder(K)),Conductor(E));
+    SetAssertions(1);
+    printf " all good!"; 
+printf "	time %o
+",Cputime(time_start_local);
+time_start_local:=Cputime();
+
+
     printf "### Testing WKICM:";
 	//AttachSpec("~/packages_github/AlgEt/spec");
 	SetAssertions(2);
@@ -1046,24 +1064,6 @@ time_start_local:=Cputime();
     E:=EquationOrder(K);
     assert #FindOverOrders(E) eq 15;
     assert #WKICM(E) eq 23;
-    SetAssertions(1);
-    printf " all good!"; 
-printf "	time %o
-",Cputime(time_start_local);
-time_start_local:=Cputime();
-
-
-    printf "### Testing WKEq:";
-	//AttachSpec("~/packages_github/AlgEt/spec");
-	SetAssertions(2);
-	_<x>:=PolynomialRing(Integers());
-    f:=x^4-100*x^3-100*x^2-100*x-100;
-    K:=EtaleAlgebra(f);
-    E:=EquationOrder(K);
-    assert not IsWeakEquivalent(E,Conductor(E));
-    assert not IsWeakEquivalent(OneIdeal(E),Conductor(E));
-    assert not IsWeakEquivalent(E,MaximalOrder(K));
-    assert IsWeakEquivalent(OneIdeal(MaximalOrder(K)),Conductor(E));
     SetAssertions(1);
     printf " all good!"; 
 printf "	time %o

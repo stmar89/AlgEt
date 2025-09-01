@@ -41,10 +41,15 @@ declare attributes AlgEtQICMElt : Parent,
                                   IsOne,
                                   IsInvertibleInMultiplicatorRing;
 
+///## Abstract representation of the ideal class monoid
+/// The second way method to compute the ideal class monoid of an order $R$, returns an abstract representation of $\mathcal{I}(R)$ with type `AlgEtQICM` together with a map to a set of representatives. Each class has type `AlgEtQICMElt` and it is internally representated as pair consisting of a weak equivalence class (of type `AlgEtQWECMElt`) and an element of the representation of $\mathrm{Pic}(S)$ (as an abstract abelian group), where $S$ is the corresponding multiplicator ring. This representation is more efficient than the previous one, since it does not need to compute in advance and store a representive for each ideal class.
+/// Ideal classes can be created using the coercion operator `!` starting from an overorder $S$ of $R$ or a fractional $S$-ideal. Ideal classes can be multiplied usin the operator `*`.
+
 //////////////////
 // AlgEtQICMElt //
 //////////////////
 
+///hide-all
 function CreateAlgEtQICMElt(icm,yw,y_inv,pT)
 // given the ideal class monoid of R, a weak equialence class of R, an element of the (abstract) picard gruop of an overorder of R, with its map pT:=Pic(T)-> ideals, it creates the corresponding ideal class.
     x:=New(AlgEtQICMElt);
@@ -73,7 +78,9 @@ intrinsic IsCoercible(icm::AlgEtQICM, x::.) -> BoolElt, .
         return false,"";
     end if;
 end intrinsic;
+///hide-none
 
+/// Coerce $x$ into $\mathrm{icm}$, when possible.
 intrinsic '!'(icm::AlgEtQICM, x::.) -> AlgEtQICMElt
 {Coerce x into icm, when possible.}
     bool,x:=IsCoercible(icm,x);
@@ -81,34 +88,38 @@ intrinsic '!'(icm::AlgEtQICM, x::.) -> AlgEtQICMElt
     return x;
 end intrinsic;
 
+/// Return whether $x$ is in $\mathrm{icm}$.
 intrinsic 'in'(x::AlgEtQICMElt,icm::AlgEtQICM) -> BoolElt
 {Returns whether x is in icm.}
     return Parent(x) cmpeq icm;
 end intrinsic;
 
+/// Returns the parent of $x$, that is, the ideal class monoid it belongs to.
 intrinsic Parent(x::AlgEtQICMElt)->AlgEtQICM
 {Returns the parent of x, that is, the ideal class monoid it belongs to.}
     return x`Parent;
 end intrinsic;
 
+/// Returns the weak equivalence class of x.
 intrinsic WEClass(x::AlgEtQICMElt)->AlgEtQWECMElt
 {Returns the weak equivalence class of x.}
     return x`WEClass;
 end intrinsic;
 
+/// Returns the elements of the abstract abelian group representing $\mathrm{Pic}(T)$, where $T$ is the multiplicator ring of x, together with the map from $\mathrm{Pic}(T)$ to the set of representing ideals.
 intrinsic PicClass(x::AlgEtQICMElt)->GrpAbElt,Map
-{Returns the elements of the PicardGroup Pic(T) of the multiplicator ring T of x together with the map from Pic(T) to the set of ideals corresponding to x.}
+{Returns the elements of the PicardGroup Pic(T) of the multiplicator ring T of x together with the map from Pic(T) to the set of representing ideals.}
     return Explode(x`PicClass);
 end intrinsic;
 
 intrinsic Ideal(x::AlgEtQICMElt)->AlgEtQIdl
-{Returns a deterministically computed ideal representing the ideal class. This is not stored in an attribute to save memory.}
+{Returns a deterministically computed ideal representing the given ideal class. This is not stored in an attribute to save memory.}
     m:=Map(Parent(x));
     return m(x);
 end intrinsic;
 
 intrinsic MultiplicatorRing(x::AlgEtQICMElt)->AlgEtQOrd
-{Returns the multiplicator ring of x.}
+{Returns the multiplicator ring of the given ideal class.}
     return MultiplicatorRing(WEClass(x));
 end intrinsic;
 
@@ -136,7 +147,7 @@ ext_map_Pic:=function(icm,S)
 end function;
 
 intrinsic '*'(x::AlgEtQICMElt,y::AlgEtQICMElt)->AlgEtQICMElt
-{Returns ideal class corresponding to the product.}
+{Returns ideal class corresponding to the product of the two given ideal classes.}
     icm:=Parent(x);
     require icm eq Parent(y) : "The classes do not blong to the same ideal class monoid";
     Sx:=MultiplicatorRing(x);
@@ -151,6 +162,7 @@ intrinsic '*'(x::AlgEtQICMElt,y::AlgEtQICMElt)->AlgEtQICMElt
     return CreateAlgEtQICMElt(icm,wxy,pic_xy,pxy);
 end intrinsic;
  
+/// Given an ideal class $x$ and a non-negative integer $n$, returns the ideal class $x^n$.}
 intrinsic '^'(x::AlgEtQICMElt,n::RngIntElt)->AlgEtQICMElt
 {Given an ideal class x and a non-negative integer n, returns the ideal class x^n.}
     require n ge 0 : "The integer must be non-negative.";
@@ -175,8 +187,9 @@ end intrinsic;
 // icm //
 /////////
 
-intrinsic IdealClassMonoidAbstract(R::AlgEtQOrd : Method:="Auto") -> AlgEtQICM,Map
-{Returns the ideal class monoid icm of R together with a map m (with preimages) sending each class of icm to a representative (determined by WeakEquivalenceClassMonoid and PicardGroup). The vararg Methods is passed to WeakEquivalenceClassMonoid.}
+/// Returns the ideal class monoid icm of the given order together with a map (with preimages) sending each class of icm to a representative (determined by `WeakEquivalenceClassMonoid` and `PicardGroup`).}
+intrinsic IdealClassMonoidAbstract(R::AlgEtQOrd) -> AlgEtQICM,Map
+{Returns the ideal class monoid icm of the given order together with a map (with preimages) sending each class of icm to a representative (determined by WeakEquivalenceClassMonoid and PicardGroup).}
     if not assigned R`ICMAbstractRep then
         icm:=New(AlgEtQICM);
         W,w:=WeakEquivalenceClassMonoidAbstract(R);
@@ -204,14 +217,12 @@ intrinsic IdealClassMonoidAbstract(R::AlgEtQOrd : Method:="Auto") -> AlgEtQICM,M
     return R`ICMAbstractRep,R`ICMAbstractRep`Map;
 end intrinsic;
 
-
-
 ////////////////////////////////////
 // AlgEtQICMElt : special classes //
 ////////////////////////////////////
 
 intrinsic IsOne(x::AlgEtQICMElt)->BoolElt
-{Returns whether x is the neutral element of the ideal class monoid it belongs to.}
+{Returns whether the given ideal class is the neutral element of the ideal class monoid it belongs to.}
     if not assigned x`IsOne then
         x`IsOne:=x eq One(Parent(x));
     end if;
@@ -219,7 +230,7 @@ intrinsic IsOne(x::AlgEtQICMElt)->BoolElt
 end intrinsic;
 
 intrinsic IsInvertibleInMultiplicatorRing(x::AlgEtQICMElt)->BoolElt
-{Returns whether x the ideal class is invertible in its own multiplicator ring.}
+{Returns whether given ideal class is invertible in its own multiplicator ring.}
     if not assigned x`IsInvertibleInMultiplicatorRing then
         x`IsInvertibleInMultiplicatorRing:=IsIdempotent(WEClass(x));
     end if;
@@ -230,28 +241,30 @@ end intrinsic;
 // AlgEtQICM : attributes and basic properties //
 /////////////////////////////////////////////////
 
+///hide-all
 intrinsic Print(W::AlgEtQICM)
 {Print the ideal class monoid.}
     printf "Ideal class monoid of %o", Order(W);
 end intrinsic;
+///hide-none
 
 intrinsic Order(icm::AlgEtQICM)->AlgEtQOrd
-{Returns the order of icm.}
+{Returns the order of given ideal class monoid.}
     return icm`Order;
 end intrinsic;
 
-intrinsic Map(W::AlgEtQICM)->Map
-{Returns the map from W to the set of ideals which returns the representative of each class.}
-    return W`Map;
+intrinsic Map(icm::AlgEtQICM)->Map
+{Returns the map from the given ideal class monoid to the set of ideals which returns the representative of each class.}
+    return icm`Map;
 end intrinsic;
 
 intrinsic 'eq'(icm1::AlgEtQICM,icm2::AlgEtQICM)->BoolElt
-{Returns whether the two ideal class monoid are the same, that is, if the underlying orders are.}
+{Returns whether the two ideal class monoid are the same, that is, if the underlying orders are so.}
     return Order(icm1) eq Order(icm2);
 end intrinsic;
 
 intrinsic '#'(icm::AlgEtQICM)->RngInt
-{Returns the size of W.}
+{Returns the size of the given ideal class monoid.}
     size:=0;
     W:=WeakEquivalenceClassMonoidAbstract(Order(icm));
     for T->v in Array(W) do
@@ -261,7 +274,7 @@ intrinsic '#'(icm::AlgEtQICM)->RngInt
 end intrinsic;
 
 intrinsic Classes(icm::AlgEtQICM)->SeqEnum[AlgEtQICMElt]
-{Returns the sequence of the classes in icm.}
+{Returns the sequence of the classes in the given ideal class monoid.}
     W:=WeakEquivalenceClassMonoidAbstract(Order(icm));
     output:=[];
     for T->WT in Array(W) do
@@ -272,13 +285,13 @@ intrinsic Classes(icm::AlgEtQICM)->SeqEnum[AlgEtQICMElt]
 end intrinsic;
 
 intrinsic Representatives(icm::AlgEtQICM)->SeqEnum[AlgEtQIdl]
-{Returns the sequence of representatives of the classes in icm.}
+{Returns the sequence of representatives of the classes in the given ideal class monoid.}
     m:=Map(icm);
     return [m(c):c in Classes(icm)];
 end intrinsic;
 
 intrinsic One(icm::AlgEtQICM)->AlgEtQICMElt
-{Returns the neutral element of W.}
+{Returns the neutral element of the given ideal class monoid.}
     if not assigned icm`One then
         m:=Map(icm);
         icm`One:=OneIdeal(Order(icm))@@m;
@@ -287,9 +300,11 @@ intrinsic One(icm::AlgEtQICM)->AlgEtQICMElt
 end intrinsic;
 
 intrinsic Random(icm::AlgEtQICM)->AlgEtQICMElt
-{Returns a random element of W.}
+{Returns a random element of the given ideal class monoid.}
     return Random(Classes(icm));
 end intrinsic;
+
+///# Example 7 TODO
 
 /* TESTS
 

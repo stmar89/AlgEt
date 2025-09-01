@@ -35,6 +35,9 @@ declare type AlgEtQCMType;
 declare attributes AlgEtQCMType : Homs, // homs from Q(Frob) of the isogeny class to CC
                                  CMPositiveElement; // a totally imaginary element b in Q(Frob), which is positive for the cm-type. such b is not unique: b and b' define the same cm-type iff b/b' is totally positive
 
+///# CM-types of a CM-étale algebra
+/// Let $A$ be a CM-étale algebra of dimension $2g$ over $\mathbb{Q}$. Then complex conjugation acts of $\mathrm{Homs}(A,\mathbb(C))$. We denote this action with $\overline{\cdot}$. A `CM-type` $\Phi$ of $A$ is a set of $g$ elements of $\mathrm{Homs}(A,\mathbb(C))$ such that $\mathrm{Homs}(A,\mathbb(C)) = \Phi \sqcup \overline{\Phi}$.
+/// TODO CONTINUE FROM HERE
 
 /////////////////////////////////////////////////////
 // Creation, print, access and equality testing for AlgEtQCMType

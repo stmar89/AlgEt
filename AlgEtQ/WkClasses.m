@@ -36,7 +36,7 @@ import "LowCohenMacaulayType.m" : wkicm_bar_CM_type2;
 ///# Weak equivalence class monoid
 /// Let $R$ be an order in an étale algebra over $\mathbb{Q}$. Then ideal multiplication induces a commutative monoid structure on the set of weak equivalence classes of fractional $R$-ideals called the `weak equivalence class monoid` of $R$. This commutative monoid, which we denote by $\mathcal{W}(R)$, is finite and has unit element given by the class of $R$. 
 ///  
-/// In MAGMA, there are two ways of computing $\mathcal{W}(R)$. The first returns if as a sequence of representatives of the classes. The second one reuturns it as an abstract commutative monoid, each element representing a class, together with a map returning a representative of each class. Further details will be given in the next subsections.
+/// In MAGMA, there are two ways of computing $\mathcal{W}(R)$. The first returns if as a sequence of representatives of the classes. The second one returns it as an abstract commutative monoid, each element representing a class, together with a map returning a representative of each class. Further details will be given in the next subsections.
 
 ///////////////////////////////////////////
 // useful functions to manypulate arrays //
@@ -187,8 +187,8 @@ end function;
 //////////////////////////////////
 
 ///## Weak equivalence class monoid as a sequence of representatives.
-/// Since the multiplictor ring is an invariant of the weak equivalence class of a fractional $R$-ideal, we have a partitioning $\mathcal{W}(R) = \bigsqcup_S \mathcal{W}_S(R)$, where the disjoint union is taken over the overorders $S$ of $R$ and $\mathcal{W}_S(R)$ is the subset of $\mathcal{W}(R)$ consisting of the weak equivalence classes of fractional $R$-ideals with multiplicator ring $S$.
-/// Let $S$ be an overorder of $R$. If $S$ is Gorenstein then $\mathcal{W}_S(R)$ consists only of the class defined by $S$. If $S$ has Cohen-Macaulay type $2$ and $\mathfrak{p}$ is a prime of $S$, then each fractional $R$-ideal $I$ with multiplicator ring $S$ satisfies either $I_\mathfrak{p} \simeq S_\mathfrak{p}$ or $I_\mathfrak{p} \simeq S^t_\mathfrak{p}$. The second possibility occurs precisely when $S$ has Cohen-Macaulay type $2$ at the primes $\mathfrak{p}$. This classification results provide a very efficient method to compute $\mathcal{W}_S(R)$ for orders $S$ with Cohen-Macaulay type $\leq 2$. In general, an an algorithm that includes a more expensive enumeration step is available.
+/// Since the multiplicator ring is an invariant of the weak equivalence class of a fractional $R$-ideal, we have a partitioning $\mathcal{W}(R) = \bigsqcup_S \mathcal{W}_S(R)$, where the disjoint union is taken over the overorders $S$ of $R$ and $\mathcal{W}_S(R)$ is the subset of $\mathcal{W}(R)$ consisting of the weak equivalence classes of fractional $R$-ideals with multiplicator ring $S$.
+/// Let $S$ be an overorder of $R$. If $S$ is Gorenstein then $\mathcal{W}_S(R)$ consists only of the class defined by $S$. If $S$ has Cohen-Macaulay type $2$ and $\mathfrak{p}$ is a prime of $S$, then each fractional $R$-ideal $I$ with multiplicator ring $S$ satisfies either $I_\mathfrak{p} \simeq S_\mathfrak{p}$ or $I_\mathfrak{p} \simeq S^t_\mathfrak{p}$. The second possibility occurs precisely when $S$ has Cohen-Macaulay type $2$ at the primes $\mathfrak{p}$. This classification results provide a very efficient method to compute $\mathcal{W}_S(R)$ for orders $S$ with Cohen-Macaulay type $\leq 2$. For the general case, an algorithm that includes a more expensive enumeration step is provided.
 ///  
 /// For further details, see:
 /// - Stefano Marseglia, "Cohen-Macaulay type of orders, generators and ideal classes", Journal of Algebra 658 (2024), 247-276.

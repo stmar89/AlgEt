@@ -30,7 +30,7 @@ declare verbose IdealsOfIndex, 2;
 /// Let $I$ be a fractional ideal or an order in an étale algebra over $\mathbb{Q}$.
 /// If $N$ is a positive integer, then there are finitely many fractional ideals $J$ (over the same order) such that $J \subseteq I$ and $[I:J]=N$.
 /// The following intrinsics allow to compute them.
-/// If the order is the maximal order, one an use the unique factorization to speed up the computation.
+/// If the order is the maximal order, one can use the unique factorization to speed up the computation.
 
 /// Given an order $O$ in a number field and a positive integer $N$, returns all the integral fractional $O$-ideals $I$ of index $[O:I]=N$.
 intrinsic IdealsOfIndex(O::RngOrd, N::RngIntElt) -> SeqEnum[RngOrdIdl]
@@ -145,7 +145,7 @@ intrinsic IdealsOfIndex(I::AlgEtQIdl, N::RngIntElt : Method := "Default") -> Seq
 end intrinsic;
 
 intrinsic IdealsOfIndex(O::AlgEtQOrd, N::RngIntElt : Method := "Default") -> SeqEnum[AlgEtQIdl]
-{Given an order O and a positive integer N, returns all the O-ideals J with index [O:J]=N. The function is very fast if N is coprime to the conductor of O. If this conditions are not satisfied a slow algorithm is used which doesn't require additional hypothesis. One can force the slow-naive by setting the vararg Method:="Slow".}
+{Given an order O and a positive integer N, returns all the O-ideals J with index [O:J]=N. The function is very fast if N is coprime to the conductor of O. If this condition is not satisfied then a slow algorithm is used which doesn't require additional hypothesis. One can force the slow-naive by setting the parameter Method:="Slow".}
     return IdealsOfIndex(OneIdeal(O),N : Method:=Method);
 end intrinsic;
 

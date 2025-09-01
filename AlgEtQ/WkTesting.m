@@ -27,7 +27,7 @@ freeze;
 declare verbose AlgEtQIdlWkClasses,3;
 
 ///# Weak equivalence classes
-/// Let $R$ be an order $I$ and $J$ be fractional $R$-ideals in an étale algebra $A$ over $\mathbb{Q}$. Then the following statments are equivalent:
+/// Let $R$ be an order $I$ and $J$ be fractional $R$-ideals in an étale algebra $A$ over $\mathbb{Q}$. Then the following statements are equivalent:
 /// - $I_{\mathfrak{p}} \simeq J_{\mathfrak{p}}$ as $R_{\mathfrak{p}}$- modules for every maximal ideal $\mathfrak{p}$ of $R$.
 /// - $I_p \simeq J_p$ as $R_p$- modules for every rational prime $p$. 
 /// - $1 \in (I:J)(J:I)$.

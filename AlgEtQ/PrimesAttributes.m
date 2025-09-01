@@ -31,11 +31,11 @@ declare verbose nice_unif,3;
 
 ///## Primes of the maximal order
 
-/// Given an element $x$ and a primes $P$  of the maximal order, it returns the valuation of $x$ at $P$.
+/// Given an element $x$ and a prime $P$ of the maximal order, returns the valuation of $x$ at $P$.
 intrinsic Valuation(x::AlgEtQElt,P::AlgEtQIdl)->RngIntElt
-{Given an element x and a primes P of the maximal order, it returns the valuation of x at P.}
+{Given an element x and a prime P of the maximal order, returns the valuation of x at P.}
     OO:=Order(P);
-    require IsMaximal(OO) and IsPrime(P): "The input needs to be a primes of the maximal order.";
+    require IsMaximal(OO) and IsPrime(P): "The input needs to be a prime of the maximal order.";
     _,comp:=IsProductOfIdeals(P);
     ind:=[ i : i in [1..#comp] | not One(NumberField(Order(comp[i]))) in comp[i] ];
     assert #ind eq 1;
@@ -43,11 +43,11 @@ intrinsic Valuation(x::AlgEtQElt,P::AlgEtQIdl)->RngIntElt
     return Valuation(Components(x)[ind],comp[ind]);
 end intrinsic;
 
-/// Given a fractional ideal $I$ and a primes $P$, both of the maximal order, it returns the valuation of $I$ at $P$.
+/// Given a fractional ideal $I$ and a prime $P$, both of the maximal order, returns the valuation of $I$ at $P$.
 intrinsic Valuation(I::AlgEtQIdl,P::AlgEtQIdl)->RngIntElt
-{Given a fractional ideal I and a primes P, both of the maximal order, it returns the valuation of I at P.}
+{Given a fractional ideal I and a prime P, both of the maximal order, returns the valuation of I at P.}
     OO:=Order(P);
-    require IsMaximal(OO) and IsPrime(P): "The input needs to be a primes of the maximal order.";
+    require IsMaximal(OO) and IsPrime(P): "The input needs to be a prime of the maximal order.";
     _,compI:=IsProductOfIdeals(I);
     _,compP:=IsProductOfIdeals(P);
     ind:=[ i : i in [1..#compP] | not One(NumberField(Order(compP[i]))) in compP[i] ];
@@ -56,12 +56,12 @@ intrinsic Valuation(I::AlgEtQIdl,P::AlgEtQIdl)->RngIntElt
     return Valuation(compI[ind],compP[ind]);
 end intrinsic;
 
-/// Given a primes $P$ of the maximal order $\mathcal{O}$ above the rational prime $p$, it returns the inertia degree of $P$, that is, the index of the finite field extension $\mathbb{F}_p->\mathcal{O}/P$.
+/// Given a prime $P$ of the maximal order $\mathcal{O}$ above the rational prime $p$, it returns the inertia degree of $P$, that is, the index of the finite field extension $\mathbb{F}_p->\mathcal{O}/P$.
 intrinsic InertiaDegree(P::AlgEtQIdl)->RngIntElt
-{Given a primes P of the maximal order O above the rational prime p, it returns the inertia degree of P, that is, the index of the finite field extension GF(p)->O/P.}
+{Given a prime P of the maximal order O above the rational prime p, it returns the inertia degree of P, that is, the index of the finite field extension GF(p)->O/P.}
     if not assigned P`InertiaDegree then
         OO:=Order(P);
-        require IsMaximal(OO) and IsPrime(P): "The input needs to be a primes of the maximal order.";
+        require IsMaximal(OO) and IsPrime(P): "The input needs to be a prime of the maximal order.";
         q:=Index(OO,P);
         t,p,f:=IsPrimePower(q);
         assert t;
@@ -70,12 +70,12 @@ intrinsic InertiaDegree(P::AlgEtQIdl)->RngIntElt
     return P`InertiaDegree;
 end intrinsic;
 
-/// Given a primes $P$ of the maximal order $\mathcal{O}$, it returns the ramification index of $P$.
+/// Given a prime $P$ of the maximal order $\mathcal{O}$, it returns the ramification index of $P$.
 intrinsic RamificationIndex(P::AlgEtQIdl)->RngIntElt
-{Given a primes P of the maximal order O, it returns the ramification index of P.}
+{Given a prime P of the maximal order O, it returns the ramification index of P.}
     if not assigned P`RamificationIndex then
         OO:=Order(P);
-        require IsMaximal(OO) and IsPrime(P): "The input needs to be a primes of the maximal order.";
+        require IsMaximal(OO) and IsPrime(P): "The input needs to be a prime of the maximal order.";
         q:=Index(OO,P);
         t,p:=IsPrimePower(q);
         assert t;

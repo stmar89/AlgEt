@@ -171,7 +171,7 @@ end intrinsic;
 // NonGorensteinPrimes
 //------------
 
-/// Given an order $S$, returns two sequences: the first containis the primes at which $S$ is locally not Gorenstein; the second containis the Cohen-Macaulay types of $S$ at these primes.
+/// Given an order $S$, returns two sequences: the first contains the primes at which $S$ is locally not Gorenstein; the second contains the Cohen-Macaulay types of $S$ at these primes.
 intrinsic NonGorensteinPrimes(S::AlgEtQOrd)->SeqEnum,SeqEnum
 {Given an order S, returns two sequences: the first containis the primes at which S is locally not Gorenstein; the second containis the CohenMacaulay types of S at these primes, that is, the dimension of S^t/PS^t over S/P, where S^t is the TraceDualIdeal of S.}
     if not assigned S`NonGorensteinPrimes then

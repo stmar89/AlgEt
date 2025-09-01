@@ -31,7 +31,7 @@ import "Ord.m" : MatrixAtoQ,MatrixAtoZ;
 
 ///## Two-generating set
 
-/// A procedure that given an invertible fractional ideal $I$, stores in the attibute `Generators` of $I$ one or two non-zerodivisors in $I$ generating $I$. The elements are chosen by a non-deterministic process.
+/// A procedure that given an invertible fractional ideal $I$, stores in the attribute `Generators` of $I$ one or two non-zerodivisors in $I$ generating $I$. The elements are chosen by a non-deterministic process.
 intrinsic TwoGeneratingSet(I::AlgEtQIdl)
 {A procedure that given an invertible fractional ideal I, stores in the attibute Generators of I one or two non-zerodivisors in I generating I. The elements are chosen by a non-deterministic process.}
     require IsInvertible(I) : "the ideal must be invertible";

@@ -32,7 +32,7 @@ declare verbose AlgEtQTraceNorm, 3;
 /// Let $m_a$ be the matrix representing the multipliction-by-$a$ on $A$ with respect to any basis of $A$ over $\mathbb{Q}$. Then $\mathrm{Tr}_{A/\mathbb{Q}}(a)$ equals the trace of $m_a$.
 ///  
 /// We define the `(absolute) norm` on $A$ as the multiplicative map $\mathrm{N}_{A/\mathbb{Q}}\colon A \to \mathbb{Q}$ by sending a unit $a \in A$ to $\prod_{i=1}^n \mathrm{N}_{K_i/\mathbb{Q}}(a)$ and every zero-divisor to $0$.
-/// We have $N_{A/\mathbb{Q}}(a)$ equals the derminant of the matrix $m_a$.
+/// We have $N_{A/\mathbb{Q}}(a)$ equals the determinant of the matrix $m_a$.
 
 //------------
 // Trace and Norm

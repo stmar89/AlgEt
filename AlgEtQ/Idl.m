@@ -261,7 +261,7 @@ end intrinsic;
 /// Let $P$ be the upper triangular Hermite normal form of the integer square matrix $d\cdot M$ where $M$ is the matrix whose rows are the coefficients of a $\mathbb{Z}$-basis of $I$ and $d$ is the least common denominator of its entries.
 /// The `Hash` of $I$ is defined to be the sequence consisting of the least common denominator of $\frac{1}{d}\cdot P$ and the entries of the upper triangular part of $\frac{1}{d}\cdot P$. 
 /// This hashing method has no collisions and it is independent of the choice of $\mathbb{Z}-basis$ from which we start the procedure.
-/// We observed that applying the inbuild Hash function to the sequence defined above, while giving a smaller hash, it often lead to collisions.
+/// We observed that applying the in-built Hash function to the sequence defined above, while giving a smaller hash, it often leads to collisions.
 
 intrinsic myHash(I::AlgEtQIdl)->RngInt
 {Hash function.}
@@ -340,7 +340,7 @@ intrinsic 'ne'(S::AlgEtQOrd,I::AlgEtQIdl) -> BoolElt
 end intrinsic;
 
 ///## Coordinates with respect to the $\mathbb{Z}$-basis and inclusion
-/// Inclusion testing of elements, orders and ideals in a given fractional ideal is perfomed by multiplying by the `inclusion matrix`. This matrix, which is stored in an attribute, is the inverse of the matrix with coefficients the $\mathbb{Z}$-basis of the order. If the output of the multiplication has integer coefficients then we have an inclusion.
+/// Inclusion testing of elements, orders and ideals in a given fractional ideal is performed by multiplying by the `inclusion matrix`. This matrix, which is stored in an attribute, is the inverse of the matrix with coefficients the $\mathbb{Z}$-basis of the order. If the output of the multiplication has integer coefficients then we have an inclusion.
 /// The same matrix can be used to obtain the coordinates of a sequence of elements with respect to the $\mathbb{Z}$-basis.
 
 /// Given a sequence of elements and a fractional ideal $I$, returns the sequence of coordinates of the elements with respect to the stored $\mathbb{Z}$-basis of $I$.
@@ -804,7 +804,7 @@ end intrinsic;
 
 // TODO example with products
 
-/// Returns a random element of the given fractonal ideal with coefficients with respect to the stored $\mathbb{Z}$-basis bounded by `bd`. One can allow zero-divisors using the parameter `ZeroDivisorsAllowed`, which is set to false by default.
+/// Returns a random element of the given fractional ideal with coefficients with respect to the stored $\mathbb{Z}$-basis bounded by `bd`. One can allow zero-divisors using the parameter `ZeroDivisorsAllowed`, which is set to false by default.
 intrinsic Random(I::AlgEtQIdl , bd::RngIntElt : ZeroDivisorsAllowed:=false ) -> AlgEtQElt
 {Returns a random element of I with coefficcients with respect to the stored Z-basis bounded by bd. One can allow zero-divisors using the parameter ZeroDivisorsAllowed, which is set to false by default.}
     require bd gt 0 : "The bound needs to be a positive integer.";

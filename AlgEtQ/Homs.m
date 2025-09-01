@@ -30,13 +30,13 @@ declare attributes AlgEtQ : HomsToC;
 
 import "Ord.m" : MatrixAtoQ , MatrixQtoA;
 ///# Homomorphisms of étale algebras over $\mathbb{Q}$
-/// Let $A$ be an étale algebra over $\mathbb{Q}$. By an `homomorphism` from $A$ to some $\mathbb{Q}$-algbra, we mean a unital $\mathbb{Q}$-algbra homomorphisms. 
+/// Let $A$ be an étale algebra over $\mathbb{Q}$. By a `homomorphism` from $A$ to some $\mathbb{Q}$-algbra, we mean a unital $\mathbb{Q}$-algbra homomorphisms. 
 
 ///## Homomorphisms to the complex numbers
-/// The set of homomorphisms from an étale algebra $A$ to the field of complex numbers consists of the homomorphisms acting as an embedding on a single compoenent and zero on every other component. Such a homomorphism is injective if and only if $A$ has a unique component, that is, is a number field.
+/// The set of homomorphisms from an étale algebra $A$ to the field of complex numbers consists of the homomorphisms acting as an embedding on a single component and zero on every other component. Such a homomorphism is injective if and only if $A$ has an unique component, that is, is a number field.
 
 intrinsic HomsToC(A::AlgEtQ : Prec:=Precision(GetDefaultRealField()))->SeqEnum[Map]
-{Returns the sequence of homomorphisms from the étale algebra to the complex field. The precision of the target can be set by the vararg "Prec".}
+{Returns the sequence of homomorphisms from the étale algebra to the complex field. The precision of the target can be set by the parameter "Prec".}
     if not assigned A`HomsToC or (Prec ne Precision(Codomain(A`HomsToC[1]))) then
         CC:=ComplexField(Prec);
         images:=function(x)
@@ -50,7 +50,7 @@ end intrinsic;
 
 ///## Homomorphisms between étale algebras over $\mathbb{Q}$
 
-/// Given two étale algebras $A$ and $B$ and a sequence of elements $img$ of $B$, returns the homomorphism defined by sending the AbsoluteBasis of A to $img$. The parameter CheckMultiplicative (default false) determines if the multiplicativity of the defined map is checked, while the parameter CheckUnital (default false) determines whether it is unital. If the parameter ComputeInverse (default true) is true, it checkes whether the map is invertible and, if so, it defines also the inverse (by assigning preimages).}
+/// Given two étale algebras $A$ and $B$ and a sequence of elements $img$ of $B$, returns the homomorphism defined by sending the AbsoluteBasis of A to $img$. The parameter CheckMultiplicative (default false) determines if the multiplicativity of the defined map is checked, while the parameter CheckUnital (default false) determines whether it is unital. If the parameter ComputeInverse (default true) is true, it checks whether the map is invertible and, if so, it defines also the inverse (by assigning preimages).}
 intrinsic Hom(A::AlgEtQ , B::AlgEtQ , img::SeqEnum[AlgEtQElt] : CheckMultiplicative:=false, CheckUnital:=false, ComputeInverse:=true)->Map
 {Given two étale algebras A and B and a sequence img of elements of B, returns the Q-algebra homomorphism defined by sending the AbsoluteBasis of A to img. The VarArg CheckMultiplicative determines if the multiplicativity of the defined map is checked, while the VarArg CheckUnital determines wheter One(A) is sent to One(B). If the VarArg ComputeInverse is true, it checkes whether the map is invertible and, if so, it defines also the inverse (by assigning preimages).}
     basis:=AbsoluteBasis(A);
@@ -85,7 +85,7 @@ intrinsic Hom(A::AlgEtQ , B::AlgEtQ , img::SeqEnum[AlgEtQElt] : CheckMultiplicat
     return m;
 end intrinsic;
 
-/// Given an étale algebra $K$ of the form $K_1\times \cdots \times K_n$ and an ´étale algebra $V$ of the form $K_1^{s_1} \times \cdots \times K_n^{s_n}$, returns the natural componentwise diagonal embedding $K\to V$. 
+/// Given an étale algebra $K$ of the form $K_1\times \cdots \times K_n$ and an ´étale algebra $V$ of the form $K_1^{s_1} \times \cdots \times K_n^{s_n}$, returns the natural component-wise diagonal embedding $K\to V$. 
 intrinsic DiagonalEmbedding(K::AlgEtQ, V::AlgEtQ)->Map
 {Let K=K1x...Kn be a product of distinct number fields, and s1,...,sn be strinctly positive integers. Put V=K1^s1x...xKn^sn. It returns the natural action of K on V, that is, the componentwise diagonal.}
     return NaturalAction(K,V);

@@ -30,13 +30,13 @@ declare attributes AlgEtQOrd:   ICM,
 ///# Ideal class monoid
 /// Let $R$ be an order in an étale algebra $A$ over $\mathbb{Q}$. Ideal multiplication induces the structure of commutative monoid on the set of ideal classes of $R$, which we then call `ideal class monoid` of $R$.
 /// We denote it by $\mathcal{I}(R)$.
-/// The unit element of $\mathcal{I}(R)$ is the class of any principal fractional $RR-ideal.
+/// The unit element of $\mathcal{I}(R)$ is the class of any principal fractional $R$-ideal.
 ///   
 /// In MAGMA there are two ways of computing the ideal class monoid, which are described in the next subsections.
 
 ///## Representatives of the ideal class monoid
-/// The first method to compute the ideal class monoid returs a sequence of representatives.
-/// We have a partitioning $\mathcal{I}(R) = \bigsqcup_S \mathcal{I}_S(R)$ where the disjoing union is taken over the overorders $S$ of $R$ and $\mathcal{I}_S(R)$ is the subset of $\mathcal{I}(R)$ consisitng of ideal classes with multiplicator ring $S$.
+/// The first method to compute the ideal class monoid returns a sequence of representatives of the ideal classes.
+/// We have a partitioning $\mathcal{I}(R) = \bigsqcup_S \mathcal{I}_S(R)$ where the disjoint union is taken over the overorders $S$ of $R$ and $\mathcal{I}_S(R)$ is the subset of $\mathcal{I}(R)$ consisting of ideal classes with multiplicator ring $S$.
 /// The computation is then performed by first computing $\mathcal{W}(R)$ and then observing that for each overorder $S$ of $R$, the Picard group $\mathrm{Pic}(S)$ acts freely on $\mathcal{I}_S(R)$ with quotient space $\mathcal{W}_S(R)$.
 
 /// Given an order $S$, returns a sequence of fractional $S$-ideals representing the ideal classes. The parameter `GRH`  determines whether the computation of the Picard groups of the overorders of $S$ is done using the GRH bound.

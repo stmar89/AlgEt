@@ -42,10 +42,10 @@ declare attributes AlgEtQWECMElt : Parent,
                                    IsIdempotent;
 
 ///## Abstract representation of the weak equivalence class monoid.
-/// The second method to compute $\mathcal{W}(R)$ returns an abstract representation of the monoid together with a mmap giving representatives. The monoid is of type `AlgEtQWECM` and each class is of type `AlgEtQWECMElt`. Classes can be created by feeding to the operator `!` a fractional $S$-ideal, when $S$ is an overorder of $R$ or an overorder of $R$. 
+/// The second method to compute $\mathcal{W}(R)$ returns an abstract representation of the monoid together with a map giving representatives. The monoid is of type `AlgEtQWECM` and each class is of type `AlgEtQWECMElt`. Classes can be created by feeding to the operator `!` a fractional $S$-ideal, when $S$ is an overorder of $R$ or an overorder of $R$. 
 /// Whenever a class is created a representative is stored in an attribute.
-/// This representative can be changed using the intrinisc `SetRepresentative`.
-/// Classs can be multiplied using the operator `*`. Whenever two classes are multiplied, the result is stored in the attribute `MultiplicationTable` of the monoid.
+/// This representative can be changed using the intrinsic `SetRepresentative`.
+/// Classes can be multiplied using the operator `*`. Whenever two classes are multiplied, the result is stored in the attribute `MultiplicationTable` of the monoid.
 
 
 ///////////////////
@@ -335,7 +335,7 @@ end intrinsic;
 // AlgEtQWECM : localizations //
 ////////////////////////////////
 
-/// Given the weak equivalence class monoid of an order $R$ in the étale algebra $K$ and a prime $P$ of $R$, returns the weak equivalance class monoid of the unique overorder of $R$ which is locally equal to $R$ at $P$ and locally maximal at every other prime. This order is $R+P^k O$, where $O$ is the maximal order of $K$ and $k$ is a non-negative big-enough integer.
+/// Given the weak equivalence class monoid of an order $R$ in the étale algebra $K$ and a prime $P$ of $R$, returns the weak equivalence class monoid of the unique overorder of $R$ which is locally equal to $R$ at $P$ and locally maximal at every other prime. This order is $R+P^k O$, where $O$ is the maximal order of $K$ and $k$ is a non-negative big-enough integer.
 intrinsic Localization(W::AlgEtQWECM,P::AlgEtQIdl)->AlgEtQWECM
 {Given the weak equivalence class monoid of an order R in the etale algebra K and a prime P of R, returns the weak equivalance class monoid of the unique overorder of R which is locally equal to R at P and locally maximal at every other prime. This order is R+P^kO, where O is the maximal order of K and k is a non-negative big-enough integer.}
     R:=Order(W);

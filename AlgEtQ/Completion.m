@@ -24,7 +24,7 @@
 
 freeze;
 
-/// Given a prime $P$ of the maximal order of an etale algebra $A$, returns the $p$-adic field corresponding to the completion $A_P$ and the natural homormophism $A\to A_P$ (with preimages). The parameter `MinPrecision` is passed to `Completion`.
+/// Given a prime $P$ of the maximal order of an étale algebra $A$, returns the $p$-adic field corresponding to the completion $A_P$ and the natural homomorphism $A\to A_P$ (with preimages). The parameter `MinPrecision` is passed to `Completion`.
 intrinsic Completion(P::AlgEtQIdl : MinPrecision:=20) -> FldPad,Map
 {Given a prime of the maximal order of an etale algebra A, returns the p-adic field corresponding to the completion A_P and the natural homormophism A->A_P (with preimages). The parameter MinPrecision is passed to Completion.}
     L:=Algebra(P);

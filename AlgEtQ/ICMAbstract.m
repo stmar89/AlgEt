@@ -42,8 +42,8 @@ declare attributes AlgEtQICMElt : Parent,
                                   IsInvertibleInMultiplicatorRing;
 
 ///## Abstract representation of the ideal class monoid
-/// The second way method to compute the ideal class monoid of an order $R$, returns an abstract representation of $\mathcal{I}(R)$ with type `AlgEtQICM` together with a map to a set of representatives. Each class has type `AlgEtQICMElt` and it is internally representated as pair consisting of a weak equivalence class (of type `AlgEtQWECMElt`) and an element of the representation of $\mathrm{Pic}(S)$ (as an abstract abelian group), where $S$ is the corresponding multiplicator ring. This representation is more efficient than the previous one, since it does not need to compute in advance and store a representive for each ideal class.
-/// Ideal classes can be created using the coercion operator `!` starting from an overorder $S$ of $R$ or a fractional $S$-ideal. Ideal classes can be multiplied usin the operator `*`.
+/// The second way method to compute the ideal class monoid of an order $R$, returns an abstract representation of $\mathcal{I}(R)$ with type `AlgEtQICM` together with a map to a set of representatives. Each class has type `AlgEtQICMElt`, and it is internally represented as pair consisting of a weak equivalence class (of type `AlgEtQWECMElt`) and an element of the representation of $\mathrm{Pic}(S)$ (as an abstract abelian group), where $S$ is the corresponding multiplicator ring. This representation is more efficient than the previous one, since it does not need to compute in advance and store a representative for each ideal class.
+/// Ideal classes can be created using the coercion operator `!` starting from an overorder $S$ of $R$ or a fractional $S$-ideal. Ideal classes can be multiplied using the operator `*`.
 
 //////////////////
 // AlgEtQICMElt //
@@ -162,7 +162,7 @@ intrinsic '*'(x::AlgEtQICMElt,y::AlgEtQICMElt)->AlgEtQICMElt
     return CreateAlgEtQICMElt(icm,wxy,pic_xy,pxy);
 end intrinsic;
  
-/// Given an ideal class $x$ and a non-negative integer $n$, returns the ideal class $x^n$.}
+/// Given an ideal class $x$ and a non-negative integer $n$, returns the ideal class $x^n$.
 intrinsic '^'(x::AlgEtQICMElt,n::RngIntElt)->AlgEtQICMElt
 {Given an ideal class x and a non-negative integer n, returns the ideal class x^n.}
     require n ge 0 : "The integer must be non-negative.";
@@ -187,9 +187,9 @@ end intrinsic;
 // icm //
 /////////
 
-/// Returns the ideal class monoid icm of the given order together with a map (with preimages) sending each class of icm to a representative (determined by `WeakEquivalenceClassMonoid` and `PicardGroup`).}
+/// Returns the ideal class monoid of the given order together with a map (with preimages) sending each class to a representative (determined by `WeakEquivalenceClassMonoid` and `PicardGroup`).
 intrinsic IdealClassMonoidAbstract(R::AlgEtQOrd) -> AlgEtQICM,Map
-{Returns the ideal class monoid icm of the given order together with a map (with preimages) sending each class of icm to a representative (determined by WeakEquivalenceClassMonoid and PicardGroup).}
+{Returns the ideal class monoid of the given order together with a map (with preimages) sending each class to a representative (determined by WeakEquivalenceClassMonoid and PicardGroup).}
     if not assigned R`ICMAbstractRep then
         icm:=New(AlgEtQICM);
         W,w:=WeakEquivalenceClassMonoidAbstract(R);

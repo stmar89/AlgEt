@@ -31,7 +31,7 @@ declare attributes AlgEtQIdl : ShortElement, SmallRepresentative;
 
 ///# Short Elements
 /// Let $I$ be a fractional ideal in an étale algebra $A$ over $\mathbb{Q}$.
-/// By LLL-reducing with respect to the T2-norm a $\mathbb{Z}$-basis of $I$ and then picking an element with small coefficients with respect to that basis allows to produce elements with small coefficients with respect to the absolute basis of $A$.
+/// By LLL-reducing with respect to the T2-norm a $\mathbb{Z}$-basis of $I$ and then picking an element with small coefficients with respect to that basis allows producing elements with small coefficients with respect to the absolute basis of $A$.
 
 //------------
 // ShortElement
@@ -83,7 +83,7 @@ end intrinsic;
 // SmallRepresentative
 //------------
 
-/// Given a fractional $R$-ideal $I$, returns an the fractional $R$-ideal $a*I$, and the element $a$, where $a$ is a non-zero divisor chosen such that $a\cdot I \subseteq  R$, and the cardinality of $R/aI$ is small. More precisely, $a$ is the output of `ShortElement` when applied to $(R:I)$. Note that if $I$ is invertible then $R/aI$ is isomorphic to $(R:I)/aR$.
+/// Given a fractional $R$-ideal $I$, returns the fractional $R$-ideal $a*I$, and the element $a$, where $a$ is a non-zero divisor chosen such that $a\cdot I \subseteq  R$, and the cardinality of $R/aI$ is small. More precisely, $a$ is the output of `ShortElement` when applied to $(R:I)$. Note that if $I$ is invertible then $R/aI$ is isomorphic to $(R:I)/aR$.
 intrinsic SmallRepresentative(I::AlgEtQIdl) ->AlgEtQIdl,AlgEtQElt
 {Given a fractional R-ideal I, returns the fractional R-ideal a*I, and the element a, where a is chose so that  a*I is a subset of R, and the cardinality of R/aI is small. More precisely, a is the output of ShortElement when applied to (R:I). Note that if I is invertible R/aI is isomorphic to (R:I)/aR.}
     if not assigned I`SmallRepresentative then                                            

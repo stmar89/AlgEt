@@ -265,7 +265,7 @@ IsPrincipal_prod_internal:=function( II , GRH )
     return true,gen;
 end function;
 
-/// Returns whethere the given fractional ideals is a principal ideal (over its order of definition), and, if so, also a generator.  The parameter `GRH` (default false) can be set to true determines if the test is done under GRH.
+/// Returns whether the given fractional ideals is a principal ideal (over its order of definition), and, if so, also a generator.  The parameter `GRH` (default false) can be set to true determines if the test is done under GRH.
 intrinsic IsPrincipal(I1::AlgEtQIdl : GRH:=false )->BoolElt, AlgEtQElt
 {Returns whethere the given fractional ideals is a principal ideal (over its order of definition), and, if so, also a generator.  The parameter GRH (default false) can be set to true determines if the test is done under GRH.}
     if not IsInvertible(I1) then return false,_; end if;

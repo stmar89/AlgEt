@@ -9,4 +9,11 @@ and that the AlgEt package is in
 -) Run the following commands
     mkdir -p ~/Magma-Maths-package/package/Algebra/AlgEt/AlgEtQ/ && 
     cp ~/AlgEt/AlgEtQ/*.m ~/Magma-Maths-package/package/Algebra/AlgEt/AlgEtQ/
-    cat ~/AlgEt/spec >> ~/Magma-Maths-package/package/Algebra/Algebra.spec
+-) Make sure that 
+    ~/Magma-Maths-package/package/Algebra/Algebra.spec
+   contains all the .m files from
+    ~/AlgEt/spec
+-) Commit/push my fork of the magma repo.
+-) Make a pull request to the original repo.
+-) Send by email an explaination, with new doc file and new test file.
+

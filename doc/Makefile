@@ -4,7 +4,7 @@
 .PHONY : clean_old 	# prevent errors from rm
 
 inputAlgEtQ = ../spec
-outfileAlgEtQ = ./ListOfCommandsAlgEtQ.md
+outfileAlgEtQ = ./UserManualAlgEtQ.md
 
 inputAlgEtQMod = ../specMod
 outfileAlgEtQMod = ./ListOfCommandsAlgEtQMod.md

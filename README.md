@@ -14,9 +14,9 @@ Please send comments and bug reports to `stefano.marseglia89@gmail.com`.
 Details
 --
 
-We introduce new type `AlgEtQ`, `AlgEtQElt`, `AlgEtQOrd` and `AlgEtQIdl` which correspond to étale algebras over the rationals, their elements, orders and ideals, respectively.
+We introduce new typeis`AlgEtQ`, `AlgEtQElt`, `AlgEtQOrd` and `AlgEtQIdl` which correspond to étale algebras over the rationals, their elements, orders and ideals, respectively.
 We have functionalities to compute isomorphism classes of invertible and non-invertible ideals for orders.
-For complete descriptions and more details we refer to the [`List of commands for AlgEtQ`](https://github.com/stmar89/AlgEt/blob/main/doc/ListOfCommandsAlgEtQ.md).
+For an introduction to the underlying theory, complete descriptions of the intrinsics and examples, we refer to the [`User Manual for AlgEtQ`](https://github.com/stmar89/AlgEt/blob/main/doc/UserManualAlgEtQ.md).
 To use them, use the magma command `AttachSpec("spec")`, after opening magma in the folder where you have downloaded the repo.
 
 We also introduce the type `AlgEtQMod`, for modules over `AlgEtQ`.

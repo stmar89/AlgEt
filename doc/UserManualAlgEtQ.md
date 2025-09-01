@@ -837,7 +837,6 @@ Returns the sequence of representatives of the classes in the given ideal class 
 Returns the neutral element of the given ideal class monoid.
 <pre><b> Random</b>(icm::AlgEtQICM)->AlgEtQICMElt</pre>
 Returns a random element of the given ideal class monoid.
-# Example 7 TODO
 # Complex Conjugation and CM-étale algebras
  Let $A$ be an étale algebra over $\mathbb{Q}$ with components $K_1\times\cdots\times K_n$.
  We say that $A$ is a `CM-étale algebra` if every component $K_i$ is a CM-field, that is, $K_i$ has involution that acts as applying complex conjugation after applying any homomorphism to the complex numbers. If $A$ is a CM-étale algebra, then it has an involution with the same property. For this reason, we call this involution `complex conjugation` and denote as $\overline{\cdot}$.

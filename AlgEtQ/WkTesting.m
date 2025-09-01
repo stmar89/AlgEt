@@ -39,7 +39,7 @@ declare verbose AlgEtQIdlWkClasses,3;
 /// Note that if $I$ is an order, then $J$ is weakly equivalent to $I$ if and only if $J$ is an invertible $I$-ideal. If both $I$ and $J$ are orders then they are weakly equivalent if and only if they are equal.
 /// 
 /// In the literature, the same notion sometimes goes under the name `local isomorphism`.
-/// For further details, we refer to "Local isomorphism classes of fractional ideals of orders in étale algebras" by Stefano Marseglia, published in Journal of Algebra 673 (2025), 77-102.
+/// Reference: Stefano Marseglia, "Local isomorphism classes of fractional ideals of orders in étale algebras", Journal of Algebra 673 (2025), 77-102.
 
 /// Given fractional ideals $I$ and $J$, returns whether they are weakly equivalent. The fractional ideals are no required to be defined over the same order.}
 intrinsic IsWeakEquivalent(I::AlgEtQIdl,J::AlgEtQIdl)->BoolElt

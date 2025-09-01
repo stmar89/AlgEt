@@ -40,7 +40,7 @@ declare attributes AlgEtQOrd:NonGorensteinPrimes, CohenMacaulayType;
 /// The order $R$ is `Bass at the prime` $\mathfrak{p}$ if every overorder $S$ of $R$ is Gorenstein at the finitely many primes above $\mathfrak{p}$. The order $R$ is `Bass` if it is so at all (singular) primes.
 /// One can show that $R$ is Bass at $\mathfrak{p}$ if and only if $\dim_{R/\mathfrak{p}}(\mathcal{O_A}/\mathfrak{p}\mathcal{O}_A)\leq 2$, where $\mathcal{O}_A$ is the maximal order of $A$.
 /// 
-/// Reference: Stefano Marseglia, "Cohen-Macaulay type of orders, generators and ideal classes" (Journal of Algebra 658 (2024), 247-276.)
+/// Reference: Stefano Marseglia, "Cohen-Macaulay type of orders, generators and ideal classes", Journal of Algebra 658 (2024), 247-276.
 
 //------------
 // CohenMacaulayType

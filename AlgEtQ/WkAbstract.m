@@ -41,6 +41,12 @@ declare attributes AlgEtQWECMElt : Parent,
                                    IsOne,
                                    IsIdempotent;
 
+///## Abstract representation of the weak equivalence class monoid.
+/// The second method to compute $\mathcal{W}(R)$ returns an abstract representation of the monoid together with a mmap giving representatives. The monoid is of type `AlgEtQWECM` and each class is of type `AlgEtQWECMElt`. Classes can be created by feeding to the operator `!` a fractional $S$-ideal, when $S$ is an overorder of $R$ or an overorder of $R$. 
+/// Whenever a class is created a representative is stored in an attribute.
+/// This representative can be changed using the intrinisc `SetRepresentative`.
+/// Classs can be multiplied using the operator `*`. Whenever two classes are multiplied, the result is stored in the attribute `MultiplicationTable` of the monoid.
+
 
 ///////////////////
 // AlgEtQWECMElt //
@@ -55,13 +61,14 @@ function CreateAlgEtQWECMElt(W,I)
     return x;
 end function;
 
+///hide-all
 intrinsic Print(x::AlgEtQWECMElt)
 {Print the element.}
     printf "weak equivalence class of the ideal %o", Ideal(x);
 end intrinsic;
 
 intrinsic IsCoercible(W::AlgEtQWECM, x::.) -> BoolElt, .
-{Return whether the element is coercible into W and the result of the coercion if so.}
+{Returns whether the element is coercible into W and the result of the coercion if so.}
     if Parent(x) cmpeq W then
         return true,x;
     elif Type(x) eq AlgEtQWECMElt and Order(W) subset Order(Parent(x)) then
@@ -74,36 +81,40 @@ intrinsic IsCoercible(W::AlgEtQWECM, x::.) -> BoolElt, .
         return false,"";
     end if;
 end intrinsic;
+///hide-none
 
+/// Given a weak equivalence class monoid $W$, coerces $x$ into $W$, when possible.
 intrinsic '!'(W::AlgEtQWECM, x::.) -> AlgEtQWECMElt
-{Coerce x into W, when possible.}
+{Given a weak equivalence class monoid W, coerces x into W, when possible.}
     bool,x:=IsCoercible(W,x);
     require bool : "The element cannot be coerced in the weak equivalence class monoid.";
     return x;
 end intrinsic;
 
+/// Returns whether the class $x$ is in the weak equivalence class monoid $W$.
 intrinsic 'in'(x::AlgEtQWECMElt,W::AlgEtQWECM) -> BoolElt
-{Returns whether x is in W.}
+{Returns whether the class x is in the weak equivalence class monoid W.}
     return Parent(x) cmpeq W;
 end intrinsic;
 
+/// Returns the weak equivalence class monoid to which the class $x$ belongs to.
 intrinsic Parent(x::AlgEtQWECMElt)->AlgEtQWECM
 {Returns the parent of x, that is, the weak equivalence class monoid it belongs to.}
     return x`Parent;
 end intrinsic;
 
 intrinsic Ideal(x::AlgEtQWECMElt)->AlgEtQIdl
-{Returns the ideal representing x.}
+{Returns the stored ideal representing the class.}
     return x`Ideal;
 end intrinsic;
 
 intrinsic MultiplicatorRing(x::AlgEtQWECMElt)->AlgEtQOrd
-{Returns the multiplicator ring of x.}
+{Returns the multiplicator ring of the class.}
     return MultiplicatorRing(Ideal(x));
 end intrinsic;
 
 intrinsic 'eq'(x::AlgEtQWECMElt,y::AlgEtQWECMElt)->BoolElt
-{Returns whether the two elements define the same class.}
+{Equality testing for classes.}
     I:=Ideal(x);
     J:=Ideal(y);
     if I eq J then
@@ -114,8 +125,9 @@ intrinsic 'eq'(x::AlgEtQWECMElt,y::AlgEtQWECMElt)->BoolElt
     end if;
 end intrinsic;
 
+/// Given a class $x$ and a fractional ideal $J$ weakly equivalent to the stored representative, changes the attribute `Ideal` of the class to $J$.
 intrinsic SetRepresentative(x::AlgEtQWECMElt,J::AlgEtQIdl)
-{It changes the Ideal attribute of x which consisits of the ideal representing the weak equivalence class to J, which must be weakly equivalent to the one of x.}
+{Given a class x and a fractional ideal J weakly equivalent to the stored representative, changes the attribute Ideal of the class to J.}
     require IsWeaklyEquivalent(Ideal(x),J) : "The given ideal does not define the same class";
     x`Ideal:=J;
 end intrinsic;
@@ -124,6 +136,7 @@ end intrinsic;
 // Operation and Multiplication Table //
 ///////////////////////////////////////
 
+/// Computes the multiplication table of $W$. It is returned as an associative array where, given two classes $x$ and $y$ of $W$, the value at the key $\{x,y\}$ is $x*y$.
 intrinsic MultiplicationTable(W::AlgEtQWECM)->Assoc
 {Computes the multiplication table of W. It is returned as an associative array where, given two classes x and y of W, the value at the key \{x,y\} is x*y.}
     if not assigned W`MultiplicationTable then
@@ -141,7 +154,7 @@ intrinsic MultiplicationTable(W::AlgEtQWECM)->Assoc
 end intrinsic;
 
 intrinsic '*'(x::AlgEtQWECMElt,y::AlgEtQWECMElt)->AlgEtQWECMElt
-{Returns weak equivalence class corresponding to the product.}
+{Returns weak equivalence class corresponding to the product of the two given classes.}
     W:=Parent(x);
     require W eq Parent(y) : "The classes do not blong to the same weak equivalence class monoid";
     if not assigned W`MultiplicationTable then
@@ -163,6 +176,7 @@ intrinsic '*'(x::AlgEtQWECMElt,y::AlgEtQWECMElt)->AlgEtQWECMElt
     return z;
 end intrinsic;
  
+/// Given a weak equivalence class $x$ and a non-negative integer $n$, returns the weak equivalence class $x^n$.
 intrinsic '^'(x::AlgEtQWECMElt,n::RngIntElt)->AlgEtQWECMElt
 {Given a weak equivalence class x and a non-negative integer n, returns the weak equivalence class x^n.}
     require n ge 0 : "The integer must be non-negative.";
@@ -185,7 +199,7 @@ end intrinsic;
 ////////////////////////////////////
 
 intrinsic IsOne(x::AlgEtQWECMElt)->BoolElt
-{Returns whether x is the neutral element of the weak equivalence class monoid it belongs to.}
+{Returns whether the given class is the neutral element of the weak equivalence class monoid it belongs to.}
     if not assigned x`IsOne then
         x`IsOne:=x eq One(Parent(x));
     end if;
@@ -193,7 +207,7 @@ intrinsic IsOne(x::AlgEtQWECMElt)->BoolElt
 end intrinsic;
 
 intrinsic IsIdempotent(x::AlgEtQWECMElt)->BoolElt
-{Returns whether x is an idempotent of weak equivalence class monoid it belongs to.}
+{Returns whether the given class is an idempotent of weak equivalence class monoid it belongs to.}
     if not assigned x`IsIdempotent then
         x`IsIdempotent:=x*x eq x;
     end if;
@@ -204,8 +218,9 @@ end intrinsic;
 // AlgEtQWECM : computation/creation //
 ///////////////////////////////////////
 
-intrinsic WeakEquivalenceClassMonoidAbstract(R::AlgEtQOrd : Method:="Auto") -> AlgEtQWECM,Map
-{Returns the weak equivalence class monoid W of R together with a map w (with preimages) sending each class of W to a representative (determined by WeakEquivalenceClassMonoid). The vararg Methods is passed to WeakEquivalenceClassMonoid.}
+/// Given an order $R$, returns the weak equivalence class monoid $W$ of $R$ together with a map (with preimages) sending each class of $W$ to a representative (determined by WeakEquivalenceClassMonoid).}
+intrinsic WeakEquivalenceClassMonoidAbstract(R::AlgEtQOrdd) -> AlgEtQWECM,Map
+{Given an order R, returns the weak equivalence class monoid W of R together with a map (with preimages) sending each class of W to a representative (determined by WeakEquivalenceClassMonoid).}
     if not assigned R`WKICMAbstractRep then
         if (not assigned R`OverOrders) or exists{T:T in R`OverOrders|not assigned T`WKICM_bar} then
             // this populates everything faster than computing separately the overorders and the wk_icm_bar's 
@@ -240,31 +255,37 @@ end intrinsic;
 // AlgEtQWECM : attributes and basic properties //
 /////////////////////////////////////////////////
 
+///hide-all
 intrinsic Print(W::AlgEtQWECM)
 {Print the weak equivalence class monoid.}
     printf "Weak equivalence class monoid of %o", Order(W);
 end intrinsic;
+///hide-none
 
+/// Returns the order of $W$.
 intrinsic Order(W::AlgEtQWECM)->AlgEtQOrd
 {Returns the order of W.}
     return W`Order;
 end intrinsic;
 
+/// Returns the underlying associative array of $W$, which is indexed by the overorders of $R$ and has values given by the weak equivalence classes with prescribed multiplicator ring.
 intrinsic Array(W::AlgEtQWECM)->Assoc
-{Return the underlying associative array of W, which is indexed by the overorder of R and values given by the weak equivalence classes with prescribed multiplicator ring.}
+{Returns the underlying associative array of W, which is indexed by the overorders of R and has values given by the weak equivalence classes with prescribed multiplicator ring.}
     return W`Array;
 end intrinsic;
 
+/// Returns the map from $W$ to the set of ideals which returns the representative of each class.
 intrinsic Map(W::AlgEtQWECM)->Map
 {Returns the map from W to the set of ideals which returns the representative of each class.}
     return W`Map;
 end intrinsic;
 
 intrinsic 'eq'(W::AlgEtQWECM,WW::AlgEtQWECM)->BoolElt
-{Returns whether the two weak equivalence class monoid are the same, that is, if the underlying orders are.}
+{Equality testing for weak equivalence class monoids, that is, if the underlying orders are equal.}
     return Order(W) eq Order(WW);
 end intrinsic;
 
+/// Returns the size of $W$.
 intrinsic '#'(W::AlgEtQWECM)->RngInt
 {Returns the size of W.}
     size:=0;
@@ -274,18 +295,21 @@ intrinsic '#'(W::AlgEtQWECM)->RngInt
     return size;
 end intrinsic;
 
+/// Returns the sequence of classes in $W$.
 intrinsic Classes(W::AlgEtQWECM)->SeqEnum[AlgEtQWECMElt]
-{Returns the sequence of the classes in W.}
+{Returns the sequence of classes in W.}
     arr:=Array(W);
     return &cat[ arr[T] : T in Keys(arr)];
 end intrinsic;
 
+/// Returns the sequence of representatives of the classes in $W$.
 intrinsic Representatives(W::AlgEtQWECM)->SeqEnum[AlgEtQIdl]
 {Returns the sequence of representatives of the classes in W.}
     w:=Map(W);
     return [w(c):c in Classes(W)];
 end intrinsic;
 
+/// Returns the neutral element of $W$.
 intrinsic One(W::AlgEtQWECM)->AlgEtQWECMElt
 {Returns the neutral element of W.}
     if not assigned W`One then
@@ -295,13 +319,15 @@ intrinsic One(W::AlgEtQWECM)->AlgEtQWECMElt
     return W`One;
 end intrinsic;
 
+/// Returns a random element of $W$.
 intrinsic Random(W::AlgEtQWECM)->AlgEtQWECMElt
 {Returns a random element of W.}
     return Random(Classes(W));
 end intrinsic;
 
+/// Returns the sequence of idempotent classes of W.
 intrinsic Idempotents(W::AlgEtQWECM)->SeqEnum[AlgEtQWECMElt]
-{Returns the sequence of the classes in W which are idempotent.}
+{Returns the sequence of idempotent classes of W.}
     return [x:x in Classes(W)|IsIdempotent(x)];
 end intrinsic;
 
@@ -309,8 +335,9 @@ end intrinsic;
 // AlgEtQWECM : localizations //
 ////////////////////////////////
 
+/// Given the weak equivalence class monoid of an order $R$ in the étale algebra $K$ and a prime $P$ of $R$, returns the weak equivalance class monoid of the unique overorder of $R$ which is locally equal to $R$ at $P$ and locally maximal at every other prime. This order is $R+P^k O$, where $O$ is the maximal order of $K$ and $k$ is a non-negative big-enough integer.
 intrinsic Localization(W::AlgEtQWECM,P::AlgEtQIdl)->AlgEtQWECM
-{Given the weak equivalence class monoid of an order R in the etale algebra K and a maximal ideal P of R, returns the weak equivalance class monoid of the unique overorder of R which is locally equal to R at P and locally maximal at every other maximal ideal. This order is R+P^kO, where O is the maximal order of K and k is a non-negative integer big enough.}
+{Given the weak equivalence class monoid of an order R in the etale algebra K and a prime P of R, returns the weak equivalance class monoid of the unique overorder of R which is locally equal to R at P and locally maximal at every other prime. This order is R+P^kO, where O is the maximal order of K and k is a non-negative big-enough integer.}
     R:=Order(W);
     require Order(P) eq R and IsPrime(P) : "P needs to be a maximal ideal of the underlying order of W";
     O:=MaximalOrder(Algebra(R));
@@ -324,8 +351,9 @@ end intrinsic;
 // AlgEtQWECM : generating sets //
 /////////////////////////////////
 
+/// Given a weak equivalence class monoid $W$ and a sequence of classes in $W$, returns whether the sequence is a generating set of $W$.
 intrinsic IsGeneratingSet(W::AlgEtQWECM,seq::SeqEnum[AlgEtQWECMElt])->BoolElt
-{Given the weak equivalence class monoid of R and a sequence of classes in W, returns whether the sequence is a generating set of W.}
+{Given a weak equivalence class monoid W and a sequence of classes in W, returns whether the sequence is a generating set of W.}
     cl:=Seqset(seq);
     Include(~cl,One(W));
     require forall{w:w in seq|w in W} : "The sequence does not consists of elements of W.";
@@ -341,8 +369,9 @@ intrinsic IsGeneratingSet(W::AlgEtQWECM,seq::SeqEnum[AlgEtQWECMElt])->BoolElt
     return N eq #W;
 end intrinsic;
 
+/// Given the weak equivalence class monoid $W$ of $R$ and a sequence of fractional $R$-ideals, returns whether the sequence represents a generating set of $W$.
 intrinsic IsGeneratingSet(W::AlgEtQWECM,seq::SeqEnum[AlgEtQIdl])->BoolElt
-{Given the weak equivalence class monoid of R and a sequence of fractional R-ideals, returns whether the sequence represents a generating set of W.}
+{Given the weak equivalence class monoid W of R and a sequence of fractional R-ideals, returns whether the sequence represents a generating set of W.}
     w:=Map(W);
     return IsGeneratingSet(W,[I@@w:I in Seqset(seq)]);
 end intrinsic;

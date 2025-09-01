@@ -33,6 +33,11 @@ declare attributes AlgEtQOrd:   WKICM,
 import "LowCohenMacaulayType.m" : wkicm_bar_CM_type2;
 
 
+///# Weak equivalence class monoid
+/// Let $R$ be an order in an étale algebra over $\mathbb{Q}$. Then ideal multiplication induces a commutative monoid structure on the set of weak equivalence classes of fractional $R$-ideals called the `weak equivalence class monoid` of $R$. This commutative monoid, which we denote by $\mathcal{W}(R)$, is finite and has unit element given by the class of $R$. 
+///  
+/// In MAGMA, there are two ways of computing $\mathcal{W}(R)$. The first returns if as a sequence of representatives of the classes. The second one reuturns it as an abstract commutative monoid, each element representing a class, together with a map returning a representative of each class. Further details will be given in the next subsections.
+
 ///////////////////////////////////////////
 // useful functions to manypulate arrays //
 ///////////////////////////////////////////
@@ -181,8 +186,23 @@ end function;
 // wkicm as sequence intrinsics //
 //////////////////////////////////
 
-intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum[AlgEtQIdl]
-{Returns representatives I of all weak equivalence classes, such that (I:I)=S. The VarArg Method (default "Auto") is not used and kept for retrocompatibility.}
+///## Weak equivalence class monoid as a sequence of representatives.
+/// Since the multiplictor ring is an invariant of the weak equivalence class of a fractional $R$-ideal, we have a partitioning $\mathcal{W}(R) = \bigsqcup_S \mathcal{W}_S(R)$, where the disjoint union is taken over the overorders $S$ of $R$ and $\mathcal{W}_S(R)$ is the subset of $\mathcal{W}(R)$ consisting of the weak equivalence classes of fractional $R$-ideals with multiplicator ring $S$.
+/// Let $S$ be an overorder of $R$. If $S$ is Gorenstein then $\mathcal{W}_S(R)$ consists only of the class defined by $S$. If $S$ has Cohen-Macaulay type $2$ and $\mathfrak{p}$ is a prime of $S$, then each fractional $R$-ideal $I$ with multiplicator ring $S$ satisfies either $I_\mathfrak{p} \simeq S_\mathfrak{p}$ or $I_\mathfrak{p} \simeq S^t_\mathfrak{p}$. The second possibility occurs precisely when $S$ has Cohen-Macaulay type $2$ at the primes $\mathfrak{p}$. This classification results provide a very efficient method to compute $\mathcal{W}_S(R)$ for orders $S$ with Cohen-Macaulay type $\leq 2$. In general, an an algorithm that includes a more expensive enumeration step is available.
+///  
+/// For further details, see:
+/// - Stefano Marseglia, "Cohen-Macaulay type of orders, generators and ideal classes", Journal of Algebra 658 (2024), 247-276.
+/// - Stefano Marseglia, "Local isomorphism classes of fractional ideals of orders in étale algebras", Journal of Algebra 673 (2025), 77-102.
+
+/// Given an order $S$, returns representatives $I$ of all weak equivalence classes of fractional $S$-ideals satisfying $(I:I)=S$.
+intrinsic WeakEquivalenceClassesWithPrescribedMultiplicatorRing(S::AlgEtQOrd) -> SeqEnum[AlgEtQIdl]
+{Given an order S, returns representatives I of all weak equivalence classes of fractional S-ideals satisfying (I:I)=S.}
+    return WKICM_bar(S);
+end intrinsic;
+
+///ditto
+intrinsic WKICM_bar(S::AlgEtQOrd) -> SeqEnum[AlgEtQIdl]
+{Given an order S, returns representatives I of all weak equivalence classes of fractional S-ideals satisfying (I:I)=S.}
     if not assigned S`WKICM_bar then
         if IsGorenstein(S) then
             vprintf WKICM_bar,2 : " Gorenstein case\n";
@@ -194,7 +214,6 @@ intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum[AlgEtQIdl]
             vprintf WkClasses,2:"Order of CohenMacaulayType = %o\n",CohenMacaulayType(S);
             // general case
             seqWk_bar:=[];
-            vprint WKICM_bar,2 : "Using new method";
             pp:=SingularPrimes(S);
             if #pp eq 1 then
                 vprint WKICM_bar,2 : "WKICM_bar: type >2, only 1 singular prime";
@@ -339,13 +358,15 @@ intrinsic WKICM_bar(S::AlgEtQOrd : Method:="Auto") -> SeqEnum[AlgEtQIdl]
     return S`WKICM_bar;
 end intrinsic;
 
-intrinsic WeakEquivalenceClassesWithPrescribedMultiplicatorRing(S::AlgEtQOrd : Method:="Auto") -> SeqEnum[AlgEtQIdl]
-{Returns representatives I of all weak equivalence classes, such that (I:I)=S. The VarArg Method (default "Auto") is not used and kept for retrocompatibility.}
-    return WKICM_bar(S);
+/// Given an order $E$, returns a set of representatives of the weak equivalence class monoid $\mathcal{W}(E)$.
+intrinsic WeakEquivalenceClassMonoid(E::AlgEtQOrd)->SeqEnum[AlgEtQIdl]
+{Given an order E, returns a set of representatives of the weak equivalence class monoid of E.}
+    return WKICM(E:Method:=Method);
 end intrinsic;
 
-intrinsic WKICM(E::AlgEtQOrd : Method:="Auto")->SeqEnum[AlgEtQIdl]
-{Returns a set of representatives of the weak equivalence class monoid of E. The VarArg Method (default "Auto") is not used and kept for retrocompatibility.}
+///ditto
+intrinsic WKICM(E::AlgEtQOrd)->SeqEnum[AlgEtQIdl]
+{Given an order E, returns a set of representatives of the weak equivalence class monoid of E.}
     if not assigned E`WKICM then
         pp:=SingularPrimes(E);
         if #pp eq 0 then
@@ -542,11 +563,6 @@ intrinsic WKICM(E::AlgEtQOrd : Method:="Auto")->SeqEnum[AlgEtQIdl]
     end if;
 
     return E`WKICM;
-end intrinsic;
-
-intrinsic WeakEquivalenceClassMonoid(E::AlgEtQOrd : Method:="Auto")->SeqEnum[AlgEtQIdl]
-{Returns a set of representatives of the weak equivalence class monoid of E. The VarArg Method (default "Auto") is not used and kept for retrocompatibility.}
-    return WKICM(E:Method:=Method);
 end intrinsic;
 
 /* TESTS

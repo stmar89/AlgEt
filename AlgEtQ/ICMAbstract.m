@@ -294,7 +294,7 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing ICMAbstract:";
-	AttachSpec("~/AlgEt/spec");
+	//AttachSpec("~/AlgEt/spec");
     SetClassGroupBounds("GRH");
 
 	_<x>:=PolynomialRing(Integers());

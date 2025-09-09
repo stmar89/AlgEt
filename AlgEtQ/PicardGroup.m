@@ -762,7 +762,7 @@ end intrinsic;
     assert #ResidueRingUnits(P) eq Index(E,P)-1;
     assert forall{ i : i in [1..20] | #ResidueRingUnits(Pi) eq Index(E,Pi) - Index(P,Pi) where Pi:=P^i};
 
-    AttachSpec("~/AlgEt/spec");
+    //AttachSpec("~/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
     SetAssertions(1);

@@ -206,7 +206,7 @@ end intrinsic;
 ///////////////////////////////////////
 
 /// Given an order $R$, returns the weak equivalence class monoid $W$ of $R$ together with a map (with preimages) sending each class of $W$ to a representative (determined by WeakEquivalenceClassMonoid).}
-intrinsic WeakEquivalenceClassMonoidAbstract(R::AlgEtQOrdd) -> AlgEtQWECM,Map
+intrinsic WeakEquivalenceClassMonoidAbstract(R::AlgEtQOrd) -> AlgEtQWECM,Map
 {Given an order R, returns the weak equivalence class monoid W of R together with a map (with preimages) sending each class of W to a representative (determined by WeakEquivalenceClassMonoid).}
     if not assigned R`WKICMAbstractRep then
         if (not assigned R`OverOrders) or exists{T:T in R`OverOrders|not assigned T`WKICM_bar} then

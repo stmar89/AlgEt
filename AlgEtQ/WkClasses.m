@@ -348,12 +348,12 @@ end intrinsic;
 /// Given an order $E$, returns a set of representatives of the weak equivalence class monoid $\mathcal{W}(E)$.
 intrinsic WeakEquivalenceClassMonoid(E::AlgEtQOrd)->SeqEnum[AlgEtQIdl]
 {Given an order E, returns a set of representatives of the weak equivalence class monoid of E.}
-    return WKICM(E:Method:=Method);
+    return WKICM(E);
 end intrinsic;
 
 ///ditto
 intrinsic WKICM(E::AlgEtQOrd)->SeqEnum[AlgEtQIdl]
-{Given an order E, returns a set of representatives of the weak equivalence class monoid of E.}
+{ " } // "
     if not assigned E`WKICM then
         pp:=SingularPrimes(E);
         if #pp eq 0 then

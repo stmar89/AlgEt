@@ -16,7 +16,7 @@ clean_old:
 magma_script:
 	@echo "Printing the new fast_tests_AlgEtQ.m"
 	@echo "The tests will be sorted in the same way as the files they are in are listed in the spec file"
-	magma -b input:=${inputAlgEtQ} output_file:=${outfileAlgEtQ} magma_make_fast_tests_AlgEtQ.txt
+	magma -b input:=${inputAlgEtQ} output_file:=${outfileAlgEtQ} magma_make_fast_tests_AlgEtQ.m
 	@echo "...Done"
 	@echo "-------------------------------------------------------------"
 	@echo "-------------------------------------------------------------"

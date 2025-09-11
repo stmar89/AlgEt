@@ -7,13 +7,12 @@ and that the AlgEt package is in
 -) Make sure that licences are up-to-date. If needed update and run:
     magma ~/AlgEt/dev/magma_script_update_licence.txt
 -) Run the following commands
-    mkdir -p ~/Magma-Maths-package/package/Algebra/AlgEt/AlgEtQ/ && 
-    cp ~/AlgEt/AlgEtQ/*.m ~/Magma-Maths-package/package/Algebra/AlgEt/AlgEtQ/
+    cp ~/AlgEt/AlgEtQ/*.m ~/Magma-Maths-package/package/Ring/AlgEtQ/
 -) Make sure that 
-    ~/Magma-Maths-package/package/Algebra/Algebra.spec
+    ~/Magma-Maths-package/package/Ring/AlgEtQ.spec
    contains all the .m files from
     ~/AlgEt/spec
 -) Commit/push my fork of the magma repo.
 -) Make a pull request to the original repo.
--) Send by email an explaination, with new doc file and new test file.
+-) Send by email an explaination, with new doc file (if needed) and updated slow tests.
 

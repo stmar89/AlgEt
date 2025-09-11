@@ -2,7 +2,7 @@
 // Copyright 2025.
 // Stefano Marseglia, stefano.marseglia89@gmail.com
 // https://stmar89.github.io/index.html
-// 
+//
 // Distributed under the terms of the CC-BY 4.0 licence.
 // https://creativecommons.org/licenses/by/4.0/
 /////////////////////////////////////////////////////
@@ -49,7 +49,7 @@ intrinsic GraphOverOrders(R:AlgEtQOrd) -> GrphDir
                 // test
                 assert2 forall{ e : e in edges_P | oo_P[e[1]] subset oo_P[e[2]]}; // inclusions
                 // the next test is very time consuming
-                assert2 forall{ e : e in edges_P | [ S : S in oo_P | S ne oo_P[e[1]] and oo_P[e[1]] subset S 
+                assert2 forall{ e : e in edges_P | [ S : S in oo_P | S ne oo_P[e[1]] and oo_P[e[1]] subset S
                                 and S subset oo_P[e[2]] ] eq [oo_P[e[2]]]}; // minimal inclusions
                 Append(~edges,edges_P);
             end for;
@@ -61,7 +61,7 @@ intrinsic GraphOverOrders(R:AlgEtQOrd) -> GrphDir
                 assert forall{i : i in [1..#output] | output[i] eq oo_at_Ps[1][i]};
             else
                 cc:=CartesianProduct([[1..#x] : x in oo_at_Ps]); // sorted as output (check for O!)
-                // given c1,c2 in cc we have that c2 is a minimaloverorder of c1 if and only if 
+                // given c1,c2 in cc we have that c2 is a minimaloverorder of c1 if and only if
                 // - c1[i] eq c2[i] for all i's but one, say i0, and
                 // - c2[i0] is a minimaloverorder of c1[i0],
                 // which is equivalent to have [c1[i0],c2[i0]] in edges[i0].
@@ -85,8 +85,8 @@ intrinsic GraphOverOrders(R:AlgEtQOrd) -> GrphDir
                 // test
                 assert2 forall{ incl : incl in min_inclusions | output[incl[1]] subset output[incl[2]]}; // inclusion
                 // the next test is very time consuming
-                assert2 forall{ incl : incl in min_inclusions | [ S : S in output | 
-                                S ne output[incl[1]] and output[incl[1]] subset S 
+                assert2 forall{ incl : incl in min_inclusions | [ S : S in output |
+                                S ne output[incl[1]] and output[incl[1]] subset S
                                     and S subset output[incl[2]]] eq [output[incl[2]]]}; // minimal inclusions
             end if;
             G:=Digraph< #output | min_inclusions >;
@@ -97,23 +97,26 @@ intrinsic GraphOverOrders(R:AlgEtQOrd) -> GrphDir
 end intrinsic;
 
 /* TESTS
-    
+
     printf "### Testing GraphOverOrders:";
     //AttachSpec("~/packages_github/AlgEt/spec");
     SetAssertions(2);
     _<x>:=PolynomialRing(Integers());
-    fs:=[ 
+    fs:=[
           x^8 + 16, //1 sing prime
           x^4-10000*x^3-10000*x^2-10000*x-10000, //2 sing primes
-          x^4-30^3*x^3-30^3*x^2-30^3*x-30^3 //3 sing primes
+          x^4-30^3*x^3-30^3*x^2-30^3*x-30^3, //3 sing primes
         ];
-    for f in fs do
+    data := [<0, 1, 89, 186>, <0, 1, 297, 950>, <0, 1, 64, 144>];
+    for i->f in fs do
         printf ".";
         A:=EtaleAlgebra(f);
-        _:=GraphOverOrders(MaximalOrder(A));
-        R:=EquationOrder(A); 
-        _:=OverOrders(R);
-        _:=GraphOverOrders(R);
+        tM := GraphOverOrders(MaximalOrder(A));
+        R:=EquationOrder(A);
+        tO := OverOrders(R);
+        tG := GraphOverOrders(R);
+        assert #tO eq #Vertices(tG);
+        assert <#Edges(tM), #Vertices(tM), #Vertices(tG), #Edges(tG)> eq data[i];
         SetAssertions(1);
     end for;
     printf " all good!";

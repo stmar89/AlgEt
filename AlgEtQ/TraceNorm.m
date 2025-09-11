@@ -2,7 +2,7 @@
 // Copyright 2025.
 // Stefano Marseglia, stefano.marseglia89@gmail.com
 // https://stmar89.github.io/index.html
-// 
+//
 // Distributed under the terms of the CC-BY 4.0 licence.
 // https://creativecommons.org/licenses/by/4.0/
 /////////////////////////////////////////////////////
@@ -14,10 +14,10 @@ freeze;
 declare verbose AlgEtQTraceNorm, 3;
 
 ///# Trace and norm
-/// Let $A$ be an étale algebra over $\mathbb{Q}$, with components $K_1\times\cdots\times K_n$. 
+/// Let $A$ be an étale algebra over $\mathbb{Q}$, with components $K_1\times\cdots\times K_n$.
 /// We define the `(absolute) trace` on $A$ as the additive map $\mathrm{Tr_{A/\mathbb{Q}}}\colon A\to \mathbb{Q}$ that sends an element $a\in A$ to $\sum_{i=1}^n \mathrm{Tr}_{K_i/\mathbb{Q}}(a)$.
 /// Let $m_a$ be the matrix representing the multipliction-by-$a$ on $A$ with respect to any basis of $A$ over $\mathbb{Q}$. Then $\mathrm{Tr}_{A/\mathbb{Q}}(a)$ equals the trace of $m_a$.
-///  
+///
 /// We define the `(absolute) norm` on $A$ as the multiplicative map $\mathrm{N}_{A/\mathbb{Q}}\colon A \to \mathbb{Q}$ by sending a unit $a \in A$ to $\prod_{i=1}^n \mathrm{N}_{K_i/\mathbb{Q}}(a)$ and every zero-divisor to $0$.
 /// We have $N_{A/\mathbb{Q}}(a)$ equals the determinant of the matrix $m_a$.
 
@@ -32,7 +32,7 @@ end intrinsic;
 
 ///ditto
 intrinsic AbsoluteTrace(x::AlgEtQElt) -> FldRatElt
-{Returns the (absolute) trace of the element.}
+{ " } // "
     return &+[AbsoluteTrace(y) : y in Components(x)];
 end intrinsic;
 
@@ -43,7 +43,7 @@ end intrinsic;
 
 ///ditto
 intrinsic AbsoluteNorm(x::AlgEtQElt) -> FldRatElt
-{Returns the (absolute) norm of the element.}
+{ " } // "
     return &*[AbsoluteNorm(y) : y in Components(x)];
 end intrinsic;
 
@@ -114,5 +114,5 @@ end intrinsic;
         assert Trace(a)+Trace(b) eq Trace(a+b);
         assert Norm(a)*Norm(b) eq Norm(a*b);
     end for;
-    printf " all good!"; 
+    printf " all good!";
 */

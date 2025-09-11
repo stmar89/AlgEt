@@ -2,7 +2,7 @@
 // Copyright 2025.
 // Stefano Marseglia, stefano.marseglia89@gmail.com
 // https://stmar89.github.io/index.html
-// 
+//
 // Distributed under the terms of the CC-BY 4.0 licence.
 // https://creativecommons.org/licenses/by/4.0/
 /////////////////////////////////////////////////////
@@ -22,22 +22,23 @@ declare attributes AlgEtQIdl: residue_class_ring_unit_subgroup_generators,
 
 ///# Picard group and unit group
 /// Let $R$ be an order in an étale algebra $A$ over $\mathbb{Q}$ with maximal order $\mathcal{O}_A$.
-/// We say that two fractional $R$-ideals $I$ and $J$ are `isomorphic` if there exists a unit $a\in A$ such that $I=aJ$. Observe that this happens if and only if $I$ and $J$ are isomorphic as $R$-modules. 
+/// We say that two fractional $R$-ideals $I$ and $J$ are `isomorphic` if there exists a unit $a\in A$ such that $I=aJ$. Observe that this happens if and only if $I$ and $J$ are isomorphic as $R$-modules.
 /// We refer to the isomorphism class $[I]$ of $I$ as its `ideal class`.
-///   
+///
 /// The set of ideal classes of invertible fractional $R$-ideals forms a group under the operation induced by ideal multiplication. This group is called the `Picard group` of $R$ and denoted $\mathrm{Pic}(R)$.
-///   
+///
 /// If $K_1\times \ldots \times K_n$ are the components of $A$ then $\mathrm{Pic}(\mathcal{O}_A) = \prod_{i=1}^n\mathrm{Cl}(\mathcal{O}_{K_i})$, where $\mathrm{Cl}(\mathcal{O}_{K_i})$ is the class group of the number field $K_i$.
 /// Also, the unit group $\mathcal{O}_A^\times$ of $\mathcal{O}_A$ satisfies $\mathcal{O}_A^\times = \mathcal{O}_{K_1}^\times \times \ldots \times \mathcal{O}_{K_n}^\times$.
-///   
+///
 /// The Picard group and the unit group of the order $R$ can be computed using the well-known exact sequence:
 /// ```math
 /// 1 \to R^\times \to \mathcal{O}_A^\times \to \dfrac{\left( \mathcal{O}/\mathfrak{f} \right)^\times}{\left( \mathcal{O}/\mathfrak{f} \right)^\times} \to \mathrm{Pic}(R)\to \mathrm{Pic}(\mathcal{O}_A) \to 1,
 /// ```
 /// where the first, second and third map are the natural maps, the fourth is induced by $a \mapsto (a\mathcal{O}_A \cap R)$ and the last one is induced by the extension map $I \mapsto I\mathcal{O}_A$.
-///   
+///
 /// The following intrinsics allow to compute all the elements of the sequence.
 /// If one wants to perform the computation under the GRH bound one can either use the appropriate parameters of use `SetClassGroupBounds("GRH")` as for number fields.
+
 
 /// Given an order $S$ and a fractional $S$-ideal $I$, returns the group $(S/I)^\times$ and a map $(S/I)^\times \to  S$ giving representatives. This is implemented only when $S$ is the maximal order.
 intrinsic ResidueRingUnits(S::AlgEtQOrd,I::AlgEtQIdl) -> GrpAb,Map
@@ -124,7 +125,7 @@ intrinsic ResidueRingUnitsSubgroupGenerators(F::AlgEtQIdl) -> SeqEnum[AlgEtQElt]
         O:=MaximalOrder(A);
         Fm:=O!!F;
         l:=Factorization(Fm);
-        l2:=[ <(S!!x[1]) meet S,x[2]>: x in l]; 
+        l2:=[ <(S!!x[1]) meet S,x[2]>: x in l];
         primes:={x[1]:x in l2};
         primes:=[<x, Maximum([y[2]: y in l2 |y[1] eq x])>:x in primes];
         primes_powers:=[ p[1]^p[2] : p in primes ];
@@ -154,7 +155,7 @@ intrinsic ResidueRingUnitsSubgroupGenerators(F::AlgEtQIdl) -> SeqEnum[AlgEtQElt]
                 M:=[1+x:x in M];
                 for elt in M do
                     c:=elt*e1+e2;
-                    // equivlent to:
+                    // equivalent to:
                     //c:=ChineseRemainderTheorem((a1a2),rest,elt,One(A));
                     assert2 c - ChineseRemainderTheorem(a1a2,rest,elt,One(A)) in a1a2*rest;
                     Include(~elts,c);
@@ -168,7 +169,7 @@ intrinsic ResidueRingUnitsSubgroupGenerators(F::AlgEtQIdl) -> SeqEnum[AlgEtQElt]
         vprintf AlgEtQPicardGroup, 2 :"residue_class_ring_unit_subgroup_generators:\n
                                          elts = %o\n",PrintSeqAlgEtQElt(Setseq(elts));
     end if;
-	return F`residue_class_ring_unit_subgroup_generators;
+    return F`residue_class_ring_unit_subgroup_generators;
 end intrinsic;
 
 IsPrincipal_prod_internal_old:=function( I , GRH )
@@ -181,15 +182,14 @@ IsPrincipal_prod_internal_old:=function( I , GRH )
     A:=Algebra(S);
     nf,embs:=Components(A);
     gen:=Zero(A);
-    if GRH then
-        SetClassGroupBounds("GRH");
-    end if;
+    // the optional parameter Proof for the ClassGroup call, which by default is "Full"
+    proof := GRH select "GRH" else "Full";
     for i in [1..#I_asProd] do
         IL:=I_asProd[i];
         OrdIL:=Order(IL);
         assert IsMaximal(OrdIL);
         //The next call is to prevent a bug of the in-built function IsPrincipal (which might have been corrected by now...).
-        OL,oL:=ClassGroup(OrdIL);
+        OL,oL:=ClassGroup(OrdIL : Proof := proof);
         testL,genL:=IsPrincipal(IL);
         assert2 (Zero(OL) eq (IL@@oL)) eq testL;
         if not testL then
@@ -224,17 +224,16 @@ IsPrincipal_prod_internal:=function( II , GRH )
     A:=Algebra(S);
     nf,embs:=Components(A);
     gen:=Zero(A);
-    if GRH then
-        SetClassGroupBounds("GRH");
-    end if;
+    // the optional parameter Proof for the ClassGroup call, which by default is "Full"
+    proof := GRH select "GRH" else "Full";
     for i in [1..#I_asProd] do
         IL:=I_asProd[i];
         OrdIL:=Order(IL);
         assert IsMaximal(OrdIL);
         //The next call is to prevent a bug of the in-built function IsPrincipal (which might have been corrected by now...).
-        //Also if one wants to use the GRH bound rather than one needs to precompute the class groups, since IsPrincipal does not accepts varargs )       
-        OL,oL:=ClassGroup(OrdIL);
-        // the next line seems to be the most consuming part of the package. 
+        //Also if one wants to use the GRH bound rather than one needs to precompute the class groups, since IsPrincipal does not accepts varargs )
+        OL,oL:=ClassGroup(OrdIL : Proof := proof);
+        // the next line seems to be the most consuming part of the package.
         // It is 10/20 times slower than the RngOrdIdl version. Need to investigate
         testL,genL:=IsPrincipal(IL);
         assert2 (Zero(OL) eq (IL@@oL)) eq testL;
@@ -244,10 +243,10 @@ IsPrincipal_prod_internal:=function( II , GRH )
         gen:=gen+embs[i](nf[i] ! genL);
     end for;
     assert2 gen*S eq I;
-    
+
     gen:=gen/a;
     vprintf AlgEtQPicardGroup, 3:"IsPrincipal_prod_internal:\n
-                            [gen,a] = %o\n",PrintSeqAlgEtQElt([gen,a]); 
+                            [gen,a] = %o\n",PrintSeqAlgEtQElt([gen,a]);
     II`Generators:=[gen];
     return true,gen;
 end function;
@@ -273,7 +272,7 @@ intrinsic IsPrincipal(I1::AlgEtQIdl : GRH:=false )->BoolElt, AlgEtQElt
     F:=Conductor(S);
     FO:=O!!F;
     cop,I:=CoprimeRepresentative(I1,F);
-    IO:=O!!I; 
+    IO:=O!!I;
     is_princ_IO,gen_IO:=IsPrincipal_prod_internal(IO,GRH);
     if not is_princ_IO then
         return false,_;
@@ -286,7 +285,7 @@ intrinsic IsPrincipal(I1::AlgEtQIdl : GRH:=false )->BoolElt, AlgEtQElt
     UO,uO:=UnitGroup(O : GRH:=GRH );
     Sgens:=ResidueRingUnitsSubgroupGenerators(F);
     B,b:=quo<R|[gen@@r : gen in Sgens]>;
-    //B,b:=ResidueRingUnits(F); // it does't see that it is related to R.
+    //B,b:=ResidueRingUnits(F); // it doesn't see that it is related to R.
     gens_UO_inB:=[ b(uO(UO.i)@@r) : i in [1..#Generators(UO)]  ];
     h:=hom<UO -> B | gens_UO_inB >;
     hUO:=Image(h);
@@ -305,13 +304,13 @@ intrinsic IsPrincipal(I1::AlgEtQIdl : GRH:=false )->BoolElt, AlgEtQElt
         return true,gen_I1;
     else
         return false, _;
-    end if;  
+    end if;
 end intrinsic;
 
 PicardGroup_prod_internal:=function( O , GRH )
 //computes the PicardGroup of a product of order in a product of number fields and returns the group (as a direct product) and a sequence of representatives
-    if assigned O`PicardGroup then 
-        return Explode(O`PicardGroup); 
+    if assigned O`PicardGroup then
+        return Explode(O`PicardGroup);
     end if;
     A:=Algebra(O);
     assert IsMaximal(O); // this function should be used only for maximal orders
@@ -320,12 +319,11 @@ PicardGroup_prod_internal:=function( O , GRH )
     nf,embs:=Components(A);
     assert #nf eq #O_asProd;
     groups_maps_fields_maps:=[**];
-    if GRH then
-        SetClassGroupBounds("GRH");
-    end if;
+    // the optional parameter Proof for the ClassGroup call, which by default is "Full"
+    proof := GRH select "GRH" else "Full";
     for i in [1..#O_asProd] do
         OL:=O_asProd[i];
-        GL,gL:=ClassGroup(OL);
+        GL,gL:=ClassGroup(OL : Proof := proof);
         assert2 forall{y : y in [gL(z) : z in GL] | MultiplicatorRing(y) eq OL};
         //this is a detector for bugs for the PicardGroup function.
         Append(~groups_maps_fields_maps,<GL,gL,nf[i],embs[i]>);
@@ -367,7 +365,7 @@ PicardGroup_prod_internal:=function( O , GRH )
             TwoGeneratingSet(gen_O);
             Append(~geninO,gen_O);
         end for;
-        assert #geninO eq #Generators(G);      
+        assert #geninO eq #Generators(G);
         rep_idinA:= function(x)
             vprint AlgEtQPicardGroup, 2: "PicardGroup_prod_internal: rep_idinA\n";
             coeff:=Eltseq(x);
@@ -385,7 +383,7 @@ PicardGroup_prod_internal:=function( O , GRH )
             return &+[g[i](id_asprod[i]@@groups_maps_fields_maps[i,2]) : i in [1..#id_asprod]];
         end function;
         Codomain:=Parent(rep_idinA(Zero(G)));
-        mapGtoO:=map<G -> Codomain | rep:-> rep_idinA(rep) , y:->inverse_map(y) >; 
+        mapGtoO:=map<G -> Codomain | rep:-> rep_idinA(rep) , y:->inverse_map(y) >;
         assert2 forall{a : a in Generators(G)| (mapGtoO(a))@@mapGtoO eq a};
         O`PicardGroup:=<G,mapGtoO>;
         vprintf AlgEtQPicardGroup, 2:"PicardGroup_prod_internal:\n
@@ -398,18 +396,18 @@ end function;
 /// Returns the Picard group $\mathrm{Pic}(S)$ of the order $S$, which is not required to be maximal, and a map from the group to a set of representatives of the ideal classes.  The parameter `GRH` (default false) can be set to true determines if the test is done under GRH.
 intrinsic PicardGroup( S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
 {Returns the Picard group of the order S, which is not required to be maximal, and a map from the group to a set of representatives of the ideal classes.  The parameter GRH (default false) can be set to true determines if the test is done under GRH.}
-    if assigned S`PicardGroup then 
-        return Explode(S`PicardGroup); 
+    if assigned S`PicardGroup then
+        return Explode(S`PicardGroup);
     end if;
-    if IsMaximal(S) then 
-        return PicardGroup_prod_internal(S,GRH); 
+    if IsMaximal(S) then
+        return PicardGroup_prod_internal(S,GRH);
     end if;
     A:=Algebra(S);
     O:=MaximalOrder(A);
     GO,gO:=PicardGroup_prod_internal(O,GRH); //C, mC
     F:=Conductor(S);
     FO:=O!!F; //Fm
-    gens_GO_in_S:=[]; //coprime with FO, in S and then meet S   
+    gens_GO_in_S:=[]; //coprime with FO, in S and then meet S
     gens_GO_in_O:=[]; //coprime with FO, in O, Cgen
     if #GO gt 1 then
         for i in [1..#Generators(GO)] do
@@ -426,14 +424,14 @@ intrinsic PicardGroup( S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
             Append(~gens_GO_in_O,cI);//used in building relDglue
         end for;
 
-        mGO_to_S:=function(rep)  
+        mGO_to_S:=function(rep)
             vprint AlgEtQPicardGroup, 3: "PicardGroup: mGO_to_S\n";
             coeff:=Eltseq(rep);
             idS:=&*[(gens_GO_in_S[i])^coeff[i] : i in [1..#coeff] ];
             return idS;
         end function;
-        mGO_to_O:=function(rep) 
-            vprint AlgEtQPicardGroup, 3: "PicardGroup: mGO_to_O\n"; 
+        mGO_to_O:=function(rep)
+            vprint AlgEtQPicardGroup, 3: "PicardGroup: mGO_to_O\n";
             coeff:=Eltseq(rep);
             assert #coeff eq #gens_GO_in_O;
             idO:=&*[(gens_GO_in_O[i])^coeff[i] : i in [1..#coeff] ];
@@ -459,15 +457,15 @@ intrinsic PicardGroup( S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
 
     R,r:=ResidueRingUnits(O,FO); // G, mG
     Sgens:=ResidueRingUnitsSubgroupGenerators(F); // ogens //generators in S of (S/F)*
-    vprintf AlgEtQPicardGroup, 2: "PicardGroup: UO..."; 
-    UO,uO:=UnitGroup(O : GRH:=GRH ); // Um, mUm 
-    vprintf AlgEtQPicardGroup, 2: "done\n"; 
+    vprintf AlgEtQPicardGroup, 2: "PicardGroup: UO...";
+    UO,uO:=UnitGroup(O : GRH:=GRH ); // Um, mUm
+    vprintf AlgEtQPicardGroup, 2: "done\n";
     H:=FreeAbelianGroup(#Generators(GO));
     D, mRD, mHD, mDR, mDH := DirectSum(R,H); // D, mGD, mHD, mDG, mDH
     relDresidue:=[mRD(x@@r) : x in Sgens];
     relDunits:=[mRD(uO(x)@@r)  : x in Generators(UO)];
     // glue R and GO
-    relDglue := [];   
+    relDglue := [];
     assert #gens_GO_in_S eq #InvariantFactors(GO);
     for i in [1..#gens_GO_in_S] do
         is_princ, gen := IsPrincipal_prod_internal(gens_GO_in_O[i]^InvariantFactors(GO)[i],GRH);
@@ -476,12 +474,12 @@ intrinsic PicardGroup( S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
     end for;
 
     P, mDP := quo<D|relDresidue cat relDunits cat relDglue>;
-    vprintf AlgEtQPicardGroup, 2: "PicardGroup: D = %o\n",D; 
-    vprintf AlgEtQPicardGroup, 2: "PicardGroup: P = %o\n",P; 
-    vprintf AlgEtQPicardGroup, 2: "PicardGroup: ker(mDP) = %o\n",Kernel(mDP); 
+    vprintf AlgEtQPicardGroup, 2: "PicardGroup: D = %o\n",D;
+    vprintf AlgEtQPicardGroup, 2: "PicardGroup: P = %o\n",P;
+    vprintf AlgEtQPicardGroup, 2: "PicardGroup: ker(mDP) = %o\n",Kernel(mDP);
     gens_P_in_D:=[P.i@@mDP : i in [1..#Generators(P)]];
     // Issue: the elements in gens_P_in_D might have very large coefficients, resulting in generators with
-    // horrible Z-bases. The next few lines, minimize the coefficients that appear in fron of the free generators.
+    // horrible Z-bases. The next few lines, minimize the coefficients that appear in front of the free generators.
         gens_P_in_D_small:=[];
         ker:=Kernel(mDP);
         ker_gens_inD:=[D!ker.i:i in [1..Ngens(ker)]];
@@ -490,13 +488,13 @@ intrinsic PicardGroup( S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
             basis_mat:=Matrix([Eltseq(mDH(g)):g in ker_free_gens_inD]);
             basis_mat_LLL,T:=LLL(basis_mat); // basis_mat_LLL = T*basis_mat
             Latt:=LatticeWithBasis(basis_mat_LLL);
-            vprintf AlgEtQPicardGroup, 2: "PicardGroup: basis_mat = \n%o\n",basis_mat; 
-            vprintf AlgEtQPicardGroup, 2: "PicardGroup: basis_mat_LLL = \n%o\n",basis_mat_LLL; 
+            vprintf AlgEtQPicardGroup, 2: "PicardGroup: basis_mat = \n%o\n",basis_mat;
+            vprintf AlgEtQPicardGroup, 2: "PicardGroup: basis_mat_LLL = \n%o\n",basis_mat_LLL;
             for g in gens_P_in_D do
                 elt:=Vector(Eltseq(-mDH(g)));
-                vprintf AlgEtQPicardGroup, 2: "PicardGroup: ClosestVector to %o...",elt; 
+                vprintf AlgEtQPicardGroup, 2: "PicardGroup: ClosestVector to %o...",elt;
                 c:=ClosestVector(Latt,elt);
-                vprintf AlgEtQPicardGroup, 2: "done\n"; 
+                vprintf AlgEtQPicardGroup, 2: "done\n";
                 c:=Eltseq(Vector(Coordinates(c))*T);
                 g_small:=g+&+[c[i]*ker_free_gens_inD[i]:i in [1..#c]];
                 // replace coeffs c of finite order N with N-c if better size
@@ -506,7 +504,7 @@ intrinsic PicardGroup( S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
                 c_better:=[Order(D.i) ne 0 and (Abs(N_c_small[i]) lt Abs(c_small[i])) select N_c_small[i] else c_small[i] : i in [1..#c_small]];
                 g_small:=&+[c_better[i]*D.i:i in[1..Ngens(D)]];
                 assert g-g_small in ker;
-                vprintf AlgEtQPicardGroup, 2: "PicardGroup: g,g_small = %o\t%o\n",g,g_small; 
+                vprintf AlgEtQPicardGroup, 2: "PicardGroup: g,g_small = %o\t%o\n",g,g_small;
                 if &+[Abs(c):c in Eltseq(g)] lt &+[Abs(c):c in Eltseq(g_small)] then
                     Append(~gens_P_in_D_small,g);
                 else
@@ -520,27 +518,27 @@ intrinsic PicardGroup( S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
     if #P gt 1 then
         generators_ideals:=[];
         for igen->gen in gens_P_in_D do
-            vprintf AlgEtQPicardGroup, 2: "PicardGroup: gens_P_in_D[%o]i = %o...\n",igen,gen; 
-            vprintf AlgEtQPicardGroup, 2: "\t\tcomputing id1 ..."; 
+            vprintf AlgEtQPicardGroup, 2: "PicardGroup: gens_P_in_D[%o]i = %o...\n",igen,gen;
+            vprintf AlgEtQPicardGroup, 2: "\t\tcomputing id1 ...";
             id1:=(S!!( O*(r(mDR(gen))) )) meet S;
-            vprintf AlgEtQPicardGroup, 2: "done: it has ZBasis of length %o\n",#Sprint(ZBasis(id1)); 
-            vprintf AlgEtQPicardGroup, 2: "\t\tcomputing id2 ..."; 
+            vprintf AlgEtQPicardGroup, 2: "done: it has ZBasis of length %o\n",#Sprint(ZBasis(id1));
+            vprintf AlgEtQPicardGroup, 2: "\t\tcomputing id2 ...";
             id2:=mGO_to_S(mDH(gen));
-            vprintf AlgEtQPicardGroup, 2: "done: it has ZBasis of length %o\n",#Sprint(ZBasis(id2)); 
-            vprintf AlgEtQPicardGroup, 2: "\t\tcomputing id1*id2 ..."; 
+            vprintf AlgEtQPicardGroup, 2: "done: it has ZBasis of length %o\n",#Sprint(ZBasis(id2));
+            vprintf AlgEtQPicardGroup, 2: "\t\tcomputing id1*id2 ...";
             gen_inS:=id1*id2;
-            vprintf AlgEtQPicardGroup, 2: "done: it has ZBasis of length %o\n",#Sprint(ZBasis(gen_inS)); 
+            vprintf AlgEtQPicardGroup, 2: "done: it has ZBasis of length %o\n",#Sprint(ZBasis(gen_inS));
             // make the rep small
-            vprintf AlgEtQPicardGroup, 2: "\t\tcalling SmallRepresentative ..."; 
+            vprintf AlgEtQPicardGroup, 2: "\t\tcalling SmallRepresentative ...";
             gen_inS:=SmallRepresentative(gen_inS); // the ZBasis is already LLL-ed
-            vprintf AlgEtQPicardGroup, 2: "done\n"; 
+            vprintf AlgEtQPicardGroup, 2: "done\n";
             assert2 IsInvertible(gen_inS); //test using colon ideal
             gen_inS`IsInvertible:=true;
             gen_inS`MultiplicatorRing:=S;
             // invertible, so 2-generated.
-            vprintf AlgEtQPicardGroup, 2: "\t\tcalling TwoGeneratingSet ..."; 
+            vprintf AlgEtQPicardGroup, 2: "\t\tcalling TwoGeneratingSet ...";
             TwoGeneratingSet(gen_inS);
-            vprintf AlgEtQPicardGroup, 2: "done\n"; 
+            vprintf AlgEtQPicardGroup, 2: "done\n";
             Append(~generators_ideals,gen_inS);
         end for;
     else
@@ -550,19 +548,19 @@ intrinsic PicardGroup( S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
         return Explode(S`PicardGroup);
     end if;
 
-    vprint AlgEtQPicardGroup, 2: "PicardGroup: defining representative_picard_group ..."; 
+    vprint AlgEtQPicardGroup, 2: "PicardGroup: defining representative_picard_group ...";
     representative_picard_group := function(rep)
-        vprint AlgEtQPicardGroup, 3: "PicardGroup: representative_picard_group\n"; 
+        vprint AlgEtQPicardGroup, 3: "PicardGroup: representative_picard_group\n";
         repseq := Eltseq(rep);
         return &*[generators_ideals[i]^repseq[i]:i in [1..#generators_ideals]];
     end function;
-    vprint AlgEtQPicardGroup, 2: "done\n"; 
+    vprint AlgEtQPicardGroup, 2: "done\n";
 
 
-    vprint AlgEtQPicardGroup, 2: "PicardGroup: defining disc_log_picard_group ..."; 
+    vprint AlgEtQPicardGroup, 2: "PicardGroup: defining disc_log_picard_group ...";
     disc_log_picard_group:=function(id)
     // (crep*id)^-1 is coprime with F
-        vprint AlgEtQPicardGroup, 3: "PicardGroup: disc_log_picard_group\n"; 
+        vprint AlgEtQPicardGroup, 3: "PicardGroup: disc_log_picard_group\n";
         crep:=1/(CoprimeRepresentative(id^-1,F));//here we check if id is invertible
         idO:=O!!(crep*id); //idO is coprime with FO
         GOrep:=idO@@gO;
@@ -573,18 +571,18 @@ intrinsic PicardGroup( S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
         assert2 IsCoprime(elt*O,FO); //..hence elt is in the image r:R->Pic(S)
         Rrep:=elt@@r;
         rep_P:=mDP(-mRD(Rrep)+mHD(H!Eltseq(GOrep)));//[I]=-[xO meet S]+GOrep
-        return rep_P;        
+        return rep_P;
     end function;
-    vprint AlgEtQPicardGroup, 2: "done\n"; 
+    vprint AlgEtQPicardGroup, 2: "done\n";
 
-    vprint AlgEtQPicardGroup, 2: "PicardGroup: computing cod ..."; 
+    vprint AlgEtQPicardGroup, 2: "PicardGroup: computing cod ...";
     cod:=Parent(representative_picard_group(Zero(P)));
-    vprint AlgEtQPicardGroup, 2: "done\n"; 
+    vprint AlgEtQPicardGroup, 2: "done\n";
 
-    vprint AlgEtQPicardGroup, 2: "PicardGroup: defining the map p ..."; 
+    vprint AlgEtQPicardGroup, 2: "PicardGroup: defining the map p ...";
     p:=map<P -> cod | rep:->representative_picard_group(rep),
                        id:->disc_log_picard_group(id) >;
-    vprint AlgEtQPicardGroup, 2: "done\n"; 
+    vprint AlgEtQPicardGroup, 2: "done\n";
     S`PicardGroup:=<P,p>;
     vprintf AlgEtQPicardGroup, 2:"PicardGroup: computation is concluded\n
                         generators_ideals = %o\n",
@@ -606,34 +604,34 @@ intrinsic ExtensionHomPicardGroups(S::AlgEtQOrd,T::AlgEtQOrd : GRH:="false")->Ma
 end intrinsic;
 
 UnitGroup_prod_internal:=function(O, GRH)
-	//returns the UnitGroup of a order which is a produc of orders
-	if assigned O`UnitGroup then 
+    //returns the UnitGroup of a order which is a produc of orders
+    if assigned O`UnitGroup then
         return Explode(O`UnitGroup);
     end if;
-	assert IsMaximal(O); //this function should be used only for maximal orders
-	test,O_asProd:=IsProductOfOrders(O);
-	assert test; //the order must be a product
-	A:=Algebra(O);
+    assert IsMaximal(O); //this function should be used only for maximal orders
+    test,O_asProd:=IsProductOfOrders(O);
+    assert test; //the order must be a product
+    A:=Algebra(O);
     nf,embs:=Components(A);
-	idemA:=OrthogonalIdempotents(A);
-	U_asProd:=[];
-	u_asProd:=[**];
-	for OL in O_asProd do
-		U,u:=UnitGroup(OL : GRH:=GRH );
-		Append(~U_asProd,U);
-		Append(~u_asProd,u);
-	end for;
-	Udp,udp,proj_Udp:=DirectSum(U_asProd);
-	gensinA:=[&+[embs[j](u_asProd[j](proj_Udp[j](Udp.i))) : j in [1..#U_asProd]] : i in [1..#Generators(Udp)] ];
-  
+    idemA:=OrthogonalIdempotents(A);
+    U_asProd:=[];
+    u_asProd:=[**];
+    for OL in O_asProd do
+        U,u:=UnitGroup(OL : GRH:=GRH );
+        Append(~U_asProd,U);
+        Append(~u_asProd,u);
+    end for;
+    Udp,udp,proj_Udp:=DirectSum(U_asProd);
+    gensinA:=[&+[embs[j](u_asProd[j](proj_Udp[j](Udp.i))) : j in [1..#U_asProd]] : i in [1..#Generators(Udp)] ];
+
     rep_inA:=function(rep)
-        vprint AlgEtQPicardGroup, 2: "UnitGroup_prod_internal: rep_inA\n"; 
+        vprint AlgEtQPicardGroup, 2: "UnitGroup_prod_internal: rep_inA\n";
         coeff:=Eltseq(rep);
         return &*[gensinA[i]^coeff[i] : i in [1..#coeff]];
     end function;
 
     disc_log:=function(x)
-        vprint AlgEtQPicardGroup, 2: "UnitGroup_prod_internal: disc_log\n"; 
+        vprint AlgEtQPicardGroup, 2: "UnitGroup_prod_internal: disc_log\n";
         comp_x:=Components(A ! x);
         x_in_Udp:=&*[ udp[i](comp_x[i]@@u_asProd[i]) : i in [1..#comp_x] ];
         return x_in_Udp;
@@ -649,7 +647,7 @@ end function;
 /// Returns the unit group of the given order. The parameter `GRH` (default false) can be set to true determines if the test is done under GRH.
 intrinsic UnitGroup(S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
 {Returns the unit group of the given order. The parameter GRH (default false) can be set to true determines if the test is done under GRH.}
-    if assigned S`UnitGroup then 
+    if assigned S`UnitGroup then
         return Explode(S`UnitGroup);
     end if;
     if IsMaximal(S) then return UnitGroup_prod_internal(S,GRH); end if;
@@ -673,7 +671,7 @@ intrinsic UnitGroup(S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
     p_codomain:=A;
 
     map_P_to_S:=function(rep)
-        vprint AlgEtQPicardGroup, 2: "UnitGroup: map_P_to_S\n"; 
+        vprint AlgEtQPicardGroup, 2: "UnitGroup: map_P_to_S\n";
         coeff:=Eltseq(rep);
         assert #coeff eq #gens_P_in_A;
         elt:=&*[gens_P_in_A[i]^coeff[i] : i in [1..#coeff]];
@@ -682,7 +680,7 @@ intrinsic UnitGroup(S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
     end function;
 
     map_S_to_P:=function(y)
-        vprint AlgEtQPicardGroup, 2: "UnitGroup: map_S_to_P\n"; 
+        vprint AlgEtQPicardGroup, 2: "UnitGroup: map_S_to_P\n";
         assert2 y in S and y^-1 in S;
         assert2 m(y@@uO) eq Zero(B);
         elt := P ! (y@@uO);
@@ -720,21 +718,21 @@ end intrinsic;
 
     printf "### Testing PicardGroup and UnitGroup:";
     //AttachSpec("~/packages_github/AlgEt/spec");
-	SetAssertions(2);
-	_<x>:=PolynomialRing(Integers());
+    SetAssertions(2);
+    _<x>:=PolynomialRing(Integers());
 
-	// very fast
+    // very fast
     f:=(x^4+16);
-	A:=EtaleAlgebra(f);
-	E:=EquationOrder(A);
-	oo:=FindOverOrders(E);
+    A:=EtaleAlgebra(f);
+    E:=EquationOrder(A);
+    oo:=FindOverOrders(E);
     for S in oo do
         P,p:=PicardGroup(S);
         U,u:=UnitGroup(S);
-        printf ".";	
+        printf ".";
     end for;
 
-	//AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/packages_github/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
     SetAssertions(1);
@@ -749,7 +747,7 @@ end intrinsic;
     printf ".";
     SetAssertions(1);
 
-	//AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/packages_github/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());
     f:=x^8+16;
     A:=EtaleAlgebra(f);
@@ -777,8 +775,8 @@ end intrinsic;
     ext:=ExtensionHomPicardGroups(E,O);
     for i in [1..100] do
         printf ".";
-        x:=Random(P); y:=Random(P); 
+        x:=Random(P); y:=Random(P);
         assert ext(x+y) eq ext(x)+ext(y);
     end for;
-    printf " all good!"; 
+    printf " all good!";
 */

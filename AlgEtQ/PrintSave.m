@@ -2,7 +2,7 @@
 // Copyright 2025.
 // Stefano Marseglia, stefano.marseglia89@gmail.com
 // https://stmar89.github.io/index.html
-// 
+//
 // Distributed under the terms of the CC-BY 4.0 licence.
 // https://creativecommons.org/licenses/by/4.0/
 /////////////////////////////////////////////////////
@@ -101,7 +101,7 @@ intrinsic LoadWKICM(str::MonStgElt) -> AlgEtQOrd
     A`MaximalOrder:=O;
     if #wk gt 1 then
         R:=ooR[1]; // the first one is R
-    else 
+    else
         R:=O; //to save attributes
         assert indO eq 1; //sanity check
     end if;
@@ -130,7 +130,7 @@ end intrinsic;
 
 
 /* TESTS
-    
+
     printf "### Testing Print Saving:";
     //AttachSpec("~/packages_github/AlgEt/spec");
     _<x>:=PolynomialRing(Integers());
@@ -162,5 +162,5 @@ end intrinsic;
     assert #FindOverOrders(R) eq #FindOverOrders(R1);
     printf ".";
 
-    printf " all good!"; 
+    printf " all good!";
 */

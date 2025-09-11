@@ -2,7 +2,7 @@
 // Copyright 2025.
 // Stefano Marseglia, stefano.marseglia89@gmail.com
 // https://stmar89.github.io/index.html
-// 
+//
 // Distributed under the terms of the CC-BY 4.0 licence.
 // https://creativecommons.org/licenses/by/4.0/
 /////////////////////////////////////////////////////
@@ -29,7 +29,7 @@ declare attributes AlgEtQWECMElt : Parent,
                                    IsIdempotent;
 
 ///## Abstract representation of the weak equivalence class monoid.
-/// The second method to compute $\mathcal{W}(R)$ returns an abstract representation of the monoid together with a map giving representatives. The monoid is of type `AlgEtQWECM` and each class is of type `AlgEtQWECMElt`. Classes can be created by feeding to the operator `!` a fractional $S$-ideal, when $S$ is an overorder of $R$ or an overorder of $R$. 
+/// The second method to compute $\mathcal{W}(R)$ returns an abstract representation of the monoid together with a map giving representatives. The monoid is of type `AlgEtQWECM` and each class is of type `AlgEtQWECMElt`. Classes can be created by feeding to the operator `!` a fractional $S$-ideal, when $S$ is an overorder of $R$ or an overorder of $R$.
 /// Whenever a class is created a representative is stored in an attribute.
 /// This representative can be changed using the intrinsic `SetRepresentative`.
 /// Classes can be multiplied using the operator `*`. Whenever two classes are multiplied, the result is stored in the attribute `MultiplicationTable` of the monoid.
@@ -59,12 +59,12 @@ intrinsic IsCoercible(W::AlgEtQWECM, x::.) -> BoolElt, .
     if Parent(x) cmpeq W then
         return true,x;
     elif Type(x) eq AlgEtQWECMElt and Order(W) subset Order(Parent(x)) then
-        return true,(Order(W)!!Ideal(x))@@Map(W); 
+        return true,(Order(W)!!Ideal(x))@@Map(W);
     elif Type(x) eq AlgEtQIdl and Order(W) subset Order(x) then
-        return true,(Order(W)!!x)@@Map(W); 
+        return true,(Order(W)!!x)@@Map(W);
     elif Type(x) eq AlgEtQOrd and Order(W) subset x then
-        return true,(Order(W)!!OneIdeal(x))@@Map(W); 
-    else 
+        return true,(Order(W)!!OneIdeal(x))@@Map(W);
+    else
         return false,"";
     end if;
 end intrinsic;
@@ -143,7 +143,7 @@ end intrinsic;
 intrinsic '*'(x::AlgEtQWECMElt,y::AlgEtQWECMElt)->AlgEtQWECMElt
 {Returns weak equivalence class corresponding to the product of the two given classes.}
     W:=Parent(x);
-    require W eq Parent(y) : "The classes do not blong to the same weak equivalence class monoid";
+    require W eq Parent(y) : "The classes do not belong to the same weak equivalence class monoid";
     if not assigned W`MultiplicationTable then
         W`MultiplicationTable:=AssociativeArray();
     end if;
@@ -162,7 +162,7 @@ intrinsic '*'(x::AlgEtQWECMElt,y::AlgEtQWECMElt)->AlgEtQWECMElt
     end if;
     return z;
 end intrinsic;
- 
+
 /// Given a weak equivalence class $x$ and a non-negative integer $n$, returns the weak equivalence class $x^n$.
 intrinsic '^'(x::AlgEtQWECMElt,n::RngIntElt)->AlgEtQWECMElt
 {Given a weak equivalence class x and a non-negative integer n, returns the weak equivalence class x^n.}
@@ -210,7 +210,7 @@ intrinsic WeakEquivalenceClassMonoidAbstract(R::AlgEtQOrd) -> AlgEtQWECM,Map
 {Given an order R, returns the weak equivalence class monoid W of R together with a map (with preimages) sending each class of W to a representative (determined by WeakEquivalenceClassMonoid).}
     if not assigned R`WKICMAbstractRep then
         if (not assigned R`OverOrders) or exists{T:T in R`OverOrders|not assigned T`WKICM_bar} then
-            // this populates everything faster than computing separately the overorders and the wk_icm_bar's 
+            // this populates everything faster than computing separately the overorders and the wk_icm_bar's
             _:=WeakEquivalenceClassMonoid(R);
         end if;
         oo:=OverOrders(R);
@@ -218,7 +218,7 @@ intrinsic WeakEquivalenceClassMonoidAbstract(R::AlgEtQOrd) -> AlgEtQWECM,Map
         W`Order:=R;
 
         arr:=AssociativeArray();
-        for T in oo do 
+        for T in oo do
             arr[T]:=[CreateAlgEtQWECMElt(W,R!!I) : I in WKICM_bar(T)];
         end for;
         W`Array:=arr;
@@ -324,7 +324,7 @@ end intrinsic;
 
 /// Given the weak equivalence class monoid of an order $R$ in the étale algebra $K$ and a prime $P$ of $R$, returns the weak equivalence class monoid of the unique overorder of $R$ which is locally equal to $R$ at $P$ and locally maximal at every other prime. This order is $R+P^k O$, where $O$ is the maximal order of $K$ and $k$ is a non-negative big-enough integer.
 intrinsic Localization(W::AlgEtQWECM,P::AlgEtQIdl)->AlgEtQWECM
-{Given the weak equivalence class monoid of an order R in the etale algebra K and a prime P of R, returns the weak equivalance class monoid of the unique overorder of R which is locally equal to R at P and locally maximal at every other prime. This order is R+P^kO, where O is the maximal order of K and k is a non-negative big-enough integer.}
+{Given the weak equivalence class monoid of an order R in the etale algebra K and a prime P of R, returns the weak equivalence class monoid of the unique overorder of R which is locally equal to R at P and locally maximal at every other prime. This order is R+P^kO, where O is the maximal order of K and k is a non-negative big-enough integer.}
     R:=Order(W);
     require Order(P) eq R and IsPrime(P) : "P needs to be a maximal ideal of the underlying order of W";
     O:=MaximalOrder(Algebra(R));
@@ -349,7 +349,7 @@ intrinsic IsGeneratingSet(W::AlgEtQWECM,seq::SeqEnum[AlgEtQWECMElt])->BoolElt
         submonoid_new:=submonoid_old;
         N:=#submonoid_old;
         for x,y in submonoid_old do
-           Include(~submonoid_new,x*y); 
+           Include(~submonoid_new,x*y);
         end for;
         submonoid_old:=submonoid_new;
     until #submonoid_old eq N;
@@ -366,10 +366,10 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing WkAbstract:";
-	//AttachSpec("~/AlgEt/spec");
-	//SetAssertions(2);
+    //AttachSpec("~/AlgEt/spec");
+    //SetAssertions(2);
     SetClassGroupBounds("GRH");
-	_<x>:=PolynomialRing(Integers());
+    _<x>:=PolynomialRing(Integers());
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
     K:=EtaleAlgebra(f);
     E:=EquationOrder(K);
@@ -397,7 +397,7 @@ end intrinsic;
     assert IsGeneratingSet(W,Idempotents(W) cat [W!TraceDualIdeal(T):T in OverOrders(E)]);
     _:=MultiplicationTable(W);
 
-	_<x>:=PolynomialRing(Integers());
+    _<x>:=PolynomialRing(Integers());
     f:=x^4+291*x^3-988*x^2-1000*x-1000;
     K:=EtaleAlgebra(f);
     E:=EquationOrder(K);
@@ -423,7 +423,7 @@ end intrinsic;
     assert IsGeneratingSet(W,Idempotents(W) cat [W!TraceDualIdeal(T):T in OverOrders(E)]);
     _:=MultiplicationTable(W);
 
-	_<x>:=PolynomialRing(Integers());
+    _<x>:=PolynomialRing(Integers());
     f:=x^3+31*x^2+43*x+77;
     K:=EtaleAlgebra(f);
     E:=EquationOrder(K);
@@ -472,5 +472,5 @@ end intrinsic;
     _:=MultiplicationTable(W);
 
     SetAssertions(1);
-    printf " all good!"; 
+    printf " all good!";
 */

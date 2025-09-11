@@ -2,7 +2,7 @@
 // Copyright 2025.
 // Stefano Marseglia, stefano.marseglia89@gmail.com
 // https://stmar89.github.io/index.html
-// 
+//
 // Distributed under the terms of the CC-BY 4.0 licence.
 // https://creativecommons.org/licenses/by/4.0/
 /////////////////////////////////////////////////////
@@ -21,8 +21,8 @@ import "LowCohenMacaulayType.m" : wkicm_bar_CM_type2;
 
 
 ///# Weak equivalence class monoid
-/// Let $R$ be an order in an étale algebra over $\mathbb{Q}$. Then ideal multiplication induces a commutative monoid structure on the set of weak equivalence classes of fractional $R$-ideals called the `weak equivalence class monoid` of $R$. This commutative monoid, which we denote by $\mathcal{W}(R)$, is finite and has unit element given by the class of $R$. 
-///  
+/// Let $R$ be an order in an étale algebra over $\mathbb{Q}$. Then ideal multiplication induces a commutative monoid structure on the set of weak equivalence classes of fractional $R$-ideals called the `weak equivalence class monoid` of $R$. This commutative monoid, which we denote by $\mathcal{W}(R)$, is finite and has unit element given by the class of $R$.
+///
 /// In MAGMA, there are two ways of computing $\mathcal{W}(R)$. The first returns if as a sequence of representatives of the classes. The second one returns it as an abstract commutative monoid, each element representing a class, together with a map returning a representative of each class. Further details will be given in the next subsections.
 
 ///////////////////////////////////////////
@@ -84,10 +84,10 @@ units_T_P_mod_S_P:=function(T,S,P)
 end function;
 
 wkicm_bar_with_P_P:=function(I,P)
-// Let S be an order, P a prime of S, and I a fractional (P:P)-ideal. 
+// Let S be an order, P a prime of S, and I a fractional (P:P)-ideal.
 // The function returns all fractional S-ideals J such that  P*I c J c I, (J:J)=S, and J(P:P)=I, up to weak equivalence.
 // We use AssociativeArrays indexed by the dimension at P to make the search faster.
-// Also, if I is invertible in (P:P) then we do not consider in the recursion the 1 dimensional vector spaces, 
+// Also, if I is invertible in (P:P) then we do not consider in the recursion the 1 dimensional vector spaces,
 // since they will all be weakly equivalent to S (which is added manually to the output).
     S:=Order(P);
     T:=Order(I);
@@ -146,7 +146,7 @@ wkicm_bar_with_P_P:=function(I,P)
                         orb_vs:=[ sub<Q | [q(u*g) : g in zbJ]> : u in U ];
                         // we add the orbit to the output_vs, and J to the output
                         for i in [1..#orb_vs] do
-                            dimJJ:=Dimension(orb_vs[i]);  
+                            dimJJ:=Dimension(orb_vs[i]);
                             if not IsDefined(output_vs,dimJJ) then
                                 output_vs[dimJJ]:=[orb_vs[i]];
                             else
@@ -176,7 +176,7 @@ end function;
 ///## Weak equivalence class monoid as a sequence of representatives.
 /// Since the multiplicator ring is an invariant of the weak equivalence class of a fractional $R$-ideal, we have a partitioning $\mathcal{W}(R) = \bigsqcup_S \mathcal{W}_S(R)$, where the disjoint union is taken over the overorders $S$ of $R$ and $\mathcal{W}_S(R)$ is the subset of $\mathcal{W}(R)$ consisting of the weak equivalence classes of fractional $R$-ideals with multiplicator ring $S$.
 /// Let $S$ be an overorder of $R$. If $S$ is Gorenstein then $\mathcal{W}_S(R)$ consists only of the class defined by $S$. If $S$ has Cohen-Macaulay type $2$ and $\mathfrak{p}$ is a prime of $S$, then each fractional $R$-ideal $I$ with multiplicator ring $S$ satisfies either $I_\mathfrak{p} \simeq S_\mathfrak{p}$ or $I_\mathfrak{p} \simeq S^t_\mathfrak{p}$. The second possibility occurs precisely when $S$ has Cohen-Macaulay type $2$ at the primes $\mathfrak{p}$. This classification results provide a very efficient method to compute $\mathcal{W}_S(R)$ for orders $S$ with Cohen-Macaulay type $\leq 2$. For the general case, an algorithm that includes a more expensive enumeration step is provided.
-///  
+///
 /// For further details, see:
 /// - Stefano Marseglia, "Cohen-Macaulay type of orders, generators and ideal classes", Journal of Algebra 658 (2024), 247-276.
 /// - Stefano Marseglia, "Local isomorphism classes of fractional ideals of orders in étale algebras", Journal of Algebra 673 (2025), 77-102.
@@ -189,7 +189,7 @@ end intrinsic;
 
 ///ditto
 intrinsic WKICM_bar(S::AlgEtQOrd) -> SeqEnum[AlgEtQIdl]
-{Given an order S, returns representatives I of all weak equivalence classes of fractional S-ideals satisfying (I:I)=S.}
+{ " } // "
     if not assigned S`WKICM_bar then
         if IsGorenstein(S) then
             vprintf WKICM_bar,2 : " Gorenstein case\n";
@@ -227,7 +227,7 @@ intrinsic WKICM_bar(S::AlgEtQOrd) -> SeqEnum[AlgEtQIdl]
                 O:=MaximalOrder(Algebra(S));
                 wk_pp:=[];
                 // We have W_bar(S) = \prod_P W_P_bar(S), where:
-                //     - P runs over the singular primes of S, 
+                //     - P runs over the singular primes of S,
                 //     - W_bar(S) is the monoid of weak equivalence classes with mult ring S, and
                 //     - W_P_bar(S) is monoid of local P-equivalence classes with mult ring equal to S at P.
                 // We also have W_P_bar(S) = W_bar(S+P^kO), for any k big enough (eg. k ge v_p([O:S]),
@@ -274,7 +274,7 @@ intrinsic WKICM_bar(S::AlgEtQOrd) -> SeqEnum[AlgEtQIdl]
                     Append(~wk_pp_idls,wk_idls);
                 end for;
                 vprintf WKICM_bar,2 : "...Done in %o secs.\n",Cputime(t1);
-                    
+
                 n:=#pp;
                 t0:=Cputime();
                 vprintf WKICM_bar,2 : "We compute the \prod_{j \\ne i} P_j^k_j\n";
@@ -305,13 +305,13 @@ intrinsic WKICM_bar(S::AlgEtQOrd) -> SeqEnum[AlgEtQIdl]
                 wk:=[];
                 for I_Ps in wk_pp_idls do
                     if GetVerbose("WKICM_bar") ge 3 then
-                        iI +:=100; perc:=Truncate(iI/tot); 
+                        iI +:=100; perc:=Truncate(iI/tot);
                         if perc gt perc_old then perc_old:=perc; printf "\t%o%% in %o secs\n",perc,Cputime(t0); end if;
                     end if;
                     J:=&+[ I_Ps[ip] : ip in [1..n] ];
                     // J satisfies: J = I_Ps[ip] locally at pp[ip] for every ip.
-                    assert2 forall{ ip : ip in [1..n] | 
-                                                    (J+I_Ps[ip]) eq I_Ps[ip]+pp[ip]*(J+I_Ps[ip]) and 
+                    assert2 forall{ ip : ip in [1..n] |
+                                                    (J+I_Ps[ip]) eq I_Ps[ip]+pp[ip]*(J+I_Ps[ip]) and
                                                     (J+I_Ps[ip]) eq J+pp[ip]*(J+I_Ps[ip])};
                     Append(~wk,J);
                 end for;
@@ -395,8 +395,8 @@ intrinsic WKICM(E::AlgEtQOrd)->SeqEnum[AlgEtQIdl]
             O:=MaximalOrder(Algebra(E));
             wk_pp:=[];
             // We have W(E) = \prod_P W_P(E), where:
-            //     - P runs over the singular primes of E, 
-            //     - W(E) is the monoid of weak equivalence classes, and 
+            //     - P runs over the singular primes of E,
+            //     - W(E) is the monoid of weak equivalence classes, and
             //     - W_P(E) is monoid of local P-equivalence classes.
             // We also have W_P(E) = W(E+P^kO), for any k big enough (eg. k ge v_p([O:E]),
             //       where p is the rational prime of P).
@@ -442,7 +442,7 @@ intrinsic WKICM(E::AlgEtQOrd)->SeqEnum[AlgEtQIdl]
                 Append(~wk_pp_idls,wk_idls);
             end for;
             vprintf WKICM,2 : "...Done in %o secs.\n",Cputime(t1);
-                
+
             n:=#pp;
             t0:=Cputime();
             vprintf WKICM,2 : "We compute the \prod_{j \\ne i} P_j^k_j\n";
@@ -473,13 +473,13 @@ intrinsic WKICM(E::AlgEtQOrd)->SeqEnum[AlgEtQIdl]
             wk:=[];
             for I_Ps in wk_pp_idls do
                 if GetVerbose("WKICM") ge 3 then
-                    iI +:=100; perc:=Truncate(iI/tot); 
+                    iI +:=100; perc:=Truncate(iI/tot);
                     if perc gt perc_old then perc_old:=perc; printf "\t%o%% in %o secs\n",perc,Cputime(t0); end if;
                 end if;
                 J:=&+[ I_Ps[ip] : ip in [1..n] ];
                 // J satisfies: J = I_Ps[ip] locally at pp[ip] for every ip.
-                assert2 forall{ ip : ip in [1..n] | 
-                                                (J+I_Ps[ip]) eq I_Ps[ip]+pp[ip]*(J+I_Ps[ip]) and 
+                assert2 forall{ ip : ip in [1..n] |
+                                                (J+I_Ps[ip]) eq I_Ps[ip]+pp[ip]*(J+I_Ps[ip]) and
                                                 (J+I_Ps[ip]) eq J+pp[ip]*(J+I_Ps[ip])};
                 Append(~wk,J);
             end for;
@@ -503,7 +503,7 @@ intrinsic WKICM(E::AlgEtQOrd)->SeqEnum[AlgEtQIdl]
 
             // We populate the attributes E`OverOrders and S`WKICM_bar for each overorder.
             // This is needed for the recursion step.
-            // Note that some of the overorders have already the vararg WKICM_bar populated, because, for 
+            // Note that some of the overorders have already the vararg WKICM_bar populated, because, for
             // example, they were coming from the recursive-1-single-singular-prime part of the code.
             // In this case, we don't want to add it a second time. Hence we need to keep track of this info.
             // We do it by using nested AssociativeArrays
@@ -555,9 +555,9 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing WKICM:";
-	//AttachSpec("~/packages_github/AlgEt/spec");
-	SetAssertions(2);
-	_<x>:=PolynomialRing(Integers());
+    //AttachSpec("~/packages_github/AlgEt/spec");
+    SetAssertions(2);
+    _<x>:=PolynomialRing(Integers());
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
     K:=EtaleAlgebra(f);
     E:=EquationOrder(K);
@@ -573,6 +573,16 @@ end intrinsic;
     E:=EquationOrder(K);
     assert #FindOverOrders(E) eq 15;
     assert #WKICM(E) eq 23;
+
+    f := x^8+16;
+    K:=EtaleAlgebra(f);
+    E:=EquationOrder(K);
+    F:=PrimitiveElement(K);
+    R:=Order([F,2/F]);
+    oo:=FindOverOrders(R : populateoo_in_oo:=true); //to avoid any computation related to the OverOrders
+    assert #oo eq 19;
+    assert #WKICM(R) eq 31;
+
     SetAssertions(1);
-    printf " all good!"; 
+    printf " all good!";
 */

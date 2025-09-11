@@ -2,7 +2,7 @@
 // Copyright 2025.
 // Stefano Marseglia, stefano.marseglia89@gmail.com
 // https://stmar89.github.io/index.html
-// 
+//
 // Distributed under the terms of the CC-BY 4.0 licence.
 // https://creativecommons.org/licenses/by/4.0/
 /////////////////////////////////////////////////////
@@ -25,8 +25,11 @@ declare attributes AlgEtQCMType : Homs, // homs from Q(Frob) of the isogeny clas
 ///# CM-types of a CM-étale algebra
 /// Let $A$ be a CM-étale algebra of dimension $2g$ over $\mathbb{Q}$. Then complex conjugation acts of $\mathrm{Homs}(A,\mathbb(C))$. We denote this action with $\overline{\cdot}$. A `CM-type` $\Phi$ of $A$ is a set of $g$ elements of $\mathrm{Homs}(A,\mathbb(C))$ such that $\mathrm{Homs}(A,\mathbb(C)) = \Phi \sqcup \overline{\Phi}$.
 /// Given a CM-type $\Phi$ and a totally imaginary element $b\in A^\times$, we say that $b$ is $\Phi$-`positive` if $\Im(\varphi(b))>0$ for every $\varphi\in \Phi$. Two elements totally imaginary elements $b$ and $b'$ in $A^\times$ represent the same CM-type $\Phi$ if and only if $b/b'$ is totally real and totally positive.
-///  
+///
 /// In MAGMA a CM-type of a CM-algebra $A$ has type `AlgEtQCMType` and it is determined by $g$ homomorphisms to $\mathbb{C}$ or by a $\Phi$-positive element.
+
+
+_Precision := Precision; // so we can use it when there is a optional parameter with the same name
 
 /////////////////////////////////////////////////////
 // Creation, print, access and equality testing for AlgEtQCMType
@@ -49,7 +52,7 @@ end intrinsic;
 
 ///ditto
 intrinsic CreateCMType(seq::SeqEnum[Map]) -> AlgEtQCMType
-{Given a sequence of homomorphisms from a CM-algebra to CC, one per conjugate pair, it returns the corresponding CMType.}
+{ " } // "
     return CMType(seq);
 end intrinsic;
 
@@ -64,7 +67,7 @@ end intrinsic;
 
 ///ditto
 intrinsic CreateCMType( b::AlgEtQElt  ) -> AlgEtQCMType
-{Given a totally imginary element b, it returns the CMType PHI for which b is PHI-positive.}
+{ " } // "
     return CMType(b);
 end intrinsic;
 
@@ -83,12 +86,12 @@ intrinsic CMPositiveElement( PHI::AlgEtQCMType )->AlgEtQElt
         F:=PrimitiveElement(A);
         V:=ComplexConjugate(F);
         e:=F-V;
-        if forall{ff: ff in Homs(PHI) | Im(ff(e)) gt 0 } then cmposelt:=e; 
-        elif forall{ff: ff in Homs(PHI) | Im(ff(-e)) gt 0} then cmposelt:=-e;
-        else 
-          R:=EquationOrder(A);  
+        if forall{ff: ff in Homs(PHI) | Im(ff(e)) gt 0 } then cm_pos_elt:=e;
+        elif forall{ff: ff in Homs(PHI) | Im(ff(-e)) gt 0} then cm_pos_elt:=-e;
+        else
+          R:=EquationOrder(A);
           bb:=5;
-          cnter:=0;
+          counter:=0;
           go:=false;
           repeat
             e1:=Random(R : CoeffRange:=bb);
@@ -96,42 +99,42 @@ intrinsic CMPositiveElement( PHI::AlgEtQCMType )->AlgEtQElt
             if not IsZeroDivisor(e) and forall{ff: ff in Homs(PHI) | Im(ff(e)) gt 0} then
                 go:=true;
             else
-                cnter +:=1;
+                counter +:=1;
             end if;
-            if cnter eq 100 then
+            if counter eq 100 then
                 bb:= 2*bb;
-                cnter:=1;
+                counter:=1;
             end if;
           until go;
-          cmposelt:=e;
-        end if;    
-        PHI`CMPositiveElement:=cmposelt;
+          cm_pos_elt:=e;
+        end if;
+        PHI`CMPositiveElement:=cm_pos_elt;
     end if;
     return PHI`CMPositiveElement;
 end intrinsic;
 
 ///ditto
 intrinsic CMPosElt( PHI::AlgEtQCMType )->AlgEtQElt
-{Given a CMType PHI returns a totally imaginary PHI-positive element (which uniquely determines PHI).}
+{ " } // "
     return CMPositiveElement(PHI);
 end intrinsic;
 
-/// Given a CM-type $\Phi$, returns the sequence of homomorphisms to complex field. The vararg `prec` determines the precision of the complex field.
-intrinsic Homs( PHI::AlgEtQCMType : prec:=Precision(GetDefaultRealField()) )->SeqEnum[Map]
-{Given a CM-type PHI, returns the sequence of maps to the complex field. The vararg prec (default value 30) determines the precision of the codomains of the maps.}
+/// Given a CM-type $\Phi$, returns the sequence of homomorphisms to complex field. The vararg `Precision` determines the precision of the complex field.
+intrinsic Homs( PHI::AlgEtQCMType : Precision := _Precision(GetDefaultRealField()) )->SeqEnum[Map]
+{Given a CM-type PHI, returns the sequence of maps to the complex field. The vararg Precision (default real field precision) determines the precision of the codomains of the maps.}
     if not assigned PHI`Homs then
         b:=CMPositiveElement(PHI);
-        A:=Parent(b); 
-        homs:=HomsToC(A : Prec:=prec);
+        A:=Parent(b);
+        homs:=HomsToC(A : Precision := Precision);
         phi:=[ ff : ff in homs | Im(ff( b )) gt 0 ];
         assert #phi eq #homs div 2;
-        PHI`Homs:=phi;    
+        PHI`Homs:=phi;
     end if;
     return PHI`Homs;
 end intrinsic;
 
 /// Equality testing for CM-types.
-intrinsic 'eq'(PHI1 :: AlgEtQCMType, PHI2::AlgEtQCMType : prec:=Precision(GetDefaultRealField()))->BoolElt
+intrinsic 'eq'(PHI1 :: AlgEtQCMType, PHI2::AlgEtQCMType : Precision := _Precision(GetDefaultRealField()))->BoolElt
 {Returns whether two cm types are equal. This happens if and only if the quotient of (any) two CMPositiveElements is totally real and totally positive.}
     A:=Domain(Homs(PHI1)[1]);
     assert forall{ phi : phi in Homs(PHI1) cat Homs(PHI2) | Domain(phi) eq A };
@@ -141,13 +144,13 @@ intrinsic 'eq'(PHI1 :: AlgEtQCMType, PHI2::AlgEtQCMType : prec:=Precision(GetDef
         return true;
     else
         b:=b1/b2;
-        homs:=HomsToC(A : Prec:=prec);
+        homs:=HomsToC(A : Precision := Precision);
         return forall{ h : h in homs | Re(h(b)) gt 0 };
     end if;
 end intrinsic;
 
 /// Returns the precision of the codomain of the homomorphisms defining the given CM-type.
-intrinsic Precision(PHI :: AlgEtQCMType)->RngIntElt 
+intrinsic Precision(PHI :: AlgEtQCMType)->RngIntElt
 {Returns the precision of the given CM-type, that is, the codomain of each homomorphism will be ComplexField(Precision).}
     if assigned PHI`Homs then
         phi0:=Homs(PHI);
@@ -164,8 +167,8 @@ intrinsic ChangePrecision(PHI0 :: AlgEtQCMType, prec::RngIntElt )->AlgEtQCMType
     PHI:=PHI0;
     if assigned PHI`CMPositiveElement then
         b:=CMPositiveElement(PHI);
-        A:=Parent(b); 
-        homs:=HomsToC(A : Prec:=prec);
+        A:=Parent(b);
+        homs:=HomsToC(A : Precision := prec);
         phi:=[ ff : ff in homs | Im(ff( b )) gt 0 ];
         assert #phi eq #homs div 2;
         PHI`Homs:=phi; //this might over-write the attribute
@@ -174,7 +177,7 @@ intrinsic ChangePrecision(PHI0 :: AlgEtQCMType, prec::RngIntElt )->AlgEtQCMType
         prec0:=Precision(Codomain(phi0[1]));
         A:=Domain(phi0[1]);
         FA:=PrimitiveElement(A);
-        homs:=HomsToC(A : Prec:=prec);
+        homs:=HomsToC(A : Precision := prec);
         phi:=[];
         for ff in phi0 do
             guess:=[ gg : gg in homs | Abs(gg(FA)-ff(FA)) lt 10^-(prec0-1)];
@@ -195,8 +198,8 @@ intrinsic ChangePrecision(~PHI :: AlgEtQCMType, prec::RngIntElt )
     require prec gt 0 : "Precision must be a positive integer";
     if assigned PHI`CMPositiveElement then
         b:=CMPositiveElement(PHI);
-        A:=Parent(b); 
-        homs:=HomsToC(A : Prec:=prec);
+        A:=Parent(b);
+        homs:=HomsToC(A : Precision := prec);
         phi:=[ ff : ff in homs | Im(ff( b )) gt 0 ];
         assert #phi eq #homs div 2;
         PHI`Homs:=phi; //this might over-write the attribute
@@ -205,7 +208,7 @@ intrinsic ChangePrecision(~PHI :: AlgEtQCMType, prec::RngIntElt )
         prec0:=Precision(Codomain(phi0[1]));
         A:=Domain(phi0[1]);
         FA:=PrimitiveElement(A);
-        homs:=HomsToC(A : Prec:=prec);
+        homs:=HomsToC(A : Precision := prec);
         phi:=[];
         for ff in phi0 do
             guess:=[ gg : gg in homs | Abs(gg(FA)-ff(FA)) lt 10^-(prec0-1)];
@@ -220,14 +223,14 @@ intrinsic ChangePrecision(~PHI :: AlgEtQCMType, prec::RngIntElt )
 end intrinsic;
 
 /////////////////////////////////////////////////////
-// AllCMTypes 
+// AllCMTypes
 /////////////////////////////////////////////////////
 
-intrinsic AllCMTypes(A::AlgEtQ : Prec := Precision(GetDefaultRealField()) ) -> SeqEnum[AlgEtQCMType]
-{Returns all the CM-types of the given étale algebra. The parameter Prec determines the precision of the output.}
+intrinsic AllCMTypes(A::AlgEtQ : Precision := _Precision(GetDefaultRealField()) ) -> SeqEnum[AlgEtQCMType]
+{Returns all the CM-types of the given étale algebra. The parameter Precision determines the precision of the output.}
     if not assigned A`AllCMTypes then
         // this uses the fact that if A HasComplexConjugation then HomsToC come in conjugate pairs
-        cc:=CartesianProduct(Partition([ h: h in HomsToC(A : Prec:=Prec )],2));
+        cc:=CartesianProduct(Partition([ h: h in HomsToC(A : Precision := Precision )],2));
         cc:=[ [ci : ci in c] : c in cc ]; //from tuple to seq
         A`AllCMTypes:=[ CMType(c) : c in cc ];
     end if;
@@ -261,7 +264,7 @@ end intrinsic;
         end for;
         for i,j in [1..#all] do
             assert (i eq j) eq (all[i] eq ChangePrecision(all[j],2*Precision(all[j])));
-        end for; 
+        end for;
         ChangePrecision(~all[1],60);
         assert Precision(all[1]) eq 60;
         printf ".";

@@ -2,7 +2,7 @@
 // Copyright 2025.
 // Stefano Marseglia, stefano.marseglia89@gmail.com
 // https://stmar89.github.io/index.html
-// 
+//
 // Distributed under the terms of the CC-BY 4.0 licence.
 // https://creativecommons.org/licenses/by/4.0/
 /////////////////////////////////////////////////////
@@ -60,13 +60,13 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQ
     output:={@ Universe({@ R @}) | @}; //empty set
     if not IsMaximalAtPrime(R,P) then
         zbR := ZBasis(R);
-        // A minimal P-overorder S of R is contained in T=(P:P) and S/P is either 
+        // A minimal P-overorder S of R is contained in T=(P:P) and S/P is either
         // a 2-dimensional vector space over R/P,
         // or a field extension of prime degree over R/P.
-        // We call the overorder S of R contained in T that satisfy one of these two 
+        // We call the overorder S of R contained in T that satisfy one of these two
         // conditions 'potential minimal P-overoerders'i of R.
         pot_min_oo := {@ @};   // will contain all potential minimal P-overorders.
-        pot_min_oo_2 := {@ @}; // will contain all potential minimal P-overorders where 
+        pot_min_oo_2 := {@ @}; // will contain all potential minimal P-overorders where
                                // the second necessary condition is satisfied
         F, f := ResidueField(P);      // f:R->R/P=F
         T := MultiplicatorRing(P);    // T=(P:P)
@@ -79,7 +79,7 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQ
                        // See Proposition 5.3 of referenced paper
             Include(~output, T);
         else
-            // minimal P-overorder S of R such that S/R has dimension 1 over R/P satisfy the followin property:
+            // minimal P-overorder S of R such that S/R has dimension 1 over R/P satisfy the following property:
             // S/R is necessarily contained in an eigenspace of x->x^q acting on V=T/R.
             q:=#F;
             qpow:=hom<V->V | [mTV((v@@mTV)^q) : v in Basis(V)]>;
@@ -90,16 +90,16 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQ
                 // for each W of dim 1 we check whether is an order, that is, multiplicatively closed
                 wT:=W.1@@mTV;
                 if q eq 2 or mTV(wT^2) in W then
-                    // for p eq 2 being a subspace of the eigenspace garantees that it is mult closed
+                    // for p eq 2 being a subspace of the eigenspace guarantees that it is mult closed
                     S:=Order([wT] cat zbR : CheckIsKnownOrder:=false );
                     Include(~pot_min_oo,S);
-                    Include(~output,S);// necessarly minimal, because it has dim 1
+                    Include(~output,S);// necessarily minimal, because it has dim 1
                 end if;
             end for;
             // the other minimal overorders S of R are such that S/P is a finite field extension of prime degree of R/P
             dims := PrimesUpTo(d+1); //the plus one is to prevent issues when d=2.
             subs_2 := Submodules(V : CodimensionLimit := d-2); //we exclude dim 0 and 1
-            subs_2 := [W : W in subs_2 | Dimension(W)+1 in dims]; // the +1 is there because we are 
+            subs_2 := [W : W in subs_2 | Dimension(W)+1 in dims]; // the +1 is there because we are
                                                                   // working in T/R instead of T/P
             for W in subs_2 do //dim at least 2
                 S := Order([(w@@mTV) : w in Basis(W)] cat zbR : CheckIsKnownOrder:=false );
@@ -146,11 +146,11 @@ intrinsic MinimalOverOrders(R::AlgEtQOrd) -> SetIndx[AlgEtQOrd]
         done:={@ tup[1] : tup in R`MinimalOverOrders @};
         pp:=pp diff done;
     end if;
-    for P in pp do 
+    for P in pp do
         _:=MinimalOverOrdersAtPrime(R,P); //this populates the attribute R`MinimalOverOrders
     end for;
     output join:=&join[ tup[2] : tup in R`MinimalOverOrders ];
-    return output; 
+    return output;
 end intrinsic;
 
 
@@ -226,12 +226,12 @@ intrinsic OverOrders(R::AlgEtQOrd : populateoo_in_oo:=false) -> SeqEnum[AlgEtQOr
             cc:=CartesianProduct([[1..#x] : x in oo_at_Ps]);
             for c in cc do
                 S:=[ c[j] : j in [1..#c] ];
-                // R is contained in all the orders. 
+                // R is contained in all the orders.
                 // Using this info we can make the generation process a bit faster.
                 if forall{x : x in S | x eq 1 } then
                     S:=R;
                 elif #[x : x in S | x ne 1] eq 1 then
-                    // this case happens for the minimal overorders of R, 
+                    // this case happens for the minimal overorders of R,
                     // and when there is only one singular prime of R
                     _,j:=Max(S); // the position of the non-1 entry
                     S:=oo_at_Ps[j][S[j]]; // the only order in the tuple bigger than R
@@ -289,7 +289,7 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing OverOrders:";
-	//AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("~/packages_github/AlgEt/spec");
 
     SetVerbose("OverOrders",1);
     SetAssertions(1);
@@ -305,5 +305,5 @@ end intrinsic;
     oo:=FindOverOrders(E);
     assert #oo eq 11;
 
-    printf " all good!"; 
+    printf " all good!";
 */

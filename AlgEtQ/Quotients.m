@@ -2,7 +2,7 @@
 // Copyright 2025.
 // Stefano Marseglia, stefano.marseglia89@gmail.com
 // https://stmar89.github.io/index.html
-// 
+//
 // Distributed under the terms of the CC-BY 4.0 licence.
 // https://creativecommons.org/licenses/by/4.0/
 /////////////////////////////////////////////////////
@@ -26,43 +26,43 @@ declare attributes AlgEtQIdl : ResidueField,PrimitiveElementResidueField;
 // Quotients
 //------------
 
-/// Given a fractional ideal $I$ and the $\mathbb{Z}$-basis of an ideal or order $J$ such that $J \subseteq I$, returns the abelian group $Q=I/J$ together with the quotient map $q:I\to Q$. 
+/// Given a fractional ideal $I$ and the $\mathbb{Z}$-basis of an ideal or order $J$ such that $J \subseteq I$, returns the abelian group $Q=I/J$ together with the quotient map $q:I\to Q$.
 intrinsic Quotient(I::AlgEtQIdl, zbJ::SeqEnum[AlgEtQElt]) -> GrpAb, Map
-{Given a fractional ideal I and the ZBasis of an ideal or order J such that  J subset I, returns the abelian group Q=I/J together with the quotient map q:I->Q.} 
+{Given a fractional ideal I and the ZBasis of an ideal or order J such that  J subset I, returns the abelian group Q=I/J together with the quotient map q:I->Q.}
     // if J is not inside I, an error occurs while forming Q. so no need to check in advance
     A:=Algebra(I);
     zbI:=ZBasis(I);
-	N := #zbI;
-	F := FreeAbelianGroup(N);
-	rel := [F ! cc : cc in AbsoluteCoordinates(zbJ,I)];
-	//mFI := map<F->A| x:->&+[Eltseq(x)[i]*zbI[i] : i in [1..N]]>;
-	mFI := map<F->A| x:->SumOfProducts(Eltseq(x),zbI)>;
-	mIF := map<A->F| x:-> F ! AbsoluteCoordinates([x],I)[1]>;
-	Q,qFQ := quo<F|rel>; //q:F->Q. Q is an "abstract" abelian group isomorphic to I/J.
-    q:=map< A->Q | x:->qFQ(mIF(x)) , y:-> mFI(y@@qFQ) >; 
+    N := #zbI;
+    F := FreeAbelianGroup(N);
+    rel := [F ! cc : cc in AbsoluteCoordinates(zbJ,I)];
+    //mFI := map<F->A| x:->&+[Eltseq(x)[i]*zbI[i] : i in [1..N]]>;
+    mFI := map<F->A| x:->DotProduct(Eltseq(x),zbI)>;
+    mIF := map<A->F| x:-> F ! AbsoluteCoordinates([x],I)[1]>;
+    Q,qFQ := quo<F|rel>; //q:F->Q. Q is an "abstract" abelian group isomorphic to I/J.
+    q:=map< A->Q | x:->qFQ(mIF(x)) , y:-> mFI(y@@qFQ) >;
     return Q,q;
 end intrinsic;
 
-/// Given fractional ideals $I$ and $J$ such that $J \subseteq I$, returns the abelian group $Q=I/J$ together with the quotient map $q:I \to Q$. 
+/// Given fractional ideals $I$ and $J$ such that $J \subseteq I$, returns the abelian group $Q=I/J$ together with the quotient map $q:I \to Q$.
 intrinsic Quotient(I::AlgEtQIdl, J::AlgEtQIdl) -> GrpAb, Map
-{Given fractional ideals I and J such that J subset I, returns the abelian group Q=I/J together with the quotient map q:I->Q.} 
+{Given fractional ideals I and J such that J subset I, returns the abelian group Q=I/J together with the quotient map q:I->Q.}
     return Quotient(I,ZBasis(J));
 end intrinsic;
 
-/// Given an order $S$ and the $\mathbb{Z}$-basis of an ideal or order $J$ such that $J \subseteq S$, returns the abelian group $Q=S/J$ together with the quotient map $q:S\to Q$. 
+/// Given an order $S$ and the $\mathbb{Z}$-basis of an ideal or order $J$ such that $J \subseteq S$, returns the abelian group $Q=S/J$ together with the quotient map $q:S\to Q$.
 intrinsic Quotient(S::AlgEtQOrd, zbJ::SeqEnum[AlgEtQElt]) -> GrpAb, Map
-{Given an order S and the ZBasis of an ideal or order J such that J subset S, returns the abelian group Q=S/J together with the quotient map q:S->Q.} 
+{Given an order S and the ZBasis of an ideal or order J such that J subset S, returns the abelian group Q=S/J together with the quotient map q:S->Q.}
     // if J is not inside S, an error occurs while forming Q. so no need to check in advance
     A:=Algebra(S);
     zbS:=ZBasis(S);
-	N := #zbS;
-	F := FreeAbelianGroup(N);
-	rel := [F ! cc : cc in AbsoluteCoordinates(zbJ,S)]; // this absolute coordinates uses inclusion_matrix. fast!
-	//mFS := map<F->A| x:->&+[Eltseq(x)[i]*zbS[i] : i in [1..N]]>;
-	mFS := map<F->A| x:->SumOfProducts(Eltseq(x),zbS)>;
-	mSF := map<A->F| x:-> F ! AbsoluteCoordinates([x],S)[1]>;
-	Q,qFQ := quo<F|rel>; //q:F->Q. Q is an "abstract" abelian group isomorphic to S/J.
-    q:=map< A->Q | x:->qFQ(mSF(x)) , y:-> mFS(y@@qFQ) >; 
+    N := #zbS;
+    F := FreeAbelianGroup(N);
+    rel := [F ! cc : cc in AbsoluteCoordinates(zbJ,S)]; // this absolute coordinates uses inclusion_matrix. fast!
+    //mFS := map<F->A| x:->&+[Eltseq(x)[i]*zbS[i] : i in [1..N]]>;
+    mFS := map<F->A| x:->DotProduct(Eltseq(x),zbS)>;
+    mSF := map<A->F| x:-> F ! AbsoluteCoordinates([x],S)[1]>;
+    Q,qFQ := quo<F|rel>; //q:F->Q. Q is an "abstract" abelian group isomorphic to S/J.
+    q:=map< A->Q | x:->qFQ(mSF(x)) , y:-> mFS(y@@qFQ) >;
     return Q,q;
 end intrinsic;
 
@@ -96,7 +96,7 @@ intrinsic ResidueField(P::AlgEtQIdl) -> FldFin, Map
         hGQ := iso<G->Q | [q(prim_elt_inA^i) : i in [0..Degree(min_poly)-1]]>;
         hQG := Inverse(hGQ);
         map := q*hQG*gGF;
-	    P`ResidueField:=<F, map>;
+        P`ResidueField:=<F, map>;
     end if;
     return Explode(P`ResidueField);
 end intrinsic;
@@ -120,7 +120,7 @@ intrinsic QuotientVS(I::AlgEtQOrd, J::AlgEtQOrd, P::AlgEtQIdl) -> ModRng, Map
  - P is prime of some order R, with residue field K;
  - J subset I and I/J is a vector space V over K, say of dimension d.
  The function returns the KModule K^d=V and the natural surjection I->V (with preimages).}
-	S := Order(P);
+    S := Order(P);
     return QuotientVS(S!!OneIdeal(I),S!!OneIdeal(J),P);
 end intrinsic;
 
@@ -130,7 +130,7 @@ intrinsic QuotientVS(I::AlgEtQOrd, J::AlgEtQIdl, P::AlgEtQIdl) -> ModRng, Map
  - P is prime of some order R, with residue field K;
  - J in I and I/J is a vector space V over K, say of dimension d.
  The function returns the KModule K^d=V and the natural surjection I->V (with preimages).}
-	S := Order(P);
+    S := Order(P);
     return QuotientVS(S!!OneIdeal(I),S!!J,P);
 end intrinsic;
 
@@ -140,7 +140,7 @@ intrinsic QuotientVS(I::AlgEtQIdl, J::AlgEtQOrd, P::AlgEtQIdl) -> ModRng, Map
  - P is prime of some order R, with residue field K;
  - J in I and I/J is a vector space V over K, say of dimension d.
  The function returns the KModule K^d=V and the natural surjection I->V (with preimages).}
-	S := Order(P);
+    S := Order(P);
     return QuotientVS(S!!I,S!!OneIdeal(J),P);
 end intrinsic;
 
@@ -150,36 +150,36 @@ intrinsic QuotientVS(I::AlgEtQIdl, J::AlgEtQIdl, P::AlgEtQIdl) -> ModRng, Map
  - P is prime of some order R;
  - J in I and I/J is a vector space over R/P, say of dimension d;
  the function returns the KModule K^d=V and the natural surjection I->V (with preimages).}
-	S := Order(P);
+    S := Order(P);
     require Order(I) eq S and Order(J) eq S : "the ideals must be over the same order ";
-    require J subset I : "Teh second argument should be a subset of the first.";
+    require J subset I : "The second argument should be a subset of the first.";
     assert2 P*I subset J;
     K,k:=ResidueField(P);
-	A := Algebra(S);
-	d := Ilog(#K,Integers() ! (Index(J)/Index(I))); // d = dim(I/J) over (S/P)
-	V := KModule(K,d);
-	//need to find a basis of I/J over R/P.
-	zbI := ZBasis(I);
-	N := #zbI;
-	F := FreeAbelianGroup(N);
-	relJ := [F ! cc : cc in AbsoluteCoordinates(ZBasis(J),I)];
+    A := Algebra(S);
+    d := Ilog(#K,Integers() ! (Index(J)/Index(I))); // d = dim(I/J) over (S/P)
+    V := KModule(K,d);
+    //need to find a basis of I/J over R/P.
+    zbI := ZBasis(I);
+    N := #zbI;
+    F := FreeAbelianGroup(N);
+    relJ := [F ! cc : cc in AbsoluteCoordinates(ZBasis(J),I)];
     rel:=relJ;
-	//mFI := map<F->A| x:->&+[Eltseq(x)[i]*zbI[i] : i in [1..N]]>;
-	mFI := map<F->A| x:->SumOfProducts(Eltseq(x),zbI)>;
-	mIF := map<A->F| x:-> F ! AbsoluteCoordinates([x],I)[1]>;
-	Q,q := quo<F|rel>; //q:F->Q. Q is an "abstract" abelian group isomorphic to I/J.
-	bas := [];
-	for i in [1..d] do
+    //mFI := map<F->A| x:->&+[Eltseq(x)[i]*zbI[i] : i in [1..N]]>;
+    mFI := map<F->A| x:->DotProduct(Eltseq(x),zbI)>;
+    mIF := map<A->F| x:-> F ! AbsoluteCoordinates([x],I)[1]>;
+    Q,q := quo<F|rel>; //q:F->Q. Q is an "abstract" abelian group isomorphic to I/J.
+    bas := [];
+    for i in [1..d] do
     //for each iteration of the loop we mod-out from I the S-ideal generated by J and the already found elements of the basis of I/J over S/P
-		elt_F := (Q.1@@q);
-		elt_I := mFI(elt_F);
-		Append(~bas,elt_I);
+        elt_F := (Q.1@@q);
+        elt_I := mFI(elt_F);
+        Append(~bas,elt_I);
         rel_i:=[mIF(bb) : bb in ZBasis(Ideal(S,elt_I))];
-		rel := rel cat rel_i;
-		Q, q := quo<F|rel>; //q:F->Q
-	end for;
-	assert IsTrivial(Q);
-    //function mIV using HNF: bas[i]*S+J eq I. exploit this on ZBasis level to find the S-coordinates of ZBasis(I) wrt bas[i]'s 
+        rel := rel cat rel_i;
+        Q, q := quo<F|rel>; //q:F->Q
+    end for;
+    assert IsTrivial(Q);
+    //function mIV using HNF: bas[i]*S+J eq I. exploit this on ZBasis level to find the S-coordinates of ZBasis(I) wrt bas[i]'s
     zbJ:=ZBasis(J);
     zbS:=ZBasis(S);
     gens:=&cat[[ b*z: z in zbS ] : b in bas];
@@ -194,9 +194,9 @@ intrinsic QuotientVS(I::AlgEtQIdl, J::AlgEtQIdl, P::AlgEtQIdl) -> ModRng, Map
     new_coords_zbI:=[];
     for k in [1..#zbI] do
         zbIk:=[];
-        for i in [0..d-1] do    
+        for i in [0..d-1] do
             //coord_i:=&+[C[k,i*N+j]*zbS[j] : j in [1..#zbS]];
-            coord_i:=SumOfProducts([C[k,i*N+j] : j in [1..#zbS]],zbS);
+            coord_i:=DotProduct([C[k,i*N+j] : j in [1..#zbS]],zbS);
             Append(~zbIk,coord_i);
         end for;
         Append(~new_coords_zbI,zbIk);
@@ -204,14 +204,14 @@ intrinsic QuotientVS(I::AlgEtQIdl, J::AlgEtQIdl, P::AlgEtQIdl) -> ModRng, Map
     mIV:=function(x)
         xinI:=AbsoluteCoordinates([x],I)[1];
         //coords_inS:=[ &+[xinI[i]*new_coords_zbI[i][k]: i in [1..#zbI]]  : k in [1..d]];
-        coords_inS:=[ SumOfProducts(xinI,[new_coords_zbI[i][k]: i in [1..#zbI]])  : k in [1..d]];
+        coords_inS:=[ DotProduct(xinI,[new_coords_zbI[i][k]: i in [1..#zbI]])  : k in [1..d]];
         coords_inK:=[k(c) : c in coords_inS];
         return &+[coords_inK[i]*V.i : i in [1..d]];
     end function;
-	mVI := function(y)
+    mVI := function(y)
         y:=[Eltseq(y)[j]@@k : j in [1..d]];
-		return SumOfProducts(bas,y);
-		//return &+[ bas[j]*(Eltseq(y)[j]@@k) : j in [1..d] ];
+        return DotProduct(bas,y);
+        //return &+[ bas[j]*(Eltseq(y)[j]@@k) : j in [1..d] ];
     end function;
     return V, map<A->V | x:->mIV(x), y:->mVI(y) >;
 end intrinsic;
@@ -220,11 +220,11 @@ end intrinsic;
 
     printf "### Testing Quotients:";
     //AttachSpec("~/packages_github/AlgEt/spec");
-	SetAssertions(2);
-	_<x>:=PolynomialRing(Integers());
+    SetAssertions(2);
+    _<x>:=PolynomialRing(Integers());
     f:=(x^4+16);
-	A:=EtaleAlgebra(f);
-	E:=EquationOrder(A);
+    A:=EtaleAlgebra(f);
+    E:=EquationOrder(A);
     icm:=ICM(E);
     pp:=SingularPrimes(E);
     for P in pp do
@@ -246,5 +246,5 @@ end intrinsic;
         end for;
     end for;
 
-    printf " all good!"; 
+    printf " all good!";
 */

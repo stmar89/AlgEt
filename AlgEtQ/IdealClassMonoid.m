@@ -2,7 +2,7 @@
 // Copyright 2025.
 // Stefano Marseglia, stefano.marseglia89@gmail.com
 // https://stmar89.github.io/index.html
-// 
+//
 // Distributed under the terms of the CC-BY 4.0 licence.
 // https://creativecommons.org/licenses/by/4.0/
 /////////////////////////////////////////////////////
@@ -18,7 +18,7 @@ declare attributes AlgEtQOrd:   ICM,
 /// Let $R$ be an order in an étale algebra $A$ over $\mathbb{Q}$. Ideal multiplication induces the structure of commutative monoid on the set of ideal classes of $R$, which we then call `ideal class monoid` of $R$.
 /// We denote it by $\mathcal{I}(R)$.
 /// The unit element of $\mathcal{I}(R)$ is the class of any principal fractional $R$-ideal.
-///   
+///
 /// In MAGMA there are two ways of computing the ideal class monoid, which are described in the next subsections.
 
 ///## Representatives of the ideal class monoid
@@ -34,7 +34,7 @@ end intrinsic;
 
 ///ditto
 intrinsic ICM(S::AlgEtQOrd : GRH:=false ) -> SeqEnum
-{Given an order S, returns a sequence of fractional S-ideals representing the ideal classes. The parameter GRH  determines whether the computation of the Picard groups of the overorders of S is done using the GRH bound.}
+{ " } // "
     if not assigned S`ICM then
         _:=WKICM(S); //to populate all attributes T`WKICM_bar
         seqOO:=OverOrders(S);
@@ -60,7 +60,7 @@ end intrinsic;
 
 ///ditto
 intrinsic ICM_bar(S::AlgEtQOrd : GRH:=false ) -> SeqEnum
-{Given an order S, returns a sequence containing all representatives of the ideal classes of fractional S-ideals with multiplicator ring S.}
+{ " } // "
     if not assigned S`ICM_bar then
         seqWKS_bar:=WKICM_bar(S);
         GS,gS:=PicardGroup(S : GRH:=GRH );
@@ -81,9 +81,9 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing ICM:";
-	SetAssertions(2);
+    SetAssertions(2);
     SetClassGroupBounds("GRH");
-	_<x>:=PolynomialRing(Integers());
+    _<x>:=PolynomialRing(Integers());
     polys:=[
         x^3-100*x^2-100*x-100,
         x^4+291*x^3-988*x^2-1000*x-1000,

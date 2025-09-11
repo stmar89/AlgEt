@@ -2,7 +2,7 @@
 // Copyright 2025.
 // Stefano Marseglia, stefano.marseglia89@gmail.com
 // https://stmar89.github.io/index.html
-// 
+//
 // Distributed under the terms of the CC-BY 4.0 licence.
 // https://creativecommons.org/licenses/by/4.0/
 /////////////////////////////////////////////////////
@@ -75,7 +75,7 @@ end intrinsic;
 intrinsic Uniformizers(PPs::SeqEnum[AlgEtQIdl]) -> SeqEnum
 {Given a sequence of primess P of the maximal order, it returns a sequence of elements t_P such that t_P is a uniformizer at P and a unit at every other prime in the sequence.}
     OO:=Order(PPs[1]);
-    require IsMaximal(OO) and forall{P : P in PPs | IsPrime(P)} : "The input needs to be a sequenc of primess of the maximal order.";
+    require IsMaximal(OO) and forall{P : P in PPs | IsPrime(P)} : "The input needs to be a sequence of primess of the maximal order.";
     vprintf nice_unif,2 : "nice_uniformizers: %o primes\n",#PPs;
     one:=One(Algebra(PPs[1]));
     nice_unifs:=[];

@@ -2,7 +2,7 @@
 // Copyright 2025.
 // Stefano Marseglia, stefano.marseglia89@gmail.com
 // https://stmar89.github.io/index.html
-// 
+//
 // Distributed under the terms of the CC-BY 4.0 licence.
 // https://creativecommons.org/licenses/by/4.0/
 /////////////////////////////////////////////////////
@@ -38,7 +38,7 @@ declare attributes AlgEtQICMElt : Parent,
 
 ///hide-all
 function CreateAlgEtQICMElt(icm,yw,y_inv,pT)
-// given the ideal class monoid of R, a weak equialence class of R, an element of the (abstract) picard gruop of an overorder of R, with its map pT:=Pic(T)-> ideals, it creates the corresponding ideal class.
+// given the ideal class monoid of R, a weak equivalence class of R, an element of the (abstract) picard group of an overorder of R, with its map pT:=Pic(T)-> ideals, it creates the corresponding ideal class.
     x:=New(AlgEtQICMElt);
     x`Parent:=icm;
     x`WEClass:=yw;
@@ -56,12 +56,12 @@ intrinsic IsCoercible(icm::AlgEtQICM, x::.) -> BoolElt, .
     if Parent(x) cmpeq icm then
         return true,x;
     elif Type(x) eq AlgEtQICMElt and Order(icm) subset Order(Parent(x)) then
-        return true,(Map(Parent(x))(x))@@Map(icm); 
+        return true,(Map(Parent(x))(x))@@Map(icm);
     elif Type(x) eq AlgEtQIdl and Order(icm) subset Order(x) then
-        return true,(Order(icm)!!x)@@Map(icm); 
+        return true,(Order(icm)!!x)@@Map(icm);
     elif Type(x) eq AlgEtQOrd and Order(icm) subset x then
-        return true,(Order(icm)!!OneIdeal(x))@@Map(icm); 
-    else 
+        return true,(Order(icm)!!OneIdeal(x))@@Map(icm);
+    else
         return false,"";
     end if;
 end intrinsic;
@@ -121,7 +121,7 @@ end intrinsic;
 
 ext_map_Pic:=function(icm,S)
 // this function takes as input the icm of an order R, and an overorder S of R.
-// it returns the extension map Pic(R)->Pic(S). 
+// it returns the extension map Pic(R)->Pic(S).
 // this populates the attribute ExtensionMapsPics of icm
     if not assigned icm`ExtensionMapsPics then
         icm`ExtensionMapsPics:=AssociativeArray();
@@ -136,7 +136,7 @@ end function;
 intrinsic '*'(x::AlgEtQICMElt,y::AlgEtQICMElt)->AlgEtQICMElt
 {Returns ideal class corresponding to the product of the two given ideal classes.}
     icm:=Parent(x);
-    require icm eq Parent(y) : "The classes do not blong to the same ideal class monoid";
+    require icm eq Parent(y) : "The classes do not belong to the same ideal class monoid";
     Sx:=MultiplicatorRing(x);
     Sy:=MultiplicatorRing(y);
     wxy:=WEClass(x)*WEClass(y);
@@ -148,7 +148,7 @@ intrinsic '*'(x::AlgEtQICMElt,y::AlgEtQICMElt)->AlgEtQICMElt
     pic_xy:=PicClass(x)@@ext_x@ext_xy+PicClass(y)@@ext_y@ext_xy;
     return CreateAlgEtQICMElt(icm,wxy,pic_xy,pxy);
 end intrinsic;
- 
+
 /// Given an ideal class $x$ and a non-negative integer $n$, returns the ideal class $x^n$.
 intrinsic '^'(x::AlgEtQICMElt,n::RngIntElt)->AlgEtQICMElt
 {Given an ideal class x and a non-negative integer n, returns the ideal class x^n.}
@@ -294,10 +294,10 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing ICMAbstract:";
-	//AttachSpec("~/AlgEt/spec");
+    //AttachSpec("~/AlgEt/spec");
     SetClassGroupBounds("GRH");
 
-	_<x>:=PolynomialRing(Integers());
+    _<x>:=PolynomialRing(Integers());
     f:=x^4+291*x^3-988*x^2-1000*x-1000;
     K:=EtaleAlgebra(f);
     E:=EquationOrder(K);
@@ -311,7 +311,7 @@ end intrinsic;
     _:=Random(icm)*Random(icm);
     _:=[Random(icm)^i:i in [1..100]];
 
-	_<x>:=PolynomialRing(Integers());
+    _<x>:=PolynomialRing(Integers());
     f:=x^3+31*x^2+43*x+77;
     K:=EtaleAlgebra(f);
     E:=EquationOrder(K);
@@ -341,5 +341,5 @@ end intrinsic;
     _:=[x*y:x,y in Classes(icm)];
 
     SetAssertions(1);
-    printf " all good!"; 
+    printf " all good!";
 */

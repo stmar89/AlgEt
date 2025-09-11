@@ -2,7 +2,7 @@
 // Copyright 2025.
 // Stefano Marseglia, stefano.marseglia89@gmail.com
 // https://stmar89.github.io/index.html
-// 
+//
 // Distributed under the terms of the CC-BY 4.0 licence.
 // https://creativecommons.org/licenses/by/4.0/
 /////////////////////////////////////////////////////
@@ -17,17 +17,19 @@ declare attributes AlgEtQ : HomsToC;
 
 import "Ord.m" : MatrixAtoQ , MatrixQtoA;
 ///# Homomorphisms of étale algebras over $\mathbb{Q}$
-/// Let $A$ be an étale algebra over $\mathbb{Q}$. By a `homomorphism` from $A$ to some $\mathbb{Q}$-algbra, we mean a unital $\mathbb{Q}$-algbra homomorphisms. 
+/// Let $A$ be an étale algebra over $\mathbb{Q}$. By a `homomorphism` from $A$ to some $\mathbb{Q}$-algbra, we mean a unital $\mathbb{Q}$-algbra homomorphisms.
 
 ///## Homomorphisms to the complex numbers
 /// The set of homomorphisms from an étale algebra $A$ to the field of complex numbers consists of the homomorphisms acting as an embedding on a single component and zero on every other component. Such a homomorphism is injective if and only if $A$ has an unique component, that is, is a number field.
 
-intrinsic HomsToC(A::AlgEtQ : Prec:=Precision(GetDefaultRealField()))->SeqEnum[Map]
-{Returns the sequence of homomorphisms from the étale algebra to the complex field. The precision of the target can be set by the parameter "Prec".}
-    if not assigned A`HomsToC or (Prec ne Precision(Codomain(A`HomsToC[1]))) then
-        CC:=ComplexField(Prec);
+_Precision := Precision; // so we can use it when there is a optional parameter with the same name
+
+intrinsic HomsToC(A::AlgEtQ : Precision:=_Precision(GetDefaultRealField()))->SeqEnum[Map]
+{Returns the sequence of homomorphisms from the étale algebra to the complex field. The precision of the target can be set by the parameter "Precision".}
+    if not assigned A`HomsToC or (Precision ne _Precision(Codomain(A`HomsToC[1]))) then
+        CC:=ComplexField(Precision);
         images:=function(x)
-            return &cat[[CC ! z : z in Conjugates(y : Precision:=Prec)] : y in Components(x)];
+            return &cat[[CC ! z : z in Conjugates(y : Precision:=Precision)] : y in Components(x)];
         end function;
         maps:=< map< A -> CC | x:-> images(x)[k] > : k in [1..Dimension(A)] >;
         A`HomsToC:=maps;
@@ -39,15 +41,15 @@ end intrinsic;
 
 /// Given two étale algebras $A$ and $B$ and a sequence of elements $img$ of $B$, returns the homomorphism defined by sending the AbsoluteBasis of A to $img$. The parameter CheckMultiplicative (default false) determines if the multiplicativity of the defined map is checked, while the parameter CheckUnital (default false) determines whether it is unital. If the parameter ComputeInverse (default true) is true, it checks whether the map is invertible and, if so, it defines also the inverse (by assigning preimages).}
 intrinsic Hom(A::AlgEtQ , B::AlgEtQ , img::SeqEnum[AlgEtQElt] : CheckMultiplicative:=false, CheckUnital:=false, ComputeInverse:=true)->Map
-{Given two étale algebras A and B and a sequence img of elements of B, returns the Q-algebra homomorphism defined by sending the AbsoluteBasis of A to img. The VarArg CheckMultiplicative determines if the multiplicativity of the defined map is checked, while the VarArg CheckUnital determines wheter One(A) is sent to One(B). If the VarArg ComputeInverse is true, it checkes whether the map is invertible and, if so, it defines also the inverse (by assigning preimages).}
+{Given two étale algebras A and B and a sequence img of elements of B, returns the Q-algebra homomorphism defined by sending the AbsoluteBasis of A to img. The VarArg CheckMultiplicative determines if the multiplicativity of the defined map is checked, while the VarArg CheckUnital determines whether One(A) is sent to One(B). If the VarArg ComputeInverse is true, it checks whether the map is invertible and, if so, it defines also the inverse (by assigning preimages).}
     basis:=AbsoluteBasis(A);
     require forall{x : x in img | x in B} and #img eq #basis : "the images do not defined an additive map.";
     image:=function(x)
-        return SumOfProducts(AbsoluteCoordinates(x),img);
+        return DotProduct(AbsoluteCoordinates(x),img);
     end function;
-    
+
     has_inverse:=false;
-    if ComputeInverse then 
+    if ComputeInverse then
         mm:=MatrixAtoQ(img);
         has_inverse:=Rank(mm) eq AbsoluteDimension(A) and AbsoluteDimension(A) eq AbsoluteDimension(B);
     end if;
@@ -55,7 +57,7 @@ intrinsic Hom(A::AlgEtQ , B::AlgEtQ , img::SeqEnum[AlgEtQElt] : CheckMultiplicat
     if has_inverse then
         img_inv:=MatrixQtoA(A,mm^-1);
         preimage:=function(y)
-            return SumOfProducts(AbsoluteCoordinates(y),img_inv);
+            return DotProduct(AbsoluteCoordinates(y),img_inv);
         end function;
         m:=map<A->B | x:->image(x), y:->preimage(y)>;
     else
@@ -66,13 +68,13 @@ intrinsic Hom(A::AlgEtQ , B::AlgEtQ , img::SeqEnum[AlgEtQElt] : CheckMultiplicat
         require forall{ x : x,y in basis | m(x)*m(y) eq m(x*y) } : "the images do not define a multiplicative map.";
     end if;
 
-    if CheckUnital then 
+    if CheckUnital then
         require m(One(A)) eq One(B) : "One(A) is not sent to One(B)";
     end if;
     return m;
 end intrinsic;
 
-/// Given an étale algebra $K$ of the form $K_1\times \cdots \times K_n$ and an ´étale algebra $V$ of the form $K_1^{s_1} \times \cdots \times K_n^{s_n}$, returns the natural component-wise diagonal embedding $K\to V$. 
+/// Given an étale algebra $K$ of the form $K_1\times \cdots \times K_n$ and an ´étale algebra $V$ of the form $K_1^{s_1} \times \cdots \times K_n^{s_n}$, returns the natural component-wise diagonal embedding $K\to V$.
 intrinsic DiagonalEmbedding(K::AlgEtQ, V::AlgEtQ)->Map
 {Let K=K1x...Kn be a product of distinct number fields, and s1,...,sn be strinctly positive integers. Put V=K1^s1x...xKn^sn. It returns the natural action of K on V, that is, the componentwise diagonal.}
     return NaturalAction(K,V);
@@ -80,7 +82,7 @@ end intrinsic;
 
 ///ditto
 intrinsic NaturalAction(K::AlgEtQ, V::AlgEtQ)->Map
-{Let K=K1x...Kn be a product of distinct number fields, and s1,...,sn be strinctly positive integers. Put V=K1^s1x...xKn^sn. It returns the natural action of K on V, that is, the componentwise diagonal.}
+{ " } // "
     Knf:=[ DefiningPolynomial(L) : L in Components(K) ];
     Vnf:=[ DefiningPolynomial(L) : L in Components(V) ];
     require #Seqset(Knf) eq #Components(K) : "The number fields defining K are not distinct";
@@ -109,7 +111,7 @@ end intrinsic;
     printf ".";
     old_prec:=Precision(Codomain(homs[1]));
     new_prec:=10*old_prec;
-    homs:=HomsToC(A : Prec:=new_prec);
+    homs:=HomsToC(A : Precision:=new_prec);
     assert Precision(Codomain(homs[1])) eq new_prec;
     printf ".";
     B:=EtaleAlgebra(Components(A) cat [NumberField(x^2+2)]);
@@ -133,6 +135,6 @@ end intrinsic;
     assert Inverse(m)(pi) eq -PrimitiveElement(A);
     assert m(One(A)) eq One(B) and Inverse(m)(One(B)) eq One(A);
     printf ".";
-    printf " all good!"; 
+    printf " all good!";
 
 */

@@ -2,7 +2,7 @@
 // Copyright 2025.
 // Stefano Marseglia, stefano.marseglia89@gmail.com
 // https://stmar89.github.io/index.html
-// 
+//
 // Distributed under the terms of the CC-BY 4.0 licence.
 // https://creativecommons.org/licenses/by/4.0/
 /////////////////////////////////////////////////////
@@ -52,7 +52,7 @@ end intrinsic;
 
 
 /* TESTS
-    
+
     printf "### Testing Completion:";
     //AttachSpec("~/packages_github/AlgEt/spec");
     PP<x>:=PolynomialRing(Integers());

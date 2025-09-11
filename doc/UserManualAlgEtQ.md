@@ -3,23 +3,23 @@
  Typical examples are:
  - $A = K\times K$ where $K$ is a number field.
  - $A = \dfrac{K[x]}{f(x)}$ where $f(x)$ is a polynomial with in $K[x]$ and no repeated roots over $\overline{K}$.
- We will refer to the field $K$ as the `prime field` of $A$ and to the fields $K_1,\ldots,K_n$  as the `components` of $A$. 
+ We will refer to the field $K$ as the `prime field` of $A$ and to the fields $K_1,\ldots,K_n$  as the `components` of $A$.
  If $F$ is a finite extension of $K$ such that $K_1,\ldots,K_n$ are all defined as relative extensions of $F$, we call $F$ the `base field` of $A$.
  If the components $K_1,\ldots,K_n$ of $A$ have distinct defining polynomials, say $f_1(x),\ldots,f_n(x) \in F[x]$ then $A$ is isomorphic to the étale algebra $F[x]/(f(x)$ where $f(x) = f_1(x)\cdot \cdots \cdot f_n(x)$. The polynomial $f(x)$ is then referred to as the `defining polynomial` of $A$.
 # Étale algebras over $\mathbb{Q}$
- Currently we have implemented in MAGMA the type `AlgEtQ` which corresponds to étale algebras over the rational field $\mathbb{Q}$. 
- An étale algebra over $\mathbb{Q}$ of type `AlgEtQ` can be created using either a sequence of number fields, given as absolute extensions of $\mathbb{Q}$, or a polynomial in $\mathbb{Z}[x]$ or $\mathbb{Q}[x]$ with no repeated complex roots. 
+ Currently we have implemented in MAGMA the type `AlgEtQ` which corresponds to étale algebras over the rational field $\mathbb{Q}$.
+ An étale algebra over $\mathbb{Q}$ of type `AlgEtQ` can be created using either a sequence of number fields, given as absolute extensions of $\mathbb{Q}$, or a polynomial in $\mathbb{Z}[x]$ or $\mathbb{Q}[x]$ with no repeated complex roots.
  For such an algebra, the base field coincides with the prime field $\mathbb{Q}$.
 <pre><b> EtaleAlgebra</b>(seq::SeqEnum[FldNum]) -> AlgEtQ</pre>
 Given a sequence of number fields which are absolute extensions of the rational field, returns the étale algebra corresponding to the direct product. The number fields with DefiningPolynomial of degree one need to created with DoLinearExtension set to true.
-<pre><b> EtaleAlgebra</b>(f::RngUPolElt[RngInt]) -> AlgEtQ</pre><pre><b> EtaleAlgebra</b>(f::RngUPolElt[FldRat]) -> AlgEtQ</pre>
+<pre><b> EtaleAlgebra</b>(f::RngUPolElt[RngQZ]) -> AlgEtQ</pre>
  Given a polynomial with integer of rational coefficients, which is squarefree, that is, with no repeated complex roots, returns the étale algebra which is the product of the number fields defined by the irreducible factors of the polynomial.
 ## Direct products
 <pre><b> DirectProduct</b>(seq::SeqEnum[AlgEtQ]) -> AlgEtQ,SeqEnum[Map],SeqEnum[Map]</pre>
  Given a sequence of étale algebras over $\mathbb{Q}$, returns the direct product, together with sequences of inclusions and projections.
 ## Conversion to a number field
-<pre><b> IsNumberField</b>(A::AlgEtQ) -> BoolElt,FldNum,Map </pre>
- Given an étale algebra $A$ over $\mathbb{Q}$, returns wheter $A$ is a number field, that is, has only one component.  If this is the case, then returns also the number field itself together an isomorphism from $A$ to the number field.
+<pre><b> IsNumberField</b>(A::AlgEtQ) -> BoolElt,FldNum,Map</pre>
+ Given an étale algebra $A$ over $\mathbb{Q}$, returns whether $A$ is a number field, that is, has only one component.  If this is the case, then returns also the number field itself together an isomorphism from $A$ to the number field.
 ## Attributes
 ### Components, equality testing and defining polynomial
  Two étale algebras are defined to be equal if the ordered sequence of their components are the same.
@@ -45,7 +45,7 @@ Returns the prime field of the étale algebra.
  An element $x$ of an étale algebra $A$ over $\mathbb{Q}$ with components $K_1,\ldots,K_n$ is stored as a tuple of elements of the number fields. Such a tuple is referred to as the `components` of the element.
  Note that $x$ is a `unit` of $A$, that is, an invertible element, if all its components are non-zero. Otherwise, it is a `zero-divisor` of $A$.
  Elements of étale algebra of type `AlgEtQ` have type `AlgEtQElt`.
-## Creation 
+## Creation
 <pre><b> '!'</b>(A::AlgEtQ, x::.) -> AlgEtQElt</pre>
  Let $A$ be an étale algebra over $\mathbb{Q}$ with components $K_1,\ldots,K_n$.
  Elements of $A$ are created using the operator `!` by giving either
@@ -117,8 +117,12 @@ Returns a random unit of the étale algebra with coefficients are bounded by the
 Returns the sum of the elements of the sequence.
 <pre><b> '&*'</b>(seq::SeqEnum[AlgEtQElt]) -> AlgEtQElt</pre>
 Returns the product of the elements of the sequence.
-<pre><b> SumOfProducts</b>(as::SeqEnum[AlgEtQElt],bs::SeqEnum[AlgEtQElt]) -> AlgEtQElt</pre><pre><b> SumOfProducts</b>(as::SeqEnum[RngIntElt],bs::SeqEnum[AlgEtQElt]) -> AlgEtQElt</pre><pre><b> SumOfProducts</b>(as::SeqEnum[FldRatElt],bs::SeqEnum[AlgEtQElt]) -> AlgEtQElt</pre><pre><b> SumOfProducts</b>(as::SeqEnum[AlgEtQElt],bs::SeqEnum[RngIntElt]) -> AlgEtQElt</pre><pre><b> SumOfProducts</b>(as::SeqEnum[AlgEtQElt],bs::SeqEnum[FldRatElt]) -> AlgEtQElt</pre>
+<pre><b> _DotProduct</b>(a::SeqEnum[AlgEtQElt], b::SeqEnum[AlgEtQElt]) -> AlgEtQElt</pre><pre><b> _DotProduct</b>(a::SeqEnum[RngQZElt], b::SeqEnum[AlgEtQElt]) -> AlgEtQElt</pre>
  Given two sequences of $n$ elements $[a_1,\ldots,a_n]$ and $[b_1,\ldots,b_n]$ returns $\sum_{i=1}^n a_i\cdot b_i$.
+<pre><b> _DotProduct</b>(a::SeqEnum[AlgEtQElt], b::SeqEnum[RngQZElt]) -> AlgEtQElt</pre>
+"
+<pre><b> DotProduct</b>(a::SeqEnum, b::SeqEnum) -> Any</pre>
+"
 ## Minimal polynomials and integrality testing.
  Given an element $a$ of an étale algebra over $\mathbb{Q}$, the `minimal polynomial` is the polynomial $f(x)$ in $\mathbb{Q}[x]$ of minimal degree such that $f(a)=0$. It is the least common multiple of the minimal polynomials of the components of $a$.
  An element $a$ is called `integral` if its minimal polynomial is monic and has integer coefficients.
@@ -137,19 +141,17 @@ Returns whether the element is integral (over the integers).
  A:=EtaleAlgebra(f);
  // We compute the `canonical` primitive element, which is the class of the variable x in A.
  a:=PrimitiveElement(A); a;
- 
- // The algebra A has two components:
+<br> // The algebra A has two components:
  comps,embeddings,projections:=Components(A);
  K1,K2:=Explode(comps);
- // The unit elemenet of each component corresponds to an orthogonal idempotent of A:
+ // The unit element of each component corresponds to an orthogonal idempotent of A:
  [ embeddings[1](K1!1),embeddings[2](K2!1) ] eq OrthogonalIdempotents(A);
- 
- // We conclude this example by showing the use of SumOfProducts and its timings advantages:
+<br> // We conclude this example by showing the use of DotProduct and its timings advantages:
  N:=10^5;
  elts1:=[ a+i : i in [1..N] ];
  elts2:=[ a-i : i in [1..N] ];
  time s1:=&+[ elts1[i]*elts2[i] : i in [1..N] ];
- time s2:=SumOfProducts(elts1,elts2);
+ time s2:=DotProduct(elts1,elts2);
  s1 eq s2;
  ```
 # Example 2
@@ -161,23 +163,23 @@ Returns whether the element is integral (over the integers).
  a:=PrimitiveElement(A); a;
  ```
 # Homomorphisms of étale algebras over $\mathbb{Q}$
- Let $A$ be an étale algebra over $\mathbb{Q}$. By a `homomorphism` from $A$ to some $\mathbb{Q}$-algbra, we mean a unital $\mathbb{Q}$-algbra homomorphisms. 
+ Let $A$ be an étale algebra over $\mathbb{Q}$. By a `homomorphism` from $A$ to some $\mathbb{Q}$-algbra, we mean a unital $\mathbb{Q}$-algbra homomorphisms.
 ## Homomorphisms to the complex numbers
  The set of homomorphisms from an étale algebra $A$ to the field of complex numbers consists of the homomorphisms acting as an embedding on a single component and zero on every other component. Such a homomorphism is injective if and only if $A$ has an unique component, that is, is a number field.
-<pre><b> HomsToC</b>(A::AlgEtQ : Prec:=Precision(GetDefaultRealField()))->SeqEnum[Map]</pre>
-Returns the sequence of homomorphisms from the étale algebra to the complex field. The precision of the target can be set by the parameter "Prec".
+<pre><b> HomsToC</b>(A::AlgEtQ : Precision:=_Precision(GetDefaultRealField()))->SeqEnum[Map]</pre>
+Returns the sequence of homomorphisms from the étale algebra to the complex field. The precision of the target can be set by the parameter "Precision".
 ## Homomorphisms between étale algebras over $\mathbb{Q}$
 <pre><b> Hom</b>(A::AlgEtQ , B::AlgEtQ , img::SeqEnum[AlgEtQElt] : CheckMultiplicative:=false, CheckUnital:=false, ComputeInverse:=true)->Map</pre>
  Given two étale algebras $A$ and $B$ and a sequence of elements $img$ of $B$, returns the homomorphism defined by sending the AbsoluteBasis of A to $img$. The parameter CheckMultiplicative (default false) determines if the multiplicativity of the defined map is checked, while the parameter CheckUnital (default false) determines whether it is unital. If the parameter ComputeInverse (default true) is true, it checks whether the map is invertible and, if so, it defines also the inverse (by assigning preimages).}
 <pre><b> DiagonalEmbedding</b>(K::AlgEtQ, V::AlgEtQ)->Map</pre><pre><b> NaturalAction</b>(K::AlgEtQ, V::AlgEtQ)->Map</pre>
- Given an étale algebra $K$ of the form $K_1\times \cdots \times K_n$ and an ´étale algebra $V$ of the form $K_1^{s_1} \times \cdots \times K_n^{s_n}$, returns the natural component-wise diagonal embedding $K\to V$. 
+ Given an étale algebra $K$ of the form $K_1\times \cdots \times K_n$ and an ´étale algebra $V$ of the form $K_1^{s_1} \times \cdots \times K_n^{s_n}$, returns the natural component-wise diagonal embedding $K\to V$.
 # Orders in étale algebras over $\mathbb{Q}$
  Let $A$ be an étale algebra over $\mathbb{Q}$. An `order` in $A$ is a subring $R$ of $A$ whose underlying additive group is a free abelian group of rank equal to the absolute dimension of $A$.
  Given an order $R$ in $A$, we say that $S$ is an `overorder` of $R$ if $R\subseteq S$.
  In MAGMA, orders have type `AlgEtQOrd`. Elements will always be considered as elements of the algebra.
 ## Creation
  Whenever we create an order, we populate the attributes `Generators` and `ZBasis`.
- Unless the parameter `Check` is set to $0$, the `ZBasis` is put in a canonical form (we use the Hermite normal form of the numerators and divide by the denominators). The entries of the corresponding upper triangular matrix uniquely determine the order and are used for hashing it. 
+ Unless the parameter `Check` is set to $0$, the `ZBasis` is put in a canonical form (we use the Hermite normal form of the numerators and divide by the denominators). The entries of the corresponding upper triangular matrix uniquely determine the order and are used for hashing it.
 <pre><b> Order</b>( gens::SeqEnum[AlgEtQElt] : Check:=100 , CheckIsKnownOrder:=true ) -> AlgEtQOrd</pre>
  Returns the order generated by a given sequence of elements. The parameter `Check` (default $100$) determines how many times the program tries to obtain a multiplicatively closed lattice by adding the product of the given generators. If `Check` is $0$ then this step is skipped. The parameter `CheckIsKnownOrder` determines whether the program checks if the order is already known, i.e. in the attribute `KnownOrders` of the algebra. The default value is true.
 <pre><b> Order</b>(A::AlgEtQ , orders::Tup) -> AlgEtQOrd</pre>
@@ -208,9 +210,9 @@ Returns the algebra of the order.
  Return a set of generators as a \mathbb{Z}}-algebra of the order.
 ## Equality
  Equality of orders is performed using the `Hash` attribute which is constructed as follows.
- Let $S$ be an order. 
+ Let $S$ be an order.
  Let $P$ be the upper triangular Hermite normal form of the integer square matrix $d\cdot M$ where $M$ is the matrix whose rows are the coefficients of a $\mathbb{Z}$-basis of $S$ and $d$ is the least common denominator of its entries.
- The `Hash` of $S$ is defined to be the sequence consisting of the least common denominator of $\frac{1}{d}\cdot P$ and the entries of the upper triangular part of $\frac{1}{d}\cdot P$. 
+ The `Hash` of $S$ is defined to be the sequence consisting of the least common denominator of $\frac{1}{d}\cdot P$ and the entries of the upper triangular part of $\frac{1}{d}\cdot P$.
  This hashing method has no collisions and it is independent of the choice of $\mathbb{Z}-basis$ from which we start the procedure.
  We observed that applying the in-built Hash function to the sequence defined above, while giving a smaller hash, it often lead to collisions.
 <pre><b> myHash</b>(S::AlgEtQOrd)->SeqEnum[RngInt]</pre>
@@ -252,7 +254,7 @@ Returns the order given by the intersection of two given orders.
 <pre><b> IsProductOfOrdersInComponents</b>(O::AlgEtQOrd)->BoolElt, Tup</pre><pre><b> IsProductOfOrders</b>(O::AlgEtQOrd)->BoolElt, Tup</pre>
 Returns whether the argument is a product of orders in the components of its parent algebra. If so, it returns also a tuple containing these orders.
 <pre><b> IsProductOfOrdersInFactorAlgebras</b>(S::AlgEtQOrd)->BoolElt,SeqEnum[AlgEtQElt]</pre>
-Returns whether the given order is a product of orders living in some factor algebras of the parent algebra. 
+Returns whether the given order is a product of orders living in some factor algebras of the parent algebra.
 This is equivalent for the given order to contain some idempotents of the algebra other than 0 and 1. If this is the case, it returns also the idempotents.
 # Example 3
  ```
@@ -261,7 +263,7 @@ This is equivalent for the given order to contain some idempotents of the algebr
  K1:=NumberField(x^2-2);
  K2:=NumberField(x^2-3);
  K3:=NumberField(x^2-5);
- // We define the product étale algebra A and the factor algebras B and C consisting of only the first two components and the last one, repsectively.
+ // We define the product étale algebra A and the factor algebras B and C consisting of only the first two components and the last one, respectively.
  B:=EtaleAlgebra([K1,K2]);
  C:=EtaleAlgebra([K3]);
  A,embs,projs:=DirectProduct([B,C]);
@@ -279,12 +281,11 @@ This is equivalent for the given order to contain some idempotents of the algebr
  IsProductOfOrdersInFactorAlgebras(R);
  ```
 # Ideals of orders in étale algebras over $\mathbb{Q}$
- Let $R$ be an order in an étale algebra $A$ over $\mathbb{Q}$. 
+ Let $R$ be an order in an étale algebra $A$ over $\mathbb{Q}$.
  A `fractional ideal` over $R$, or fractional $R$-ideal, is a sub-$R$-module of $A$ whose underlying additive group is free of rank equal to the absolute dimension of $A$.
  A fractional $R$-ideal is said to be `integral` if $I\subseteq R$.
  Note that every overorder of $R$ is a fractional $R$-ideal.
- 
- In MAGMA, fractional ideals have type `AlgEtQIdl`. Elements will always be considered as elements of the algebra.
+<br> In MAGMA, fractional ideals have type `AlgEtQIdl`. Elements will always be considered as elements of the algebra.
 ## Creation
 <pre><b> Ideal</b>(S::AlgEtQOrd, gens::SeqEnum) -> AlgEtQIdl</pre>
  Given an order $S$ in an étale algebra and a sequence `gens` of elements coercible in the algebra, returns the fractional $S$-ideal generated by `gens`.}
@@ -311,15 +312,13 @@ Returns a set of generators of the fractional ideal.
 ## Hashing and equality
  Let $I$ a fractional $S$-ideal in an étale algebra over $\mathbb{Q}$.
  Let $P$ be the upper triangular Hermite normal form of the integer square matrix $d\cdot M$ where $M$ is the matrix whose rows are the coefficients of a $\mathbb{Z}$-basis of $I$ and $d$ is the least common denominator of its entries.
- The `Hash` of $I$ is defined to be the sequence consisting of the least common denominator of $\frac{1}{d}\cdot P$ and the entries of the upper triangular part of $\frac{1}{d}\cdot P$. 
+ The `Hash` of $I$ is defined to be the sequence consisting of the least common denominator of $\frac{1}{d}\cdot P$ and the entries of the upper triangular part of $\frac{1}{d}\cdot P$.
  This hashing method has no collisions and it is independent of the choice of $\mathbb{Z}-basis$ from which we start the procedure.
  We observed that applying the in-built Hash function to the sequence defined above, while giving a smaller hash, it often leads to collisions.
 <pre><b> myHash</b>(I::AlgEtQIdl)->SeqEnum[RngInt]</pre>
 Hash function.
 <pre><b> 'eq'</b>(I::AlgEtQIdl , J::AlgEtQIdl ) -> BoolElt</pre><pre><b> 'eq'</b>(I::AlgEtQIdl, S::AlgEtQOrd) -> BoolElt</pre><pre><b> 'eq'</b>(S::AlgEtQOrd,I::AlgEtQIdl) -> BoolElt</pre>
 Equality testing.
-<pre><b> 'ne'</b>(I::AlgEtQIdl , J::AlgEtQIdl ) -> BoolElt</pre><pre><b> 'ne'</b>(I::AlgEtQIdl, S::AlgEtQOrd) -> BoolElt</pre><pre><b> 'ne'</b>(S::AlgEtQOrd,I::AlgEtQIdl) -> BoolElt</pre>
-Disequality testing.
 ## Coordinates with respect to the $\mathbb{Z}$-basis and inclusion
  Inclusion testing of elements, orders and ideals in a given fractional ideal is performed by multiplying by the `inclusion matrix`. This matrix, which is stored in an attribute, is the inverse of the matrix with coefficients the $\mathbb{Z}$-basis of the order. If the output of the multiplication has integer coefficients then we have an inclusion.
  The same matrix can be used to obtain the coordinates of a sequence of elements with respect to the $\mathbb{Z}$-basis.
@@ -367,7 +366,7 @@ Given two fractional ideals over the same order, returns their intersection.
 <pre><b> ColonIdeal</b>(I::AlgEtQIdl,O::AlgEtQOrd)->AlgEtQIdl</pre>
  Given an order $\mathcal{O}$ and a fractional $\mathcal{O}$-ideal $I$, returns $(I:\mathcal{O})$.
 ## Invertibility and multiplicator ring
- Let $I$ be a fractional $R$-ideal. 
+ Let $I$ be a fractional $R$-ideal.
  The `multiplicator ring` of $I$ is the biggest order $S$ such that $I$ is a fractional $S$-ideal.
  It is easy to verify that the multiplicator ring of $I$ is the overorder $(I:I)$ of $R$.
  We say that $I$ is `invertible` if $I\cdot (R:I) = R$.
@@ -404,7 +403,7 @@ Returns the smallest integer contained in the given fractional ideal, which must
  Whenever we call the intrinsic `ZBasis` for an order or a fractional ideal, we are computing a $\mathbb{Z}$-basis. This is produced directly from the known generators. This elements might have large coefficients making certain operation considerable slower. One can then reduce the given basis using the LLL algorithm to get better coefficients. While this procedure might cost some time, it is often convenient to perform this reduction if the ideal or the order are supposed to be used further.
  We provide the intrinsic `ZBasisLLL` which is a procedure changing the stored $\mathbb{Z}$-basis to an LLL-reduced one, if this has not been done before. The attribute `inclusion_matrix` is also deleted, since it depends on the stored $\mathbb{Z}$-basis.
 <pre><b> ZBasisLLL</b>(S::AlgEtQOrd)</pre><pre><b> ZBasisLLL</b>(S::AlgEtQIdl)</pre>
- A procedure that replaces the stored $\mathbb{Z}$-basis with an LLL-reduced one. 
+ A procedure that replaces the stored $\mathbb{Z}$-basis with an LLL-reduced one.
 ## Two-generating set
 <pre><b> TwoGeneratingSet</b>(I::AlgEtQIdl)</pre>
  A procedure that given an invertible fractional ideal $I$, stores in the attribute `Generators` of $I$ one or two non-zerodivisors in $I$ generating $I$. The elements are chosen by a non-deterministic process.
@@ -423,7 +422,7 @@ Returns the smallest integer contained in the given fractional ideal, which must
  Given a sequence `Is` of $N$ integral fractional $S$-ideals $I_1,\ldots,I_N$, pairwise coprime, returns a map $S \to S^N$ representing the natural isomorphism $S/I \to \frac{S}{I_1}\times \cdots \times \frac{S}{I_N}$, where $I=\prod_i I_i$, and a map $S^N \to S$ representing the inverse.
 # Primes, factorization and completions
 ## Primes
- Let $S$ be an order in an étale algebra $A$. A `prime` of $S$ is a maximal ideal of $S$, that is, an integral fractional ideal $\mathfrak{p}$ such that $S/\mathfrak{p}$ is a field. 
+ Let $S$ be an order in an étale algebra $A$. A `prime` of $S$ is a maximal ideal of $S$, that is, an integral fractional ideal $\mathfrak{p}$ such that $S/\mathfrak{p}$ is a field.
  It is well-known that a prime $\mathfrak{p}$ of $S$ is invertible if and only if $\mathfrak{p}$ does not contain the conductor of $S$. Such primes are also called `regular`. A prime which in non-invertible is also called `singular`.
  In particular, there is only finitely many singular primes.
 <pre><b> IsPrime</b>(I::AlgEtQIdl) -> BoolElt</pre><pre><b> IsMaximal</b>(I::AlgEtQIdl) -> BoolElt</pre><pre><b> IsMaximalIdeal</b>(I::AlgEtQIdl) -> BoolElt</pre>
@@ -437,8 +436,7 @@ Returns the non-invertible primes of the order.
 ## Factorization
  Every integral fractional $S$-ideal which is coprime to the conductor of $S$ can be written as a product of invertible primes of $S$.
  This factorization is unique up to permutation of the factors.
- 
- Consider the decomposition $K_1\times \cdots \times K_n$ of $A$ into the direct product of its components.
+<br> Consider the decomposition $K_1\times \cdots \times K_n$ of $A$ into the direct product of its components.
  Then every prime $\mathfrak{P}$ of the maximal order $\mathcal{O}_A$ of $A$ is generated by a maximal ideal in exactly one component and by $1$ in every other component.
  It follows that the factorization problem for fractional ideals over the maximal order can be immediately reduced to the number field case.
  We deal the case of non-maximal orders by taking intersections.
@@ -477,11 +475,11 @@ Returns the non-invertible primes of the order.
  Then the quotient $J/I$ is finite.
  We represent this quotient as a finite abelian group, a finite field, or a finite dimensional vector space over a finite field, depending on the properties of $I$ and $J$.
 <pre><b> Quotient</b>(I::AlgEtQIdl, zbJ::SeqEnum[AlgEtQElt]) -> GrpAb, Map</pre>
- Given a fractional ideal $I$ and the $\mathbb{Z}$-basis of an ideal or order $J$ such that $J \subseteq I$, returns the abelian group $Q=I/J$ together with the quotient map $q:I\to Q$. 
+ Given a fractional ideal $I$ and the $\mathbb{Z}$-basis of an ideal or order $J$ such that $J \subseteq I$, returns the abelian group $Q=I/J$ together with the quotient map $q:I\to Q$.
 <pre><b> Quotient</b>(I::AlgEtQIdl, J::AlgEtQIdl) -> GrpAb, Map</pre>
- Given fractional ideals $I$ and $J$ such that $J \subseteq I$, returns the abelian group $Q=I/J$ together with the quotient map $q:I \to Q$. 
+ Given fractional ideals $I$ and $J$ such that $J \subseteq I$, returns the abelian group $Q=I/J$ together with the quotient map $q:I \to Q$.
 <pre><b> Quotient</b>(S::AlgEtQOrd, zbJ::SeqEnum[AlgEtQElt]) -> GrpAb, Map</pre>
- Given an order $S$ and the $\mathbb{Z}$-basis of an ideal or order $J$ such that $J \subseteq S$, returns the abelian group $Q=S/J$ together with the quotient map $q:S\to Q$. 
+ Given an order $S$ and the $\mathbb{Z}$-basis of an ideal or order $J$ such that $J \subseteq S$, returns the abelian group $Q=S/J$ together with the quotient map $q:S\to Q$.
 <pre><b> ResidueRing</b>(S::AlgEtQOrd,I::AlgEtQIdl) -> GrpAb , Map</pre>
  Given an order $S$ and integral fractional $S$-ideal $I$, returns the abelian group $S/I$ and the quotient map $q:S \to S/I$ (with preimages). Important: the domain of $q$ is the parent algebra of $S$, since the elements of $S$ are expressed as elements of $A$. We stress that the output is a group and does not have a multiplication. This can be obtained by first taking preimages, doing the multiplication, and then applying the projection.
 <pre><b> ResidueField</b>(P::AlgEtQIdl) -> FldFin, Map</pre>
@@ -535,11 +533,10 @@ Given an order R and prime P of R, returns R and the overorders S of R with cond
 <pre><b> GraphOverOrders</b>(R:AlgEtQOrd) -> GrphDir</pre>
  Given an order $R$, returns the graph $G$ of minimal inclusions of the overorders of $R$. The vertices of $G$ are integers between $1$ and the number of overorders of $R$, and there is an edge $[i,j]$ if and only if $j$-th overorder of $R$ is a minimal overorder of the $i$-th.
 # Trace and norm
- Let $A$ be an étale algebra over $\mathbb{Q}$, with components $K_1\times\cdots\times K_n$. 
+ Let $A$ be an étale algebra over $\mathbb{Q}$, with components $K_1\times\cdots\times K_n$.
  We define the `(absolute) trace` on $A$ as the additive map $\mathrm{Tr_{A/\mathbb{Q}}}\colon A\to \mathbb{Q}$ that sends an element $a\in A$ to $\sum_{i=1}^n \mathrm{Tr}_{K_i/\mathbb{Q}}(a)$.
  Let $m_a$ be the matrix representing the multipliction-by-$a$ on $A$ with respect to any basis of $A$ over $\mathbb{Q}$. Then $\mathrm{Tr}_{A/\mathbb{Q}}(a)$ equals the trace of $m_a$.
-  
- We define the `(absolute) norm` on $A$ as the multiplicative map $\mathrm{N}_{A/\mathbb{Q}}\colon A \to \mathbb{Q}$ by sending a unit $a \in A$ to $\prod_{i=1}^n \mathrm{N}_{K_i/\mathbb{Q}}(a)$ and every zero-divisor to $0$.
+<br> We define the `(absolute) norm` on $A$ as the multiplicative map $\mathrm{N}_{A/\mathbb{Q}}\colon A \to \mathbb{Q}$ by sending a unit $a \in A$ to $\prod_{i=1}^n \mathrm{N}_{K_i/\mathbb{Q}}(a)$ and every zero-divisor to $0$.
  We have $N_{A/\mathbb{Q}}(a)$ equals the determinant of the matrix $m_a$.
 <pre><b> Trace</b>(x::AlgEtQElt) -> FldRatElt</pre><pre><b> AbsoluteTrace</b>(x::AlgEtQElt) -> FldRatElt</pre>
 Returns the (absolute) trace of the element.
@@ -571,29 +568,29 @@ Returns the trace dual ideal of the given order.
 <pre><b> MaximalIntermediateIdeals</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]</pre>
  Given fractional $S$-ideals $I$ and $J$ such that $J \subseteq I$, returns the maximal (with respect to inclusion) fractional $S$-ideals $K$ such that $J \subseteq K \subsetneq I$. Note that $I$ is never in the output, while $J$ is in the output if and only if the $S$-module $I/J$ is simple, in which case the output consists only of $J$.
 <pre><b> IntermediateIdealsWithTrivialExtension</b>(I::AlgEtQIdl,J::AlgEtQIdl, O::AlgEtQOrd)->SetIndx[AlgEtQIdl]</pre>
- Given fractional $S$-ideals $I$ and $J$ and an order $O$ such that 
- - $S \subseteq O$,  
- - $J \subseteq I$, and 
+ Given fractional $S$-ideals $I$ and $J$ and an order $O$ such that
+ - $S \subseteq O$,
+ - $J \subseteq I$, and
  - $O \subseteq (I:I)$,
- returns all the fractional $S$-ideals $K$ such that 
- - $J \subseteq K \subseteq I$, and 
- - $O\cdot K = I$. 
- Note that the output always contains $I$. 
+ returns all the fractional $S$-ideals $K$ such that
+ - $J \subseteq K \subseteq I$, and
+ - $O\cdot K = I$.
+ Note that the output always contains $I$.
  The output is produced by recursively computing maximal intermediate ideals.
 <pre><b> IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing</b>(I::AlgEtQIdl,J::AlgEtQIdl, O::AlgEtQOrd)->SetIndx[AlgEtQIdl]</pre>
- Given fractional $S$-ideals $I$ and $J$ and an order $O$ such that 
- - $S \subseteq O$,  
- - $J \subseteq I$, and 
- - $O \subseteq (I:I)$, 
+ Given fractional $S$-ideals $I$ and $J$ and an order $O$ such that
+ - $S \subseteq O$,
+ - $J \subseteq I$, and
+ - $O \subseteq (I:I)$,
  returns all the fractional $S$-ideals $K$ satisfying
- - $J \subseteq K \subseteq I$, 
- - $O\cdot K = I$, and 
- - $(K:K) = S$. 
+ - $J \subseteq K \subseteq I$,
+ - $O\cdot K = I$, and
+ - $(K:K) = S$.
  In particular, the output contains $I$ if and only if $O = (I:I) = S$. The output is produced by recursively computing maximal intermediate ideals.
 <pre><b> IntermediateIdealsOfIndex</b>(I::AlgEtQIdl,J::AlgEtQIdl,N::RngIntElt)->SetIndx[AlgEtQIdl]</pre>
  Given fractional $S$-ideals $I$ and $J$ satisfying $J \subseteq I$, and a positive integer $N$, returns all the fractional $S$-ideals $K$ such that:
- - $J \subseteq K \subseteq I$, and 
- - $[I:K]=N$. 
+ - $J \subseteq K \subseteq I$, and
+ - $[I:K]=N$.
  The output is produced by recursively computing the maximal ones.
 # Ideals with prescribed index
  Let $I$ be a fractional ideal or an order in an étale algebra over $\mathbb{Q}$.
@@ -617,21 +614,17 @@ Given an order O and a positive integer N, returns all the O-ideals J with index
  Given a fractional $R$-ideal $I$, returns the fractional $R$-ideal $a*I$, and the element $a$, where $a$ is a non-zero divisor chosen such that $a\cdot I \subseteq  R$, and the cardinality of $R/aI$ is small. More precisely, $a$ is the output of `ShortElement` when applied to $(R:I)$. Note that if $I$ is invertible then $R/aI$ is isomorphic to $(R:I)/aR$.
 # Picard group and unit group
  Let $R$ be an order in an étale algebra $A$ over $\mathbb{Q}$ with maximal order $\mathcal{O}_A$.
- We say that two fractional $R$-ideals $I$ and $J$ are `isomorphic` if there exists a unit $a\in A$ such that $I=aJ$. Observe that this happens if and only if $I$ and $J$ are isomorphic as $R$-modules. 
+ We say that two fractional $R$-ideals $I$ and $J$ are `isomorphic` if there exists a unit $a\in A$ such that $I=aJ$. Observe that this happens if and only if $I$ and $J$ are isomorphic as $R$-modules.
  We refer to the isomorphism class $[I]$ of $I$ as its `ideal class`.
-   
- The set of ideal classes of invertible fractional $R$-ideals forms a group under the operation induced by ideal multiplication. This group is called the `Picard group` of $R$ and denoted $\mathrm{Pic}(R)$.
-   
- If $K_1\times \ldots \times K_n$ are the components of $A$ then $\mathrm{Pic}(\mathcal{O}_A) = \prod_{i=1}^n\mathrm{Cl}(\mathcal{O}_{K_i})$, where $\mathrm{Cl}(\mathcal{O}_{K_i})$ is the class group of the number field $K_i$.
+<br> The set of ideal classes of invertible fractional $R$-ideals forms a group under the operation induced by ideal multiplication. This group is called the `Picard group` of $R$ and denoted $\mathrm{Pic}(R)$.
+<br> If $K_1\times \ldots \times K_n$ are the components of $A$ then $\mathrm{Pic}(\mathcal{O}_A) = \prod_{i=1}^n\mathrm{Cl}(\mathcal{O}_{K_i})$, where $\mathrm{Cl}(\mathcal{O}_{K_i})$ is the class group of the number field $K_i$.
  Also, the unit group $\mathcal{O}_A^\times$ of $\mathcal{O}_A$ satisfies $\mathcal{O}_A^\times = \mathcal{O}_{K_1}^\times \times \ldots \times \mathcal{O}_{K_n}^\times$.
-   
- The Picard group and the unit group of the order $R$ can be computed using the well-known exact sequence:
+<br> The Picard group and the unit group of the order $R$ can be computed using the well-known exact sequence:
  ```math
  1 \to R^\times \to \mathcal{O}_A^\times \to \dfrac{\left( \mathcal{O}/\mathfrak{f} \right)^\times}{\left( \mathcal{O}/\mathfrak{f} \right)^\times} \to \mathrm{Pic}(R)\to \mathrm{Pic}(\mathcal{O}_A) \to 1,
  ```
  where the first, second and third map are the natural maps, the fourth is induced by $a \mapsto (a\mathcal{O}_A \cap R)$ and the last one is induced by the extension map $I \mapsto I\mathcal{O}_A$.
-   
- The following intrinsics allow to compute all the elements of the sequence.
+<br> The following intrinsics allow to compute all the elements of the sequence.
  If one wants to perform the computation under the GRH bound one can either use the appropriate parameters of use `SetClassGroupBounds("GRH")` as for number fields.
 <pre><b> ResidueRingUnits</b>(S::AlgEtQOrd,I::AlgEtQIdl) -> GrpAb,Map</pre><pre><b> ResidueRingUnits</b>(I::AlgEtQIdl) -> GrpAb,Map</pre>
  Given an order $S$ and a fractional $S$-ideal $I$, returns the group $(S/I)^\times$ and a map $(S/I)^\times \to  S$ giving representatives. This is implemented only when $S$ is the maximal order.
@@ -651,17 +644,14 @@ Given an order O and a positive integer N, returns all the O-ideals J with index
  Let $R$ be an order in an étale algebra $A$ over $\mathbb{Q}$.
  The `(Cohen-Macaulay) type` of $R$ `at a prime` $\mathfrak{p}$ is defined as minimal number of generators at $\mathfrak{p}$ of the trace dual ideal $R^t$, that is, the dimension $\dim_{R/\mathfrak{p}}(R^t/\mathfrak{p}R^t$.
  The `(Cohen-Macaulay) type` of $R$ is the maximum of all the local types.
-  
- If the type of $R$ at $\mathfrak{p}$ is one, we say that $R$ is `Gorenstein at the prime` $\mathfrak{p}$.
+<br> If the type of $R$ at $\mathfrak{p}$ is one, we say that $R$ is `Gorenstein at the prime` $\mathfrak{p}$.
  It follows that if $\mathfrak{p}$ is invertible then $R$ is Gorenstein at $\mathfrak{p}$.
  Moreover, $R$ is Gorenstein at $\mathfrak{p}$ if and only if every ideal with multiplicator ring $R$ is locally principal at $\mathfrak{p}$.
  The order $R$ is said to be `Gorenstein` if it is so at all its (singular) primes.
  This is equivalent to every fractional $R$-ideal $I$ with $(I:I)=R$ being invertible.
-  
- The order $R$ is `Bass at the prime` $\mathfrak{p}$ if every overorder $S$ of $R$ is Gorenstein at the finitely many primes above $\mathfrak{p}$. The order $R$ is `Bass` if it is so at all (singular) primes.
+<br> The order $R$ is `Bass at the prime` $\mathfrak{p}$ if every overorder $S$ of $R$ is Gorenstein at the finitely many primes above $\mathfrak{p}$. The order $R$ is `Bass` if it is so at all (singular) primes.
  One can show that $R$ is Bass at $\mathfrak{p}$ if and only if $\dim_{R/\mathfrak{p}}(\mathcal{O_A}/\mathfrak{p}\mathcal{O}_A)\leq 2$, where $\mathcal{O}_A$ is the maximal order of $A$.
- 
- Reference: Stefano Marseglia, "Cohen-Macaulay type of orders, generators and ideal classes", Journal of Algebra 658 (2024), 247-276.
+<br> Reference: Stefano Marseglia, "Cohen-Macaulay type of orders, generators and ideal classes", Journal of Algebra 658 (2024), 247-276.
 <pre><b> CohenMacaulayTypeAtPrime</b>(S::AlgEtQOrd,P::AlgEtQIdl)->RngIntElt</pre>
  Given an order $S$ and a prime $P$, returns the Cohen-Macaulay type of $S$ at $P$.
 <pre><b> CohenMacaulayType</b>(S::AlgEtQOrd)->RngIntElt</pre>
@@ -693,28 +683,24 @@ Given an order O and a positive integer N, returns all the O-ideals J with index
 # Weak equivalence classes
  Let $R$ be an order $I$ and $J$ be fractional $R$-ideals in an étale algebra $A$ over $\mathbb{Q}$. Then the following statements are equivalent:
  - $I_{\mathfrak{p}} \simeq J_{\mathfrak{p}}$ as $R_{\mathfrak{p}}$- modules for every maximal ideal $\mathfrak{p}$ of $R$.
- - $I_p \simeq J_p$ as $R_p$- modules for every rational prime $p$. 
+ - $I_p \simeq J_p$ as $R_p$- modules for every rational prime $p$.
  - $1 \in (I:J)(J:I)$.
  - $I$ and $J$ have the same multiplicator ring, say $S$, and $(I:J)$ is an invertible fractional $S$-ideal.
  - $I$ and $J$ have the same multiplicator ring, say $S$, and $(J:I)$ is an invertible fractional $S$-ideal.
  If the previous conditions hold, one says that $I$ and $J$ are `weakly equivalent`.
  This is an equivalence relation.
- 
- Note that if $I$ is an order, then $J$ is weakly equivalent to $I$ if and only if $J$ is an invertible $I$-ideal. If both $I$ and $J$ are orders then they are weakly equivalent if and only if they are equal.
- 
- In the literature, the same notion sometimes goes under the name `local isomorphism`.
+<br> Note that if $I$ is an order, then $J$ is weakly equivalent to $I$ if and only if $J$ is an invertible $I$-ideal. If both $I$ and $J$ are orders then they are weakly equivalent if and only if they are equal.
+<br> In the literature, the same notion sometimes goes under the name `local isomorphism`.
  Reference: Stefano Marseglia, "Local isomorphism classes of fractional ideals of orders in étale algebras", Journal of Algebra 673 (2025), 77-102.
 <pre><b> IsWeakEquivalent</b>(I::AlgEtQIdl,J::AlgEtQIdl)->BoolElt</pre><pre><b> IsWeakEquivalent</b>(O1::AlgEtQOrd,O2::AlgEtQOrd)->BoolElt</pre><pre><b> IsWeakEquivalent</b>(O::AlgEtQOrd,J::AlgEtQIdl)->BoolElt</pre><pre><b> IsWeakEquivalent</b>(J::AlgEtQIdl,O::AlgEtQOrd)->BoolElt</pre><pre><b> IsWeaklyEquivalent</b>(I::AlgEtQIdl,J::AlgEtQIdl)->BoolElt</pre><pre><b> IsWeaklyEquivalent</b>(O1::AlgEtQOrd,O2::AlgEtQOrd)->BoolElt</pre><pre><b> IsWeaklyEquivalent</b>(O::AlgEtQOrd,J::AlgEtQIdl)->BoolElt</pre><pre><b> IsWeaklyEquivalent</b>(J::AlgEtQIdl,O::AlgEtQOrd)->BoolElt</pre>
  Given fractional ideals $I$ and $J$, returns whether they are weakly equivalent. The fractional ideals are no required to be defined over the same order.}
 # Weak equivalence class monoid
- Let $R$ be an order in an étale algebra over $\mathbb{Q}$. Then ideal multiplication induces a commutative monoid structure on the set of weak equivalence classes of fractional $R$-ideals called the `weak equivalence class monoid` of $R$. This commutative monoid, which we denote by $\mathcal{W}(R)$, is finite and has unit element given by the class of $R$. 
-  
- In MAGMA, there are two ways of computing $\mathcal{W}(R)$. The first returns if as a sequence of representatives of the classes. The second one returns it as an abstract commutative monoid, each element representing a class, together with a map returning a representative of each class. Further details will be given in the next subsections.
+ Let $R$ be an order in an étale algebra over $\mathbb{Q}$. Then ideal multiplication induces a commutative monoid structure on the set of weak equivalence classes of fractional $R$-ideals called the `weak equivalence class monoid` of $R$. This commutative monoid, which we denote by $\mathcal{W}(R)$, is finite and has unit element given by the class of $R$.
+<br> In MAGMA, there are two ways of computing $\mathcal{W}(R)$. The first returns if as a sequence of representatives of the classes. The second one returns it as an abstract commutative monoid, each element representing a class, together with a map returning a representative of each class. Further details will be given in the next subsections.
 ## Weak equivalence class monoid as a sequence of representatives.
  Since the multiplicator ring is an invariant of the weak equivalence class of a fractional $R$-ideal, we have a partitioning $\mathcal{W}(R) = \bigsqcup_S \mathcal{W}_S(R)$, where the disjoint union is taken over the overorders $S$ of $R$ and $\mathcal{W}_S(R)$ is the subset of $\mathcal{W}(R)$ consisting of the weak equivalence classes of fractional $R$-ideals with multiplicator ring $S$.
  Let $S$ be an overorder of $R$. If $S$ is Gorenstein then $\mathcal{W}_S(R)$ consists only of the class defined by $S$. If $S$ has Cohen-Macaulay type $2$ and $\mathfrak{p}$ is a prime of $S$, then each fractional $R$-ideal $I$ with multiplicator ring $S$ satisfies either $I_\mathfrak{p} \simeq S_\mathfrak{p}$ or $I_\mathfrak{p} \simeq S^t_\mathfrak{p}$. The second possibility occurs precisely when $S$ has Cohen-Macaulay type $2$ at the primes $\mathfrak{p}$. This classification results provide a very efficient method to compute $\mathcal{W}_S(R)$ for orders $S$ with Cohen-Macaulay type $\leq 2$. For the general case, an algorithm that includes a more expensive enumeration step is provided.
-  
- For further details, see:
+<br> For further details, see:
  - Stefano Marseglia, "Cohen-Macaulay type of orders, generators and ideal classes", Journal of Algebra 658 (2024), 247-276.
  - Stefano Marseglia, "Local isomorphism classes of fractional ideals of orders in étale algebras", Journal of Algebra 673 (2025), 77-102.
 <pre><b> WeakEquivalenceClassesWithPrescribedMultiplicatorRing</b>(S::AlgEtQOrd) -> SeqEnum[AlgEtQIdl]</pre><pre><b> WKICM_bar</b>(S::AlgEtQOrd) -> SeqEnum[AlgEtQIdl]</pre>
@@ -722,7 +708,7 @@ Given an order O and a positive integer N, returns all the O-ideals J with index
 <pre><b> WeakEquivalenceClassMonoid</b>(E::AlgEtQOrd)->SeqEnum[AlgEtQIdl]</pre><pre><b> WKICM</b>(E::AlgEtQOrd)->SeqEnum[AlgEtQIdl]</pre>
  Given an order $E$, returns a set of representatives of the weak equivalence class monoid $\mathcal{W}(E)$.
 ## Abstract representation of the weak equivalence class monoid.
- The second method to compute $\mathcal{W}(R)$ returns an abstract representation of the monoid together with a map giving representatives. The monoid is of type `AlgEtQWECM` and each class is of type `AlgEtQWECMElt`. Classes can be created by feeding to the operator `!` a fractional $S$-ideal, when $S$ is an overorder of $R$ or an overorder of $R$. 
+ The second method to compute $\mathcal{W}(R)$ returns an abstract representation of the monoid together with a map giving representatives. The monoid is of type `AlgEtQWECM` and each class is of type `AlgEtQWECMElt`. Classes can be created by feeding to the operator `!` a fractional $S$-ideal, when $S$ is an overorder of $R$ or an overorder of $R$.
  Whenever a class is created a representative is stored in an attribute.
  This representative can be changed using the intrinsic `SetRepresentative`.
  Classes can be multiplied using the operator `*`. Whenever two classes are multiplied, the result is stored in the attribute `MultiplicationTable` of the monoid.
@@ -750,7 +736,7 @@ Returns weak equivalence class corresponding to the product of the two given cla
 Returns whether the given class is the neutral element of the weak equivalence class monoid it belongs to.
 <pre><b> IsIdempotent</b>(x::AlgEtQWECMElt)->BoolElt</pre>
 Returns whether the given class is an idempotent of weak equivalence class monoid it belongs to.
-<pre><b> WeakEquivalenceClassMonoidAbstract</b>(R::AlgEtQOrdd) -> AlgEtQWECM,Map</pre>
+<pre><b> WeakEquivalenceClassMonoidAbstract</b>(R::AlgEtQOrd) -> AlgEtQWECM,Map</pre>
  Given an order $R$, returns the weak equivalence class monoid $W$ of $R$ together with a map (with preimages) sending each class of $W$ to a representative (determined by WeakEquivalenceClassMonoid).}
 <pre><b> Order</b>(W::AlgEtQWECM)->AlgEtQOrd</pre>
  Returns the order of $W$.
@@ -782,8 +768,7 @@ Equality testing for weak equivalence class monoids, that is, if the underlying 
  Let $R$ be an order in an étale algebra $A$ over $\mathbb{Q}$. Ideal multiplication induces the structure of commutative monoid on the set of ideal classes of $R$, which we then call `ideal class monoid` of $R$.
  We denote it by $\mathcal{I}(R)$.
  The unit element of $\mathcal{I}(R)$ is the class of any principal fractional $R$-ideal.
-   
- In MAGMA there are two ways of computing the ideal class monoid, which are described in the next subsections.
+<br> In MAGMA there are two ways of computing the ideal class monoid, which are described in the next subsections.
 ## Representatives of the ideal class monoid
  The first method to compute the ideal class monoid returns a sequence of representatives of the ideal classes.
  We have a partitioning $\mathcal{I}(R) = \bigsqcup_S \mathcal{I}_S(R)$ where the disjoint union is taken over the overorders $S$ of $R$ and $\mathcal{I}_S(R)$ is the subset of $\mathcal{I}(R)$ consisting of ideal classes with multiplicator ring $S$.
@@ -840,8 +825,7 @@ Returns a random element of the given ideal class monoid.
 # Complex Conjugation and CM-étale algebras
  Let $A$ be an étale algebra over $\mathbb{Q}$ with components $K_1\times\cdots\times K_n$.
  We say that $A$ is a `CM-étale algebra` if every component $K_i$ is a CM-field, that is, $K_i$ has involution that acts as applying complex conjugation after applying any homomorphism to the complex numbers. If $A$ is a CM-étale algebra, then it has an involution with the same property. For this reason, we call this involution `complex conjugation` and denote as $\overline{\cdot}$.
- 
- Given an element of $A$, an order or a fractional ideal in $A$, we say that it is `conjugate stable` if it equals it complex conjugate.
+<br> Given an element of $A$, an order or a fractional ideal in $A$, we say that it is `conjugate stable` if it equals it complex conjugate.
  An element $x$ of $A$ is called `totally real` if $a=\overline{a}$ and totally imaginary if $a=-\overline{a}$.
  A totally real element $a$ is called `totally positive (resp. negative)` if $\varphi(a) > 0$ (resp. $\varphi(a)<0$) for every homomorphism $\varphi:A\to \mathbb{C}$.
 <pre><b> HasComplexConjugate</b>(A::AlgEtQ) -> BoolElt</pre>
@@ -849,36 +833,35 @@ Returns if the algebra is the product of CM fields.
 <pre><b> ComplexConjugate</b>(x::AlgEtQElt) -> AlgEtQElt</pre>
 Returns the complex conjugate of the argument.
 <pre><b> IsConjugateStable</b>(O::AlgEtQOrd) -> BoolElt,AlgEtQOrd</pre>
- Given an order $O$ in a CM-étale algebra, returns wheter $O$ is conjugate stable and the complex conjugate.
+ Given an order $O$ in a CM-étale algebra, returns whether $O$ is conjugate stable and the complex conjugate.
 <pre><b> ComplexConjugate</b>(O::AlgEtQOrd) -> AlgEtQOrd</pre>
  Given an order $O$ in a CM-étale algebra, returns the complex conjugate of $O$.
 <pre><b> IsConjugateStable</b>(I::AlgEtQIdl) -> BoolElt,AlgEtQIdl</pre>
- Given a fractional ideal $I$ in a CM-étale algebra, returns wheter $I$ is conjugate stable and the complex conjugate. If the order of $I$ is not conjugate stable, then the second output will be defined over the complex conjugate of the order.
+ Given a fractional ideal $I$ in a CM-étale algebra, returns whether $I$ is conjugate stable and the complex conjugate. If the order of $I$ is not conjugate stable, then the second output will be defined over the complex conjugate of the order.
 <pre><b> ComplexConjugate</b>(I::AlgEtQIdl) -> AlgEtQIdl</pre>
  Given a fractional ideal $I$ in a CM-étale algebra, returns the complex conjugate of $I$. If the order of $I$ is not conjugate stable, then the second output will be defined over the complex conjugate of the order.
 # CM-types of a CM-étale algebra
  Let $A$ be a CM-étale algebra of dimension $2g$ over $\mathbb{Q}$. Then complex conjugation acts of $\mathrm{Homs}(A,\mathbb(C))$. We denote this action with $\overline{\cdot}$. A `CM-type` $\Phi$ of $A$ is a set of $g$ elements of $\mathrm{Homs}(A,\mathbb(C))$ such that $\mathrm{Homs}(A,\mathbb(C)) = \Phi \sqcup \overline{\Phi}$.
  Given a CM-type $\Phi$ and a totally imaginary element $b\in A^\times$, we say that $b$ is $\Phi$-`positive` if $\Im(\varphi(b))>0$ for every $\varphi\in \Phi$. Two elements totally imaginary elements $b$ and $b'$ in $A^\times$ represent the same CM-type $\Phi$ if and only if $b/b'$ is totally real and totally positive.
-  
- In MAGMA a CM-type of a CM-algebra $A$ has type `AlgEtQCMType` and it is determined by $g$ homomorphisms to $\mathbb{C}$ or by a $\Phi$-positive element.
+<br> In MAGMA a CM-type of a CM-algebra $A$ has type `AlgEtQCMType` and it is determined by $g$ homomorphisms to $\mathbb{C}$ or by a $\Phi$-positive element.
 <pre><b> CMType</b>(seq::SeqEnum[Map]) -> AlgEtQCMType</pre><pre><b> CreateCMType</b>(seq::SeqEnum[Map]) -> AlgEtQCMType</pre>
  Given a sequence of homomorphisms from a CM-algebra to CC, one per conjugate pair, it returns the corresponding CMType.
 <pre><b> CMType</b>( b::AlgEtQElt  ) -> AlgEtQCMType</pre><pre><b> CreateCMType</b>( b::AlgEtQElt  ) -> AlgEtQCMType</pre>
  Given a totally imaginary element $b$ in an CM-étale algebra $A$ such that $b\in A^\times$, returns the CM-type $\Phi$ for which $b$ is $\Phi$-positive.
 <pre><b> CMPositiveElement</b>( PHI::AlgEtQCMType )->AlgEtQElt</pre><pre><b> CMPosElt</b>( PHI::AlgEtQCMType )->AlgEtQElt</pre>
  Given a CMType $\Phi$ returns a totally imaginary $\Phi$-positive element.
-<pre><b> Homs</b>( PHI::AlgEtQCMType : prec:=Precision(GetDefaultRealField()) )->SeqEnum[Map]</pre>
- Given a CM-type $\Phi$, returns the sequence of homomorphisms to complex field. The vararg `prec` determines the precision of the complex field.
-<pre><b> 'eq'</b>(PHI1 :: AlgEtQCMType, PHI2::AlgEtQCMType : prec:=Precision(GetDefaultRealField()))->BoolElt</pre>
+<pre><b> Homs</b>( PHI::AlgEtQCMType : Precision := _Precision(GetDefaultRealField()) )->SeqEnum[Map]</pre>
+ Given a CM-type $\Phi$, returns the sequence of homomorphisms to complex field. The vararg `Precision` determines the precision of the complex field.
+<pre><b> 'eq'</b>(PHI1 :: AlgEtQCMType, PHI2::AlgEtQCMType : Precision := _Precision(GetDefaultRealField()))->BoolElt</pre>
  Equality testing for CM-types.
-<pre><b> Precision</b>(PHI :: AlgEtQCMType)->RngIntElt </pre>
+<pre><b> Precision</b>(PHI :: AlgEtQCMType)->RngIntElt</pre>
  Returns the precision of the codomain of the homomorphisms defining the given CM-type.
 <pre><b> ChangePrecision</b>(PHI0 :: AlgEtQCMType, prec::RngIntElt )->AlgEtQCMType</pre>
  Given a CM-type and a positive integer, returns the same CM-type but precision set to the given value.
 <pre><b> ChangePrecision</b>(~PHI :: AlgEtQCMType, prec::RngIntElt )</pre>
  Changes the precision of the given CM-type, that is, the codomain of each homomorphism will be ComplexField(Precision).
-<pre><b> AllCMTypes</b>(A::AlgEtQ : Prec := Precision(GetDefaultRealField()) ) -> SeqEnum[AlgEtQCMType]</pre>
-Returns all the CM-types of the given étale algebra. The parameter Prec determines the precision of the output.
+<pre><b> AllCMTypes</b>(A::AlgEtQ : Precision := _Precision(GetDefaultRealField()) ) -> SeqEnum[AlgEtQCMType]</pre>
+Returns all the CM-types of the given étale algebra. The parameter Precision determines the precision of the output.
 # Printing and Saving
 <pre><b> PrintSeqAlgEtQElt</b>(seq::SeqEnum[AlgEtQElt]) -> SeqEnum,MonStgElt</pre>
 Given a sequence of elements, returns a sequence of tuples of sequence of rational numbers that can be coerced into the original algebra to obtain the input sequence. As a second output, returns a string that can be printed to file.
@@ -886,3 +869,13 @@ Given a sequence of elements, returns a sequence of tuples of sequence of ration
 Given an order R, returns a string that contains the data about the weak equivalence classes of R, sorted by multiplicator ring. In particular, the overorders of R can be recovered from this string. Such string can be easily printed to file. To load the string, after using Read() on the file, use the intrinsic LoadWKICM.
 <pre><b> LoadWKICM</b>(str::MonStgElt) -> AlgEtQOrd</pre>
 Given a string produced with PrintWKICM it returns the corresponding order R with populated attributes regarding overorders and weak equivalence classes. These can be recovered with the appropriate intrinsics.
+<pre><b> IsTotallyReal</b>(a::AlgEtQElt) -> BoolElt</pre>
+Returns whether a is totally real.
+<pre><b> IsTotallyRealPositive</b>(a::AlgEtQElt) -> BoolElt</pre>
+Returns whether a is totally positive, that is, totally real and with positive image in CC.
+<pre><b> TotallyRealSubAlgebra</b>(K::AlgEtQ) -> AlgEtQ,Map</pre>
+Given a CM algebra K, returns the unique totally real subalgebra, with an embedding.
+<pre><b> TotallyRealUnitGroup</b>(S::AlgEtQOrd) -> Grp</pre>
+Given an order S in a CM étale algebra A returns the groups of totally real units of S, as a subgroup of S^*.
+<pre><b> TotallyRealPositiveUnitGroup</b>(S::AlgEtQOrd) -> Grp</pre>
+Given an order S in a CM étale algebra. Returns the groups of totally positive units of S, as a subgroup of S^*.

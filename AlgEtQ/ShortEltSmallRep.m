@@ -2,7 +2,7 @@
 // Copyright 2025.
 // Stefano Marseglia, stefano.marseglia89@gmail.com
 // https://stmar89.github.io/index.html
-// 
+//
 // Distributed under the terms of the CC-BY 4.0 licence.
 // https://creativecommons.org/licenses/by/4.0/
 /////////////////////////////////////////////////////
@@ -34,13 +34,13 @@ intrinsic ShortElement(I::AlgEtQIdl) ->AlgEtQElt
         elts:=[ x : x in B | not IsZeroDivisor(x) ];
         while #elts eq 0 do //if all ZeroDiv
             rndm_coeffs:=[ [Random([-bd..bd]) : i in [1..#B]] : j in [1..10]];
-            elts:=[ SumOfProducts(rndm,B) : rndm in rndm_coeffs];
+            elts:=[ DotProduct(rndm,B) : rndm in rndm_coeffs];
             elts:=[ x : x in elts | not IsZeroDivisor(x) ];
             bd +:=1;
         end while;
         _,i:=Min([Norm(x) : x in elts]);
         elt:=elts[i];
-        
+
         // // The following is deterministic, but does not always work. Also, enumerating all short vectors is too much, and too memory extensive.
         // L:=Lattice(MatrixAtoQ(ZBasis(I)));
         // // b:=Basis(LLL(L)); //we reduce above, so it is cached.
@@ -73,7 +73,7 @@ end intrinsic;
 /// Given a fractional $R$-ideal $I$, returns the fractional $R$-ideal $a*I$, and the element $a$, where $a$ is a non-zero divisor chosen such that $a\cdot I \subseteq  R$, and the cardinality of $R/aI$ is small. More precisely, $a$ is the output of `ShortElement` when applied to $(R:I)$. Note that if $I$ is invertible then $R/aI$ is isomorphic to $(R:I)/aR$.
 intrinsic SmallRepresentative(I::AlgEtQIdl) ->AlgEtQIdl,AlgEtQElt
 {Given a fractional R-ideal I, returns the fractional R-ideal a*I, and the element a, where a is chose so that  a*I is a subset of R, and the cardinality of R/aI is small. More precisely, a is the output of ShortElement when applied to (R:I). Note that if I is invertible R/aI is isomorphic to (R:I)/aR.}
-    if not assigned I`SmallRepresentative then                                            
+    if not assigned I`SmallRepresentative then
         R:=Order(I);
         cRI:=ColonIdeal(R,I);
         a:=ShortElement(cRI);
@@ -89,21 +89,21 @@ end intrinsic;
 
 
 /* TESTS
-    
+
     printf "### Testing ShortEltSmallRep:";
-	//AttachSpec("~/packages_github/AlgEt/spec");
-	_<x>:=PolynomialRing(Integers());
+    //AttachSpec("~/packages_github/AlgEt/spec");
+    _<x>:=PolynomialRing(Integers());
     f:=(x^2+5)*(x^2+7)*(x^2+11);
     assert IsSquarefree(f);
     K:=EtaleAlgebra(f);
     E:=EquationOrder(K);
     ff:=Conductor(E);
     _:=ShortElement(ff);
-    oo:=FindOverOrders(E); 
+    oo:=FindOverOrders(E);
     for S in oo do
         printf ".";
         ff:=Conductor(S);
         _:=ShortElement(ff);
     end for;
-    printf " all good!"; 
+    printf " all good!";
 */

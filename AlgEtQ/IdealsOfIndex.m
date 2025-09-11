@@ -2,7 +2,7 @@
 // Copyright 2025.
 // Stefano Marseglia, stefano.marseglia89@gmail.com
 // https://stmar89.github.io/index.html
-// 
+//
 // Distributed under the terms of the CC-BY 4.0 licence.
 // https://creativecommons.org/licenses/by/4.0/
 /////////////////////////////////////////////////////
@@ -47,7 +47,7 @@ intrinsic IdealsOfIndex(I::RngOrdIdl, N::RngIntElt) -> SeqEnum[RngOrdIdl]
     assert forall{J : J in Js | J+ff eq 1*OK};
     result := [];
     for J in Js do
-            K := (O meet J) * I; // OK/J=O/(J meet O)=I/K, where the second isomorphism holds because 
+            K := (O meet J) * I; // OK/J=O/(J meet O)=I/K, where the second isomorphism holds because
                                  // (J meet O) is invertible in O, since it is coprime with ff.
             Append(~result, K);
     end for;
@@ -56,7 +56,7 @@ end intrinsic;
 
 ///ditto
 intrinsic IdealsOfIndex(I::RngOrdFracIdl, N::RngIntElt) -> SeqEnum[RngOrdFracIdl]
-{Given a fractional O-ideal I in a number field and a positive integer N, with N coprime with the conductor, returns all the fractional O-ideals J contained in I with index [I:J]=N.}
+{ " } // "
     vprintf IdealsOfIndex,2 : "IdealsOfIndex RngOrdFracIdl\n";
     require N gt 0 : "N must be a strictly positive integer";
     if N eq 1 then
@@ -70,7 +70,7 @@ intrinsic IdealsOfIndex(I::RngOrdFracIdl, N::RngIntElt) -> SeqEnum[RngOrdFracIdl
 end intrinsic;
 
 ideals_of_index_product:=function(Is, N)
-    // Given a list Is of ideals representing the ideal I as a product and positive integer N, 
+    // Given a list Is of ideals representing the ideal I as a product and positive integer N,
     // returns all the ideals of index N. N has to be coprime with the conductor.
     vprintf IdealsOfIndex,2 : "IdealsOfIndexProduct internal\n";
     if #Is eq 1 then
@@ -92,7 +92,7 @@ end function;
 /// Given a fractional $O$-ideal $I$ and a positive integer $N$, returns all the fractional $O$-ideals $J$ satisfying $J \subseteq I$ and $[I:J]=N$. The intrinsic is very fast if $N$ is coprime to the conductor of $O$. If this condition is not satisfied, a slower algorithm is used. One can force the slow algorithm by setting the parameter `Method:="Slow"`.
 intrinsic IdealsOfIndex(I::AlgEtQIdl, N::RngIntElt : Method := "Default") -> SeqEnum[AlgEtQIdl]
 {Given a fractional O-ideal I and a positive integer N, returns all the fractional O-ideals J satisfying  J subseteq I and [I:J]=N. The intrinsic is very fast if N is coprime to the conductor of O. If this condition is not satisfied a slower algorithm. One can force the slow algorithm by setting the parameter Method:="Slow".}
-    require Method in {"Default","Slow"} : "The method is not recognized. It should be either Default or Slow"; 
+    require Method in {"Default","Slow"} : "The method is not recognized. It should be either Default or Slow";
     require N gt 0 : "N must be a strictly positive integer";
     if N eq 1 then
         return [I];
@@ -126,7 +126,7 @@ intrinsic IdealsOfIndex(I::AlgEtQIdl, N::RngIntElt : Method := "Default") -> Seq
         return result;
     else
         vprintf IdealsOfIndex,2 : "Slow version\n";
-        result:=[ K : K in IntermediateIdealsOfIndex(I,N*I,N)]; // conver to SeqEnum
+        result:=[ K : K in IntermediateIdealsOfIndex(I,N*I,N)]; // convert to SeqEnum
         return result;
     end if;
 end intrinsic;
@@ -150,7 +150,7 @@ end intrinsic;
     O:=MaximalOrder(A);
     ind:=Index(O,E);
     for N in [1..15] do
-        printf "."; 
+        printf ".";
         // test with maximal order
         assert Seqset(IdealsOfIndex(O,N)) eq Seqset(IdealsOfIndex(O,N : Method:="Slow"));
 
@@ -161,6 +161,6 @@ end intrinsic;
             _:=IdealsOfIndex(E,N);
         end if;
     end for;
-    SetAssertions(1);    
-    printf " all good!"; 
+    SetAssertions(1);
+    printf " all good!";
 */

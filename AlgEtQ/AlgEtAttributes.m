@@ -2,7 +2,7 @@
 // Copyright 2025.
 // Stefano Marseglia, stefano.marseglia89@gmail.com
 // https://stmar89.github.io/index.html
-// 
+//
 // Distributed under the terms of the CC-BY 4.0 licence.
 // https://creativecommons.org/licenses/by/4.0/
 /////////////////////////////////////////////////////
@@ -21,7 +21,7 @@ intrinsic Print(A::AlgEtQ)
 {Prints the defining polynomial or the components defining A.}
     if assigned A`DefiningPolynomial then
         f:=DefiningPolynomial(A);
-        printf "Etale Algebra over (%o) defined by %o", FieldOfFractions(CoefficientRing(f)),f;    
+        printf "Etale Algebra over (%o) defined by %o", FieldOfFractions(CoefficientRing(f)),f;
     else
         printf "Etale Algebra product of %o", Components(A);
     end if;
@@ -102,10 +102,10 @@ end intrinsic;
 
 /// Returns the dimension of A over the base field, which in this case is $\mathbb{Q}$.
 intrinsic Dimension(A::AlgEtQ)->RngInt
-{Returns the dimension of A over the base field, which in this case is the rational field.}    
+{Returns the dimension of A over the base field, which in this case is the rational field.}
     if not assigned A`Dimension then
         nf:=Components(A);
-        require HasBaseField(A) : "The number fields of A shoud all be defined over the same base ring.";
+        require HasBaseField(A) : "The number fields of A should all be defined over the same base ring.";
         A`Dimension:=&+[Degree(E) : E in nf];
     end if;
     return A`Dimension;
@@ -113,7 +113,7 @@ end intrinsic;
 
 /// Returns the dimension of $A$ over the prime field.
 intrinsic AbsoluteDimension(A::AlgEtQ)->RngInt
-{Returns the dimension of A over the prime field, which in this case is the rational field.}    
+{Returns the dimension of A over the prime field, which in this case is the rational field.}
     if not assigned A`AbsoluteDimension then
         A`AbsoluteDimension:=&+[AbsoluteDegree(E) : E in Components(A)];
     end if;

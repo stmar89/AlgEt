@@ -2,7 +2,7 @@
 // Copyright 2025.
 // Stefano Marseglia, stefano.marseglia89@gmail.com
 // https://stmar89.github.io/index.html
-// 
+//
 // Distributed under the terms of the CC-BY 4.0 licence.
 // https://creativecommons.org/licenses/by/4.0/
 /////////////////////////////////////////////////////
@@ -35,7 +35,7 @@ import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQ
 // Let I1+I2=S be ideals.
 // Let zI1 and zI2 be the matrices whose rows are given by ZBasis(I1) and ZBasis(I2).
 // Let U be such that U*VerticalJoin(d*zI1,d*zI2) = H, where H is in HNF, hence equal to the H above.
-// 
+//
 // Then cc*VerticalJoin(d*zS , 0n) = cc * V^-1 * U * VerticalJoin(d*zI1,d*zI2).
 // This implies that (a1,...,an,b1,...,bn) = cc*V^-1*U satisfies
 // 1 = a1zI11+..+anzI1n + b1I21 + ... + bnzI2n.
@@ -53,7 +53,7 @@ CRT_data_order:=function(S)
         H,V:=HermiteForm(M); // V*M eq H
         cc:=AbsoluteCoordinates([One(Algebra(S))],S)[1];
         vprintf CRT,2 : "ZBasis(S)=%o\nM=\n%o\ncc=%o\nH=\n%o\nV=\n%o\n",zS,M,cc,H,V;
-        assert2 SumOfProducts(cc,zS) eq One(Algebra(S));
+        assert2 DotProduct(cc,zS) eq One(Algebra(S));
         cc:=cc cat [0 : i in [1..#zS]];
         cc:=Matrix([cc])*crZQ(V^-1);
         vprintf CRT,2 : "cc*V^-1=%o\n",cc;
@@ -100,7 +100,7 @@ intrinsic ChineseRemainderTheorem(I::AlgEtQIdl,J::AlgEtQIdl,a::AlgEtQElt,b::AlgE
         cc:=cc*crZQ(U);
         vprintf CRT,2 : "cc*V^-1*U=%o\n",cc;
         cc:=Partition(Eltseq(cc),n);
-        cs:=[ SumOfProducts(cc[i],zIs[i]) : i in [1..N] ]; 
+        cs:=[ DotProduct(cc[i],zIs[i]) : i in [1..N] ];
         vprintf CRT,2 : "c1,c2=\n%o\n",cs;
         // cs[i] in Is[i] and \sum_i cs[i] = 1
     else
@@ -108,7 +108,7 @@ intrinsic ChineseRemainderTheorem(I::AlgEtQIdl,J::AlgEtQIdl,a::AlgEtQElt,b::AlgE
         cs:=[c1s[i]*Is_min[i] : i in [1..N]];// only integers here. very fast
     end if;
     //e:=&+[cs[i]*ashat[i] : i in [1..N]];
-    e:=SumOfProducts(cs,ashat);
+    e:=DotProduct(cs,ashat);
     assert2 forall{ cs : i in [1..N] | cs[i] in Is[i] };
     assert2 &+cs eq One(Algebra(S));
     assert forall{ i : i in [1..N] | e-as[i] in Is[i]};
@@ -124,7 +124,7 @@ intrinsic ChineseRemainderTheorem(Is::SeqEnum[AlgEtQIdl],as::SeqEnum[AlgEtQElt])
     require #Is eq N: "The number of ideals is not the same as the number of elements";
     require forall{i : i in [1..N] | as[i] in S}:"the elements must lie in order of definition of the ideals";
     require forall{i : i in [2..N] | Order(Is[i]) eq S}:"the ideals must be of the same order";
-    if N eq 1 then 
+    if N eq 1 then
         return as[1];
     else
         b:=$$(Is[2..N],as[2..N]);
@@ -144,14 +144,14 @@ intrinsic ChineseRemainderTheoremFunctions(Is::SeqEnum[AlgEtQIdl])-> Map,Map
     maps:=<>;
     for I in Is do
         QI,qI:=Quotient(S,I);
-        Append(~quots,QI); 
-        Append(~maps,qI); 
+        Append(~quots,QI);
+        Append(~maps,qI);
     end for;
     D,embs,projs:=DirectSum(quots);
     assert IsIsomorphic(D,Q);
     isom:=iso<Q->D | [ &+[embs[j](maps[j](Q.i@@q)) : j in [1..#Is]] : i in [1..Ngens(Q)] ]>;
     // isom : E1/&meet(Is) -> \prod_{I in Is} E1/I
-    // is the natural isomorphism of E1 modules. 
+    // is the natural isomorphism of E1 modules.
     // The inverse (constructed by considering isom as an addive map) is automatically E1 linear
     func1:=function(x)
         return [projs[j](isom(q(x)))@@maps[j] : j in [1..N] ];
@@ -177,7 +177,7 @@ end intrinsic;
     f:=(x^8+16)*(x^8+81);
     A:=EtaleAlgebra(f);
     E1:=EquationOrder(A);
-    
+
     pp:=PrimesAbove(Conductor(E1));
     pp13:=[ P : P in pp | MinimalInteger(P) eq 13 ];
 
@@ -193,7 +193,7 @@ end intrinsic;
     end for;
     printf ".";
     // test 1
-    
+
     out1:=[];
     for pair in pairs do
         a:=pair[1];
@@ -219,7 +219,7 @@ end intrinsic;
     assert forall{i : i in [1..#out1] | (out1[i] - out2[i]) in pp13};
 
     // test 3 : >2 primes
-    tuples:=[]; 
+    tuples:=[];
     for i in [1..1000] do
         i_tup:=[];
         for j in [1..#pp] do
@@ -237,7 +237,7 @@ end intrinsic;
         e:=ChineseRemainderTheorem(pp,tup);
         Append(~out3,e);
     end for;
-    
+
     f,g:=ChineseRemainderTheoremFunctions(pp);
     for tup in tuples do
         e:=g(tup);
@@ -249,7 +249,23 @@ end intrinsic;
 
     printf ".";
 
-    SetAssertions(1);    
-    printf " all good!"; 
+
+    f:=x^6 - 3*x^5 - 3*x^4 + 65*x^3 - 48*x^2 - 768*x + 4096;
+    A:=EtaleAlgebra(f);
+    gensT:=[
+        <[ 1, 0 ], [ 1/9, 5/6, 1, 41/18 ]>,
+        <[ 0, 1 ], [ 0, 1, 0, 0 ]>,
+        <[ 0, 0 ], [ 8/9, 11/6, 4/3, 133/18 ]>,
+        <[ 0, 0 ], [ 0, 8/3, 7/3, 29/3 ]>,
+        <[ 0, 0 ], [ 0, 0, 3, 3 ]>,
+        <[ 0, 0 ], [ 0, 0, 0, 18 ]>
+    ];
+    gensT:=[ A ! g : g in gensT ];
+    T:=Order(gensT);
+    assert #PicardGroup(T) eq 192;
+    printf ".";
+
+    SetAssertions(1);
+    printf " all good!";
 
 */

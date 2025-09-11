@@ -48,6 +48,8 @@
                 assert type in {"hide-all","hide-none","ditto"}; // only these are implemented
                 return true,type,"";
             end if;
+        elif line eq "///" then
+            return true,"text","<br>";
         else
             return false,"","";
         end if;
@@ -109,6 +111,7 @@
                     repeat
                         i+:=1;
                         is_doc,type,cnt:=is_doc_line(lines[i]);
+//i,is_doc,type,cnt;
                         if is_doc and type in {"text","sec"} then
                             output cat:=cnt;
                         else 
@@ -117,6 +120,7 @@
                             i-:=1;
                         end if;
                     until not doc;
+//output;
                 elif type eq "ditto" then
                     // it must be followed by an intrinsic
                     // while parsing the following intrinsc, we ignore the doc in braces and use the 
@@ -136,17 +140,20 @@
                     repeat
                         i+:=1;
                         is_doc,type,cnt:=is_doc_line(lines[i]);
-i,is_doc;
                         if is_doc and type eq "text" then
                             doc_next_intrinisc cat:=cnt;
-doc_next_intrinisc;
                         else 
                             // end of doc
                             doc:=false;
                             i-:=1;
                         end if;
                     until not doc;
-                    assert is_intrinsic(lines[i+1]);
+                    try
+                        assert is_intrinsic(lines[i+1]);
+                    catch e
+                        printf "\n\n\t\t\tERROR : expected intrinsic at line %o in file %o\n\n\n",i+1,dot_m;
+                        break dot_m;
+                    end try;
                 end if;
             elif is_intrinsic(lines[i]) then
                 lines_intrisic:=[ lines[i] ];

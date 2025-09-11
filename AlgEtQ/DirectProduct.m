@@ -2,7 +2,7 @@
 // Copyright 2025.
 // Stefano Marseglia, stefano.marseglia89@gmail.com
 // https://stmar89.github.io/index.html
-// 
+//
 // Distributed under the terms of the CC-BY 4.0 licence.
 // https://creativecommons.org/licenses/by/4.0/
 /////////////////////////////////////////////////////
@@ -57,7 +57,7 @@ end intrinsic;
     B:=EtaleAlgebra([NumberField(x^8+16),NumberField(x^3+x+1)]);
     _,_,_:=DirectProduct([A,B]);
     printf ".";
-    
+
     SetAssertions(1);
     printf " all good!";
 

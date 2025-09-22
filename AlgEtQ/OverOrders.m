@@ -119,7 +119,6 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQ
         for i in [1..#output] do
             S:=output[i];
             IsKnownOrder(~S);
-            ZBasisLLL(S);
             output[i]:=S;
         end for;
         output:=SequenceToIndexedSet(output);
@@ -198,7 +197,6 @@ intrinsic OverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SeqEnum[AlgEtQOrd]
     end while;
     for iS in [1..#output] do
         S:=output[iS];
-        ZBasisLLL(S);
     end for;
     output:=Setseq(output);
     assert2 forall{S : S in output | S eq R or PrimesAbove(ColonIdeal(R,R!!OneIdeal(S))) eq [ P ]};
@@ -239,7 +237,6 @@ intrinsic OverOrders(R::AlgEtQOrd : populateoo_in_oo:=false) -> SeqEnum[AlgEtQOr
                     gens:=&cat[ZBasis(oo_at_Ps[j][S[j]]) : j in [1..#S] | S[j] ne 1];
                     S:=Order(gens);
                 end if;
-                ZBasisLLL(S);
                 Append(~output,S);
             end for;
             assert2 R in output;

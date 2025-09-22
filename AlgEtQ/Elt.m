@@ -594,10 +594,11 @@ intrinsic '&*'(seq::SeqEnum[AlgEtQElt]) -> AlgEtQElt
 end intrinsic;
 
 
+// The following intrinsics do the same as &+[a[i]*b[i]:i in [1..#a]] BUT without creating #a elements in the sequence before summing. Essentially, they do the dot-products componentwise in number fields -- which is much faster -- then create a single AlgEtQElt at the end.
+
 /// Given two sequences of $n$ elements $[a_1,\ldots,a_n]$ and $[b_1,\ldots,b_n]$ returns $\sum_{i=1}^n a_i\cdot b_i$.
 intrinsic _DotProduct(a::SeqEnum[AlgEtQElt], b::SeqEnum[AlgEtQElt]) -> AlgEtQElt
 {Given sequences a and b, such that #a eq #b, returns &+[a[i]*b[i] : i in [1..#a]]. .}
-// This intrinsic is included to obviate to the loss of efficiency due to the many calls of IsCoercible.
     A := Universe(a);
     require A eq Universe(b) : "The sequences don't have the same universe";
     require #a eq #b : "The sequences don't have the same size";
@@ -641,27 +642,34 @@ end intrinsic;
 
 
 ///## Minimal polynomials and integrality testing.
-/// Given an element $a$ of an étale algebra over $\mathbb{Q}$, the `minimal polynomial` is the polynomial $f(x)$ in $\mathbb{Q}[x]$ of minimal degree such that $f(a)=0$. It is the least common multiple of the minimal polynomials of the components of $a$.
+/// Given an element $a$ of an étale algebra over $\mathbb{Q}$, the `(absolute) minimal polynomial` is the polynomial $f(x)$ in $\mathbb{Q}[x]$ of minimal degree such that $f(a)=0$. It is the least common multiple of the minimal polynomials of the components of $a$.
 /// An element $a$ is called `integral` if its minimal polynomial is monic and has integer coefficients.
+/// Relative versions of the minimal polynomial is available, where one can replace the prime field $\mathbb{Q}$ with a number field $F$ that needs to be contained in all the components of the étale algebra.
 
 intrinsic MinimalPolynomial(x::AlgEtQElt) -> RngUPolElt
 {Returns the minimal polynomial of the element over the base field.}
     A:=Algebra(x);
     require HasBaseField(A) : "The number fields of A should all be defined over the same base ring.";
-    m:=LCM( [ MinimalPolynomial(c) : c in Components(x) ] );
+    return MinimalPolynomial(x, BaseField(A));
+end intrinsic;
+
+intrinsic MinimalPolynomial(x::AlgEtQElt, F::Fld) -> RngUPolElt
+{Returns the minimal polynomial of the element over the field F.}
+    A:=Algebra(x);
+    m:=LCM( [ MinimalPolynomial(c, F) : c in Components(x) ] );
     assert2 (0 eq Evaluate(m,x));
     return m;
 end intrinsic;
 
 intrinsic AbsoluteMinimalPolynomial(x::AlgEtQElt) -> RngUPolElt
 {Returns the minimal polynomial of the element over the prime field.}
-    return MinimalPolynomial(x,PrimeField(Algebra(x)));
+    return MinimalPolynomial(x, PrimeField(Algebra(x)));
 end intrinsic;
 
 intrinsic IsIntegral(x::AlgEtQElt) -> BoolElt
 {Returns whether the element is integral (over the integers).}
     m:=AbsoluteMinimalPolynomial(x);
-    return IsMonic(m) and IsCoercible(PolynomialRing(Integers()),m);
+    return IsMonic(m) and IsCoercible(PolynomialRing(Integers()), m);
 end intrinsic;
 
 /// Evaluate the polynomial $f(x)$ at the element $a$.

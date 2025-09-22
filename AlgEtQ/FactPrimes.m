@@ -50,7 +50,7 @@ intrinsic IsMaximalIdeal(I::AlgEtQIdl) -> BoolElt
 end intrinsic;
 
 /// Given an integral fractional $S$-ideal $I$, returns the sequence of primes of $S$ containing $I$.
-intrinsic PrimesAbove(I::AlgEtQIdl) -> SeqEnum[AlgEtQOrdIdl]
+intrinsic PrimesAbove(I::AlgEtQIdl) -> SeqEnum[AlgEtQIdl]
 {Given an integral fractional S-ideal I, returns the sequence of primes of S containing I.}
     require IsIntegral(I): "the ideal must be integral";
     if not assigned I`PrimesAbove then
@@ -99,7 +99,7 @@ intrinsic PlacesAboveRationalPrime(E::AlgEtQ,p::RngIntElt)->SeqEnum[AlgEtQIdl]
     return E`PlacesAboveRationalPrime;
 end intrinsic;
 
-intrinsic SingularPrimes(R::AlgEtQOrd) -> SeqEnum[AlgEtQOrdIdl]
+intrinsic SingularPrimes(R::AlgEtQOrd) -> SeqEnum[AlgEtQIdl]
 {Returns the non-invertible primes of the order.}
     if not assigned R`SingularPrimes then
         R`SingularPrimes:=PrimesAbove(Conductor(R));

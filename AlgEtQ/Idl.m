@@ -14,6 +14,7 @@ freeze;
 declare verbose AlgEtQIdl, 3;
 
 declare type AlgEtQIdl;
+
 declare attributes AlgEtQIdl : Index, //stores the index
                               Order, //order of definition. it might be smaller than the multiplicator ring
                               Algebra,
@@ -410,7 +411,7 @@ intrinsic OneIdeal(S::AlgEtQOrd) -> AlgEtQIdl
 end intrinsic;
 
 /// Computes the conductor of an order $R$, defined as the colon ideal $(R:\mathcal{O})$, where $\mathcal{O}$ is the maximal order of the algebra.
-intrinsic Conductor(O::AlgEtQOrd) ->AlgEtQOrdIdl
+intrinsic Conductor(O::AlgEtQOrd) ->AlgEtQIdl
 {Computes the conductor of an order, defined as the colon ideal (O:OK), where OK is the maximal order of the algebra.}
     if not assigned O`Conductor then
         A:=Algebra(O);

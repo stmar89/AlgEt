@@ -61,7 +61,7 @@
     end for;
     printf "\n";
     printf "Current running time = %o \n",t_tot;
-    tprevbest:=47.880; //on diophantus
+    tprevbest:=15.440; //on laptop
     if Abs(t_tot - tprevbest) gt 0.1*tprevbest then
         if t_tot lt tprevbest then
             printf "PicardGroup for %o got faster. Update the previous best known time\n",f;
@@ -99,7 +99,7 @@
         _:=#PicardGroup(T);
     t1:=Cputime(t0);
     printf "Current running time = %o \n",t1;
-    tprevbest:=0.5; //on diophantus
+    tprevbest:=0.3; //on laptop
     if Abs(t1 - tprevbest) gt tprevbest then //so fast than the small random component in SmallRepresentative triggers the warning
         if t1 lt tprevbest then
             printf "PicardGroup for %o got faster. Update the previous best known time\n",f;
@@ -125,7 +125,7 @@
         ooet:=FindOverOrders(Eet);
     t1:=Cputime(t0);
     printf "Current running time = %o \n",t1;
-    tprevbest:=1.1; //on diophantus
+    tprevbest:=0.630; //on laptop
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "FindOverOrders for %o got faster. Update the previous best known time\n",f;
@@ -139,7 +139,7 @@
         ooet:=GraphOverOrders(Eet);
     t1:=Cputime(t0);
     printf "Current running time = %o \n",t1;
-    tprevbest:=0.3; //on diophantus
+    tprevbest:=0.160; //on laptop
     if Abs(t1 - tprevbest) gt 1*tprevbest then
         if t1 lt tprevbest then
             printf "GraphOverOrders for %o got faster. Update the previous best known time\n",f;
@@ -169,7 +169,7 @@
         ooet:=FindOverOrders(Eet);
     t1:=Cputime(t0);
     printf "Current running time = %o \n",t1;
-    tprevbest:=15; // on diophantus
+    tprevbest:=8.060; // on laptop
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "FindOverOrders for %o got faster. Update the previous best known time\n",f;
@@ -183,7 +183,7 @@
         ooet:=GraphOverOrders(Eet);
     t1:=Cputime(t0);
     printf "Current running time = %o \n",t1;
-    tprevbest:=30.5; //on diophantus
+    tprevbest:=15.470; //on laptop
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "GraphOverOrders for %o got faster. Update the previous best known time\n",f;
@@ -216,7 +216,7 @@
     t1:=Cputime(t0);
     assert #ooet eq 3200;
     printf "Current running time = %o \n",t1;
-    tprevbest:=21; // on diophantus
+    tprevbest:=12.200; // on laptop
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "FindOverOrders for %o got faster. Update the previous best known time\n",f;
@@ -228,7 +228,7 @@
         ooet:=GraphOverOrders(Eet);
     t1:=Cputime(t0);
     printf "Current running time = %o \n",t1;
-    tprevbest:=37; //on diophantus
+    tprevbest:=20.350; //on laptop
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "GraphOverOrders for %o got faster. Update the previous best known time\n",f;
@@ -258,7 +258,7 @@
         _:=#WKICM(R);
     t1:=Cputime(t0);
     printf "Current running time = %o \n",t1;
-    tprevbest:=2.1; // diophantus
+    tprevbest:=1.220; // on laptop
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "WKICM for %o got faster. Update the previous best known time\n",f;
@@ -299,7 +299,7 @@
     t0:=Cputime();
         assert #WKICM_bar(S) eq 7;   
     t_curr:=Cputime(t0);
-    t_prev_best:=11.9;
+    t_prev_best:=7.270; // on laptop
     "Current running time: ",t_curr;
     if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
         print "The current timing is different from the previous best known one. UPDATE!"; 
@@ -317,7 +317,7 @@
     t0:=Cputime();
         assert #WKICM(R) eq 173;
     t_curr:=Cputime(t0);
-    t_prev_best:=26;
+    t_prev_best:=15.030; // on laptop
     "Current running time: ",t_curr;
     if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
         print "The current timing is different from the previous best known one. UPDATE!"; 
@@ -339,7 +339,7 @@
         assert #WKICM(R) eq 238;
     t_curr:=Cputime(t0);
     "Current running time: ",t_curr;
-    t_prev_best:=10.4;
+    t_prev_best:=6.100; // on laptop
     if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
         print "The current timing is different from the previous best known one. UPDATE!"; 
     end if;
@@ -359,7 +359,7 @@
         assert #WKICM(R) eq 315;
     t_curr:=Cputime(t0);
     "Current running time: ",t_curr;
-    t_prev_best:=14.1;
+    t_prev_best:=8.870; // on laptop
     if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
         print "The current timing is different from the previous best known one. UPDATE!"; 
     end if;
@@ -378,7 +378,7 @@
         assert #WKICM(R) eq 560;
     t_curr:=Cputime(t0);
     "Current running time: ",t_curr;
-    t_prev_best:=16.5;
+    t_prev_best:=10.310; // on laptop
     if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
         print "The current timing is different from the previous best known one. UPDATE!"; 
     end if;
@@ -393,7 +393,7 @@
         assert #WKICM(R) eq 114492 ;
     t_curr:=Cputime(t0);
     "Current running time: ",t_curr;
-    t_prev_best:=4462;
+    t_prev_best:=4462; // old timings, on diophantus
     if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
         print "The current timing is different from the previous best known one. UPDATE!"; 
     end if;

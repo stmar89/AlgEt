@@ -59,11 +59,11 @@ intrinsic IsCoercible(W::AlgEtQWECM, x::.) -> BoolElt, .
     if Parent(x) cmpeq W then
         return true,x;
     elif Type(x) eq AlgEtQWECMElt and Order(W) subset Order(Parent(x)) then
-        return true,(Order(W)!!Ideal(x))@@Map(W);
+        return true,(Order(W)!!Ideal(x))@@RepresentativeMap(W);
     elif Type(x) eq AlgEtQIdl and Order(W) subset Order(x) then
-        return true,(Order(W)!!x)@@Map(W);
+        return true,(Order(W)!!x)@@RepresentativeMap(W);
     elif Type(x) eq AlgEtQOrd and Order(W) subset x then
-        return true,(Order(W)!!OneIdeal(x))@@Map(W);
+        return true,(Order(W)!!OneIdeal(x))@@RepresentativeMap(W);
     else
         return false,"";
     end if;
@@ -262,7 +262,7 @@ intrinsic Array(W::AlgEtQWECM)->Assoc
 end intrinsic;
 
 /// Returns the map from $W$ to the set of ideals which returns the representative of each class.
-intrinsic Map(W::AlgEtQWECM)->Map
+intrinsic RepresentativeMap(W::AlgEtQWECM)->Map
 {Returns the map from W to the set of ideals which returns the representative of each class.}
     return W`Map;
 end intrinsic;
@@ -292,7 +292,7 @@ end intrinsic;
 /// Returns the sequence of representatives of the classes in $W$.
 intrinsic Representatives(W::AlgEtQWECM)->SeqEnum[AlgEtQIdl]
 {Returns the sequence of representatives of the classes in W.}
-    w:=Map(W);
+    w:=RepresentativeMap(W);
     return [w(c):c in Classes(W)];
 end intrinsic;
 
@@ -300,7 +300,7 @@ end intrinsic;
 intrinsic One(W::AlgEtQWECM)->AlgEtQWECMElt
 {Returns the neutral element of W.}
     if not assigned W`One then
-        w:=Map(W);
+        w:=RepresentativeMap(W);
         W`One:=OneIdeal(Order(W))@@w;
     end if;
     return W`One;
@@ -359,7 +359,7 @@ end intrinsic;
 /// Given the weak equivalence class monoid $W$ of $R$ and a sequence of fractional $R$-ideals, returns whether the sequence represents a generating set of $W$.
 intrinsic IsGeneratingSet(W::AlgEtQWECM,seq::SeqEnum[AlgEtQIdl])->BoolElt
 {Given the weak equivalence class monoid W of R and a sequence of fractional R-ideals, returns whether the sequence represents a generating set of W.}
-    w:=Map(W);
+    w:=RepresentativeMap(W);
     return IsGeneratingSet(W,[I@@w:I in Seqset(seq)]);
 end intrinsic;
 

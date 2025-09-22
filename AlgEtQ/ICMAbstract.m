@@ -56,11 +56,11 @@ intrinsic IsCoercible(icm::AlgEtQICM, x::.) -> BoolElt, .
     if Parent(x) cmpeq icm then
         return true,x;
     elif Type(x) eq AlgEtQICMElt and Order(icm) subset Order(Parent(x)) then
-        return true,(Map(Parent(x))(x))@@Map(icm);
+        return true,(RepresentativeMap(Parent(x))(x))@@RepresentativeMap(icm);
     elif Type(x) eq AlgEtQIdl and Order(icm) subset Order(x) then
-        return true,(Order(icm)!!x)@@Map(icm);
+        return true,(Order(icm)!!x)@@RepresentativeMap(icm);
     elif Type(x) eq AlgEtQOrd and Order(icm) subset x then
-        return true,(Order(icm)!!OneIdeal(x))@@Map(icm);
+        return true,(Order(icm)!!OneIdeal(x))@@RepresentativeMap(icm);
     else
         return false,"";
     end if;
@@ -101,7 +101,7 @@ end intrinsic;
 
 intrinsic Ideal(x::AlgEtQICMElt)->AlgEtQIdl
 {Returns a deterministically computed ideal representing the given ideal class. This is not stored in an attribute to save memory.}
-    m:=Map(Parent(x));
+    m:=RepresentativeMap(Parent(x));
     return m(x);
 end intrinsic;
 
@@ -240,7 +240,7 @@ intrinsic Order(icm::AlgEtQICM)->AlgEtQOrd
     return icm`Order;
 end intrinsic;
 
-intrinsic Map(icm::AlgEtQICM)->Map
+intrinsic RepresentativeMap(icm::AlgEtQICM)->Map
 {Returns the map from the given ideal class monoid to the set of ideals which returns the representative of each class.}
     return icm`Map;
 end intrinsic;
@@ -273,14 +273,14 @@ end intrinsic;
 
 intrinsic Representatives(icm::AlgEtQICM)->SeqEnum[AlgEtQIdl]
 {Returns the sequence of representatives of the classes in the given ideal class monoid.}
-    m:=Map(icm);
+    m:=RepresentativeMap(icm);
     return [m(c):c in Classes(icm)];
 end intrinsic;
 
 intrinsic One(icm::AlgEtQICM)->AlgEtQICMElt
 {Returns the neutral element of the given ideal class monoid.}
     if not assigned icm`One then
-        m:=Map(icm);
+        m:=RepresentativeMap(icm);
         icm`One:=OneIdeal(Order(icm))@@m;
     end if;
     return icm`One;

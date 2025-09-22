@@ -777,7 +777,6 @@ end intrinsic;
 intrinsic Random(I::AlgEtQIdl , bd::RngIntElt : ZeroDivisorsAllowed:=false ) -> AlgEtQElt
 {Returns a random element of I with coefficcients with respect to the stored Z-basis bounded by bd. One can allow zero-divisors using the parameter ZeroDivisorsAllowed, which is set to false by default.}
     require bd gt 0 : "The bound needs to be a positive integer.";
-    ZBasisLLL(I); // to keep it small
     B := ZBasis(I);
     if ZeroDivisorsAllowed then
        elt:=&+[ Random([-bd..bd])*b : b in B];

@@ -24,9 +24,9 @@ declare attributes AlgEtQIdl : ShortElement, SmallRepresentative;
 // ShortElement
 //------------
 
-/// Given a fractional ideal $I$, returns a non-zerodivisor in $I$ with small coefficients (in the LLL sense). This is achieved by randomly picking an element with small coefficients in a LLL-reduced $\mathbb{Z}$-basis (wrt the T2 norm).
+/// Given a fractional ideal $I$, returns a non-zerodivisor in $I$ with small coefficients (in the LLL sense). This is achieved by randomly picking an element with small coefficients in a LLL-reduced $\mathbb{Z}$-basis (wrt the T2 norm). If the stored ZBasis is not LLL-reduced, it will be changed to an LLL-reduced one.
 intrinsic ShortElement(I::AlgEtQIdl) ->AlgEtQElt
-{Given a fractional ideal I, returns a non-zerodivisor in I with small coefficients (in the LLL sense). This is achieved by randomly picking an element with small coefficients in a LLL-reduced Z-basis (wrt the T2 norm).}
+{Given a fractional ideal I, returns a non-zerodivisor in I with small coefficients (in the LLL sense). This is achieved by randomly picking an element with small coefficients in a LLL-reduced Z-basis (wrt the T2 norm). If the stored ZBasis is not LLL-reduced, it will be changed to an LLL-reduced one.}
     if not assigned I`ShortElement then
         ZBasisLLL(I);
         B := ZBasis(I);

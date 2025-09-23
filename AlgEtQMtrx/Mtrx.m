@@ -347,7 +347,7 @@ end intrinsic;
 //     r:=NumberOfColumns(x2);
 //     rows1:=Rows(x1);
 //     cols2:=Columns(x2);
-//     x3:=[ [ SumOfProducts(rows1[i],cols2[j]) : j in [1..r] ] : i in [1..s] ];
+//     x3:=[ [ DotProduct(rows1[i],cols2[j]) : j in [1..r] ] : i in [1..s] ];
 //     x3:=Matrix(x3);
 //     assert2 NumberOfRows(x3) eq s and NumberOfColumns(x3) eq r;
 //     return x3;

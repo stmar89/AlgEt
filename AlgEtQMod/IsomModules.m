@@ -99,10 +99,10 @@ Method should be of the form "julia -J /tmp/Hecke.so ~/path/to/AlgEt/" (the ".so
             /*
             // TODO add isom. it should be something like what is below
             zz:=ZBasis(I);
-            assert forall{r:r in Rows(T)|SumOfProducts(Eltseq(r),ZBasis(J)) in I};
+            assert forall{r:r in Rows(T)|DotProduct(Eltseq(r),ZBasis(J)) in I};
             mat:=crZQ(matI)^-1*T^-1*matJ;
 
-            imgs:=[ SumOfProducts(Eltseq(r),AbsoluteBasis(V)) : r in Columns(mat) ];
+            imgs:=[ DotProduct(Eltseq(r),AbsoluteBasis(V)) : r in Columns(mat) ];
             isom:=Hom(V,V,imgs);
             assert Module(S,m,[isom(z):z in ZBasis(I)]) eq J;
             return true,isom;

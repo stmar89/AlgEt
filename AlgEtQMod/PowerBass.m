@@ -238,7 +238,7 @@ bass_factor:=function(gens_input,Rg,mAgs,embs,projs)
     AZ:=crQZ(d_A*A); 
     assert #Rows(AZ) eq #gens_JinvM;
     vect:=Vector([ d_A ] cat [0 : i in [1..n-1] ]);
-    v:=SumOfProducts(Eltseq(Solution(AZ,vect)),gens_JinvM);
+    v:=DotProduct(Eltseq(Solution(AZ,vect)),gens_JinvM);
 
     // Define M0=J^-1*N0, where N0 is the set of elements of J^-1*M such that the projection onto u is 0, 
     // that is, N0=ker(J^-1*M ->> Ag*u)    

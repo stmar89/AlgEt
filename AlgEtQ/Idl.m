@@ -314,6 +314,12 @@ end intrinsic;
 /// Inclusion testing of elements, orders and ideals in a given fractional ideal is performed by multiplying by the `inclusion matrix`. This matrix, which is stored in an attribute, is the inverse of the matrix with coefficients the $\mathbb{Z}$-basis of the order. If the output of the multiplication has integer coefficients then we have an inclusion.
 /// The same matrix can be used to obtain the coordinates of a sequence of elements with respect to the $\mathbb{Z}$-basis.
 
+/// Given an element $x$ and a fractional ideal $I$, returns the coordinates of the element with respect to the stored $\mathbb{Z}$-basis of $I$.
+intrinsic AbsoluteCoordinates(x::AlgEtQElt,I::AlgEtQIdl) -> SeqEnum
+{Given an element x and a fractional ideal I, returns the coordinates of the element with respect to the stored Z-basis of I.}
+    return AbsoluteCoordinates([x],I)[1];
+end intrinsic;
+
 /// Given a sequence of elements and a fractional ideal $I$, returns the sequence of coordinates of the elements with respect to the stored $\mathbb{Z}$-basis of $I$.
 intrinsic AbsoluteCoordinates(seq::SeqEnum[AlgEtQElt],I::AlgEtQIdl) -> SeqEnum
 {Given a sequence of elements and a fractional ideal I, returns the sequence of coordinates of the elements with respect to the stored Z-basis of I.}
@@ -937,6 +943,12 @@ end intrinsic;
     _:=&meet(ids);
     rr:=[ResidueRing(E1,I) : I in ids ];
     cc:=[ ColonIdeal(I,J) : I,J in ids[1..10]  ];
+    for I in ids do
+        x:=Random(I);
+        abs:=AbsoluteCoordinates(x,I);
+        assert abs eq AbsoluteCoordinates([x],I)[1];
+        assert x eq DotProduct(abs,ZBasis(I));
+    end for;
 
     O:=MaximalOrder(A);
     test,O_prod:=IsProductOfOrders(O);

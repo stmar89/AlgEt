@@ -189,6 +189,12 @@ for i in [2..#seq] do
     c*:=seq[i];
 end for;
 assert c eq c0;
+basis:=[Random([1..100])*b: b in AbsoluteBasis(A)];
+for c in seq do
+    abs:=AbsoluteCoordinates(c);
+    assert c eq DotProduct(abs,AbsoluteBasis(A));
+    assert c eq DotProduct(AbsoluteCoordinates(c,basis),basis);
+end for;
 s1:=&+[seq[i]*seq[i] : i in [1..#seq]];
 s2:=DotProduct(seq,seq);
 assert s1 eq s2;
@@ -316,7 +322,11 @@ printf ".";
 assert forall{z : z in ZBasis(O1) | z in O1 };
 for O in [O1,O2,O3] do
     for i in [1..100] do
-        assert Random(O) in O;
+        elt:=Random(O);
+        assert elt in O;
+        abs:=AbsoluteCoordinates(elt,O);
+        assert abs eq AbsoluteCoordinates([elt],O)[1];
+        assert elt eq DotProduct(abs,ZBasis(O));
     end for;
 end for;
 printf ".";
@@ -400,6 +410,12 @@ ids:=[ Ideal(E1,[Random(E1) : i in [1..10]]) : i in [1..200]];
 _:=&meet(ids);
 rr:=[ResidueRing(E1,I) : I in ids ];
 cc:=[ ColonIdeal(I,J) : I,J in ids[1..10]  ];
+for I in ids do
+    x:=Random(I);
+    abs:=AbsoluteCoordinates(x,I);
+    assert abs eq AbsoluteCoordinates([x],I)[1];
+    assert x eq DotProduct(abs,ZBasis(I));
+end for;
 O:=MaximalOrder(A);
 test,O_prod:=IsProductOfOrders(O);
 assert test;

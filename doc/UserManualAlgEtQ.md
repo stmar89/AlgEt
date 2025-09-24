@@ -64,7 +64,11 @@ Returns a basis of the algebra over the prime field.
 <pre><b> '.'</b>(A::AlgEtQ,i::RngIntElt)->AlgEtQElt</pre>
  Returns the $i$-th element of the absolute basis.
 <pre><b> AbsoluteCoordinates</b>(x::AlgEtQElt) -> SeqEnum</pre>
-Given an element, returns the coordinates relative to the absolute basis, which are elements of the prime rational field.
+Given an element, returns the coordinates relative to the absolute basis of the algebra, which are elements of the prime rational field.
+<pre><b> AbsoluteCoordinates</b>(seq::SeqEnum[AlgEtQElt]) -> SeqEnum</pre>
+Given a sequence of elements, returns the coordinates relative to the absolute basis of the algebra, which are elements of the prime rational field.
+<pre><b> AbsoluteCoordinates</b>(x::AlgEtQElt , basis::SeqEnum[AlgEtQElt]) -> SeqEnum</pre>
+Given an element and a basis over the prime field, returns the coordinates of the element with respect to the given basis.
 <pre><b> AbsoluteCoordinates</b>(seq::SeqEnum[AlgEtQElt] , basis::SeqEnum[AlgEtQElt]) -> SeqEnum</pre>
 Given a sequence of elements and a basis over the prime field, returns a sequence whose entries are the coordinates with respect to the given basis.
 ## Special elements
@@ -233,6 +237,8 @@ Inclusion of elements.
 Inclusion of elements.
 <pre><b> 'subset'</b>(O1 :: AlgEtQOrd, O2 :: AlgEtQOrd) -> BoolElt</pre>
 Checks if the first argument is inside the second.
+<pre><b> AbsoluteCoordinates</b>(x::AlgEtQElt,S::AlgEtQOrd) -> SeqEnum</pre>
+ Given an element $x$ and an order $S$, returns the coordinates of the element with respect to the stored $\mathbb{Z}$-basis of $S$.
 <pre><b> AbsoluteCoordinates</b>(seq::SeqEnum[AlgEtQElt],O::AlgEtQOrd) -> SeqEnum</pre>
  Returns the absolute coordinates of a sequence of elements  with respect to the stored $\mathbb{Z}$-basis of the given order.
 ## Special and random elements in an order
@@ -325,6 +331,8 @@ Equality testing.
 ## Coordinates with respect to the $\mathbb{Z}$-basis and inclusion
  Inclusion testing of elements, orders and ideals in a given fractional ideal is performed by multiplying by the `inclusion matrix`. This matrix, which is stored in an attribute, is the inverse of the matrix with coefficients the $\mathbb{Z}$-basis of the order. If the output of the multiplication has integer coefficients then we have an inclusion.
  The same matrix can be used to obtain the coordinates of a sequence of elements with respect to the $\mathbb{Z}$-basis.
+<pre><b> AbsoluteCoordinates</b>(x::AlgEtQElt,I::AlgEtQIdl) -> SeqEnum</pre>
+ Given an element $x$ and a fractional ideal $I$, returns the coordinates of the element with respect to the stored $\mathbb{Z}$-basis of $I$.
 <pre><b> AbsoluteCoordinates</b>(seq::SeqEnum[AlgEtQElt],I::AlgEtQIdl) -> SeqEnum</pre>
  Given a sequence of elements and a fractional ideal $I$, returns the sequence of coordinates of the elements with respect to the stored $\mathbb{Z}$-basis of $I$.
 <pre><b> 'in'</b>(x::AlgEtQElt , I::AlgEtQIdl ) -> BoolElt</pre><pre><b> 'in'</b>(x::RngIntElt , I::AlgEtQIdl ) -> BoolElt</pre><pre><b> 'in'</b>(x::FldRatElt , I::AlgEtQIdl ) -> BoolElt</pre>

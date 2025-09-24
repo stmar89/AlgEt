@@ -389,6 +389,12 @@ intrinsic 'subset'(O1 :: AlgEtQOrd, O2 :: AlgEtQOrd) -> BoolElt
   return forall{z : z in Generators(O1) | z in O2 };
 end intrinsic;
 
+/// Given an element $x$ and an order $S$, returns the coordinates of the element with respect to the stored $\mathbb{Z}$-basis of $S$.
+intrinsic AbsoluteCoordinates(x::AlgEtQElt,S::AlgEtQOrd) -> SeqEnum
+{Given an element x and an order S, returns the coordinates of the element with respect to the stored Z-basis of S.}
+    return AbsoluteCoordinates([x],S)[1];
+end intrinsic;
+
 /// Returns the absolute coordinates of a sequence of elements  with respect to the stored $\mathbb{Z}$-basis of the given order.
 intrinsic AbsoluteCoordinates(seq::SeqEnum[AlgEtQElt],O::AlgEtQOrd) -> SeqEnum
 {Returns the absolute coordinates of a sequence of elements  with respect to the stored Z-basis of the given order.}
@@ -687,7 +693,11 @@ end intrinsic;
     assert forall{z : z in ZBasis(O1) | z in O1 };
     for O in [O1,O2,O3] do
         for i in [1..100] do
-            assert Random(O) in O;
+            elt:=Random(O);
+            assert elt in O;
+            abs:=AbsoluteCoordinates(elt,O);
+            assert abs eq AbsoluteCoordinates([elt],O)[1];
+            assert elt eq DotProduct(abs,ZBasis(O));
         end for;
     end for;
     printf ".";

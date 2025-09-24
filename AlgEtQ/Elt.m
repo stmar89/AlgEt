@@ -139,11 +139,21 @@ intrinsic '.'(A::AlgEtQ,i::RngIntElt)->AlgEtQElt
 end intrinsic;
 
 intrinsic AbsoluteCoordinates(x::AlgEtQElt) -> SeqEnum
-{Given an element, returns the coordinates relative to the absolute basis, which are elements of the prime rational field.}
+{Given an element, returns the coordinates relative to the absolute basis of the algebra, which are elements of the prime rational field.}
     if not assigned x`AbsoluteCoordinates then
         x`AbsoluteCoordinates:=&cat[ Flat(c) : c in Components(x) ];
     end if;
     return x`AbsoluteCoordinates;
+end intrinsic;
+
+intrinsic AbsoluteCoordinates(seq::SeqEnum[AlgEtQElt]) -> SeqEnum
+{Given a sequence of elements, returns the coordinates relative to the absolute basis of the algebra, which are elements of the prime rational field.}
+    return [ AbsoluteCoordinates(x) : x in seq ];
+end intrinsic;
+
+intrinsic AbsoluteCoordinates(x::AlgEtQElt , basis::SeqEnum[AlgEtQElt]) -> SeqEnum
+{Given an element and a basis over the prime field, returns the coordinates of the element with respect to the given basis.}
+    return AbsoluteCoordinates([x],basis)[1];
 end intrinsic;
 
 intrinsic AbsoluteCoordinates(seq::SeqEnum[AlgEtQElt] , basis::SeqEnum[AlgEtQElt]) -> SeqEnum
@@ -789,6 +799,12 @@ end intrinsic;
         c*:=seq[i];
     end for;
     assert c eq c0;
+    basis:=[Random([1..100])*b: b in AbsoluteBasis(A)];
+    for c in seq do
+        abs:=AbsoluteCoordinates(c);
+        assert c eq DotProduct(abs,AbsoluteBasis(A));
+        assert c eq DotProduct(AbsoluteCoordinates(c,basis),basis);
+    end for;
 
     s1:=&+[seq[i]*seq[i] : i in [1..#seq]];
     s2:=DotProduct(seq,seq);

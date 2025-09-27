@@ -570,15 +570,19 @@ Returns the trace dual ideal of the given order.
  Let $I$ and $J$ be orders or fractional ideals in an étale algebra over $\mathbb{Q}$ satisfying $J subseteq I$.
  Since the quotient $I/J$ is finite, there are finitely many fractional ideals $K$ (over a fixed order) such that $J \subseteq K \subseteq I$.
  The following intrinsic allow to compute them.
-<pre><b> MinimalIntermediateIdeals</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]</pre>
  Given fractional $S$-ideals $I$ and $J$ such that $J \subseteq I$, returns the minimal (with respect to inclusion) fractional $S$-ideals $K$ such that $J \subsetneq K \subseteq I$. Note that $J$ is never in the output.
-<pre><b> IntermediateIdeals</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]</pre>
+<pre><b> _MinimalIntermediateIdeals</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]</pre>
+Given fractional S-ideals I and J such that J subseteq I, returns the minimal (with respect to inclusion) fractional S-ideals K such that J subsetneq K subseteq I.
+ Note that J is never in the output.
+<pre><b> _IntermediateIdeals</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]</pre>
  Given fractional $S$-ideals $I$ and $J$ such that $J$ \subseteq $I$, returns all the fractional $S$-ideals $K$ such that $J \subseteq K \subseteq I$. They are produced recursively from the minimal ones. The output includes $I$ and $J$.
-<pre><b> IntermediateIdealsWithPrescribedMultiplicatorRing</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]</pre>
+<pre><b> _IntermediateIdealsWithPrescribedMultiplicatorRing</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]</pre>
  Given fractional $S$-ideals $I$ and $J$ such that $J \subseteq I$, returns all the fractional $S$-ideals $K$ such that $J \subseteq K \subseteq I$ and $(K:K)=S$. They are produced recursively from the minimal ones. The output includes $I$, if $(I:I)=S$, and $J$, if $(J:J)=S$.
-<pre><b> MaximalIntermediateIdeals</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]</pre>
+<pre><b> _MaximalIntermediateIdeals</b>(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]</pre>
  Given fractional $S$-ideals $I$ and $J$ such that $J \subseteq I$, returns the maximal (with respect to inclusion) fractional $S$-ideals $K$ such that $J \subseteq K \subsetneq I$. Note that $I$ is never in the output, while $J$ is in the output if and only if the $S$-module $I/J$ is simple, in which case the output consists only of $J$.
-<pre><b> IntermediateIdealsWithTrivialExtension</b>(I::AlgEtQIdl,J::AlgEtQIdl, O::AlgEtQOrd)->SetIndx[AlgEtQIdl]</pre>
+<pre><b> IntermediateIdeals</b>(I::AlgEtQIdl, J::AlgEtQIdl :</pre>
+ Given fractional $S$-ideals $I$ and $J$ such that $J$ \subseteq $I$, returns all the fractional $S$-ideals $K$ such that $J \subseteq K \subseteq I$. There are 3 boolean parameters, and no more than one can be turned to `true`. If the parameter `Maximal` is `true` then the only the maximal intermediate ideals are returned. In particular, the output will not contain $I$. If the parameter `Minimal` is set to `true` then only the minimal intermediate ideals are returned. In particular the output will not contain $J$. If the parameter `PrescribedMultiplicatorRing` is set to `true` then the output will contain only the intermediate ideal $K$ satisfying $(K:K)=S$.
+<pre><b> _IntermediateIdealsWithTrivialExtension</b>(I::AlgEtQIdl,J::AlgEtQIdl, O::AlgEtQOrd)->SetIndx[AlgEtQIdl]</pre>
  Given fractional $S$-ideals $I$ and $J$ and an order $O$ such that
  - $S \subseteq O$,
  - $J \subseteq I$, and
@@ -588,7 +592,7 @@ Returns the trace dual ideal of the given order.
  - $O\cdot K = I$.
  Note that the output always contains $I$.
  The output is produced by recursively computing maximal intermediate ideals.
-<pre><b> IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing</b>(I::AlgEtQIdl,J::AlgEtQIdl, O::AlgEtQOrd)->SetIndx[AlgEtQIdl]</pre>
+<pre><b> _IntermediateIdealsWithTrivialExtensionAndPrescribedMultiplicatorRing</b>(I::AlgEtQIdl,J::AlgEtQIdl, O::AlgEtQOrd)->SetIndx[AlgEtQIdl]</pre>
  Given fractional $S$-ideals $I$ and $J$ and an order $O$ such that
  - $S \subseteq O$,
  - $J \subseteq I$, and
@@ -598,11 +602,24 @@ Returns the trace dual ideal of the given order.
  - $O\cdot K = I$, and
  - $(K:K) = S$.
  In particular, the output contains $I$ if and only if $O = (I:I) = S$. The output is produced by recursively computing maximal intermediate ideals.
-<pre><b> IntermediateIdealsOfIndex</b>(I::AlgEtQIdl,J::AlgEtQIdl,N::RngIntElt)->SetIndx[AlgEtQIdl]</pre>
+<pre><b> IntermediateIdeals</b>(I::AlgEtQIdl, J::AlgEtQIdl, O::AlgEtQOrd : PrescribedMultiplicatorRing := false) -> SetIndx[AlgEtQIdl]</pre>
+ Given fractional $S$-ideals $I$ and $J$ and an order $O$ such that
+ - $S \subseteq O$,
+ - $J \subseteq I$, and
+ - $O \subseteq (I:I)$,
+ returns all the fractional $S$-ideals $K$ such that
+ - $J \subseteq K \subseteq I$, and
+ - $O!!K = I$, and
+ If `PrescribedMultiplicatorRing` is `true`, then the output contains only $K$ such that $(K:K)=S$.
+ Note that the output may contain $I$.
+ The output is produced by recursively computing maximal intermediate ideals.
+<pre><b> _IntermediateIdealsOfIndex</b>(I::AlgEtQIdl,J::AlgEtQIdl,N::RngIntElt)->SetIndx[AlgEtQIdl]</pre>
  Given fractional $S$-ideals $I$ and $J$ satisfying $J \subseteq I$, and a positive integer $N$, returns all the fractional $S$-ideals $K$ such that:
  - $J \subseteq K \subseteq I$, and
  - $[I:K]=N$.
  The output is produced by recursively computing the maximal ones.
+<pre><b> IntermediateIdeals</b>(I::AlgEtQIdl, J::AlgEtQIdl, N::RngIntElt) -> SetIndx[AlgEtQIdl]</pre>
+"
 # Ideals with prescribed index
  Let $I$ be a fractional ideal or an order in an étale algebra over $\mathbb{Q}$.
  If $N$ is a positive integer, then there are finitely many fractional ideals $J$ (over the same order) such that $J \subseteq I$ and $[I:J]=N$.

@@ -591,7 +591,7 @@ intrinsic PicardGroup( S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
 end intrinsic;
 
 /// Given orders $S$ and $T$ such that $S \subseteq T$, returns the surjective extension map $\mathrm{Pic}(S) \to \mathrm{Pic}(T)$. The parameter `GRH`, default false, is passed to `PicardGroup`.
-intrinsic ExtensionHomPicardGroups(S::AlgEtQOrd,T::AlgEtQOrd : GRH:="false")->Map
+intrinsic ExtensionHomPicardGroups(S::AlgEtQOrd,T::AlgEtQOrd : GRH:=false)->Map
 {Given orders S and T such that S subseteq T, returns the surjective extension map from PicardGroup(S) to PicardGroup(T). The vararg GRH, default false, is passed to PicardGroup.}
     require S subset T : "The second order is not an overorder of the first.";
     PS,pS:=PicardGroup(S:GRH:=GRH);

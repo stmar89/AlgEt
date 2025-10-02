@@ -29,7 +29,7 @@ WkAbstract.m
 IdealClassMonoid.m
 ICMAbstract.m
 ComplexConj.m
+TotRealTotPos.m
 ComplexMult.m
 PrintSave.m
-TotRealTotPos.m
 }

@@ -662,7 +662,7 @@ Given an order O and a positive integer N, returns all the O-ideals J with index
  Returns whether the given fractional ideals is a principal ideal (over its order of definition), and, if so, also a generator.  The parameter `GRH` (default false) can be set to true determines if the test is done under GRH.
 <pre><b> PicardGroup</b>( S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map</pre>
  Returns the Picard group $\mathrm{Pic}(S)$ of the order $S$, which is not required to be maximal, and a map from the group to a set of representatives of the ideal classes.  The parameter `GRH` (default false) can be set to true determines if the test is done under GRH.
-<pre><b> ExtensionHomPicardGroups</b>(S::AlgEtQOrd,T::AlgEtQOrd : GRH:="false")->Map</pre>
+<pre><b> ExtensionHomPicardGroups</b>(S::AlgEtQOrd,T::AlgEtQOrd : GRH:=false)->Map</pre>
  Given orders $S$ and $T$ such that $S \subseteq T$, returns the surjective extension map $\mathrm{Pic}(S) \to \mathrm{Pic}(T)$. The parameter `GRH`, default false, is passed to `PicardGroup`.
 <pre><b> UnitGroup</b>(S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map</pre>
  Returns the unit group of the given order. The parameter `GRH` (default false) can be set to true determines if the test is done under GRH.
@@ -868,6 +868,16 @@ Returns the complex conjugate of the argument.
  Given a fractional ideal $I$ in a CM-étale algebra, returns whether $I$ is conjugate stable and the complex conjugate. If the order of $I$ is not conjugate stable, then the second output will be defined over the complex conjugate of the order.
 <pre><b> ComplexConjugate</b>(I::AlgEtQIdl) -> AlgEtQIdl</pre>
  Given a fractional ideal $I$ in a CM-étale algebra, returns the complex conjugate of $I$. If the order of $I$ is not conjugate stable, then the second output will be defined over the complex conjugate of the order.
+<pre><b> IsTotallyReal</b>(a::AlgEtQElt) -> BoolElt</pre>
+Returns whether a is totally real.
+<pre><b> IsTotallyRealPositive</b>(a::AlgEtQElt) -> BoolElt</pre>
+Returns whether a is totally positive, that is, totally real and with positive image in CC.
+<pre><b> TotallyRealSubAlgebra</b>(K::AlgEtQ) -> AlgEtQ,Map</pre>
+Given a CM algebra K, returns the unique totally real subalgebra, with an embedding.
+<pre><b> TotallyRealUnitGroup</b>(S::AlgEtQOrd) -> Grp</pre>
+Given an order S in a CM étale algebra A returns the groups of totally real units of S, as a subgroup of S^*.
+<pre><b> TotallyRealPositiveUnitGroup</b>(S::AlgEtQOrd) -> Grp</pre>
+Given an order S in a CM étale algebra. Returns the groups of totally positive units of S, as a subgroup of S^*.
 # CM-types of a CM-étale algebra
  Let $A$ be a CM-étale algebra of dimension $2g$ over $\mathbb{Q}$. Then complex conjugation acts of $\mathrm{Homs}(A,\mathbb(C))$. We denote this action with $\overline{\cdot}$. A `CM-type` $\Phi$ of $A$ is a set of $g$ elements of $\mathrm{Homs}(A,\mathbb(C))$ such that $\mathrm{Homs}(A,\mathbb(C)) = \Phi \sqcup \overline{\Phi}$.
  Given a CM-type $\Phi$ and a totally imaginary element $b\in A^\times$, we say that $b$ is $\Phi$-`positive` if $\Im(\varphi(b))>0$ for every $\varphi\in \Phi$. Two elements totally imaginary elements $b$ and $b'$ in $A^\times$ represent the same CM-type $\Phi$ if and only if $b/b'$ is totally real and totally positive.
@@ -897,13 +907,3 @@ Given a sequence of elements, returns a sequence of tuples of sequence of ration
 Given an order R, returns a string that contains the data about the weak equivalence classes of R, sorted by multiplicator ring. In particular, the overorders of R can be recovered from this string. Such string can be easily printed to file. To load the string, after using Read() on the file, use the intrinsic LoadWKICM.
 <pre><b> LoadWKICM</b>(str::MonStgElt) -> AlgEtQOrd</pre>
 Given a string produced with PrintWKICM it returns the corresponding order R with populated attributes regarding overorders and weak equivalence classes. These can be recovered with the appropriate intrinsics.
-<pre><b> IsTotallyReal</b>(a::AlgEtQElt) -> BoolElt</pre>
-Returns whether a is totally real.
-<pre><b> IsTotallyRealPositive</b>(a::AlgEtQElt) -> BoolElt</pre>
-Returns whether a is totally positive, that is, totally real and with positive image in CC.
-<pre><b> TotallyRealSubAlgebra</b>(K::AlgEtQ) -> AlgEtQ,Map</pre>
-Given a CM algebra K, returns the unique totally real subalgebra, with an embedding.
-<pre><b> TotallyRealUnitGroup</b>(S::AlgEtQOrd) -> Grp</pre>
-Given an order S in a CM étale algebra A returns the groups of totally real units of S, as a subgroup of S^*.
-<pre><b> TotallyRealPositiveUnitGroup</b>(S::AlgEtQOrd) -> Grp</pre>
-Given an order S in a CM étale algebra. Returns the groups of totally positive units of S, as a subgroup of S^*.

@@ -126,7 +126,7 @@ intrinsic IdealsOfIndex(I::AlgEtQIdl, N::RngIntElt : Method := "Default") -> Seq
         return result;
     else
         vprintf IdealsOfIndex,2 : "Slow version\n";
-        result:=[ K : K in IntermediateIdealsOfIndex(I,N*I,N)]; // convert to SeqEnum
+        result:=[ K : K in _IntermediateIdealsOfIndex(I,N*I,N)]; // convert to SeqEnum
         return result;
     end if;
 end intrinsic;

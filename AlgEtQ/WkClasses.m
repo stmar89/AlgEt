@@ -106,7 +106,7 @@ wkicm_bar_with_P_P:=function(I,P)
                                             // the primes of T above P. This function is a bit faster than
                                             // the next one, which works also when I ne T.
     else
-        maximal_sub_T_mod:=MaximalIntermediateIdeals(I,PI);
+        maximal_sub_T_mod:=_MaximalIntermediateIdeals(I,PI);
     end if;
     maximal_sub_T_mod:=[ sub<Q | [q(z) : z in ZBasis(M)]> : M in maximal_sub_T_mod ] ; // maximal sub-T-modules m of Q,
                                                                                        // whose lift M=q^-1(m) c I

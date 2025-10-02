@@ -48,7 +48,7 @@ end function;
 
 intrinsic Print(x::AlgEtQICMElt)
 {Print the element.}
-    printf "ideal class over the order %o", Order(x);
+    printf "ideal class over the %o", Order(Parent(x));
 end intrinsic;
 
 intrinsic IsCoercible(icm::AlgEtQICM, x::.) -> BoolElt, .

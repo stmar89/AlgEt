@@ -31,7 +31,7 @@ intrinsic HomsToC(A::AlgEtQ : Precision:=_Precision(GetDefaultRealField()))->Seq
         images:=function(x)
             return &cat[[CC ! z : z in Conjugates(y : Precision:=Precision)] : y in Components(x)];
         end function;
-        maps:=[ map< A -> CC | x:-> images(x)[k] > : k in [1..Dimension(A)] :q>;
+        maps:=[ map< A -> CC | x:-> images(x)[k] > : k in [1..Dimension(A)]];
         A`HomsToC:=maps;
     end if;
     return A`HomsToC;

@@ -58,7 +58,7 @@ end intrinsic;
 //////////////////////////
 
 intrinsic TotallyRealUnitGroup(S::AlgEtQOrd) -> Grp
-{Given an order S in a CM étale algebra A returns the groups of totally real units of S, as a subgroup of S^*.}
+{Given an order S in a CM étale algebra A returns the group of totally real units of S, as a subgroup of S^*.}
     if not assigned S`TotallyRealUnitGroup then
         K:=Algebra(S);
         F,FtoK:=TotallyRealSubAlgebra(K);
@@ -113,7 +113,7 @@ debug_test:=function(S,S_tot_pos_in_US)
 end function;
 
 intrinsic TotallyRealPositiveUnitGroup(S::AlgEtQOrd) -> Grp
-{Given an order S in a CM étale algebra. Returns the groups of totally positive units of S, as a subgroup of S^*.}
+{Given an order S in a CM étale algebra. Returns the group of totally positive totally real units of S, as a subgroup of S^*.}
     if not assigned S`TotallyRealPositiveUnitGroup then
         K:=Algebra(S);
         F,FtoK:=TotallyRealSubAlgebra(K);

@@ -875,9 +875,9 @@ Returns whether a is totally positive, that is, totally real and with positive i
 <pre><b> TotallyRealSubAlgebra</b>(K::AlgEtQ) -> AlgEtQ,Map</pre>
 Given a CM algebra K, returns the unique totally real subalgebra, with an embedding.
 <pre><b> TotallyRealUnitGroup</b>(S::AlgEtQOrd) -> Grp</pre>
-Given an order S in a CM étale algebra A returns the groups of totally real units of S, as a subgroup of S^*.
+Given an order S in a CM étale algebra A returns the group of totally real units of S, as a subgroup of S^*.
 <pre><b> TotallyRealPositiveUnitGroup</b>(S::AlgEtQOrd) -> Grp</pre>
-Given an order S in a CM étale algebra. Returns the groups of totally positive units of S, as a subgroup of S^*.
+Given an order S in a CM étale algebra. Returns the group of totally positive totally real units of S, as a subgroup of S^*.
 # CM-types of a CM-étale algebra
  Let $A$ be a CM-étale algebra of dimension $2g$ over $\mathbb{Q}$. Then complex conjugation acts of $\mathrm{Homs}(A,\mathbb(C))$. We denote this action with $\overline{\cdot}$. A `CM-type` $\Phi$ of $A$ is a set of $g$ elements of $\mathrm{Homs}(A,\mathbb(C))$ such that $\mathrm{Homs}(A,\mathbb(C)) = \Phi \sqcup \overline{\Phi}$.
  Given a CM-type $\Phi$ and a totally imaginary element $b\in A^\times$, we say that $b$ is $\Phi$-`positive` if $\Im(\varphi(b))>0$ for every $\varphi\in \Phi$. Two elements totally imaginary elements $b$ and $b'$ in $A^\times$ represent the same CM-type $\Phi$ if and only if $b/b'$ is totally real and totally positive.

@@ -141,7 +141,11 @@ end intrinsic;
 intrinsic AbsoluteCoordinates(x::AlgEtQElt) -> SeqEnum
 {Given an element, returns the coordinates relative to the absolute basis of the algebra, which are elements of the prime rational field.}
     if not assigned x`AbsoluteCoordinates then
-        x`AbsoluteCoordinates:=&cat[ Flat(c) : c in Components(x) ];
+        // The components are elements of absolute number fields, for which
+        // Eltseq and Flat return the same rational coordinates. We use Eltseq
+        // because Flat leaks a small amount of memory on each call, which adds
+        // up over the many AbsoluteCoordinates calls done while building orders.
+        x`AbsoluteCoordinates:=&cat[ Eltseq(c) : c in Components(x) ];
     end if;
     return x`AbsoluteCoordinates;
 end intrinsic;

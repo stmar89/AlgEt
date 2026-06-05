@@ -15,6 +15,8 @@ declare verbose FactPrimes, 3;
 
 declare attributes AlgEtQOrd : SingularPrimes;
 
+declare attributes AlgEtQ : PlacesAboveRationalPrime;
+
 ///# Primes, factorization and completions
 
 ///## Primes

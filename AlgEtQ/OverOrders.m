@@ -57,6 +57,9 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQ
     end if;
 
     // not already_computed
+    // FIXME why are output, pot_min_oo and pot_min_oo_2 Sets? Check if can be turned into sequences.
+    // I don't think I am ocunting things twice here. I believe whenver I get something mult closed, I should just
+    // add it to output.
     output:={@ Universe({@ R @}) | @}; //empty set
     if not IsMaximalAtPrime(R,P) then
         zbR := ZBasis(R);
@@ -70,30 +73,84 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQ
                                // the second necessary condition is satisfied
         F, f := ResidueField(P);      // f:R->R/P=F
         T := MultiplicatorRing(P);    // T=(P:P)
-        V,mTV := QuotientVS(T, R, P); // mTV: T->T/R=V
-        assert2 forall{ v : v in Basis(V) | mTV((v@@mTV)^2) in V };
-        assert2 forall{ v : v in Basis(V) | mTV((v@@mTV)) eq v };
-        assert2 forall{ t : t in ZBasis(T) | t-((mTV(t))@@mTV) in R };
+        VT,mTtoVT:= QuotientVS(T,P,P); // This is a ring
+        dVT := [1..Dimension(VT)];
+        VT1 := mTtoVT(1);
+        V,mVTtoV:= quo<VT|[VT1]>; // V is not a ring. Does not have a well defined multiplication.
         d := Dimension(V);
+        assert #dVT eq d+1; 
         if d eq 1 then // If d=1 then T/P had dimension 2 over R/T. This means that T is a minimal P-overorders of R
                        // See Proposition 5.3 of referenced paper
             Include(~output, T);
         else
             // minimal P-overorder S of R such that S/R has dimension 1 over R/P satisfy the following property:
             // S/R is necessarily contained in an eigenspace of x->x^q acting on V=T/R.
+            mTV := map<T->V|x:->mVTtoV(mTtoVT(x)),y:->y@@mVTtoV@@mTtoVT>; // mTV: T->T/R=V
+            // We create 3 auxiliary function: a multiplication map on VT, a n-power map on VT, and 
+            // an order generator inside V. This is to avoid having to lift to T to perform this operations.
+            // If Algebra(T) this should keep coefficients much smaller.
+            //dV := [1..d];
+            VTi_inT := [VT.i@@mTtoVT:i in dVT];
+            VT0:=Zero(VT);
+            VTi_VTj := [[VT0:i in dVT]:j in dVT];
+            for j in dVT,i in [1..j] do
+                x:=mTtoVT(VTi_inT[i]*VTi_inT[j]);
+                VTi_VTj[i,j]:=x;
+                VTi_VTj[j,i]:=x;
+            end for;
+            mult := func<x,y|&+[x[i]*y[j]*VTi_VTj[i,j]:i,j in dVT]>;
+            pow:=function(x,n)
+                result := VT1;
+                base := x;
+                exp := n;
+                while exp gt 0 do
+                    if exp mod 2 eq 1 then
+                        result := mult(result,base);
+                    end if;
+                    base := mult(base,base);
+                    exp := exp div 2;
+                end while;
+                return result;
+            end function;
+            is_ord_inV:=function(W)
+                // Given a subvectors space W of V, returns whether its preimage in VT is multiplicatively closed.
+                // This happens precisely when W is the reduction of an order S such that R < S < T.
+                dWT:=Dimension(W)+1;
+                bWTinVT:=Append([g@@mVTtoV:g in Basis(W)],VT1);
+                return forall{i:i in [1..dWT]|forall{j:j in [1..i]|mVTtoV(mult(bWTinVT[i],bWTinVT[j])) in W}};
+            end function;
+            assert2 forall{z:z in zbR|mTV(z) eq 0};
+            assert2 forall{ v : v,w in Basis(VT) | mult(v,w) eq mTtoVT(v@@mTtoVT * w@@mTtoVT) };
+            assert2 forall{ v : v in Basis(VT) | pow(v,10) eq mTtoVT((v@@mTtoVT)^10)};
+            assert2 forall{ v : v in Basis(VT) | mTV((v@@mTtoVT)^2) in VT };
+            assert2 forall{ v : v in Basis(VT) | pow(v,2) in VT };
+            assert2 forall{ v : v,w in Basis(VT) | mult(v,w) in VT };
+            assert2 forall{ v : v in Basis(VT) | mTtoVT((v@@mTtoVT)) eq v };
+            assert2 forall{ t : t in ZBasis(T) | t-((mTtoVT(t))@@mTtoVT) in R };
+
             q:=#F;
-            qpow:=hom<V->V | [mTV((v@@mTV)^q) : v in Basis(V)]>;
+            qpow:=hom<V->V | [mVTtoV(pow(v@@mVTtoV,q)) : v in Basis(V)]>;
             eigen_vals:=[e[1] : e in Setseq(Eigenvalues(Matrix(qpow)))];
             eigen_spaces:=[Kernel(hom<V->V | [qpow(v)-e*v : v in Basis(V)]>): e in eigen_vals]; // eigenspaces in V
+
+            //FIXME check which one of the next two lines is better/correct
             subs_1:=[ W: W in &cat[Submodules(E) : E in eigen_spaces] | Dimension(W) eq 1];
+            //subs_1:=[ W: W in &cat[Submodules(E : CodimensionLimit:=Dimension(E)-1) : E in eigen_spaces] | Dimension(W) eq 1 ];
             for W in subs_1 do
                 // for each W of dim 1 we check whether is an order, that is, multiplicatively closed
-                wT:=W.1@@mTV;
-                if q eq 2 or mTV(wT^2) in W then
-                    // for p eq 2 being a subspace of the eigenspace guarantees that it is mult closed
-                    S:=Order([wT] cat zbR : CheckIsKnownOrder:=false );
-                    Include(~pot_min_oo,S);
+                if q eq 2 then
+                    // for q eq 2 being a subspace of the eigenspace guarantees that it is mult closed
+                    w:=V!W.1;
+                    Include(~pot_min_oo,W);
+                    S:=Order([(V!v)@@mTV:v in Basis(W)] cat zbR : CheckIsKnownOrder:=false );
                     Include(~output,S);// necessarily minimal, because it has dim 1
+                else
+                    wVT:=(V!W.1)@@mVTtoV;
+                    if mVTtoV(pow(wVT,2)) in W then
+                        Include(~pot_min_oo,W);
+                        S:=Order(Append(zbR,wVT@@mTtoVT) : CheckIsKnownOrder:=false );
+                        Include(~output,S);// necessarily minimal, because it has dim 1
+                    end if;
                 end if;
             end for;
             // the other minimal overorders S of R are such that S/P is a finite field extension of prime degree of R/P
@@ -102,15 +159,19 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQ
             subs_2 := [W : W in subs_2 | Dimension(W)+1 in dims]; // the +1 is there because we are
                                                                   // working in T/R instead of T/P
             for W in subs_2 do //dim at least 2
-                S := Order([(w@@mTV) : w in Basis(W)] cat zbR : CheckIsKnownOrder:=false );
-                Include(~pot_min_oo,S);
-                Include(~pot_min_oo_2,S);
-            end for;
-            //we remove non-minimals overorders from the potential ones in pot_min_oo_2
-            for S in pot_min_oo_2 do
-                if not exists {T : T in pot_min_oo | S ne T and T subset S} then
-                    Include(~output, S);
+                if is_ord_inV(W) then
+                    Include(~pot_min_oo,W);
+                    Include(~pot_min_oo_2,W);
                 end if;
+            end for;
+            // FIXME I don't think the next if (now commented out is really necessary. If so, we can save on the 
+            // Include from above ...
+            //we remove non-minimals overorders from the potential ones in pot_min_oo_2
+            for SV in pot_min_oo_2 do
+                //if not exists {T : T in pot_min_oo | SV ne T and T subset SV} then
+                    S:=Order([v@@mTV:v in Basis(SV)] cat zbR : CheckIsKnownOrder:=false );
+                    Include(~output, S);
+                //end if;
             end for;
         end if;
         // we check if any of these orders was already computed
@@ -139,7 +200,7 @@ intrinsic MinimalOverOrders(R::AlgEtQOrd) -> SetIndx[AlgEtQOrd]
     if IsMaximal(R) then
         return output;
     end if;
-    // Note: every overorders is a P-MinimalOverOrder for some singular prime P.
+    // Note: every minimal overorder is a P-MinimalOverOrder for some singular prime P.
     pp:={@ P : P in SingularPrimes(R) @};
     if assigned R`MinimalOverOrders then
         done:={@ tup[1] : tup in R`MinimalOverOrders @};
@@ -186,7 +247,6 @@ intrinsic OverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SeqEnum[AlgEtQOrd]
                 Q:=pp[i];
                 Q`IsPrime:=true;
             end for;
-            //pp:=PrimesAbove(T!!P);
             for Q in pp do
                 pot_new join:=MinimalOverOrdersAtPrime(T,Q);
             end for;

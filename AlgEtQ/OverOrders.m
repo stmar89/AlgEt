@@ -45,7 +45,7 @@ intrinsic IsMaximalAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> BoolElt
 end intrinsic;
 
 /// Given an order $R$ and prime $P$ of $R$, returns the minimal overorders $S$ of R whose conductor $(R:S)$ is a $P$-primary ideal of $R$. The minimality assumption forces the conductor $(R:S)$ to be exactly $P$.
-intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQOrd]
+intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SeqEnum[AlgEtQOrd]
 {Given an order R and prime P of R, returns the minimal overorders S of R whose conductor (R:S) is a P-primary ideal of R. The minimality assumption forces the conductor (R:S) to be exactly P. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.}
     require IsPrime(P) : "The ideal P must be prime.";
     require Order(P) eq R : "P must be an ideal of R";
@@ -56,40 +56,35 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQ
         return output;
     end if;
 
-    // not already_computed
-    // FIXME why are output, pot_min_oo and pot_min_oo_2 Sets? Check if can be turned into sequences.
-    // I don't think I am ocunting things twice here. I believe whenver I get something mult closed, I should just
-    // add it to output.
-    output:={@ Universe({@ R @}) | @}; //empty set
+    output:=[ Universe([ R ]) | ]; //empty sequence
     if not IsMaximalAtPrime(R,P) then
         zbR := ZBasis(R);
-        // A minimal P-overorder S of R is contained in T=(P:P) and S/P is either
-        // a 2-dimensional vector space over R/P,
-        // or a field extension of prime degree over R/P.
-        // We call the overorder S of R contained in T that satisfy one of these two
-        // conditions 'potential minimal P-overoerders'i of R.
-        pot_min_oo := {@ @};   // will contain all potential minimal P-overorders.
-        pot_min_oo_2 := {@ @}; // will contain all potential minimal P-overorders where
+        // A minimal P-overorder S of R is contained in T=(P:P), and S/P is either
+        // 1) a 2-dimensional vector space over R/P,
+        // 2) or a field extension of prime degree >2 over R/P.
+        // These two conditions are mutually exclusive.
+        min_oo_type1 := [ ];   // will contain minimal P-overorders of the first type
+        min_oo_type2 := [ ]; // will contain all potential minimal P-overorders where
                                // the second necessary condition is satisfied
-        F, f := ResidueField(P);      // f:R->R/P=F
-        T := MultiplicatorRing(P);    // T=(P:P)
-        VT,mTtoVT:= QuotientVS(T,P,P); // This is a ring
+        T := MultiplicatorRing(P);     // T=(P:P)
+        VT,mTtoVT:= QuotientVS(T,P,P); // VT=T/P is a R/P-algebra.
         dVT := [1..Dimension(VT)];
-        VT1 := mTtoVT(1);
-        V,mVTtoV:= quo<VT|[VT1]>; // V is not a ring. Does not have a well defined multiplication.
-        d := Dimension(V);
-        assert #dVT eq d+1; 
-        if d eq 1 then // If d=1 then T/P had dimension 2 over R/T. This means that T is a minimal P-overorders of R
-                       // See Proposition 5.3 of referenced paper
-            Include(~output, T);
+        if #dVT eq 2 then
+            // VT is 2-dimensional if and only if T is the unique minimal P-overorder.
+            Append(~output, T);
         else
+            VT1 := mTtoVT(1);
+            V,mVTtoV:= quo<VT|[VT1]>;      // V is not a ring since it does not have a well defined multiplication.
+            dV := Dimension(V);
+            assert #dVT eq dV+1; 
             // minimal P-overorder S of R such that S/R has dimension 1 over R/P satisfy the following property:
             // S/R is necessarily contained in an eigenspace of x->x^q acting on V=T/R.
             mTV := map<T->V|x:->mVTtoV(mTtoVT(x)),y:->y@@mVTtoV@@mTtoVT>; // mTV: T->T/R=V
             // We create 3 auxiliary function: a multiplication map on VT, a n-power map on VT, and 
-            // an order generator inside V. This is to avoid having to lift to T to perform this operations.
-            // If Algebra(T) this should keep coefficients much smaller.
-            //dV := [1..d];
+            // a functions that checks whether a subspace of V is mult closed, that is, the reduction of an order. 
+            // The latter builds upon the first 2.
+            // This approach keeps the coefficients bounded, allowing to use linear algebra over finite fields 
+            // rather than over the integers.
             VTi_inT := [VT.i@@mTtoVT:i in dVT];
             VT0:=Zero(VT);
             VTi_VTj := [[VT0:i in dVT]:j in dVT];
@@ -98,8 +93,9 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQ
                 VTi_VTj[i,j]:=x;
                 VTi_VTj[j,i]:=x;
             end for;
-            mult := func<x,y|&+[x[i]*y[j]*VTi_VTj[i,j]:i,j in dVT]>;
+            mult := func<x,y|&+[x[i]*y[j]*VTi_VTj[i,j]:i,j in dVT]>; //x*y in VT
             pow:=function(x,n)
+                // x^n in VT
                 result := VT1;
                 base := x;
                 exp := n;
@@ -128,7 +124,7 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQ
             assert2 forall{ v : v in Basis(VT) | mTtoVT((v@@mTtoVT)) eq v };
             assert2 forall{ t : t in ZBasis(T) | t-((mTtoVT(t))@@mTtoVT) in R };
 
-            q:=#F;
+            q:=Index(R,P);
             qpow:=hom<V->V | [mVTtoV(pow(v@@mVTtoV,q)) : v in Basis(V)]>;
             eigen_vals:=[e[1] : e in Setseq(Eigenvalues(Matrix(qpow)))];
             eigen_spaces:=[Kernel(hom<V->V | [qpow(v)-e*v : v in Basis(V)]>): e in eigen_vals]; // eigenspaces in V
@@ -141,48 +137,31 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SetIndx[AlgEtQ
                 if q eq 2 then
                     // for q eq 2 being a subspace of the eigenspace guarantees that it is mult closed
                     w:=V!W.1;
-                    Include(~pot_min_oo,W);
-                    S:=Order([(V!v)@@mTV:v in Basis(W)] cat zbR : CheckIsKnownOrder:=false );
-                    Include(~output,S);// necessarily minimal, because it has dim 1
+                    Append(~min_oo_type1,W);
+                    S:=Order([(V!v)@@mTV:v in Basis(W)] cat zbR : CheckIsKnownOrder:=true );
+                    Append(~output,S);// necessarily minimal, because it has dim 1
                 else
                     wVT:=(V!W.1)@@mVTtoV;
                     if mVTtoV(pow(wVT,2)) in W then
-                        Include(~pot_min_oo,W);
-                        S:=Order(Append(zbR,wVT@@mTtoVT) : CheckIsKnownOrder:=false );
-                        Include(~output,S);// necessarily minimal, because it has dim 1
+                        Append(~min_oo_type1,W);
+                        S:=Order(Append(zbR,wVT@@mTtoVT) : CheckIsKnownOrder:=true );
+                        Append(~output,S);// necessarily minimal, because it has dim 1
                     end if;
                 end if;
             end for;
             // the other minimal overorders S of R are such that S/P is a finite field extension of prime degree of R/P
-            dims := PrimesUpTo(d+1); //the plus one is to prevent issues when d=2.
-            subs_2 := Submodules(V : CodimensionLimit := d-2); //we exclude dim 0 and 1
-            subs_2 := [W : W in subs_2 | Dimension(W)+1 in dims]; // the +1 is there because we are
-                                                                  // working in T/R instead of T/P
-            for W in subs_2 do //dim at least 2
-                if is_ord_inV(W) then
-                    Include(~pot_min_oo,W);
-                    Include(~pot_min_oo_2,W);
+            dims := PrimesUpTo(dV+1); //the plus one is to prevent issues when d=2.
+            subs_type2 := Submodules(V : CodimensionLimit := dV-2); //we exclude dim 0 and 1
+            for W in subs_type2 do
+                if Dimension(W)+1 in dims and is_ord_inV(W) then
+                    assert Dimension(W) ge 2;
+                    S:=Order([v@@mTV:v in Basis(W)] cat zbR : CheckIsKnownOrder:=true );
+                    Append(~output,S);
                 end if;
-            end for;
-            // FIXME I don't think the next if (now commented out is really necessary. If so, we can save on the 
-            // Include from above ...
-            //we remove non-minimals overorders from the potential ones in pot_min_oo_2
-            for SV in pot_min_oo_2 do
-                //if not exists {T : T in pot_min_oo | SV ne T and T subset SV} then
-                    S:=Order([v@@mTV:v in Basis(SV)] cat zbR : CheckIsKnownOrder:=false );
-                    Include(~output, S);
-                //end if;
             end for;
         end if;
         // we check if any of these orders was already computed
         assert2 forall{S : S in output | ColonIdeal(R,R!!OneIdeal(S)) eq P};
-        output:=Isetseq(output);
-        for i in [1..#output] do
-            S:=output[i];
-            IsKnownOrder(~S);
-            output[i]:=S;
-        end for;
-        output:=SequenceToIndexedSet(output);
         if not assigned R`MinimalOverOrders then
             R`MinimalOverOrders:=[<P,output>];
         else
@@ -194,23 +173,26 @@ end intrinsic;
 
 
 /// Computes the minimal overorders of the order $R$.
-intrinsic MinimalOverOrders(R::AlgEtQOrd) -> SetIndx[AlgEtQOrd]
+intrinsic MinimalOverOrders(R::AlgEtQOrd) -> SeqEnum[AlgEtQOrd]
 {Computes the minimal overorders of R.}
-    output:={@ Universe({@ R @}) | @}; //empty set
+    output:=[ Universe([ R ]) | ]; //empty set
     if IsMaximal(R) then
         return output;
     end if;
-    // Note: every minimal overorder is a P-MinimalOverOrder for some singular prime P.
-    pp:={@ P : P in SingularPrimes(R) @};
-    if assigned R`MinimalOverOrders then
-        done:={@ tup[1] : tup in R`MinimalOverOrders @};
-        pp:=pp diff done;
-    end if;
-    for P in pp do
-        _:=MinimalOverOrdersAtPrime(R,P); //this populates the attribute R`MinimalOverOrders
-    end for;
-    output join:=&join[ tup[2] : tup in R`MinimalOverOrders ];
-    return output;
+    // Note: every minimal overorder is a P-MinimalOverOrder for a unique singular prime P.
+    // i.e. if P ne Q, then the set of P-minimal overorders and Q-minimal overorders are disjoint!
+    return &cat[ MinimalOverOrdersAtPrime(R,P):P in SingularPrimes(R) ];
+// FIXME remove the following old code after testing
+//    pp:={@ P : P in SingularPrimes(R) @};
+//    if assigned R`MinimalOverOrders then
+//        done:={@ tup[1] : tup in R`MinimalOverOrders @};
+//        pp:=pp diff done;
+//    end if;
+//    for P in pp do
+//        _:=MinimalOverOrdersAtPrime(R,P); //this populates the attribute R`MinimalOverOrders
+//    end for;
+//    output join:=&join[ tup[2] : tup in R`MinimalOverOrders ];
+//    return output;
 end intrinsic;
 
 
@@ -248,7 +230,7 @@ intrinsic OverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SeqEnum[AlgEtQOrd]
                 Q`IsPrime:=true;
             end for;
             for Q in pp do
-                pot_new join:=MinimalOverOrdersAtPrime(T,Q);
+                pot_new join:=SequenceToIndexedSet(MinimalOverOrdersAtPrime(T,Q));
             end for;
         end for;
         output join:=pot_new;

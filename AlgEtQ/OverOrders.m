@@ -47,6 +47,7 @@ end intrinsic;
 /// Given an order $R$ and prime $P$ of $R$, returns the minimal overorders $S$ of R whose conductor $(R:S)$ is a $P$-primary ideal of $R$. The minimality assumption forces the conductor $(R:S)$ to be exactly $P$.
 intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SeqEnum[AlgEtQOrd]
 {Given an order R and prime P of R, returns the minimal overorders S of R whose conductor (R:S) is a P-primary ideal of R. The minimality assumption forces the conductor (R:S) to be exactly P. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.}
+    //TODO CheckIsKnownOrder always?
     require IsPrime(P) : "The ideal P must be prime.";
     require Order(P) eq R : "P must be an ideal of R";
 
@@ -63,9 +64,6 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SeqEnum[AlgEtQ
         // 1) a 2-dimensional vector space over R/P,
         // 2) or a field extension of prime degree >2 over R/P.
         // These two conditions are mutually exclusive.
-        min_oo_type1 := [ ];   // will contain minimal P-overorders of the first type
-        min_oo_type2 := [ ]; // will contain all potential minimal P-overorders where
-                               // the second necessary condition is satisfied
         T := MultiplicatorRing(P);     // T=(P:P)
         VT,mTtoVT:= QuotientVS(T,P,P); // VT=T/P is a R/P-algebra.
         dVT := [1..Dimension(VT)];
@@ -74,7 +72,8 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SeqEnum[AlgEtQ
             Append(~output, T);
         else
             VT1 := mTtoVT(1);
-            V,mVTtoV:= quo<VT|[VT1]>;      // V is not a ring since it does not have a well defined multiplication.
+            V,mVTtoV:= quo<VT|[VT1]>;      // V=T/R is not a ring: multiplication is not well-defined.
+                                           // To multiply we need to lift to VT=T/P.
             dV := Dimension(V);
             assert #dVT eq dV+1; 
             // minimal P-overorder S of R such that S/R has dimension 1 over R/P satisfy the following property:
@@ -125,31 +124,54 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SeqEnum[AlgEtQ
             assert2 forall{ t : t in ZBasis(T) | t-((mTtoVT(t))@@mTtoVT) in R };
 
             q:=Index(R,P);
-            qpow:=hom<V->V | [mVTtoV(pow(v@@mVTtoV,q)) : v in Basis(V)]>;
+            qpow:=hom<V->V | [mVTtoV(pow(v@@mVTtoV,q)) : v in Basis(V)]>; // This map V->V sends x:->x^q. It is well-def.
             eigen_vals:=[e[1] : e in Setseq(Eigenvalues(Matrix(qpow)))];
-            eigen_spaces:=[Kernel(hom<V->V | [qpow(v)-e*v : v in Basis(V)]>): e in eigen_vals]; // eigenspaces in V
+            eigen_spaces:=[Kernel(hom<V->V | [qpow(v)-e*v : v in Basis(V)]>): e in eigen_vals]; 
 
-            //FIXME check which one of the next two lines is better/correct
-            subs_1:=[ W: W in &cat[Submodules(E) : E in eigen_spaces] | Dimension(W) eq 1];
-            //subs_1:=[ W: W in &cat[Submodules(E : CodimensionLimit:=Dimension(E)-1) : E in eigen_spaces] | Dimension(W) eq 1 ];
-            for W in subs_1 do
-                // for each W of dim 1 we check whether is an order, that is, multiplicatively closed
-                if q eq 2 then
-                    // for q eq 2 being a subspace of the eigenspace guarantees that it is mult closed
-                    w:=V!W.1;
-                    Append(~min_oo_type1,W);
-                    S:=Order([(V!v)@@mTV:v in Basis(W)] cat zbR : CheckIsKnownOrder:=true );
-                    Append(~output,S);// necessarily minimal, because it has dim 1
-                else
-                    wVT:=(V!W.1)@@mVTtoV;
-                    if mVTtoV(pow(wVT,2)) in W then
-                        Append(~min_oo_type1,W);
-                        S:=Order(Append(zbR,wVT@@mTtoVT) : CheckIsKnownOrder:=true );
-                        Append(~output,S);// necessarily minimal, because it has dim 1
-                    end if;
-                end if;
+            for E in eigen_spaces do
+                n:=Dimension(E);
+                // The following loop generates all generators of 1-dimensional subspaces of E.
+                for pivot := 1 to n do
+                    // Pre-pivot elements are 0, pivot is 1, post-pivot elements vary over F
+                    tail_tuples := CartesianPower(F, n - pivot);
+                    for t in tail_tuples do
+                        w := V!E![F!0 : j in [1..pivot-1]] cat [F!1] cat [F!x : x in t];
+                        if q eq 2 then
+                            // for q eq 2 being a subspace of the eigenspace guarantees that it is mult closed
+                            S:=Order([w@@mTV] cat zbR : CheckIsKnownOrder:=true );
+                            Append(~output,S);// necessarily minimal, because it has dim 1
+                        else
+                            wVT:=w@@mVTtoV;
+                            W:=sub<V|w>;
+                            if mVTtoV(pow(wVT,2)) in W then
+                                S:=Order(Append(zbR,wVT@@mTtoVT) : CheckIsKnownOrder:=true );
+                                Append(~output,S);// necessarily minimal, because it has dim 1
+                            end if;
+                        end if;
+                    end for;
+                end for;
             end for;
-            // the other minimal overorders S of R are such that S/P is a finite field extension of prime degree of R/P
+            // FIXME OLD CODE TO BE REMOVED AFTER TESTING 
+            // subs_1:=[ W: W in &cat[Submodules(E) : E in eigen_spaces] | Dimension(W) eq 1];
+            // for W in subs_1 do
+            //     // for each W of dim 1 we check whether is an order, that is, multiplicatively closed
+            //     if q eq 2 then
+            //         // for q eq 2 being a subspace of the eigenspace guarantees that it is mult closed
+            //         w:=V!W.1;
+            //         Append(~min_oo_type1,W);
+            //         S:=Order([(V!v)@@mTV:v in Basis(W)] cat zbR : CheckIsKnownOrder:=true );
+            //         Append(~output,S);// necessarily minimal, because it has dim 1
+            //     else
+            //         wVT:=(V!W.1)@@mVTtoV;
+            //         if mVTtoV(pow(wVT,2)) in W then
+            //             Append(~min_oo_type1,W);
+            //             S:=Order(Append(zbR,wVT@@mTtoVT) : CheckIsKnownOrder:=true );
+            //             Append(~output,S);// necessarily minimal, because it has dim 1
+            //         end if;
+            //     end if;
+            // end for;
+            ////////////////////////////////////////////////////////////////////////////
+            // The other minimal overorders S of R are such that S/P is a finite field extension of prime degree of R/P
             dims := PrimesUpTo(dV+1); //the plus one is to prevent issues when d=2.
             subs_type2 := Submodules(V : CodimensionLimit := dV-2); //we exclude dim 0 and 1
             for W in subs_type2 do

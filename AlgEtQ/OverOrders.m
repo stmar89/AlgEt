@@ -241,13 +241,12 @@ intrinsic OverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SeqEnum[AlgEtQOrd]
 
     ppO:=PrimesAbove(MaximalOrder(Algebra(R))!!P);
 
-    // FIXME is this really an improvement? check timings
     queue := AssociativeArray(:Default:={@ @});
     queue[Index(R)] := {@ R @};
     output:= AssociativeArray(:Default:={@ @});
     output[Index(R)] := {@ R @};
     done := AssociativeArray(:Default:={@ @});
-    while #queue gt 0 do
+    while &+[#queue[ind]:ind in Keys(queue)] gt 0 do
         pot_new := AssociativeArray(:Default:={@ @});
         for ind->set_ind in queue do
             for T in set_ind do
@@ -257,12 +256,15 @@ intrinsic OverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SeqEnum[AlgEtQOrd]
                     Q`IsPrime:=true;
                 end for;
                 for Q in pp do
-                    pot_new_T_Q := MinimalOverOrdersAtPrime(T,Q : CheckIsKnownOrder:=false);
+                    pot_new_T_Q := AssociativeArray(:Default:={@ @});
+                    for S in MinimalOverOrdersAtPrime(T,Q : CheckIsKnownOrder:=false) do
                     // In the previous line, we compute the MinimalOverOrdersAtPrime using the 
                     // vararg CheckIsKnownOrder set to false, since there are possibly repetitions 
                     // here. Hence, we run the check IsKnownOrder in a loop in this intrinsic below.
-                    for S in pot_new_T_Q do
-                        Include(~pot_new[Index(S)],S);
+                        Include(~pot_new_T_Q[Index(S)],S);
+                    end for;
+                    for ind in Keys(pot_new_T_Q) do
+                        pot_new[ind] join:= pot_new_T_Q[ind];
                     end for;
                 end for;
             end for;
@@ -273,10 +275,13 @@ intrinsic OverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SeqEnum[AlgEtQOrd]
         for ind in Keys(queue) do
             done[ind] join:=queue[ind];
         end for;
-        for ind in Keys(pot_new) do
+        for ind in Keys(pot_new) join Keys(done) do
             queue[ind] := pot_new[ind] diff done[ind];
         end for;
     end while;
+    output:=&cat[ Setseq(output[ind]) : ind in Keys(output) ];
+    output:=[R] cat Exclude(output,R); // QOL: it is nice to have R at the first place
+
     // FIXME OLD CODE turning these indexed sets into associative arrays
     // indexed by Index(R) should make the join / diff operations faster
     // queue := {@ R @};
@@ -301,9 +306,10 @@ intrinsic OverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SeqEnum[AlgEtQOrd]
     //     done join:=queue;
     //     queue := pot_new diff done;
     // end while;
+    // Seqset(~output);
+
     // Now, we know that there are no repetitions in the orders, so we check if any of the orders we just created 
     // was already known.
-    output:=Setseq(output);
     for iS in [1..#output] do
         S:=output[iS];
         IsKnownOrder(~S);

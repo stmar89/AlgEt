@@ -26,7 +26,7 @@ import "LowCohenMacaulayType.m" : wkicm_bar_CM_type2;
 /// In MAGMA, there are two ways of computing $\mathcal{W}(R)$. The first returns if as a sequence of representatives of the classes. The second one returns it as an abstract commutative monoid, each element representing a class, together with a map returning a representative of each class. Further details will be given in the next subsections.
 
 ///////////////////////////////////////////
-// useful functions to manypulate arrays //
+// useful functions to manipulate arrays //
 ///////////////////////////////////////////
 
 join_ass_arr:=function(A,B)
@@ -136,9 +136,14 @@ wkicm_bar_with_P_P:=function(I,P)
             if not IsDefined(pot_new,dimW) then
                 pot_new[dimW]:=[];
             end if;
-            if not W in pot_new[dimW] and not exists{ M : M in maximal_sub_T_mod | W subset M } then
+            if not W in pot_new[dimW] 
+            // FIXME we can try to make the next line faster.
+                    and not exists{ M : M in maximal_sub_T_mod | W subset M } then
                 Append(~pot_new[dimW],W);
                 J:=Ideal(S,[ (Q!b)@@q : b in Basis(W) ] cat zbPI);
+                // FIXME the next if can certainly be made faster by not generating the ideal J
+                // That is easy. But then I also need to figure out how to act with U directly on W,
+                // i.e. on the vector space Q.
                 if MultiplicatorRing(J) eq S then
                     if not IsDefined(output_vs,dimW) or not W in output_vs[dimW] then
                         // something new! we compute the orbit

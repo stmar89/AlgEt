@@ -15,13 +15,13 @@ freeze;
 
 declare verbose OverOrders, 1;
 
-declare attributes AlgEtQOrd : MinimalOverOrders, // a sequence of tuples <P,{@ T1,...,Tn @}>, where
+declare attributes AlgEtQOrd : MinimalOverOrders, // a sequence of tuples <P,[ T1,...,Tn ]>, where
                                                   // P is a singular prime of the order R, and
                                                   // T1,..,Tn are all the minimal overorders with conductor (R:Ti)=P.
-                               OverOrdersAtPrimes, // a sequence of tuples <P,{@ T1,...,Tn @}>, where
+                               OverOrdersAtPrimes, // a sequence of tuples <P,[ T1,...,Tn ]>, where
                                                   // P is a singular prime of the order R, and
                                                   // T1,..,Tn are all the overorders with P-primary conductor (R:Ti), plus R
-                               OverOrders;  // all overorders
+                               OverOrders;        // all overorders
 
 ///# Overorders
 /// Let $R$ be an order in an étale algebra $A$ over $\mathbb{Q}$ with maximal order $\mathcal{O}_A$.
@@ -45,9 +45,8 @@ intrinsic IsMaximalAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> BoolElt
 end intrinsic;
 
 /// Given an order $R$ and prime $P$ of $R$, returns the minimal overorders $S$ of R whose conductor $(R:S)$ is a $P$-primary ideal of $R$. The minimality assumption forces the conductor $(R:S)$ to be exactly $P$.
-intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SeqEnum[AlgEtQOrd]
-{Given an order R and prime P of R, returns the minimal overorders S of R whose conductor (R:S) is a P-primary ideal of R. The minimality assumption forces the conductor (R:S) to be exactly P. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.}
-    //TODO CheckIsKnownOrder always?
+intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl : CheckIsKnownOrder:=true) -> SeqEnum[AlgEtQOrd]
+{Given an order R and prime P of R, returns the minimal overorders S of R whose conductor (R:S) is a P-primary ideal of R. The minimality assumption forces the conductor (R:S) to be exactly P. The vararg CheckIsKnownOrder (default true) determines wheter the output is checked against the global database of known overorders. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.}
     require IsPrime(P) : "The ideal P must be prime.";
     require Order(P) eq R : "P must be an ideal of R";
 
@@ -128,6 +127,7 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SeqEnum[AlgEtQ
             eigen_vals:=[e[1] : e in Setseq(Eigenvalues(Matrix(qpow)))];
             eigen_spaces:=[Kernel(hom<V->V | [qpow(v)-e*v : v in Basis(V)]>): e in eigen_vals]; 
 
+            F:=BaseField(V);
             for E in eigen_spaces do
                 n:=Dimension(E);
                 // The following loop generates all generators of 1-dimensional subspaces of E.
@@ -135,17 +135,17 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SeqEnum[AlgEtQ
                     // Pre-pivot elements are 0, pivot is 1, post-pivot elements vary over F
                     tail_tuples := CartesianPower(F, n - pivot);
                     for t in tail_tuples do
-                        w := V!E![F!0 : j in [1..pivot-1]] cat [F!1] cat [F!x : x in t];
+                        w := V!E!([F!0 : j in [1..pivot-1]] cat [F!1] cat [F!x : x in t]);
                         if q eq 2 then
                             // for q eq 2 being a subspace of the eigenspace guarantees that it is mult closed
-                            S:=Order([w@@mTV] cat zbR : CheckIsKnownOrder:=true );
+                            S:=Order([w@@mTV] cat zbR : CheckIsKnownOrder:=CheckIsKnownOrder);
                             Append(~output,S);// necessarily minimal, because it has dim 1
                         else
                             wVT:=w@@mVTtoV;
-                            W:=sub<V|w>;
-                            if mVTtoV(pow(wVT,2)) in W then
-                                S:=Order(Append(zbR,wVT@@mTtoVT) : CheckIsKnownOrder:=true );
-                                Append(~output,S);// necessarily minimal, because it has dim 1
+                            w_square:=pow(wVT,2)@mVTtoV;
+                            if Rank(Matrix([w,w_square])) eq 1 then
+                                S:=Order(Append(zbR,wVT@@mTtoVT) : CheckIsKnownOrder:=CheckIsKnownOrder);
+                                Append(~output,S); // necessarily minimal, because it has dim 1
                             end if;
                         end if;
                     end for;
@@ -177,7 +177,7 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SeqEnum[AlgEtQ
             for W in subs_type2 do
                 if Dimension(W)+1 in dims and is_ord_inV(W) then
                     assert Dimension(W) ge 2;
-                    S:=Order([v@@mTV:v in Basis(W)] cat zbR : CheckIsKnownOrder:=true );
+                    S:=Order([v@@mTV:v in Basis(W)] cat zbR : CheckIsKnownOrder:=CheckIsKnownOrder);
                     Append(~output,S);
                 end if;
             end for;
@@ -240,29 +240,75 @@ intrinsic OverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SeqEnum[AlgEtQOrd]
     end if;
 
     ppO:=PrimesAbove(MaximalOrder(Algebra(R))!!P);
-    queue := {@ R @};
-    output:={@ R @};
-    done:={@ @};
+
+    // FIXME is this really an improvement? check timings
+    queue := AssociativeArray(:Default:={@ @});
+    queue[Index(R)] := {@ R @};
+    output:= AssociativeArray(:Default:={@ @});
+    output[Index(R)] := {@ R @};
+    done := AssociativeArray(:Default:={@ @});
     while #queue gt 0 do
-        pot_new:={@ @};
-        for T in queue do
-            pp:={@ OneIdeal(T) meet T!!Q : Q in ppO @};
-            for i in [1..#pp] do
-                Q:=pp[i];
-                Q`IsPrime:=true;
-            end for;
-            for Q in pp do
-                pot_new join:=SequenceToIndexedSet(MinimalOverOrdersAtPrime(T,Q));
+        pot_new := AssociativeArray(:Default:={@ @});
+        for ind->set_ind in queue do
+            for T in set_ind do
+                pp:={@ OneIdeal(T) meet T!!Q : Q in ppO @};
+                for i in [1..#pp] do
+                    Q:=pp[i];
+                    Q`IsPrime:=true;
+                end for;
+                for Q in pp do
+                    pot_new_T_Q := MinimalOverOrdersAtPrime(T,Q : CheckIsKnownOrder:=false);
+                    // In the previous line, we compute the MinimalOverOrdersAtPrime using the 
+                    // vararg CheckIsKnownOrder set to false, since there are possibly repetitions 
+                    // here. Hence, we run the check IsKnownOrder in a loop in this intrinsic below.
+                    for S in pot_new_T_Q do
+                        Include(~pot_new[Index(S)],S);
+                    end for;
+                end for;
             end for;
         end for;
-        output join:=pot_new;
-        done join:=queue;
-        queue := pot_new diff done;
+        for ind in Keys(pot_new) do
+            output[ind] join:=pot_new[ind];
+        end for;
+        for ind in Keys(queue) do
+            done[ind] join:=queue[ind];
+        end for;
+        for ind in Keys(pot_new) do
+            queue[ind] := pot_new[ind] diff done[ind];
+        end for;
     end while;
+    // FIXME OLD CODE turning these indexed sets into associative arrays
+    // indexed by Index(R) should make the join / diff operations faster
+    // queue := {@ R @};
+    // output:={@ R @};
+    // done:={@ @};
+    // while #queue gt 0 do
+    //     pot_new:={@ @};
+    //     for T in queue do
+    //         pp:={@ OneIdeal(T) meet T!!Q : Q in ppO @};
+    //         for i in [1..#pp] do
+    //             Q:=pp[i];
+    //             Q`IsPrime:=true;
+    //         end for;
+    //         for Q in pp do
+    //             pot_new join:=SequenceToIndexedSet(MinimalOverOrdersAtPrime(T,Q : CheckIsKnownOrder:=false));
+    //             // In the previous line, we compute the MinimalOverOrdersAtPrime using the 
+    //             // vararg CheckIsKnownOrder set to false, since there are possibly repetitions 
+    //             // here. Hence, we run the check IsKnownOrder in a loop in this intrinsic below.
+    //         end for;
+    //     end for;
+    //     output join:=pot_new;
+    //     done join:=queue;
+    //     queue := pot_new diff done;
+    // end while;
+    // Now, we know that there are no repetitions in the orders, so we check if any of the orders we just created 
+    // was already known.
+    output:=Setseq(output);
     for iS in [1..#output] do
         S:=output[iS];
+        IsKnownOrder(~S);
+        output[iS]:=S;
     end for;
-    output:=Setseq(output);
     assert2 forall{S : S in output | S eq R or PrimesAbove(ColonIdeal(R,R!!OneIdeal(S))) eq [ P ]};
     if not assigned R`OverOrdersAtPrimes then
         R`OverOrdersAtPrimes:=[<P,output>];

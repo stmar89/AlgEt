@@ -256,17 +256,17 @@ intrinsic IsKnownOrder(~R::AlgEtQOrd)
     // new with AssociativeArray. Sorting the orders, should make it faster.
     if not assigned A`KnownOrders then
         A`KnownOrders:=AssociativeArray();
-        A`KnownOrders[Index(R)]:={@ R @};
+        A`KnownOrders[Index(R)]:=[ R ];
     else
         ind:=Index(R);
         if not IsDefined(A`KnownOrders,ind) then
-            A`KnownOrders[ind]:={@ R @};
+            A`KnownOrders[ind]:=[ R ];
         else
             if exists(S){ T : T in A`KnownOrders[ind] | R eq T } then // this equality is done on the Hash level,
                                                                       // which means that
                 R:=S;
             else
-                Include(~A`KnownOrders[ind],R);
+                Append(~A`KnownOrders[ind],R);
             end if;
         end if;
     end if;

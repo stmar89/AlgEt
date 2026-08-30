@@ -151,25 +151,6 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl : CheckIsKnownOrde
                     end for;
                 end for;
             end for;
-            // FIXME OLD CODE TO BE REMOVED AFTER TESTING 
-            // subs_1:=[ W: W in &cat[Submodules(E) : E in eigen_spaces] | Dimension(W) eq 1];
-            // for W in subs_1 do
-            //     // for each W of dim 1 we check whether is an order, that is, multiplicatively closed
-            //     if q eq 2 then
-            //         // for q eq 2 being a subspace of the eigenspace guarantees that it is mult closed
-            //         w:=V!W.1;
-            //         Append(~min_oo_type1,W);
-            //         S:=Order([(V!v)@@mTV:v in Basis(W)] cat zbR : CheckIsKnownOrder:=true );
-            //         Append(~output,S);// necessarily minimal, because it has dim 1
-            //     else
-            //         wVT:=(V!W.1)@@mVTtoV;
-            //         if mVTtoV(pow(wVT,2)) in W then
-            //             Append(~min_oo_type1,W);
-            //             S:=Order(Append(zbR,wVT@@mTtoVT) : CheckIsKnownOrder:=true );
-            //             Append(~output,S);// necessarily minimal, because it has dim 1
-            //         end if;
-            //     end if;
-            // end for;
             ////////////////////////////////////////////////////////////////////////////
             // The other minimal overorders S of R are such that S/P is a finite field extension of prime degree of R/P
             dims := PrimesUpTo(dV+1); //the plus one is to prevent issues when d=2.
@@ -204,17 +185,6 @@ intrinsic MinimalOverOrders(R::AlgEtQOrd) -> SeqEnum[AlgEtQOrd]
     // Note: every minimal overorder is a P-MinimalOverOrder for a unique singular prime P.
     // i.e. if P ne Q, then the set of P-minimal overorders and Q-minimal overorders are disjoint!
     return &cat[ MinimalOverOrdersAtPrime(R,P):P in SingularPrimes(R) ];
-// FIXME remove the following old code after testing
-//    pp:={@ P : P in SingularPrimes(R) @};
-//    if assigned R`MinimalOverOrders then
-//        done:={@ tup[1] : tup in R`MinimalOverOrders @};
-//        pp:=pp diff done;
-//    end if;
-//    for P in pp do
-//        _:=MinimalOverOrdersAtPrime(R,P); //this populates the attribute R`MinimalOverOrders
-//    end for;
-//    output join:=&join[ tup[2] : tup in R`MinimalOverOrders ];
-//    return output;
 end intrinsic;
 
 
@@ -281,32 +251,6 @@ intrinsic OverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SeqEnum[AlgEtQOrd]
     end while;
     output:=&cat[ Setseq(output[ind]) : ind in Keys(output) ];
     output:=[R] cat Exclude(output,R); // QOL: it is nice to have R at the first place
-
-    // FIXME OLD CODE turning these indexed sets into associative arrays
-    // indexed by Index(R) should make the join / diff operations faster
-    // queue := {@ R @};
-    // output:={@ R @};
-    // done:={@ @};
-    // while #queue gt 0 do
-    //     pot_new:={@ @};
-    //     for T in queue do
-    //         pp:={@ OneIdeal(T) meet T!!Q : Q in ppO @};
-    //         for i in [1..#pp] do
-    //             Q:=pp[i];
-    //             Q`IsPrime:=true;
-    //         end for;
-    //         for Q in pp do
-    //             pot_new join:=SequenceToIndexedSet(MinimalOverOrdersAtPrime(T,Q : CheckIsKnownOrder:=false));
-    //             // In the previous line, we compute the MinimalOverOrdersAtPrime using the 
-    //             // vararg CheckIsKnownOrder set to false, since there are possibly repetitions 
-    //             // here. Hence, we run the check IsKnownOrder in a loop in this intrinsic below.
-    //         end for;
-    //     end for;
-    //     output join:=pot_new;
-    //     done join:=queue;
-    //     queue := pot_new diff done;
-    // end while;
-    // Seqset(~output);
 
     // Now, we know that there are no repetitions in the orders, so we check if any of the orders we just created 
     // was already known.

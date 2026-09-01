@@ -35,9 +35,11 @@ join_ass_arr:=function(A,B)
         if not IsDefined(A,k) then
             A[k]:=B[k];
         else
-            for b in B[k] do
-                Include(~A[k],b);
-            end for;
+            A[k] join:=B[k];
+            // FIXME OLD CODE
+            // for b in B[k] do
+            //     Include(~A[k],b);
+            // end for;
         end if;
     end for;
     return A;
@@ -52,9 +54,11 @@ diff_ass_arr:=function(A,B,stop_at_dim_2)
     end if;
     for k in Keys(B) do
         if IsDefined(A,k) then
-            for b in B[k] do
-                Exclude(~A[k],b);
-            end for;
+            A[k] diff:=B[k];
+            // FIXME OLD CODE
+            // for b in B[k] do
+            //     Exclude(~A[k],b);
+            // end for;
         end if;
     end for;
     for k in Keys(A) do

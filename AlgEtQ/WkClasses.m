@@ -87,6 +87,41 @@ units_T_P_mod_S_P:=function(T,S,P)
     return U;
 end function;
 
+is_mult_ring_S:=function(q,Q,k,A_basis,W) //TODO
+// Input:
+// - q:I->I/PI=Q a k=S/P-vector space, where I is a (P:P)-ideal with P a singular prime of S.
+// - A_basis, TODO
+// - W is a sub-k-vector space of Q, so that J:=q^-1(W) is a fractional S-ideal inside I, containing IP.
+// Output:
+// - a boolean = is (J:J)=S ?
+// The function returns the answer without computing J, but working only with W. This allows to use fast linear
+// algebra over finite fields, and keeps coefficients small.
+    Q_W:=, proj := quo<Q|W>;
+    dim := Dimension(Q_W);
+    d:=#A_basis;
+    if dim eq 0 then
+        output := false;  // because I is a (P:P)-module, and (P:P) is strictly bigger than S.
+    else
+        // Set up system for scalars lambda_1, ..., lambda_d such that 
+        // sum_j lambda_j * proj(v * A_j) = 0 in Q/W for all v in Basis(W)
+        // FIXME Why does the solution space of this system return the Stabilizer of W in A?
+        R_rows := [];
+        for v in Basis(W) do
+            for q_idx in [1..dim] do
+                row := [ k!0 : j in [1..d] ];
+                for j in [1..d] do
+                    q_vec := proj(v * A_basis[j]);
+                    row[j] := q_vec[q_idx];
+                end for;
+                Append(~R_rows, row);
+            end for;
+        end for;
+        R_mat := Matrix(k,R_rows);
+        output := Dimension(Kernel(R_mat)) eq 1;
+    end if;
+    return output;
+end if;
+
 wkicm_bar_with_P_P:=function(I,P)
 // Let S be an order, P a prime of S, and I a fractional (P:P)-ideal.
 // The function returns all fractional S-ideals J such that  P*I c J c I, (J:J)=S, and J(P:P)=I, up to weak equivalence.
@@ -140,14 +175,15 @@ wkicm_bar_with_P_P:=function(I,P)
             if not IsDefined(pot_new,dimW) then
                 pot_new[dimW]:=[];
             end if;
-            if not W in pot_new[dimW] 
+            if not W in pot_new[dimW] //TODO why this if? could W be already in pot_new?
             // FIXME we can try to make the next line faster.
                     and not exists{ M : M in maximal_sub_T_mod | W subset M } then
                 Append(~pot_new[dimW],W);
                 J:=Ideal(S,[ (Q!b)@@q : b in Basis(W) ] cat zbPI);
-                // FIXME the next if can certainly be made faster by not generating the ideal J
+                // FIXME the next 'if' can certainly be made faster by not generating the ideal J
                 // That is easy. But then I also need to figure out how to act with U directly on W,
                 // i.e. on the vector space Q.
+                // The next line should be replaced by the runction is_mult_ring_S
                 if MultiplicatorRing(J) eq S then
                     if not IsDefined(output_vs,dimW) or not W in output_vs[dimW] then
                         // something new! we compute the orbit

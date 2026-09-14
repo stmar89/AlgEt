@@ -96,7 +96,7 @@ is_mult_ring_S:=function(q,Q,k,A_basis,W) //TODO
 // - a boolean = is (J:J)=S ?
 // The function returns the answer without computing J, but working only with W. This allows to use fast linear
 // algebra over finite fields, and keeps coefficients small.
-    Q_W:=, proj := quo<Q|W>;
+    Q_W, proj := quo<Q|W>; // Q_W = Q/W = I/J
     dim := Dimension(Q_W);
     d:=#A_basis;
     if dim eq 0 then
@@ -110,7 +110,7 @@ is_mult_ring_S:=function(q,Q,k,A_basis,W) //TODO
             for q_idx in [1..dim] do
                 row := [ k!0 : j in [1..d] ];
                 for j in [1..d] do
-                    q_vec := proj(v * A_basis[j]);
+                    q_vec := proj(v * A_basis[j]); //FIXME this is computed over and over ... does not make sense
                     row[j] := q_vec[q_idx];
                 end for;
                 Append(~R_rows, row);

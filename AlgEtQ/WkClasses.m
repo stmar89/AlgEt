@@ -73,9 +73,23 @@ end function;
 // wkicm functions //
 /////////////////////
 
+//FIXME OLD CODE
+//units_T_P_mod_S_P:=function(T,S,P)
+//    // Let S be an order with a unique singular prime ideal P, and T = (P:P)
+//    // we compute U:=transversal in T of U:=(T_P)*/(S_P)*
+//    // U = (T/ff)*/(R/ff)*, where ff is the conductor of S in O=MaximalOrder
+//    // Alternatively, one could use that ff = (S:T) = P, but at the moment there is no implementation to compute A^*, where A=T/P.
+//    FPS:=Conductor(S);
+//    O:=MaximalOrder(Algebra(S));
+//    FPT:=T!!FPS;
+//    uTP,map:=ResidueRingUnits(FPT);
+//    uSP:=sub<uTP|[uTP!(g@@map) : g in ResidueRingUnitsSubgroupGenerators(FPS)]>;
+//    U:=[ map(t) : t in Transversal(uTP,uSP) ];
+//    return U;
+//end function;
 units_T_P_mod_S_P:=function(T,S,P)
     // Let S be an order with a unique singular prime ideal P, and T = (P:P)
-    // we compute U:=transversal in T of U:=(T_P)*/(S_P)*
+    // we compute U:=(T_P)*/(S_P)*
     // U = (T/ff)*/(R/ff)*, where ff is the conductor of S in O=MaximalOrder
     // Alternatively, one could use that ff = (S:T) = P, but at the moment there is no implementation to compute A^*, where A=T/P.
     FPS:=Conductor(S);
@@ -83,8 +97,9 @@ units_T_P_mod_S_P:=function(T,S,P)
     FPT:=T!!FPS;
     uTP,map:=ResidueRingUnits(FPT);
     uSP:=sub<uTP|[uTP!(g@@map) : g in ResidueRingUnitsSubgroupGenerators(FPS)]>;
-    U:=[ map(t) : t in Transversal(uTP,uSP) ];
-    return U;
+    U,q:=quo<uTP|uSP>;
+    map_out:=map<U->Algebra(S)|u:->u@@q@map>;
+    return U,map_out;
 end function;
 
 is_mult_ring_S:=function(q,Q,k,A_basis,W) //TODO
@@ -105,13 +120,13 @@ is_mult_ring_S:=function(q,Q,k,A_basis,W) //TODO
         // Set up system for scalars lambda_1, ..., lambda_d such that 
         // sum_j lambda_j * proj(v * A_j) = 0 in Q/W for all v in Basis(W)
         // FIXME Why does the solution space of this system return the Stabilizer of W in A?
+        projs:=[[ proj(Q!(Basis(W)[i])*A_basis[j]) : j in [1..d] ] : i in [1..#Basis(W)]];
         R_rows := [];
-        for v in Basis(W) do
+        for i in [1..#Basis(W)] do
             for q_idx in [1..dim] do
                 row := [ k!0 : j in [1..d] ];
                 for j in [1..d] do
-                    q_vec := proj(v * A_basis[j]); //FIXME this is computed over and over ... does not make sense
-                    row[j] := q_vec[q_idx];
+                    row[j] := projs[i,j,q_idx];
                 end for;
                 Append(~R_rows, row);
             end for;
@@ -120,7 +135,7 @@ is_mult_ring_S:=function(q,Q,k,A_basis,W) //TODO
         output := Dimension(Kernel(R_mat)) eq 1;
     end if;
     return output;
-end if;
+end function;
 
 wkicm_bar_with_P_P:=function(I,P)
 // Let S be an order, P a prime of S, and I a fractional (P:P)-ideal.
@@ -140,6 +155,20 @@ wkicm_bar_with_P_P:=function(I,P)
     IS:=S!!I;
     zbPI:=ZBasis(PI);
     Q,q:=QuotientVS(IS,P*IS,P); // q:I->I/PI=Q
+    n:=Dimension(Q);
+    k:=Field(Q);
+    MS := MatrixRing(k, n);
+    A_gens:=[ Matrix([q((Q.i@@q)*t): i in [1..Ngens(Q)]]): t in ZBasis(T)]; // Matrices in MS representing 
+                                                                            // the action of T on Q
+                                                                            // TODO check rows vs columns
+    A_space := sub< MS | MS!1 >; // Start with identity matrix I_n
+    repeat
+        old_dim := Dimension(A_space);
+        new_mats := [ b * g : b in Basis(A_space), g in A_gens ];
+        A_space := sub< MS | Basis(A_space) cat new_mats >;
+    until Dimension(A_space) eq old_dim;
+    A_basis := Basis(A_space);
+
     if I eq OneIdeal(T) then
         maximal_sub_T_mod:=PrimesAbove(TP); // if I=T then the maximal T-modules P c M c T are precisely
                                             // the primes of T above P. This function is a bit faster than
@@ -150,7 +179,14 @@ wkicm_bar_with_P_P:=function(I,P)
     maximal_sub_T_mod:=[ sub<Q | [q(z) : z in ZBasis(M)]> : M in maximal_sub_T_mod ] ; // maximal sub-T-modules m of Q,
                                                                                        // whose lift M=q^-1(m) c I
                                                                                        // satisfies PI c M c I
-    U:=units_T_P_mod_S_P(T,S,P);
+    U,u:=units_T_P_mod_S_P(T,S,P);
+    mats:=[];
+    for g in Generators(U) do
+        // Construct n x n matrix representation of g acting on Q
+        row_images := [ q((g@u)*(Q.i@@q)) : i in [1..n] ];
+        Append(~mats, Matrix(row_images));
+    end for;
+    U_mat := MatrixGroup< n, k | mats >;
 
     queue:=AssociativeArray();
     queue[Dimension(Q)]:=[Q];
@@ -180,15 +216,12 @@ wkicm_bar_with_P_P:=function(I,P)
                     and not exists{ M : M in maximal_sub_T_mod | W subset M } then
                 Append(~pot_new[dimW],W);
                 J:=Ideal(S,[ (Q!b)@@q : b in Basis(W) ] cat zbPI);
-                // FIXME the next 'if' can certainly be made faster by not generating the ideal J
-                // That is easy. But then I also need to figure out how to act with U directly on W,
-                // i.e. on the vector space Q.
-                // The next line should be replaced by the runction is_mult_ring_S
-                if MultiplicatorRing(J) eq S then
+                if is_mult_ring_S(q,Q,k,A_basis,W) then
                     if not IsDefined(output_vs,dimW) or not W in output_vs[dimW] then
-                        // something new! we compute the orbit
-                        zbJ:=Generators(J);
-                        orb_vs:=[ sub<Q | [q(u*g) : g in zbJ]> : u in U ];
+                        // FIXME OLD CODE 
+                        // zbJ:=Generators(J);
+                        // orb_vs:=[ sub<Q | [q(u*g) : g in zbJ]> : u in U ];
+                        orb_vs:=Orbit(U_mat, W);
                         // we add the orbit to the output_vs, and J to the output
                         for i in [1..#orb_vs] do
                             dimJJ:=Dimension(orb_vs[i]);

@@ -48,6 +48,9 @@ Changelog
     - Privatized internal intrinsics to compute intermediate ideal with underscore prefix (`_MinimalIntermediateIdeals`, etc.).
     - New public `IntermediateIdeals` intrinsic with boolean parameters `Maximal`, `Minimal`, `PrescribedMultiplicatorRing` returning only maximal, minimal and filtered by multiplicator ring intermediate ideals.
     - The intrinsic `Map` to acess the representatives of the abstract representations of the ICM and the weak equivalence class monoid is now called `RepresentativeMap`.
+- v1.0.2 : October 22, 2026.
+  - Bugfix:
+    - A bug occurring while multiplying or taking powers of elements of `AlgEtQICM` has been fixed.  
 
 References
 --

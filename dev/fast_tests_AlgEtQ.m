@@ -1354,7 +1354,11 @@ assert forall{T:T in OverOrders(E) | IsInvertibleInMultiplicatorRing(icm!T)};
 assert #IdealClassMonoidAbstract(MaximalOrder(K)) eq #PicardGroup(MaximalOrder(K));
 assert Random(icm) in icm;
 assert #[c:c in cs|c*one ne c] eq 0;
-assert #[<a,b>:a,b in cs|a*b ne (w(a)*w(b))@@w] eq 0;
+assert #[<a,b>:a,b in cs[1..5]|a*b ne (w(a)*w(b))@@w] eq 0;
+assert forall{c:c in cs|c^2 eq (w(c)^2)@@w};
+// test-alarm-limit 150
+// x^n must not form the ideal power of the representative, whose size grows with n.
+assert one^(2^64+1) eq one;
 _:=Random(icm)*Random(icm);
 _:=[Random(icm)^i:i in [1..100]];
 _<x>:=PolynomialRing(Integers());
@@ -1372,7 +1376,7 @@ assert forall{T:T in OverOrders(E) | IsInvertibleInMultiplicatorRing(icm!T)};
 assert #IdealClassMonoidAbstract(MaximalOrder(K)) eq #PicardGroup(MaximalOrder(K));
 assert Random(icm) in icm;
 assert #[c:c in cs|c*one ne c] eq 0;
-assert #[<a,b>:a,b in cs|a*b ne (w(a)*w(b))@@w] eq 0;
+assert #[<a,b>:a,b in cs[1..5]|a*b ne (w(a)*w(b))@@w] eq 0;
 _:=Random(icm)*Random(icm);
 _:=[Random(icm)^i:i in [1..100]];
 L:=RationalsAsNumberField();

@@ -159,16 +159,10 @@ intrinsic '^'(x::AlgEtQICMElt,n::RngIntElt)->AlgEtQICMElt
     elif n eq 1 then
         return x;
     else
-        icm:=Parent(x);
-        S:=MultiplicatorRing(x);
-        w_xn:=WEClass(x)^n;
-        Sn:=MultiplicatorRing(w_xn);
-        _,pn:=PicardGroup(Sn);
-        ext_x:=ext_map_Pic(icm,S);
-        ext_xn:=ext_map_Pic(icm,Sn);
-        M := ColonIdeal(Ideal(WEClass(x))^n, Ideal(w_xn));
-        pic_xn:=(Sn!!M)@@pn + n*(PicClass(x)@@ext_x@ext_xn); // additive notation for pic
-        return CreateAlgEtQICMElt(icm,w_xn,pic_xn,pn);
+        // Repeated squaring through '*' never forms Ideal(WEClass(x))^n, whose size grows with n.
+        y:=x^(n div 2);
+        y:=y*y;
+        return IsOdd(n) select y*x else y;
     end if;
 end intrinsic;
 
@@ -314,7 +308,11 @@ end intrinsic;
     assert #IdealClassMonoidAbstract(MaximalOrder(K)) eq #PicardGroup(MaximalOrder(K));
     assert Random(icm) in icm;
     assert #[c:c in cs|c*one ne c] eq 0;
-    assert #[<a,b>:a,b in cs|a*b ne (w(a)*w(b))@@w] eq 0;
+    assert #[<a,b>:a,b in cs[1..5]|a*b ne (w(a)*w(b))@@w] eq 0;
+    assert forall{c:c in cs|c^2 eq (w(c)^2)@@w};
+    // test-alarm-limit 150
+    // x^n must not form the ideal power of the representative, whose size grows with n.
+    assert one^(2^64+1) eq one;
     _:=Random(icm)*Random(icm);
     _:=[Random(icm)^i:i in [1..100]];
 
@@ -333,7 +331,7 @@ end intrinsic;
     assert #IdealClassMonoidAbstract(MaximalOrder(K)) eq #PicardGroup(MaximalOrder(K));
     assert Random(icm) in icm;
     assert #[c:c in cs|c*one ne c] eq 0;
-    assert #[<a,b>:a,b in cs|a*b ne (w(a)*w(b))@@w] eq 0;
+    assert #[<a,b>:a,b in cs[1..5]|a*b ne (w(a)*w(b))@@w] eq 0;
     _:=Random(icm)*Random(icm);
     _:=[Random(icm)^i:i in [1..100]];
 

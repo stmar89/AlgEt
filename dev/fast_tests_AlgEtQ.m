@@ -22,7 +22,7 @@ A:=EtaleAlgebra(&*seq);
 printf ".";
 SetAssertions(1);
 printf " all good!";
-Sprintf("ttime %o", Cputime(time_start_local));
+Sprintf(" time %o", Cputime(time_start_local));
 
 Cputime(time_start);
 
@@ -47,7 +47,7 @@ _,_,_:=DirectProduct([A,B]);
 printf ".";
 SetAssertions(1);
 printf " all good!";
-Sprintf("ttime %o", Cputime(time_start_local));
+Sprintf(" time %o", Cputime(time_start_local));
 
 Cputime(time_start);
 
@@ -86,7 +86,7 @@ assert not IsNumberField(A);
 printf ".";
 SetAssertions(1);
 printf " all good!";
-Sprintf("ttime %o", Cputime(time_start_local));
+Sprintf(" time %o", Cputime(time_start_local));
 
 Cputime(time_start);
 
@@ -111,7 +111,7 @@ assert A cmpeq A;
 assert not A cmpeq B;
 SetAssertions(1);
 printf " all good!";
-Sprintf("ttime %o", Cputime(time_start_local));
+Sprintf(" time %o", Cputime(time_start_local));
 
 Cputime(time_start);
 
@@ -224,7 +224,7 @@ a:=PrimitiveElement(A);
 assert Degree(MinimalPolynomial(a)) eq AbsoluteDimension(A);
 _:=PowerBasis(A);
 printf " all good!";
-Sprintf("ttime %o", Cputime(time_start_local));
+Sprintf(" time %o", Cputime(time_start_local));
 
 Cputime(time_start);
 
@@ -271,7 +271,7 @@ assert Inverse(m)(pi) eq -PrimitiveElement(A);
 assert m(One(A)) eq One(B) and Inverse(m)(One(B)) eq One(A);
 printf ".";
 printf " all good!";
-Sprintf("ttime %o", Cputime(time_start_local));
+Sprintf(" time %o", Cputime(time_start_local));
 
 Cputime(time_start);
 
@@ -357,7 +357,7 @@ assert OA meet E1 eq E1;
 assert not E2 meet E1 eq E2;
 SetAssertions(1);
 printf "all good!";
-Sprintf("ttime %o", Cputime(time_start_local));
+Sprintf(" time %o", Cputime(time_start_local));
 
 Cputime(time_start);
 
@@ -445,7 +445,7 @@ is_def,I5:=IsDefined(I`KnownPowers,5);
 assert is_def and I5 eq (I*I)*(I*I)*I;
 SetAssertions(1);
 printf " all good!";
-Sprintf("ttime %o", Cputime(time_start_local));
+Sprintf(" time %o", Cputime(time_start_local));
 
 Cputime(time_start);
 
@@ -470,7 +470,7 @@ ZBasisLLL(I);
 assert ZBasis(J) ne ZBasis(I);
 assert J eq I;
 printf " all good!";
-Sprintf("ttime %o", Cputime(time_start_local));
+Sprintf(" time %o", Cputime(time_start_local));
 
 Cputime(time_start);
 
@@ -523,7 +523,7 @@ TwoGeneratingSet(I);
 l2:=[ I^i : i in exp ];
 assert l1 eq l2;
 printf " all good!";
-Sprintf("ttime %o", Cputime(time_start_local));
+Sprintf(" time %o", Cputime(time_start_local));
 
 Cputime(time_start);
 
@@ -620,7 +620,7 @@ assert #PicardGroup(T) eq 192;
 printf ".";
 SetAssertions(1);
 printf " all good!";
-Sprintf("ttime %o", Cputime(time_start_local));
+Sprintf(" time %o", Cputime(time_start_local));
 
 Cputime(time_start);
 
@@ -667,7 +667,7 @@ facs:=[ Factorization(I) : I in ids ];
 printf ".";
 SetAssertions(1);
 printf " all good!";
-Sprintf("ttime %o", Cputime(time_start_local));
+Sprintf(" time %o", Cputime(time_start_local));
 
 Cputime(time_start);
 
@@ -716,7 +716,7 @@ for iP->P in pp do
     end for;
 end for;
 printf " all good!";
-Sprintf("ttime %o", Cputime(time_start_local));
+Sprintf(" time %o", Cputime(time_start_local));
 
 Cputime(time_start);
 
@@ -754,7 +754,7 @@ for I in icm do
     end for;
 end for;
 printf " all good!";
-Sprintf("ttime %o", Cputime(time_start_local));
+Sprintf(" time %o", Cputime(time_start_local));
 
 Cputime(time_start);
 
@@ -779,7 +779,7 @@ E:=EquationOrder(A);
 oo:=FindOverOrders(E);
 assert #oo eq 11;
 printf " all good!";
-Sprintf("ttime %o", Cputime(time_start_local));
+Sprintf(" time %o", Cputime(time_start_local));
 
 Cputime(time_start);
 
@@ -812,7 +812,7 @@ for i->f in fs do
     SetAssertions(1);
 end for;
 printf " all good!";
-Sprintf("ttime %o", Cputime(time_start_local));
+Sprintf(" time %o", Cputime(time_start_local));
 
 Cputime(time_start);
 
@@ -836,7 +836,7 @@ for i in [1..100] do
     assert Norm(a)*Norm(b) eq Norm(a*b);
 end for;
 printf " all good!";
-Sprintf("ttime %o", Cputime(time_start_local));
+Sprintf(" time %o", Cputime(time_start_local));
 
 Cputime(time_start);
 
@@ -949,7 +949,7 @@ assert OneIdeal(O) in nn;
 printf ".";
 SetAssertions(1);
 printf " all good!";
-Sprintf("ttime %o", Cputime(time_start_local));
+Sprintf(" time %o", Cputime(time_start_local));
 
 Cputime(time_start);
 
@@ -983,7 +983,7 @@ for N in [1..15] do
 end for;
 SetAssertions(1);
 printf " all good!";
-Sprintf("ttime %o", Cputime(time_start_local));
+Sprintf(" time %o", Cputime(time_start_local));
 
 Cputime(time_start);
 
@@ -1010,7 +1010,7 @@ for S in oo do
     _:=ShortElement(ff);
 end for;
 printf " all good!";
-Sprintf("ttime %o", Cputime(time_start_local));
+Sprintf(" time %o", Cputime(time_start_local));
 
 Cputime(time_start);
 
@@ -1080,7 +1080,7 @@ for i in [1..100] do
     assert ext(x+y) eq ext(x)+ext(y);
 end for;
 printf " all good!";
-Sprintf("ttime %o", Cputime(time_start_local));
+Sprintf(" time %o", Cputime(time_start_local));
 
 Cputime(time_start);
 
@@ -1112,7 +1112,7 @@ for S in oo do
 end for;
 SetAssertions(1);
 printf " all good!";
-Sprintf("ttime %o", Cputime(time_start_local));
+Sprintf(" time %o", Cputime(time_start_local));
 
 Cputime(time_start);
 
@@ -1136,7 +1136,7 @@ assert not IsWeakEquivalent(E,MaximalOrder(K));
 assert IsWeakEquivalent(OneIdeal(MaximalOrder(K)),Conductor(E));
 SetAssertions(1);
 printf " all good!";
-Sprintf("ttime %o", Cputime(time_start_local));
+Sprintf(" time %o", Cputime(time_start_local));
 
 Cputime(time_start);
 
@@ -1174,7 +1174,7 @@ assert #oo eq 19;
 assert #WKICM(R) eq 31;
 SetAssertions(1);
 printf " all good!";
-Sprintf("ttime %o", Cputime(time_start_local));
+Sprintf(" time %o", Cputime(time_start_local));
 
 Cputime(time_start);
 
@@ -1289,7 +1289,7 @@ assert IsGeneratingSet(W,Idempotents(W));
 _:=MultiplicationTable(W);
 SetAssertions(1);
 printf " all good!";
-Sprintf("ttime %o", Cputime(time_start_local));
+Sprintf(" time %o", Cputime(time_start_local));
 
 Cputime(time_start);
 
@@ -1317,7 +1317,7 @@ for f in polys do
 end for;
 SetAssertions(1);
 printf " all good!";
-Sprintf("ttime %o", Cputime(time_start_local));
+Sprintf(" time %o", Cputime(time_start_local));
 
 Cputime(time_start);
 
@@ -1336,12 +1336,17 @@ f:=x^4+291*x^3-988*x^2-1000*x-1000;
 K:=EtaleAlgebra(f);
 E:=EquationOrder(K);
 icm,w:=IdealClassMonoidAbstract(E);
-assert forall{x:x in Classes(icm)| (w(x)*RandomUnit(K))@@w eq x};
-assert One(icm) eq icm!OneIdeal(E);
+one:=One(icm);
+cs:=Classes(icm);
+assert one*one eq one;
+assert forall{x:x in cs| (w(x)*RandomUnit(K))@@w eq x};
+assert one eq icm!OneIdeal(E);
 assert IsOne(icm!(RandomUnit(K)*OneIdeal(E)));
 assert forall{T:T in OverOrders(E) | IsInvertibleInMultiplicatorRing(icm!T)};
 assert #IdealClassMonoidAbstract(MaximalOrder(K)) eq #PicardGroup(MaximalOrder(K));
 assert Random(icm) in icm;
+assert #[c:c in cs|c*one ne c] eq 0;
+assert #[<a,b>:a,b in cs|a*b ne (w(a)*w(b))@@w] eq 0;
 _:=Random(icm)*Random(icm);
 _:=[Random(icm)^i:i in [1..100]];
 _<x>:=PolynomialRing(Integers());
@@ -1349,31 +1354,40 @@ f:=x^3+31*x^2+43*x+77;
 K:=EtaleAlgebra(f);
 E:=EquationOrder(K);
 icm,w:=IdealClassMonoidAbstract(E);
-assert forall{x:x in Classes(icm)| (w(x)*RandomUnit(K))@@w eq x};
-assert One(icm) eq icm!OneIdeal(E);
+one:=One(icm);
+cs:=Classes(icm);
+assert one*one eq one;
+assert forall{x:x in cs| (w(x)*RandomUnit(K))@@w eq x};
+assert one eq icm!OneIdeal(E);
 assert IsOne(icm!(RandomUnit(K)*OneIdeal(E)));
 assert forall{T:T in OverOrders(E) | IsInvertibleInMultiplicatorRing(icm!T)};
 assert #IdealClassMonoidAbstract(MaximalOrder(K)) eq #PicardGroup(MaximalOrder(K));
 assert Random(icm) in icm;
+assert #[c:c in cs|c*one ne c] eq 0;
+assert #[<a,b>:a,b in cs|a*b ne (w(a)*w(b))@@w] eq 0;
 _:=Random(icm)*Random(icm);
 _:=[Random(icm)^i:i in [1..100]];
-_:=[x*y:x,y in Classes(icm)];
 L:=RationalsAsNumberField();
 K:=EtaleAlgebra([L,L,L]);
 a:=PrimitiveElement(K);
 E:=Order([a]);
-icm:=IdealClassMonoidAbstract(E);
+icm,w:=IdealClassMonoidAbstract(E);
+one:=One(icm);
+assert one*one eq one;
+cs:=Classes(icm);
 O:=MaximalOrder(K);
 assert #IdealClassMonoidAbstract(O) eq 1;
 assert not IsMaximal(E);
 assert One(icm) eq icm!OneIdeal(E);
 assert IsOne(icm!(RandomUnit(K)*OneIdeal(E)));
+assert #[c:c in cs|c*one ne c] eq 0;
+assert #[<a,b>:a,b in cs|a*b ne (w(a)*w(b))@@w] eq 0;
 _:=Random(icm)*Random(icm);
 _:=[Random(icm)^i:i in [1..100]];
 _:=[x*y:x,y in Classes(icm)];
 SetAssertions(1);
 printf " all good!";
-Sprintf("ttime %o", Cputime(time_start_local));
+Sprintf(" time %o", Cputime(time_start_local));
 
 Cputime(time_start);
 
@@ -1405,7 +1419,7 @@ assert IsConjugateStable(TraceDualIdeal(S));
 assert not IsConjugateStable(EquationOrder(K));
 printf ".";
 printf " all good!";
-Sprintf("ttime %o", Cputime(time_start_local));
+Sprintf(" time %o", Cputime(time_start_local));
 
 Cputime(time_start);
 
@@ -1432,7 +1446,7 @@ for iS in [1..#oo] do
 end for;
 SetAssertions(1);
 printf " all good!";
-Sprintf("ttime %o", Cputime(time_start_local));
+Sprintf(" time %o", Cputime(time_start_local));
 
 Cputime(time_start);
 
@@ -1473,7 +1487,7 @@ for f in polys do
     printf ".";
 end for;
 printf " all good!";
-Sprintf("ttime %o", Cputime(time_start_local));
+Sprintf(" time %o", Cputime(time_start_local));
 
 Cputime(time_start);
 
@@ -1513,7 +1527,7 @@ assert #WKICM(R) eq #WKICM(R1);
 assert #FindOverOrders(R) eq #FindOverOrders(R1);
 printf ".";
 printf " all good!";
-Sprintf("ttime %o", Cputime(time_start_local));
+Sprintf(" time %o", Cputime(time_start_local));
 
 Cputime(time_start);
 

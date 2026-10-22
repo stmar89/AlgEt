@@ -80,7 +80,7 @@ generate_test_content_from_file:=function(folder, filename)
     out := Sprintf("// Tests from %o/%o\n", folder, filename);
     out cat:= "time_start_local := Cputime();\n";
     out cat:= inp_local;
-    out cat:= "\nSprintf(\"ttime %o\", Cputime(time_start_local));\n";
+    out cat:= "\nSprintf(\" time %o\", Cputime(time_start_local));\n";
     return out;
 end function;
 

@@ -136,7 +136,7 @@ end function;
 intrinsic '*'(x::AlgEtQICMElt,y::AlgEtQICMElt)->AlgEtQICMElt
 {Returns ideal class corresponding to the product of the two given ideal classes.}
     icm:=Parent(x);
-    require icm eq Parent(y) : "The classes do not belong to the same ideal class monoid";
+    require icm eq Parent(y) : "The classes do not belong to the same ideal class monoid.";
     Sx:=MultiplicatorRing(x);
     Sy:=MultiplicatorRing(y);
     wxy:=WEClass(x)*WEClass(y);

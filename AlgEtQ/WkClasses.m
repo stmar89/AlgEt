@@ -35,11 +35,9 @@ join_ass_arr:=function(A,B)
         if not IsDefined(A,k) then
             A[k]:=B[k];
         else
-            A[k] join:=B[k];
-            // FIXME OLD CODE
-            // for b in B[k] do
-            //     Include(~A[k],b);
-            // end for;
+            for b in B[k] do
+                Include(~A[k],b);
+            end for;
         end if;
     end for;
     return A;
@@ -54,11 +52,9 @@ diff_ass_arr:=function(A,B,stop_at_dim_2)
     end if;
     for k in Keys(B) do
         if IsDefined(A,k) then
-            A[k] diff:=B[k];
-            // FIXME OLD CODE
-            // for b in B[k] do
-            //     Exclude(~A[k],b);
-            // end for;
+            for b in B[k] do
+                Exclude(~A[k],b);
+            end for;
         end if;
     end for;
     for k in Keys(A) do
@@ -142,9 +138,10 @@ wkicm_bar_with_P_P:=function(I,P)
 // The function returns all fractional S-ideals J such that  P*I c J c I, (J:J)=S, and J(P:P)=I, up to weak equivalence.
 // We use AssociativeArrays indexed by the dimension at P to make the search faster.
 // Also, if I is invertible in (P:P) then we do not consider in the recursion the 1 dimensional vector spaces,
-// since they will all be weakly equivalent to S (which is added manually to the output).
+// since they will all be weakly equivalent to S (which is added manually to the output); see stop_at_dim_2.
     S:=Order(P);
     T:=Order(I);
+    assert T eq MultiplicatorRing(P);
     stop_at_dim_2:=false;
     if IsInvertible(I) then
         I:=OneIdeal(T);
@@ -155,87 +152,71 @@ wkicm_bar_with_P_P:=function(I,P)
     IS:=S!!I;
     zbPI:=ZBasis(PI);
     Q,q:=QuotientVS(IS,P*IS,P); // q:I->I/PI=Q
-    n:=Dimension(Q);
+    dimQ:=Dimension(Q);
     k:=Field(Q);
-    MS := MatrixRing(k, n);
-    A_gens:=[ Matrix([q((Q.i@@q)*t): i in [1..Ngens(Q)]]): t in ZBasis(T)]; // Matrices in MS representing 
-                                                                            // the action of T on Q
-                                                                            // TODO check rows vs columns
+    MS := MatrixRing(k,dimQ);
+    A_gens:={@ Transpose(Matrix([q((Q.i@@q)*t): i in [1..Ngens(Q)]])): t in ZBasis(T) @}; 
+                                                                               // Matrices in MS representing 
+                                                                               // the action of T on Q
     A_space := sub< MS | MS!1 >; // Start with identity matrix I_n
     repeat
         old_dim := Dimension(A_space);
-        new_mats := [ b * g : b in Basis(A_space), g in A_gens ];
+        new_mats := [ g*b : b in Basis(A_space), g in A_gens ];
         A_space := sub< MS | Basis(A_space) cat new_mats >;
     until Dimension(A_space) eq old_dim;
     A_basis := Basis(A_space);
 
-    if I eq OneIdeal(T) then
-        maximal_sub_T_mod:=PrimesAbove(TP); // if I=T then the maximal T-modules P c M c T are precisely
-                                            // the primes of T above P. This function is a bit faster than
-                                            // the next one, which works also when I ne T.
-    else
-        maximal_sub_T_mod:=_MaximalIntermediateIdeals(I,PI);
-    end if;
-    maximal_sub_T_mod:=[ sub<Q | [q(z) : z in ZBasis(M)]> : M in maximal_sub_T_mod ] ; // maximal sub-T-modules m of Q,
-                                                                                       // whose lift M=q^-1(m) c I
-                                                                                       // satisfies PI c M c I
+//    if I eq OneIdeal(T) then
+//        maximal_sub_T_mod:=PrimesAbove(TP); // if I=T then the maximal T-modules P c M c T are precisely
+//                                            // the primes of T above P. This function is a bit faster than
+//                                            // the next one, which works also when I ne T.
+//    else
+//        maximal_sub_T_mod:=_MaximalIntermediateIdeals(I,PI);
+//    end if;
+//    maximal_sub_T_mod:=[ sub<Q | [q(z) : z in ZBasis(M)]> : M in maximal_sub_T_mod ] ; // max sub-T-modules m of Q,
+//                                                                                       // whose lift M=q^-1(m) c I
+//                                                                                       // satisfies PI c M c I
     U,u:=units_T_P_mod_S_P(T,S,P);
     mats:=[];
     for g in Generators(U) do
-        // Construct n x n matrix representation of g acting on Q
-        row_images := [ q((g@u)*(Q.i@@q)) : i in [1..n] ];
+        // Construct dimQ x dimQ matrix representation of g acting on Q
+        row_images:=[ q((g@u)*(Q.i@@q)) : i in [1..dimQ] ];
+        // TODO check rows vs columns
         Append(~mats, Matrix(row_images));
     end for;
-    U_mat := MatrixGroup< n, k | mats >;
+    U_mat:=MatrixGroup<dimQ,k|mats>;
 
     queue:=AssociativeArray();
     queue[Dimension(Q)]:=[Q];
-    output:=AssociativeArray();
-    output_vs:=AssociativeArray(); //will contain the orbits
+    done:=AssociativeArray();
+    output:=AssociativeArray(:Default:=[]);
+    output_vs:=AssociativeArray(:Default:=[]); //will contain the orbits
     if MultiplicatorRing(I) eq S then
         output[Dimension(Q)]:=[IS];
     end if;
     if stop_at_dim_2 then
         output[1]:=[OneIdeal(S)];
     end if;
-    done:=AssociativeArray();
     while #queue gt 0 do //empty keys are removed
         // We want only the sub-S/P-vector spaces W of Q such that W.T=Q (where ".T" denotes the natural action).
         // This is equivalent to having JT=I, where J=q^-1(W) c I.
-        // We use that: JT=I if and only if W is not contained in any M for M in maximal_sub_T_mod.
         // Also, if W does not have trivial extension, then all its subspace will not have trivial extension.
         // Hence we do not add such W to the queue.
-        pot_new:=AssociativeArray();
-        for W in &cat[ &cat[ MaximalSubmodules(elt) : elt in queue[k_queue] ] : k_queue in Keys(queue) ] do
+        pot_new:=AssociativeArray(:Default:=[]);
+        for W in Seqset(&cat[ &cat[ MaximalSubmodules(elt) : elt in queue[k_queue] ] : k_queue in Keys(queue) ]) do
             dimW:=Dimension(W);
-            if not IsDefined(pot_new,dimW) then
-                pot_new[dimW]:=[];
-            end if;
             if not W in pot_new[dimW] //TODO why this if? could W be already in pot_new?
-            // FIXME we can try to make the next line faster.
-                    and not exists{ M : M in maximal_sub_T_mod | W subset M } then
+               and Dimension(sub<Q|[(Q!W.i)*a:a in A_basis, i in [1..Ngens(W)]]>) eq dimQ then 
                 Append(~pot_new[dimW],W);
-                J:=Ideal(S,[ (Q!b)@@q : b in Basis(W) ] cat zbPI);
                 if is_mult_ring_S(q,Q,k,A_basis,W) then
-                    if not IsDefined(output_vs,dimW) or not W in output_vs[dimW] then
-                        // FIXME OLD CODE 
-                        // zbJ:=Generators(J);
-                        // orb_vs:=[ sub<Q | [q(u*g) : g in zbJ]> : u in U ];
-                        orb_vs:=Orbit(U_mat, W);
+                    if W notin output_vs[dimW] then
+                        orb_vs:=Setseq({@ sub<Q|[Q!(W.i)*g : i in [1..Ngens(W)]]> : g in U_mat @});
                         // we add the orbit to the output_vs, and J to the output
-                        for i in [1..#orb_vs] do
-                            dimJJ:=Dimension(orb_vs[i]);
-                            if not IsDefined(output_vs,dimJJ) then
-                                output_vs[dimJJ]:=[orb_vs[i]];
-                            else
-                                Append(~output_vs[dimJJ],orb_vs[i]);
-                            end if;
+                        for WW in orb_vs do
+                            Append(~output_vs[Dimension(WW)],WW);
                         end for;
-                        if not IsDefined(output,dimW) then
-                            output[dimW]:=[J];
-                        else
-                            Append(~output[dimW],J);
-                        end if;
+                        J:=Ideal(S,[ (Q!b)@@q : b in Basis(W) ] cat zbPI);
+                        Append(~output[dimW],J);
                     end if;
                 end if;
             end if;
@@ -633,7 +614,7 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing WKICM:";
-    //AttachSpec("~/packages_github/AlgEt/spec");
+    AttachSpec("../spec");
     SetAssertions(2);
     _<x>:=PolynomialRing(Integers());
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;

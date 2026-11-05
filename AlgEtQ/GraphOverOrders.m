@@ -60,13 +60,35 @@ intrinsic GraphOverOrders(R:AlgEtQOrd) -> GrphDir
                 //test
                 assert forall{i : i in [1..#output] | output[i] eq oo_at_Ps[1][i]};
             else
-                cc:=CartesianProduct([[1..#x] : x in oo_at_Ps]); // sorted as output (check for O!)
+                cc:=CartesianProduct([[1..#x] : x in oo_at_Ps]);
+                cc:=[ c : c in cc ];
+                // The output of OverOrders(R) is sorted by index (and myHash), so its order does not match
+                // the one of cc. We reconstruct the correspondence cc[i] -> position in output, by rebuilding
+                // the orders as in OverOrders(R) (these are cheap lookups in the known orders) and looking
+                // them up by their hash.
+                pos:=AssociativeArray();
+                for i->S in output do
+                    pos[myHash(S)]:=i;
+                end for;
+                cc_to_output:=[];
+                for c in cc do
+                    S:=[ c[j] : j in [1..#c] ];
+                    if forall{x : x in S | x eq 1 } then
+                        T:=R;
+                    elif #[x : x in S | x ne 1] eq 1 then
+                        _,j:=Max(S);
+                        T:=oo_at_Ps[j][S[j]];
+                    else
+                        T:=Order(&cat[ZBasis(oo_at_Ps[j][S[j]]) : j in [1..#S] | S[j] ne 1]);
+                    end if;
+                    Append(~cc_to_output,pos[myHash(T)]);
+                end for;
+                assert Seqset(cc_to_output) eq {1..#output};
                 // given c1,c2 in cc we have that c2 is a minimaloverorder of c1 if and only if
                 // - c1[i] eq c2[i] for all i's but one, say i0, and
                 // - c2[i0] is a minimaloverorder of c1[i0],
                 // which is equivalent to have [c1[i0],c2[i0]] in edges[i0].
                 min_inclusions:=[];
-                cc:=[ c : c in cc ];
                 for i,j in [1..#output] do
                     c1:=cc[i];
                     c2:=cc[j];
@@ -77,8 +99,8 @@ intrinsic GraphOverOrders(R:AlgEtQOrd) -> GrphDir
                         edges_P:=edges[i0];
                         incl_atP:=[c1[i0],c2[i0]];
                         if incl_atP in edges[i0] then
-                            // we found a minimal inclusion: output[i] subset output[j]]
-                            Append(~min_inclusions,[i,j]);
+                            // we found a minimal inclusion between the orders corresponding to cc[i] and cc[j]
+                            Append(~min_inclusions,[cc_to_output[i],cc_to_output[j]]);
                         end if;
                     end if;
                 end for;

@@ -123,7 +123,7 @@ end function;
 /// Whenever we create an order, we populate the attributes `Generators` and `ZBasis`.
 /// Unless the parameter `Check` is set to $0$, the `ZBasis` is put in a canonical form (we use the Hermite normal form of the numerators and divide by the denominators). The entries of the corresponding upper triangular matrix uniquely determine the order and are used for hashing it.
 
-/// Returns the order generated as an algebra over $\mathbb{Z}$ by a given sequence of elements. The parameter `Check` (default $100$) determines how many times the program tries to obtain a multiplicatively closed lattice by adding the product of the given generators. If `Check` is $0$ then this step is skipped. The parameter `CheckIsKnownOrder` determines whether the program checks if the order is already known, i.e. in the attribute `KnownOrders` of the algebra. The default value is true.The stored $\mathbb{Z}$-basis is LLL reduced.
+/// Returns the order generated as an algebra over $\mathbb{Z}$ by a given sequence of elements. The parameter `Check` (default $100$) determines how many times the program tries to obtain a multiplicatively closed lattice by adding the product of the given generators. If `Check` is $0$ then this step is skipped. The parameter `CheckIsKnownOrder` determines whether the program checks if the order is already known, i.e. in the attribute `KnownOrders` of the algebra. The default value is true. The stored $\mathbb{Z}$-basis is LLL reduced.
 intrinsic Order( gens::SeqEnum[AlgEtQElt] : Check:=100 , CheckIsKnownOrder:=true ) -> AlgEtQOrd
 {Returns the order generated as an algebra over ZZ by a given sequence of elements. The parameter Check (default 100) determines how many times the program tries to obtain a multiplicatively closed lattice by adding the product of the given generators. If Check 0 then this step is skipped. The vararg CheckIsKnownOrder determines whether the program checks if the order is already known, i.e. in the attribute KnownOrders of the algebra. The default value is true. The stored ZBasis is LLL-reduced.}
     A:=Universe(gens);
@@ -256,17 +256,17 @@ intrinsic IsKnownOrder(~R::AlgEtQOrd)
     // new with AssociativeArray. Sorting the orders, should make it faster.
     if not assigned A`KnownOrders then
         A`KnownOrders:=AssociativeArray();
-        A`KnownOrders[Index(R)]:=[ R ];
+        A`KnownOrders[Index(R)]:={@ R @};
     else
         ind:=Index(R);
         if not IsDefined(A`KnownOrders,ind) then
-            A`KnownOrders[ind]:=[ R ];
+            A`KnownOrders[ind]:={@ R @};
         else
             if exists(S){ T : T in A`KnownOrders[ind] | R eq T } then // this equality is done on the Hash level,
                                                                       // which means that
                 R:=S;
             else
-                Append(~A`KnownOrders[ind],R);
+                Include(~A`KnownOrders[ind],R);
             end if;
         end if;
     end if;

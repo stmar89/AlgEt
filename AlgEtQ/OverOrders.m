@@ -15,13 +15,23 @@ freeze;
 
 declare verbose OverOrders, 1;
 
-declare attributes AlgEtQOrd : MinimalOverOrders, // a sequence of tuples <P,[ T1,...,Tn ]>, where
+declare attributes AlgEtQOrd : MinimalOverOrders, // a sequence of tuples <P,{@ T1,...,Tn @}>, where
                                                   // P is a singular prime of the order R, and
                                                   // T1,..,Tn are all the minimal overorders with conductor (R:Ti)=P.
                                OverOrdersAtPrimes, // a sequence of tuples <P,[ T1,...,Tn ]>, where
                                                   // P is a singular prime of the order R, and
                                                   // T1,..,Tn are all the overorders with P-primary conductor (R:Ti), plus R
                                OverOrders;        // all overorders
+
+sort_overorders:=procedure(~oo)
+// Given a sequence oo of orders, sorts it by decreasing Index(S), breaking ties using myHash(S).
+// If the orders in oo are overorders of a fixed order R, then Index(S,R)=Index(R)/Index(S), so this is
+// the same as sorting by increasing index [S:R]. In particular, R is always the first entry, and the
+// maximal order the last one.
+// This makes the output of OverOrdersAtPrime and OverOrders independent of the way the orders are produced.
+    keys:=[ [1/Index(S)] cat myHash(S) : S in oo ];
+    ParallelSort(~keys,~oo);
+end procedure;
 
 ///# Overorders
 /// Let $R$ be an order in an étale algebra $A$ over $\mathbb{Q}$ with maximal order $\mathcal{O}_A$.
@@ -44,9 +54,9 @@ intrinsic IsMaximalAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> BoolElt
     return not (Conductor(R) subset P);
 end intrinsic;
 
-/// Given an order $R$ and prime $P$ of $R$, returns the minimal overorders $S$ of R whose conductor $(R:S)$ is a $P$-primary ideal of $R$. The minimality assumption forces the conductor $(R:S)$ to be exactly $P$.
-intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl : CheckIsKnownOrder:=true) -> SeqEnum[AlgEtQOrd]
-{Given an order R and prime P of R, returns the minimal overorders S of R whose conductor (R:S) is a P-primary ideal of R. The minimality assumption forces the conductor (R:S) to be exactly P. The vararg CheckIsKnownOrder (default true) determines wheter the output is checked against the global database of known overorders. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.}
+/// Given an order $R$ and prime $P$ of $R$, returns the minimal overorders $S$ of R whose conductor $(R:S)$ is a $P$-primary ideal of $R$. The minimality assumption forces the conductor $(R:S)$ to be exactly $P$. The vararg `CheckIsKnownOrder` (default `true`) determines whether the output is checked against the global database of known orders. If it is set to `false`, the output is not stored in the attribute `MinimalOverOrders` of $R$. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.
+intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl : CheckIsKnownOrder:=true) -> SetIndx[AlgEtQOrd]
+{Given an order R and prime P of R, returns the minimal overorders S of R whose conductor (R:S) is a P-primary ideal of R. The minimality assumption forces the conductor (R:S) to be exactly P. The vararg CheckIsKnownOrder (default true) determines whether the output is checked against the global database of known orders. If it is set to false, the output is not stored in the attribute MinimalOverOrders of R. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.}
     require IsPrime(P) : "The ideal P must be prime.";
     require Order(P) eq R : "P must be an ideal of R";
 
@@ -56,7 +66,7 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl : CheckIsKnownOrde
         return output;
     end if;
 
-    output:=[ Universe([ R ]) | ]; //empty sequence
+    output:={@ Universe({@ R @}) | @}; //empty set
     if not IsMaximalAtPrime(R,P) then
         zbR := ZBasis(R);
         // A minimal P-overorder S of R is contained in T=(P:P), and S/P is either
@@ -68,7 +78,7 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl : CheckIsKnownOrde
         dVT := [1..Dimension(VT)];
         if #dVT eq 2 then
             // VT is 2-dimensional if and only if T is the unique minimal P-overorder.
-            Append(~output, T);
+            Include(~output, T);
         else
             VT1 := mTtoVT(1);
             V,mVTtoV:= quo<VT|[VT1]>;      // V=T/R is not a ring: multiplication is not well-defined.
@@ -116,9 +126,6 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl : CheckIsKnownOrde
             assert2 forall{z:z in zbR|mTV(z) eq 0};
             assert2 forall{ v : v,w in Basis(VT) | mult(v,w) eq mTtoVT(v@@mTtoVT * w@@mTtoVT) };
             assert2 forall{ v : v in Basis(VT) | pow(v,10) eq mTtoVT((v@@mTtoVT)^10)};
-            assert2 forall{ v : v in Basis(VT) | mTV((v@@mTtoVT)^2) in VT };
-            assert2 forall{ v : v in Basis(VT) | pow(v,2) in VT };
-            assert2 forall{ v : v,w in Basis(VT) | mult(v,w) in VT };
             assert2 forall{ v : v in Basis(VT) | mTtoVT((v@@mTtoVT)) eq v };
             assert2 forall{ t : t in ZBasis(T) | t-((mTtoVT(t))@@mTtoVT) in R };
 
@@ -128,6 +135,7 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl : CheckIsKnownOrde
             eigen_spaces:=[Kernel(hom<V->V | [qpow(v)-e*v : v in Basis(V)]>): e in eigen_vals]; 
 
             F:=BaseField(V);
+            type1_ws:=[V|]; // the images in V of the generators of the minimal overorders S with dim_F(S/R)=1.
             for E in eigen_spaces do
                 n:=Dimension(E);
                 // The following loop generates all generators of 1-dimensional subspaces of E.
@@ -139,36 +147,51 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl : CheckIsKnownOrde
                         if q eq 2 then
                             // for q eq 2 being a subspace of the eigenspace guarantees that it is mult closed
                             S:=Order([w@@mTV] cat zbR : CheckIsKnownOrder:=CheckIsKnownOrder);
-                            Append(~output,S);// necessarily minimal, because it has dim 1
+                            Include(~output,S);// necessarily minimal, because it has dim 1
+                            Append(~type1_ws,w);
                         else
                             wVT:=w@@mVTtoV;
                             w_square:=pow(wVT,2)@mVTtoV;
                             if Rank(Matrix([w,w_square])) eq 1 then
                                 S:=Order(Append(zbR,wVT@@mTtoVT) : CheckIsKnownOrder:=CheckIsKnownOrder);
-                                Append(~output,S); // necessarily minimal, because it has dim 1
+                                Include(~output,S); // necessarily minimal, because it has dim 1
+                                Append(~type1_ws,w);
                             end if;
                         end if;
                     end for;
                 end for;
             end for;
             ////////////////////////////////////////////////////////////////////////////
-            // The other minimal overorders S of R are such that S/P is a finite field extension of prime degree of R/P
+            // The other minimal overorders S of R are such that S/P is a finite field extension of prime degree
+            // l>2 of F=R/P. Given a subspace W of V of dimension l-1 whose preimage in VT=T/P is multiplicatively
+            // closed, say B=S/P, we need to check that B is a field.
+            // If B is not a field, then B contains a non-zero element e which is either nilpotent (with e^2=0) or
+            // idempotent (e^2=e). In both cases, F+Fe is a 2-dimensional subalgebra of B, that is, the reduction
+            // of a minimal overorder of type 1 found above. Conversely, if B is a field then it contains no
+            // proper subalgebra strictly containing F, since [B:F] is prime.
+            // Hence S is minimal if and only if W contains none of the lines spanned by type1_ws.
             dims := PrimesUpTo(dV+1); //the plus one is to prevent issues when d=2.
             subs_type2 := Submodules(V : CodimensionLimit := dV-2); //we exclude dim 0 and 1
             for W in subs_type2 do
-                if Dimension(W)+1 in dims and is_ord_inV(W) then
+                if Dimension(W)+1 in dims and
+                        not exists{ w : w in type1_ws | w in W } and
+                        is_ord_inV(W) then
                     assert Dimension(W) ge 2;
                     S:=Order([v@@mTV:v in Basis(W)] cat zbR : CheckIsKnownOrder:=CheckIsKnownOrder);
-                    Append(~output,S);
+                    Include(~output,S);
                 end if;
             end for;
         end if;
-        // we check if any of these orders was already computed
         assert2 forall{S : S in output | ColonIdeal(R,R!!OneIdeal(S)) eq P};
-        if not assigned R`MinimalOverOrders then
-            R`MinimalOverOrders:=[<P,output>];
-        else
-            Append(~R`MinimalOverOrders,<P,output>);
+        // We store the output only if its orders have been checked against the database of known orders.
+        // Otherwise, the attribute would contain copies of orders which do not share their attributes
+        // with the known ones.
+        if CheckIsKnownOrder then
+            if not assigned R`MinimalOverOrders then
+                R`MinimalOverOrders:=[<P,output>];
+            else
+                Append(~R`MinimalOverOrders,<P,output>);
+            end if;
         end if;
     end if;
     return output;
@@ -176,21 +199,21 @@ end intrinsic;
 
 
 /// Computes the minimal overorders of the order $R$.
-intrinsic MinimalOverOrders(R::AlgEtQOrd) -> SeqEnum[AlgEtQOrd]
+intrinsic MinimalOverOrders(R::AlgEtQOrd) -> SetIndx[AlgEtQOrd]
 {Computes the minimal overorders of R.}
-    output:=[ Universe([ R ]) | ]; //empty set
+    output:={@ Universe({@ R @}) | @}; //empty set
     if IsMaximal(R) then
         return output;
     end if;
     // Note: every minimal overorder is a P-MinimalOverOrder for a unique singular prime P.
     // i.e. if P ne Q, then the set of P-minimal overorders and Q-minimal overorders are disjoint!
-    return &cat[ MinimalOverOrdersAtPrime(R,P):P in SingularPrimes(R) ];
+    return &join[ MinimalOverOrdersAtPrime(R,P):P in SingularPrimes(R) ];
 end intrinsic;
 
 
-// Given an order $R$ and prime $P$ of $R$, returns $R$ and the overorders $S$ of $R$ with conductor $(R:S)$ which is $P$-primary.
+// Given an order $R$ and prime $P$ of $R$, returns $R$ and the overorders $S$ of $R$ with conductor $(R:S)$ which is $P$-primary. We recursively produce the minimal $Q$-overorders where $Q$ are primes above $P$. The output is sorted by decreasing `Index(S)`, which is the same as increasing index $[S:R]$, with ties broken using `myHash(S)`. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.
 intrinsic OverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SeqEnum[AlgEtQOrd]
-{Given an order R and prime P of R, returns R and the overorders S of R with conductor (R:S) which is P-primary. We recursively produce the minimal PP-overorders where PP are primes above P. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.}
+{Given an order R and prime P of R, returns R and the overorders S of R with conductor (R:S) which is P-primary. We recursively produce the minimal PP-overorders where PP are primes above P. The output is sorted by decreasing Index(S), which is the same as increasing index [S:R], with ties broken using myHash(S). Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.}
     require IsPrime(P) : "The ideal P must be prime.";
     require Order(P) eq R : "P must be an ideal of R";
 
@@ -202,7 +225,9 @@ intrinsic OverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SeqEnum[AlgEtQOrd]
 
     if assigned R`OverOrders then
     // early exit if already computed. This is useful when Loading the data using LoadWKICM
-        return [ R ] cat [ S : S in R`OverOrders | PrimesAbove(ColonIdeal(R,R!!OneIdeal(S))) eq [ P ] ];
+        output:=[ R ] cat [ S : S in R`OverOrders | PrimesAbove(ColonIdeal(R,R!!OneIdeal(S))) eq [ P ] ];
+        sort_overorders(~output);
+        return output;
     end if;
 
     if IsMaximalAtPrime(R,P) then
@@ -211,54 +236,27 @@ intrinsic OverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SeqEnum[AlgEtQOrd]
 
     ppO:=PrimesAbove(MaximalOrder(Algebra(R))!!P);
 
-    queue := AssociativeArray(:Default:={@ @});
-    queue[Index(R)] := {@ R @};
-    output:= AssociativeArray(:Default:={@ @});
-    output[Index(R)] := {@ R @};
-    done := AssociativeArray(:Default:={@ @});
-    while &+[#queue[ind]:ind in Keys(queue)] gt 0 do
-        pot_new := AssociativeArray(:Default:={@ @});
-        for ind->set_ind in queue do
-            for T in set_ind do
-                pp:={@ OneIdeal(T) meet T!!Q : Q in ppO @};
-                for i in [1..#pp] do
-                    Q:=pp[i];
-                    Q`IsPrime:=true;
-                end for;
-                for Q in pp do
-                    pot_new_T_Q := AssociativeArray(:Default:={@ @});
-                    for S in MinimalOverOrdersAtPrime(T,Q : CheckIsKnownOrder:=false) do
-                    // In the previous line, we compute the MinimalOverOrdersAtPrime using the 
-                    // vararg CheckIsKnownOrder set to false, since there are possibly repetitions 
-                    // here. Hence, we run the check IsKnownOrder in a loop in this intrinsic below.
-                        Include(~pot_new_T_Q[Index(S)],S);
-                    end for;
-                    for ind in Keys(pot_new_T_Q) do
-                        pot_new[ind] join:= pot_new_T_Q[ind];
-                    end for;
-                end for;
+    queue := {@ R @};
+    output:={@ R @};
+    done:={@ @};
+    while #queue gt 0 do
+        pot_new:={@ @};
+        for T in queue do
+            pp:={@ OneIdeal(T) meet T!!Q : Q in ppO @};
+            for i in [1..#pp] do
+                Q:=pp[i];
+                Q`IsPrime:=true;
+            end for;
+            for Q in pp do
+                pot_new join:=MinimalOverOrdersAtPrime(T,Q);
             end for;
         end for;
-        for ind in Keys(pot_new) do
-            output[ind] join:=pot_new[ind];
-        end for;
-        for ind in Keys(queue) do
-            done[ind] join:=queue[ind];
-        end for;
-        for ind in Keys(pot_new) join Keys(done) do
-            queue[ind] := pot_new[ind] diff done[ind];
-        end for;
+        output join:=pot_new;
+        done join:=queue;
+        queue := pot_new diff done;
     end while;
-    output:=&cat[ Setseq(output[ind]) : ind in Keys(output) ];
-    output:=[R] cat Exclude(output,R); // QOL: it is nice to have R at the first place
-
-    // Now, we know that there are no repetitions in the orders, so we check if any of the orders we just created 
-    // was already known.
-    for iS in [1..#output] do
-        S:=output[iS];
-        IsKnownOrder(~S);
-        output[iS]:=S;
-    end for;
+    output:=Setseq(output);
+    sort_overorders(~output);
     assert2 forall{S : S in output | S eq R or PrimesAbove(ColonIdeal(R,R!!OneIdeal(S))) eq [ P ]};
     if not assigned R`OverOrdersAtPrimes then
         R`OverOrdersAtPrimes:=[<P,output>];
@@ -268,9 +266,9 @@ intrinsic OverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SeqEnum[AlgEtQOrd]
     return output;
 end intrinsic;
 
-/// Returns the overorders of $R$. The parameter `populateoo_in_oo` (default false) determines whether the algorithms fills the attribute `OverOrders` for each overorder of $R$.
+/// Returns the overorders of $R$, sorted by decreasing `Index(S)`, which is the same as increasing index $[S:R]$, with ties broken using `myHash`. The parameter `populateoo_in_oo` (default false) determines whether the algorithms fills the attribute `OverOrders` for each overorder of $R$. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.
 intrinsic OverOrders(R::AlgEtQOrd : populateoo_in_oo:=false) -> SeqEnum[AlgEtQOrd]
-{Returns the overorders of R. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana. The parameter "populateoo_in_oo" (default false) determines whether we should fill the attribute T`OverOrders for every overorder T of R.}
+{Returns the overorders of R, sorted by decreasing Index(S), which is the same as increasing index [S:R], with ties broken using myHash(S). The parameter "populateoo_in_oo" (default false) determines whether we should fill the attribute T`OverOrders for every overorder T of R. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.}
     if not assigned R`OverOrders then
         if IsMaximal(R) then
             output:=[R];
@@ -299,6 +297,7 @@ intrinsic OverOrders(R::AlgEtQOrd : populateoo_in_oo:=false) -> SeqEnum[AlgEtQOr
                 end if;
                 Append(~output,S);
             end for;
+            sort_overorders(~output);
             assert2 R in output;
             assert2 MaximalOrder(Algebra(R)) in output;
         end if;
@@ -318,7 +317,7 @@ end intrinsic;
 
 ///ditto
 intrinsic FindOverOrders(R::AlgEtQOrd : populateoo_in_oo:=false) -> SetIndx[AlgEtQOrd]
-{Returns the overorders of R. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana. The parameter "populateoo_in_oo" (default false) determines whether we should fill the attribute T`OverOrders for every overorder T of R.}
+{Returns the overorders of R, sorted by decreasing Index(S), which is the same as increasing index [S:R], with ties broken using myHash(S). Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana. The parameter "populateoo_in_oo" (default false) determines whether we should fill the attribute T`OverOrders for every overorder T of R.}
     return OverOrders(R : populateoo_in_oo:=populateoo_in_oo);
 end intrinsic;
 

@@ -28,12 +28,12 @@ declare verbose AlgEtQIdlWkClasses,3;
 /// In the literature, the same notion sometimes goes under the name `local isomorphism`.
 /// Reference: Stefano Marseglia, "Local isomorphism classes of fractional ideals of orders in étale algebras", Journal of Algebra 673 (2025), 77-102.
 
-/// Given fractional ideals $I$ and $J$, returns whether they are weakly equivalent. The fractional ideals are no required to be defined over the same order.}
-intrinsic IsWeakEquivalent(I::AlgEtQIdl,J::AlgEtQIdl)->BoolElt
-{Given fractional ideals I and J, returns whether they are weakly equivalent, that is, if 1 \in (I:J)*(J:I). The fractional ideals are no required to be defined over the same order.}
+/// Given fractional ideals $I$ and $J$, returns whether they are weakly equivalent. If $I$ and $J$ are weakly equivalent then also the colon ideals $(I:J)$ and $(J:I)$  are returned as ideals over the multiplicator ring of $I$ and $J$. The fractional ideals are no required to be defined over the same order.}
+intrinsic IsWeakEquivalent(I::AlgEtQIdl,J::AlgEtQIdl)->BoolElt,AlgEtQIdl,AlgEtQIdl
+{Given fractional ideals I and J, returns whether they are weakly equivalent, that is, if 1 \in (I:J)*(J:I). If I and J are weakly equivalent then also the colon ideals (I:J) and (J:I)  are returned as ideals over the multiplicator ring of I and J.  The fractional ideals are no required to be defined over the same order.}
     S := MultiplicatorRing(I);
     if MultiplicatorRing(J) ne S then
-        return false;
+        return false,_,_;
     else
         IS:=S!!I;
         JS:=S!!J;
@@ -42,6 +42,10 @@ intrinsic IsWeakEquivalent(I::AlgEtQIdl,J::AlgEtQIdl)->BoolElt
         //test := OneIdeal(S) eq (CIJ*CJI); //note that this test does not depend on the order of definition of the ideals.
         id:=(CIJ*CJI);
         test:=One(Algebra(I)) in id; //faster!
+        if not test then
+            return false,_,_;
+        else
+            return true,CIJ,CJI;
         return test;
     end if;
 end intrinsic;

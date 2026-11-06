@@ -21,10 +21,6 @@
 For example:
     magma -b input:=AlgEtQ.spec prefix:=../../../test/Ring/AlgEtQ/test generate_tests.m
 The tests can then be run in parallel. For example:
-    MAGMA_USER_SPEC="../../../package/Ring/AlgEtQ/AlgEtQ.spec"; ls test_* | parallel magma // broken ?
-                                                                                           // MAGMA_USER_SPEC is
-                                                                                           // passed correctly to 
-                                                                                           // parallel
     MAGMA_USER_SPEC="/path/to/spec" parallel --env MAGMA_USER_SPEC magma -b ::: test_*.m
 */
 

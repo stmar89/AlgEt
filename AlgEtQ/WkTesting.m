@@ -28,9 +28,9 @@ declare verbose AlgEtQIdlWkClasses,3;
 /// In the literature, the same notion sometimes goes under the name `local isomorphism`.
 /// Reference: Stefano Marseglia, "Local isomorphism classes of fractional ideals of orders in étale algebras", Journal of Algebra 673 (2025), 77-102.
 
-/// Given fractional ideals $I$ and $J$, returns whether they are weakly equivalent. If $I$ and $J$ are weakly equivalent then also the colon ideals $(I:J)$ and $(J:I)$  are returned as ideals over the multiplicator ring of $I$ and $J$. The fractional ideals are no required to be defined over the same order.}
+/// Given fractional ideals $I$ and $J$, returns whether they are weakly equivalent. If $I$ and $J$ are weakly equivalent then also the colon ideals $(I:J)$ and $(J:I)$ are returned as ideals over the multiplicator ring of $I$ and $J$. The fractional ideals are not required to be defined over the same order.
 intrinsic IsWeakEquivalent(I::AlgEtQIdl,J::AlgEtQIdl)->BoolElt,AlgEtQIdl,AlgEtQIdl
-{Given fractional ideals I and J, returns whether they are weakly equivalent, that is, if 1 \in (I:J)*(J:I). If I and J are weakly equivalent then also the colon ideals (I:J) and (J:I)  are returned as ideals over the multiplicator ring of I and J.  The fractional ideals are no required to be defined over the same order.}
+{Given fractional ideals I and J, returns whether they are weakly equivalent, that is, if 1 \in (I:J)*(J:I). If I and J are weakly equivalent then also the colon ideals (I:J) and (J:I) are returned as ideals over the multiplicator ring of I and J.  The fractional ideals are not required to be defined over the same order.}
     S := MultiplicatorRing(I);
     if MultiplicatorRing(J) ne S then
         return false,_,_;
@@ -47,50 +47,57 @@ intrinsic IsWeakEquivalent(I::AlgEtQIdl,J::AlgEtQIdl)->BoolElt,AlgEtQIdl,AlgEtQI
         else
             return true,CIJ,CJI;
         end if;
-        return test;
     end if;
 end intrinsic;
 
 ///ditto
 intrinsic IsWeakEquivalent(O1::AlgEtQOrd,O2::AlgEtQOrd)->BoolElt,AlgEtQIdl,AlgEtQIdl
 {Check if the two orders are weakly equivalent, that is equal.}
-    return O1 eq O2;
+    if O1 eq O2 then 
+        return true,OneIdeal(O1),OneIdeal(O1);
+    else
+        return false,_,_;
+    end if;
 end intrinsic;
 
 ///ditto
 intrinsic IsWeakEquivalent(O::AlgEtQOrd,J::AlgEtQIdl)->BoolElt,AlgEtQIdl,AlgEtQIdl
-{Checks if the ideal J is weakly equivalent to order O, that is, if J is invertible in O.}
+{Checks if the ideal J is weakly equivalent to order O, that is, if J is invertible in O. If so, the inverse (O:J) and J are also returned.}
     return IsWeakEquivalent(OneIdeal(O), J);
 end intrinsic;
 
 ///ditto
 intrinsic IsWeakEquivalent(J::AlgEtQIdl,O::AlgEtQOrd)->BoolElt,AlgEtQIdl,AlgEtQIdl
-{Checks if the ideal J is weakly equivalent to order O, that is, if J is invertible in O.}
-    return IsWeakEquivalent(OneIdeal(O), J);
+{Checks if the ideal J is weakly equivalent to order O, that is, if J is invertible in O. If so, J and its the inverse (O:J) are also returned.}
+    return IsWeakEquivalent(J,OneIdeal(O));
 end intrinsic;
 
 ///ditto
 intrinsic IsWeaklyEquivalent(I::AlgEtQIdl,J::AlgEtQIdl)->BoolElt,AlgEtQIdl,AlgEtQIdl
-{Checks if I and J are weakly equivalent, that is, if 1 \in (I:J)*(J:I), or equivalently, if I and J are locally equivalent at all prime of their common multiplicator ring. This function does not require that the ideals are defined over the same order.}
+{Checks if I and J are weakly equivalent, that is, if 1 \in (I:J)*(J:I), or equivalently, if I and J are locally equivalent at all prime of their common multiplicator ring. If I and J are weakly equivalent then also the colon ideals (I:J) and (J:I)  are returned as ideals over the multiplicator ring of I and J. This function does not require that the ideals are defined over the same order.}
     return IsWeakEquivalent(I,J);
 end intrinsic;
 
 ///ditto
 intrinsic IsWeaklyEquivalent(O1::AlgEtQOrd,O2::AlgEtQOrd)->BoolElt,AlgEtQIdl,AlgEtQIdl
-{Check if the two orders are weakly equivalent, that is equal.}
-    return O1 eq O2;
+{Check if the two orders are weakly equivalent, that is equal. If so, O1 and O2 are also returned.}
+    if O1 eq O2 then 
+        return true,OneIdeal(O1),OneIdeal(O1);
+    else
+        return false,_,_;
+    end if;
 end intrinsic;
 
 ///ditto
 intrinsic IsWeaklyEquivalent(O::AlgEtQOrd,J::AlgEtQIdl)->BoolElt,AlgEtQIdl,AlgEtQIdl
-{Checks if the ideal J is weakly equivalent to order O, that is, if J is invertible in O.}
+{Checks if the ideal J is weakly equivalent to order O, that is, if J is invertible in O. If so, the inverse (O:J) and J are also returned.}
     return IsWeakEquivalent(OneIdeal(O), J);
 end intrinsic;
 
 ///ditto
 intrinsic IsWeaklyEquivalent(J::AlgEtQIdl,O::AlgEtQOrd)->BoolElt,AlgEtQIdl,AlgEtQIdl
-{Checks if the ideal J is weakly equivalent to order O, that is, if J is invertible in O.}
-    return IsWeakEquivalent(OneIdeal(O), J);
+{Checks if the ideal J is weakly equivalent to order O, that is, if J is invertible in O. If so, J and its the inverse (O:J) are also returned.}
+    return IsWeakEquivalent(J,OneIdeal(O));
 end intrinsic;
 
 /* TESTS

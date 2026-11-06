@@ -1,5 +1,3 @@
-/* vim: set syntax=magma :*/
-
 /////////////////////////////////////////////////////
 // Stefano Marseglia, Utrecht University, stefano.marseglia89@gmail.com
 // https://stmar89.github.io/index.html
@@ -61,7 +59,7 @@
     end for;
     printf "\n";
     printf "Current running time = %o \n",t_tot;
-    tprevbest:=15.440; //on laptop
+    tprevbest:=7.530; //on laptop aerox
     if Abs(t_tot - tprevbest) gt 0.1*tprevbest then
         if t_tot lt tprevbest then
             printf "PicardGroup for %o got faster. Update the previous best known time\n",f;
@@ -99,7 +97,7 @@
         _:=#PicardGroup(T);
     t1:=Cputime(t0);
     printf "Current running time = %o \n",t1;
-    tprevbest:=0.3; //on laptop
+    tprevbest:=0.260; //on laptop aerox
     if Abs(t1 - tprevbest) gt tprevbest then //so fast than the small random component in SmallRepresentative triggers the warning
         if t1 lt tprevbest then
             printf "PicardGroup for %o got faster. Update the previous best known time\n",f;
@@ -125,7 +123,7 @@
         ooet:=FindOverOrders(Eet);
     t1:=Cputime(t0);
     printf "Current running time = %o \n",t1;
-    tprevbest:=0.630; //on laptop
+    tprevbest:=0.580; //on laptop aerox
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "FindOverOrders for %o got faster. Update the previous best known time\n",f;
@@ -139,7 +137,7 @@
         ooet:=GraphOverOrders(Eet);
     t1:=Cputime(t0);
     printf "Current running time = %o \n",t1;
-    tprevbest:=0.160; //on laptop
+    tprevbest:=0.390; //on laptop aerox
     if Abs(t1 - tprevbest) gt 1*tprevbest then
         if t1 lt tprevbest then
             printf "GraphOverOrders for %o got faster. Update the previous best known time\n",f;
@@ -169,7 +167,7 @@
         ooet:=FindOverOrders(Eet);
     t1:=Cputime(t0);
     printf "Current running time = %o \n",t1;
-    tprevbest:=8.060; // on laptop
+    tprevbest:=8.000; // on laptop aerox
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "FindOverOrders for %o got faster. Update the previous best known time\n",f;
@@ -183,7 +181,7 @@
         ooet:=GraphOverOrders(Eet);
     t1:=Cputime(t0);
     printf "Current running time = %o \n",t1;
-    tprevbest:=15.470; //on laptop
+    tprevbest:=21.290; //on laptop aerox
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "GraphOverOrders for %o got faster. Update the previous best known time\n",f;
@@ -216,7 +214,7 @@
     t1:=Cputime(t0);
     assert #ooet eq 3200;
     printf "Current running time = %o \n",t1;
-    tprevbest:=12.200; // on laptop
+    tprevbest:=8.490; // on laptop aerox
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "FindOverOrders for %o got faster. Update the previous best known time\n",f;
@@ -228,7 +226,7 @@
         ooet:=GraphOverOrders(Eet);
     t1:=Cputime(t0);
     printf "Current running time = %o \n",t1;
-    tprevbest:=20.350; //on laptop
+    tprevbest:=26.270; //on laptop aerox
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "GraphOverOrders for %o got faster. Update the previous best known time\n",f;
@@ -258,7 +256,7 @@
         _:=#WKICM(R);
     t1:=Cputime(t0);
     printf "Current running time = %o \n",t1;
-    tprevbest:=1.220; // on laptop
+    tprevbest:=0.160; // on laptop aerox
     if Abs(t1 - tprevbest) gt 0.1*tprevbest then
         if t1 lt tprevbest then
             printf "WKICM for %o got faster. Update the previous best known time\n",f;
@@ -299,7 +297,7 @@
     t0:=Cputime();
         assert #WKICM_bar(S) eq 7;   
     t_curr:=Cputime(t0);
-    t_prev_best:=7.270; // on laptop
+    t_prev_best:=0.740; // on laptop aerox
     "Current running time: ",t_curr;
     if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
         print "The current timing is different from the previous best known one. UPDATE!"; 
@@ -317,7 +315,7 @@
     t0:=Cputime();
         assert #WKICM(R) eq 173;
     t_curr:=Cputime(t0);
-    t_prev_best:=15.030; // on laptop
+    t_prev_best:=5.750; // on laptop aerox
     "Current running time: ",t_curr;
     if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
         print "The current timing is different from the previous best known one. UPDATE!"; 
@@ -339,7 +337,7 @@
         assert #WKICM(R) eq 238;
     t_curr:=Cputime(t0);
     "Current running time: ",t_curr;
-    t_prev_best:=6.100; // on laptop
+    t_prev_best:=4.570; // on laptop aerox
     if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
         print "The current timing is different from the previous best known one. UPDATE!"; 
     end if;
@@ -359,7 +357,7 @@
         assert #WKICM(R) eq 315;
     t_curr:=Cputime(t0);
     "Current running time: ",t_curr;
-    t_prev_best:=8.870; // on laptop
+    t_prev_best:=2.430; // on laptop aerox
     if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
         print "The current timing is different from the previous best known one. UPDATE!"; 
     end if;
@@ -378,13 +376,13 @@
         assert #WKICM(R) eq 560;
     t_curr:=Cputime(t0);
     "Current running time: ",t_curr;
-    t_prev_best:=10.310; // on laptop
+    t_prev_best:=3.380; // on laptop aerox
     if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
         print "The current timing is different from the previous best known one. UPDATE!"; 
     end if;
 
     "-------------------------------------------------------------";
-    "A very big example. It should take approx 1.5h";
+    "A very big example. It should take approx 15min";
     P<x>:=PolynomialRing(Integers());
     f:=x^8 - 2*x^7 + 7*x^6 - 14*x^5 + 40*x^4 - 56*x^3 + 112*x^2 - 128*x + 256;
     A:=EtaleAlgebra(f);
@@ -393,7 +391,7 @@
         assert #WKICM(R) eq 114492 ;
     t_curr:=Cputime(t0);
     "Current running time: ",t_curr;
-    t_prev_best:=4462; // old timings, on diophantus
+    t_prev_best:=1330; // on laptop aerox
     if Abs((t_curr - t_prev_best)/t_prev_best) gt 0.1 then 
         print "The current timing is different from the previous best known one. UPDATE!"; 
     end if;

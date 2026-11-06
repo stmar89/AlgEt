@@ -36,7 +36,7 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing IsNumberField:";
-    //AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("../spec");
     SetAssertions(2);
     _<x>:=PolynomialRing(Integers());
     printf ".";

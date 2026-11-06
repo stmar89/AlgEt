@@ -102,7 +102,8 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing Trace and Norm:";
-    //AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("../spec");
+    SetAssertions(2);
     SetVerbose("AlgEtQTraceNorm",1);
 
     _<x>:=PolynomialRing(Integers());
@@ -114,5 +115,6 @@ end intrinsic;
         assert Trace(a)+Trace(b) eq Trace(a+b);
         assert Norm(a)*Norm(b) eq Norm(a*b);
     end for;
+    SetAssertions(1);
     printf " all good!";
 */

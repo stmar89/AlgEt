@@ -290,7 +290,8 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing ICMAbstract:";
-    //AttachSpec("~/AlgEt/spec");
+    //AttachSpec("../spec");
+    SetAssertions(2);
     SetClassGroupBounds("GRH");
 
     _<x>:=PolynomialRing(Integers());

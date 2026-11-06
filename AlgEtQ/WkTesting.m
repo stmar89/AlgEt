@@ -46,48 +46,49 @@ intrinsic IsWeakEquivalent(I::AlgEtQIdl,J::AlgEtQIdl)->BoolElt,AlgEtQIdl,AlgEtQI
             return false,_,_;
         else
             return true,CIJ,CJI;
+        end if;
         return test;
     end if;
 end intrinsic;
 
 ///ditto
-intrinsic IsWeakEquivalent(O1::AlgEtQOrd,O2::AlgEtQOrd)->BoolElt
+intrinsic IsWeakEquivalent(O1::AlgEtQOrd,O2::AlgEtQOrd)->BoolElt,AlgEtQIdl,AlgEtQIdl
 {Check if the two orders are weakly equivalent, that is equal.}
     return O1 eq O2;
 end intrinsic;
 
 ///ditto
-intrinsic IsWeakEquivalent(O::AlgEtQOrd,J::AlgEtQIdl)->BoolElt
+intrinsic IsWeakEquivalent(O::AlgEtQOrd,J::AlgEtQIdl)->BoolElt,AlgEtQIdl,AlgEtQIdl
 {Checks if the ideal J is weakly equivalent to order O, that is, if J is invertible in O.}
     return IsWeakEquivalent(OneIdeal(O), J);
 end intrinsic;
 
 ///ditto
-intrinsic IsWeakEquivalent(J::AlgEtQIdl,O::AlgEtQOrd)->BoolElt
+intrinsic IsWeakEquivalent(J::AlgEtQIdl,O::AlgEtQOrd)->BoolElt,AlgEtQIdl,AlgEtQIdl
 {Checks if the ideal J is weakly equivalent to order O, that is, if J is invertible in O.}
     return IsWeakEquivalent(OneIdeal(O), J);
 end intrinsic;
 
 ///ditto
-intrinsic IsWeaklyEquivalent(I::AlgEtQIdl,J::AlgEtQIdl)->BoolElt
+intrinsic IsWeaklyEquivalent(I::AlgEtQIdl,J::AlgEtQIdl)->BoolElt,AlgEtQIdl,AlgEtQIdl
 {Checks if I and J are weakly equivalent, that is, if 1 \in (I:J)*(J:I), or equivalently, if I and J are locally equivalent at all prime of their common multiplicator ring. This function does not require that the ideals are defined over the same order.}
     return IsWeakEquivalent(I,J);
 end intrinsic;
 
 ///ditto
-intrinsic IsWeaklyEquivalent(O1::AlgEtQOrd,O2::AlgEtQOrd)->BoolElt
+intrinsic IsWeaklyEquivalent(O1::AlgEtQOrd,O2::AlgEtQOrd)->BoolElt,AlgEtQIdl,AlgEtQIdl
 {Check if the two orders are weakly equivalent, that is equal.}
     return O1 eq O2;
 end intrinsic;
 
 ///ditto
-intrinsic IsWeaklyEquivalent(O::AlgEtQOrd,J::AlgEtQIdl)->BoolElt
+intrinsic IsWeaklyEquivalent(O::AlgEtQOrd,J::AlgEtQIdl)->BoolElt,AlgEtQIdl,AlgEtQIdl
 {Checks if the ideal J is weakly equivalent to order O, that is, if J is invertible in O.}
     return IsWeakEquivalent(OneIdeal(O), J);
 end intrinsic;
 
 ///ditto
-intrinsic IsWeaklyEquivalent(J::AlgEtQIdl,O::AlgEtQOrd)->BoolElt
+intrinsic IsWeaklyEquivalent(J::AlgEtQIdl,O::AlgEtQOrd)->BoolElt,AlgEtQIdl,AlgEtQIdl
 {Checks if the ideal J is weakly equivalent to order O, that is, if J is invertible in O.}
     return IsWeakEquivalent(OneIdeal(O), J);
 end intrinsic;
@@ -95,16 +96,19 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing WKEq:";
-    //AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("../spec");
     SetAssertions(2);
     _<x>:=PolynomialRing(Integers());
     f:=x^4-100*x^3-100*x^2-100*x-100;
     K:=EtaleAlgebra(f);
     E:=EquationOrder(K);
-    assert not IsWeakEquivalent(E,Conductor(E));
-    assert not IsWeakEquivalent(OneIdeal(E),Conductor(E));
-    assert not IsWeakEquivalent(E,MaximalOrder(K));
-    assert IsWeakEquivalent(OneIdeal(MaximalOrder(K)),Conductor(E));
+    O:=MaximalOrder(K);
+    ff:=Conductor(E);
+    t,C1,C2:=IsWeakEquivalent(E,ff);
+    assert not t;
+    assert not IsWeakEquivalent(OneIdeal(E),ff);
+    assert not IsWeakEquivalent(E,O);
+    assert t and C1*O!!ff eq OneIdeal(O) and C2 eq O!!ff where t,C1,C2:=IsWeakEquivalent(O,ff);
     SetAssertions(1);
     printf " all good!";
 */

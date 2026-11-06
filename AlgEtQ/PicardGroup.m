@@ -747,7 +747,7 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing PicardGroup and UnitGroup:";
-    //AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("../spec");
     SetAssertions(2);
     _<x>:=PolynomialRing(Integers());
 
@@ -762,7 +762,7 @@ end intrinsic;
         printf ".";
     end for;
 
-    //AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("../spec");
     _<x>:=PolynomialRing(Integers());
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
     SetAssertions(1);
@@ -777,7 +777,7 @@ end intrinsic;
     printf ".";
     SetAssertions(1);
 
-    //AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("../spec");
     _<x>:=PolynomialRing(Integers());
     f:=x^8+16;
     A:=EtaleAlgebra(f);
@@ -790,7 +790,7 @@ end intrinsic;
     assert #ResidueRingUnits(P) eq Index(E,P)-1;
     assert forall{ i : i in [1..20] | #ResidueRingUnits(Pi) eq Index(E,Pi) - Index(P,Pi) where Pi:=P^i};
 
-    //AttachSpec("~/AlgEt/spec");
+    //AttachSpec("../spec");
     _<x>:=PolynomialRing(Integers());
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
     SetAssertions(1);

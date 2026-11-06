@@ -345,10 +345,10 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing OverOrders:";
-    //AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("../spec");
 
     SetVerbose("OverOrders",1);
-    SetAssertions(1);
+    SetAssertions(2);
 
     _<x>:=PolynomialRing(Integers());
     f:=(x^4+16);
@@ -360,6 +360,8 @@ end intrinsic;
     E:=EquationOrder(A);
     oo:=FindOverOrders(E);
     assert #oo eq 11;
+
+    SetAssertions(1);
 
     printf " all good!";
 */

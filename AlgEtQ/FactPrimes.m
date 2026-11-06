@@ -193,7 +193,7 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing Primes and Factorizaton:";
-    //AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("../spec");
     SetAssertions(2);
 
     _<x>:=PolynomialRing(Integers());

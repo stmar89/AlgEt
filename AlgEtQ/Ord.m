@@ -648,7 +648,7 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing Orders:";
-    //AttachSpec("~/AlgEt/spec");
+    //AttachSpec("../spec");
     SetVerbose("AlgEtQOrd",1);
     SetAssertions(2);
 

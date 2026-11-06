@@ -731,7 +731,8 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing Elements:";
-    //AttachSpec("~/AlgEt/spec");
+    //AttachSpec("../spec");
+    SetAssertions(2);
     SetVerbose("AlgEtQElt",2);
 
     _<x>:=PolynomialRing(Integers());
@@ -786,7 +787,7 @@ end intrinsic;
     end for;
 
     // testing sequences
-    //AttachSpec("~/AlgEt/spec");
+    //AttachSpec("../spec");
     _<x>:=PolynomialRing(Integers());
     f:=(x^8+16)*(x^8+81);
     A:=EtaleAlgebra(f);
@@ -827,7 +828,7 @@ end intrinsic;
     assert s1 eq s2 and s1 eq s3 and s1 eq s4;
 
     //testing PrimitiveElement and PowerBasis
-    //AttachSpec("~/AlgEt/spec");
+    //AttachSpec("../spec");
     _<x>:=PolynomialRing(Integers());
     K:=NumberField(x^8+16);
     A:=EtaleAlgebra([K,K]);
@@ -841,6 +842,7 @@ end intrinsic;
     assert Degree(MinimalPolynomial(a)) eq AbsoluteDimension(A);
     _:=PowerBasis(A);
 
+    SetAssertions(1);
     printf " all good!";
 
 */

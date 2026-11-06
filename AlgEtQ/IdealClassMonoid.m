@@ -81,6 +81,7 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing ICM:";
+    //AttachSpec("../spec");
     SetAssertions(2);
     SetClassGroupBounds("GRH");
     _<x>:=PolynomialRing(Integers());

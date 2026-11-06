@@ -98,7 +98,8 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing Complex Conjugation:";
-    //AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("../spec");
+    SetAssertions(2);
     _<x>:=PolynomialRing(Integers());
     f:=x^4 + 6*x^2 + 25;
     K:=EtaleAlgebra(f);
@@ -117,6 +118,7 @@ end intrinsic;
     assert IsConjugateStable(TraceDualIdeal(S));
     assert not IsConjugateStable(EquationOrder(K));
     printf ".";
+    SetAssertions(1);
     printf " all good!";
 
 */

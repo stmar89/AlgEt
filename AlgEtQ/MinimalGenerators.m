@@ -49,7 +49,8 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing MinimalGenerators:";
-    //AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("../spec");
+    SetAssertions(2);
     SetClassGroupBounds("GRH");
     _<x>:=PolynomialRing(Integers());
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
@@ -96,5 +97,6 @@ end intrinsic;
     TwoGeneratingSet(I);
     l2:=[ I^i : i in exp ];
     assert l1 eq l2;
+    SetAssertions(1);
     printf " all good!";
 */

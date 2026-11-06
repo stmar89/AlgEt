@@ -169,7 +169,7 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing CRT:";
-    //AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("../spec");
     SetVerbose("CRT",1);
     SetAssertions(2);
 

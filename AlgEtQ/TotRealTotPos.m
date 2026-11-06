@@ -142,7 +142,7 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing TotRealPos:";
-    //AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("../spec");
     PP<x>:=PolynomialRing(Integers());
     SetAssertions(2);
 

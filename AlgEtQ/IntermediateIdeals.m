@@ -312,6 +312,7 @@ intrinsic IntermediateIdeals(I::AlgEtQIdl, J::AlgEtQIdl, N::RngIntElt) -> SetInd
 end intrinsic;
 /* TESTS
     printf "### Testing IntermediateIdeals:";
+    //AttachSpec("../spec");
     SetAssertions(2);
     _<x>:=PolynomialRing(Integers());
     f:=x^3-100*x^2-100*x-100;

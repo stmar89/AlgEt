@@ -366,8 +366,8 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing WkAbstract:";
-    //AttachSpec("~/AlgEt/spec");
-    //SetAssertions(2);
+    //AttachSpec("../spec");
+    SetAssertions(1); //no assert2 in this package
     SetClassGroupBounds("GRH");
     _<x>:=PolynomialRing(Integers());
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;

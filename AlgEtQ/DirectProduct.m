@@ -45,7 +45,7 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing DirectProduct:";
-    //AttachSpec("~/AlgEt/spec");
+    //AttachSpec("../spec");
     SetAssertions(2);
     _<x>:=PolynomialRing(Integers());
     seq:=[x^2-5,x^2-7,x^2-5,x^2-11,x^3+x+1];

@@ -243,10 +243,10 @@ end function;
 /* TESTS
 
     printf "### Testing LowCohenMacaulayType:";
+    //AttachSpec("../spec");
     SetAssertions(2);
     _<x>:=PolynomialRing(Integers());
     f:=x^4-10000*x^3-10000*x^2-10000*x-10000;
-    //AttachSpec("~/packages_github/AlgEt/spec");
     A:=EtaleAlgebra(f);
     E:=EquationOrder(A);
     oo:=FindOverOrders(E); // ~13 secs

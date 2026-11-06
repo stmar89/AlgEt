@@ -240,7 +240,8 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing CM-types:";
-    //AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("../spec");
+    SetAssertions(2);
     _<x>:=PolynomialRing(Integers());
     polys:=[
     x^4+x^2+529,
@@ -269,6 +270,7 @@ end intrinsic;
         assert Precision(all[1]) eq 60;
         printf ".";
     end for;
+    SetAssertions(1);
     printf " all good!";
 
 */

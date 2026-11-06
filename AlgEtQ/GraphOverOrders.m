@@ -121,7 +121,7 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing GraphOverOrders:";
-    //AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("../spec");
     SetAssertions(2);
     _<x>:=PolynomialRing(Integers());
     fs:=[
@@ -139,8 +139,8 @@ end intrinsic;
         tG := GraphOverOrders(R);
         assert #tO eq #Vertices(tG);
         assert <#Edges(tM), #Vertices(tM), #Vertices(tG), #Edges(tG)> eq data[i];
-        SetAssertions(1);
     end for;
+    SetAssertions(1);
     printf " all good!";
 
 */

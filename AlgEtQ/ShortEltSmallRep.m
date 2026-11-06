@@ -91,7 +91,8 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing ShortEltSmallRep:";
-    //AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("../spec");
+    SetAssertions(2);
     _<x>:=PolynomialRing(Integers());
     f:=(x^2+5)*(x^2+7)*(x^2+11);
     assert IsSquarefree(f);
@@ -105,5 +106,6 @@ end intrinsic;
         ff:=Conductor(S);
         _:=ShortElement(ff);
     end for;
+    SetAssertions(1);
     printf " all good!";
 */

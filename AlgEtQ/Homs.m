@@ -101,7 +101,8 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing Homs:";
-    //AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("../spec");
+    SetAssertions(2);
     _<x>:=PolynomialRing(Integers());
     f:=(x^8+16)*(x^8+81);
     A:=EtaleAlgebra(f);
@@ -135,6 +136,7 @@ end intrinsic;
     assert Inverse(m)(pi) eq -PrimitiveElement(A);
     assert m(One(A)) eq One(B) and Inverse(m)(One(B)) eq One(A);
     printf ".";
+    SetAssertions(1);
     printf " all good!";
 
 */

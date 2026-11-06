@@ -123,7 +123,7 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing Attributes and Equality:";
-    //AttachSpec("~/packages_github/AlgEt/spec");
+    //AttachSpec("../spec");
     SetAssertions(2);
     _<x>:=PolynomialRing(Integers());
     f:=(x^8+16)*(x^8+81);

@@ -200,6 +200,64 @@ A:=EtaleAlgebra([K,K,K,K]);
 a:=PrimitiveElement(A);
 assert Degree(MinimalPolynomial(a)) eq AbsoluteDimension(A);
 _:=PowerBasis(A);
+//testing Hash: sets and associative arrays of elements, also when hash values collide
+//AttachSpec("../spec");
+_<x>:=PolynomialRing(Integers());
+A:=EtaleAlgebra((x^4+16)*(x^4-x^2+4));
+nf:=Components(A);
+assert [ Degree(L) : L in nf ] eq [4,4];
+elt_from_coords:=func< s | A!< nf[1]!s[1..4], nf[2]!s[5..8] > >;
+Q:=Rationals();
+// 1. Natural collisions. We look for distinct coordinate sequences with the same hash value.
+// With the current Magma, 20000 random sequences contain around 20 of them.
+SetSeed(1);
+seqs:=Setseq({ [Q| Random(-5,5) : i in [1..8]] : j in [1..20000] });
+buckets:=AssociativeArray();
+for s in seqs do
+    h:=Hash(s);
+    if IsDefined(buckets,h) then Append(~buckets[h],s); else buckets[h]:=[s]; end if;
+end for;
+coll:=[ s : s in buckets[h], h in Keys(buckets) | #buckets[h] gt 1 ];
+assert #coll gt 0;
+others:=[ s : s in seqs[1..50] | not s in coll ];
+elts:=[ elt_from_coords(s) : s in coll cat others ]; // distinct elements
+assert #{ Hash(e) : e in elts } lt #elts; // some hash values collide
+assert #Setseq(Seqset(elts)) eq #elts;
+// equal elements created separately are identified
+copies:=[ A!Components(e) : e in elts ];
+assert #Seqset(elts cat copies) eq #elts;
+S:=Seqset(elts);
+assert forall{ e : e in copies | e in S };
+assert not elt_from_coords([Q| 6 : i in [1..8]]) in S;
+AA:=AssociativeArray();
+for i in [1..#elts] do AA[elts[i]]:=i; end for;
+assert #Keys(AA) eq #elts;
+assert forall{ i : i in [1..#elts] | AA[copies[i]] eq i };
+printf ".";
+// 2. Forced collisions: all the elements get the same hash value, stored in the attribute Hash.
+elts:=[ elt_from_coords(s) : s in seqs[1..60] ]; // distinct elements
+copies:=[ A!Components(e) : e in elts ];
+for e in elts cat copies do y:=e; y`Hash:=0; end for; // y and e are the same object
+assert #{ Hash(e) : e in elts } eq 1;
+assert #Setseq(Seqset(elts)) eq #elts;
+assert #Seqset(elts cat copies) eq #elts;
+S:=Seqset(elts);
+assert forall{ e : e in copies | e in S };
+AA:=AssociativeArray();
+for i in [1..#elts] do AA[elts[i]]:=i; end for;
+assert #Keys(AA) eq #elts;
+assert forall{ i : i in [1..#elts] | AA[copies[i]] eq i };
+printf ".";
+// 3. The hash value does not depend on how the element was created
+e:=elt_from_coords([Q| 1,2,3,4,5,6,7,8 ]);
+f:=&+[ i*AbsoluteBasis(A)[i] : i in [1..8] ];
+g:=A!<nf[1]![1,2,3,4], nf[2]![5,6,7,8]>;
+assert Hash(e) eq Hash(f) and Hash(e) eq Hash(g);
+E:=EquationOrder(A);
+I:=Ideal(E,[ A!Random(E,3) : i in [1..3] ]);
+ZBasisLLL(I); // the elements of the new ZBasis are created from their coordinates
+assert forall{ z : z in ZBasis(I) | Hash(z) eq Hash(A!Components(z)) };
+printf ".";
 SetAssertions(1);
 printf " all good!";
 Sprintf(" time %o", Cputime(time_start_local));

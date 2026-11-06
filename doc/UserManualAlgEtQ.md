@@ -102,6 +102,8 @@ Returns a random unit of the étale algebra with coefficients are bounded by the
  Equality testing and operations are performed component-wise, that is, at the level of the components.
 <pre><b> 'eq'</b>(x1::AlgEtQElt,x2::AlgEtQElt) -> BoolElt</pre><pre><b> 'eq'</b>(x1::RngIntElt,x2::AlgEtQElt) -> BoolElt</pre><pre><b> 'eq'</b>(x1::FldRatElt,x2::AlgEtQElt) -> BoolElt</pre><pre><b> 'eq'</b>(x1::AlgEtQElt,x2::RngIntElt) -> BoolElt</pre><pre><b> 'eq'</b>(x1::AlgEtQElt,x2::FldRatElt) -> BoolElt</pre>
  Returns whether the two elements are equal.
+<pre><b> Hash</b>(x::AlgEtQElt) -> RngIntElt</pre>
+ Returns a hash value of the element, computed from its absolute coordinates, so that equal elements have the same hash value. The value is stored in the attribute `Hash`. Magma uses it to build sets, indexed sets and associative arrays of elements: only elements with the same hash value are compared with `eq`. Different elements might have the same hash value: this only costs an extra comparison.
 <pre><b> '+'</b>(x1::AlgEtQElt,x2::AlgEtQElt) -> AlgEtQElt</pre><pre><b> '+'</b>(x1::.,x2::AlgEtQElt) -> AlgEtQElt</pre><pre><b> '+'</b>(x1::AlgEtQElt,x2::.) -> AlgEtQElt</pre><pre><b> '+'</b>(x1::RngIntElt,x2::AlgEtQElt) -> AlgEtQElt</pre><pre><b> '+'</b>(x1::FldRatElt,x2::AlgEtQElt) -> AlgEtQElt</pre><pre><b> '+'</b>(x1::AlgEtQElt,x2::RngIntElt) -> AlgEtQElt</pre><pre><b> '+'</b>(x1::AlgEtQElt,x2::FldRatElt) -> AlgEtQElt</pre>
  Returns the sum of the two elements.
 <pre><b> '-'</b>(x::AlgEtQElt) -> AlgEtQElt</pre>

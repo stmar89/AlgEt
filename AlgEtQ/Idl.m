@@ -64,22 +64,6 @@ mult_matrix:=function(x)
     return M;
 end function;
 
-remove_duplicates:=function(gens)
-// Removes repeated elements from gens, keeping the order.
-// Comparing the AbsoluteCoordinates, which are hashable, is much faster than Seqset(gens),
-// which compares the elements pairwise with 'eq'.
-    seen:={ PowerSequence(Rationals()) | };
-    out:=[];
-    for g in gens do
-        c:=AbsoluteCoordinates(g);
-        if not c in seen then
-            Include(~seen,c);
-            Append(~out,g);
-        end if;
-    end for;
-    return out;
-end function;
-
 CreateAlgEtQIdl:=function(S,gens)
 // Given S::AlgEtQOrd and some generators creates the new object
 // The ZBasis is computed only if there are more generators than the dimension of the algebra.
@@ -87,7 +71,9 @@ CreateAlgEtQIdl:=function(S,gens)
     I:=New(AlgEtQIdl);
     I`Algebra:=A;
     I`Order:=S;
-    gens:=remove_duplicates(gens);
+    // We remove the repeated generators. This is fast since AlgEtQElt has a Hash intrinsic.
+    // An indexed set keeps the order of the generators: changing it can make the HNFs computed later slower.
+    gens:=IndexedSetToSequence({@ g : g in gens @});
     if #gens gt AbsoluteDimension(A) then
         ZZ:=Integers();
         vprint AlgEtQIdl,3: "CreateAlgEtQIdl: too many gens";

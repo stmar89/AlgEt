@@ -730,12 +730,8 @@ end intrinsic;
 /// Given two fractional ideals $I$ and $J$ over the same order, checks whether $I=x\cdot J$, for some unit $x$. If so, $x$ is also returned. The parameter `GRH` (default false) can be set to true determines if the test is done under GRH.
 intrinsic IsIsomorphic(I::AlgEtQIdl, J::AlgEtQIdl : GRH:=false ) -> BoolElt, AlgEtQElt
 {Given two fractional ideals I and J over the same order, checks whether I=x*J, for some unit x. If so, x is also returned. The parameter GRH (default false) can be set to true determines if the test is done under GRH.}
-    test:=IsWeakEquivalent(I,J); //if so I=(I:J)*J and (I:J) is invertible in its MultiplicatorRing
+    test,CIJ:=IsWeakEquivalent(I,J); //if so I=(I:J)*J and (I:J) is invertible in its MultiplicatorRing
     if test then
-        S:=MultiplicatorRing(I);
-        IS:=S!!I;
-        JS:=S!!J;
-        CIJ:=ColonIdeal(IS,JS);
         test2,x:= IsPrincipal(CIJ : GRH:=GRH );
         if test2 then
             return test2,x;

@@ -18,15 +18,15 @@ declare attributes AlgEtQIdl : ShortElement, SmallRepresentative;
 
 ///# Short Elements
 /// Let $I$ be a fractional ideal in an étale algebra $A$ over $\mathbb{Q}$.
-/// By LLL-reducing with respect to the T2-norm a $\mathbb{Z}$-basis of $I$ and then picking an element with small coefficients with respect to that basis allows producing elements with small coefficients with respect to the absolute basis of $A$.
+/// By LLL-reducing a $\mathbb{Z}$-basis of $I$, written in the coordinates of the absolute basis of $A$, and then picking an element with small coefficients with respect to that basis allows producing elements with small coefficients with respect to the absolute basis of $A$.
 
 //------------
 // ShortElement
 //------------
 
-/// Given a fractional ideal $I$, returns a non-zerodivisor in $I$ with small coefficients (in the LLL sense). This is achieved by randomly picking an element with small coefficients in a LLL-reduced $\mathbb{Z}$-basis (wrt the T2 norm). If the stored ZBasis is not LLL-reduced, it will be changed to an LLL-reduced one.
+/// Given a fractional ideal $I$, returns a non-zerodivisor in $I$ with small coefficients (in the LLL sense). This is achieved by picking, among the non-zerodivisors in an LLL-reduced $\mathbb{Z}$-basis of $I$ (in the absolute coordinates), one whose norm has the smallest absolute value. If all the elements of this basis are zerodivisors, then random combinations with small coefficients are used instead. If the stored ZBasis is not LLL-reduced, it will be changed to an LLL-reduced one.
 intrinsic ShortElement(I::AlgEtQIdl) ->AlgEtQElt
-{Given a fractional ideal I, returns a non-zerodivisor in I with small coefficients (in the LLL sense). This is achieved by randomly picking an element with small coefficients in a LLL-reduced Z-basis (wrt the T2 norm). If the stored ZBasis is not LLL-reduced, it will be changed to an LLL-reduced one.}
+{Given a fractional ideal I, returns a non-zerodivisor in I with small coefficients (in the LLL sense). This is achieved by picking, among the non-zerodivisors in an LLL-reduced Z-basis of I (in the absolute coordinates), one whose norm has the smallest absolute value. If all the elements of this basis are zerodivisors, then random combinations with small coefficients are used instead. If the stored ZBasis is not LLL-reduced, it will be changed to an LLL-reduced one.}
     if not assigned I`ShortElement then
         ZBasisLLL(I);
         B := ZBasis(I);
@@ -38,7 +38,7 @@ intrinsic ShortElement(I::AlgEtQIdl) ->AlgEtQElt
             elts:=[ x : x in elts | not IsZeroDivisor(x) ];
             bd +:=1;
         end while;
-        _,i:=Min([Norm(x) : x in elts]);
+        _,i:=Min([Abs(Norm(x)) : x in elts]);
         elt:=elts[i];
 
         // // The following is deterministic, but does not always work. Also, enumerating all short vectors is too much, and too memory extensive.
@@ -75,10 +75,13 @@ intrinsic SmallRepresentative(I::AlgEtQIdl) ->AlgEtQIdl,AlgEtQElt
 {Given a fractional R-ideal I, returns the fractional R-ideal a*I, and the element a, where a is chose so that  a*I is a subset of R, and the cardinality of R/aI is small. More precisely, a is the output of ShortElement when applied to (R:I). Note that if I is invertible R/aI is isomorphic to (R:I)/aR.}
     if not assigned I`SmallRepresentative then
         R:=Order(I);
-        cRI:=ColonIdeal(R,I);
+        // if I is invertible and its inverse is known, then the inverse is (R:I)
+        cRI:=assigned I`Inverse select I`Inverse else ColonIdeal(R,I);
         a:=ShortElement(cRI);
         aI:=a*I;
-        // the ZBasis of aI might be very big. We make it smaller.
+        // The ZBasis of aI might be very big. We make it smaller.
+        // Since aI is contained in R with small index, its HNF has small entries even if ZBasis(I) is huge,
+        // and ZBasisLLL will use it: this is much faster than the LLL of a*ZBasis(I).
         ZBasisLLL(aI);
         vprintf ShortEltSmallRep,2: "SmallRepresentative:\n
                                 I = %o\n,aI = %o\n",PrintSeqAlgEtQElt(ZBasis(I)),PrintSeqAlgEtQElt(ZBasis(aI));

@@ -52,6 +52,34 @@ intrinsic Print(I::AlgEtQIdl)
   printf"Ideal of %o", Order(I);
 end intrinsic;
 
+mult_matrix:=function(x)
+// Given an element x of A, returns the matrix of the multiplication by x with respect to AbsoluteBasis(A):
+// the i-th row contains the AbsoluteCoordinates of x*AbsoluteBasis(A)[i].
+// The matrix is block diagonal, with blocks the representation matrices of the components of x.
+    comps:=Components(x);
+    M:=RepresentationMatrix(comps[1]);
+    for i in [2..#comps] do
+        M:=DiagonalJoin(M,RepresentationMatrix(comps[i]));
+    end for;
+    return M;
+end function;
+
+remove_duplicates:=function(gens)
+// Removes repeated elements from gens, keeping the order.
+// Comparing the AbsoluteCoordinates, which are hashable, is much faster than Seqset(gens),
+// which compares the elements pairwise with 'eq'.
+    seen:={ PowerSequence(Rationals()) | };
+    out:=[];
+    for g in gens do
+        c:=AbsoluteCoordinates(g);
+        if not c in seen then
+            Include(~seen,c);
+            Append(~out,g);
+        end if;
+    end for;
+    return out;
+end function;
+
 CreateAlgEtQIdl:=function(S,gens)
 // Given S::AlgEtQOrd and some generators creates the new object
 // The ZBasis is computed only if there are more generators than the dimension of the algebra.
@@ -59,7 +87,7 @@ CreateAlgEtQIdl:=function(S,gens)
     I:=New(AlgEtQIdl);
     I`Algebra:=A;
     I`Order:=S;
-    gens:=Setseq(Seqset(gens));
+    gens:=remove_duplicates(gens);
     if #gens gt AbsoluteDimension(A) then
         ZZ:=Integers();
         vprint AlgEtQIdl,3: "CreateAlgEtQIdl: too many gens";
@@ -666,13 +694,11 @@ intrinsic ColonIdeal(I::AlgEtQIdl,J::AlgEtQIdl)->AlgEtQIdl
         return out;
     end if;
     // based on jv code
+    // Since I is an O-module, x*J c I if and only if x*g in I for every generator g of J over O.
+    // So we only need the multiplication matrices of the generators of J: at most N of them, often only 2.
     N:=AbsoluteDimension(A);
-    zbI:=ZBasis(I);
-    //mIinv:=MatrixAtoQ(zbI)^-1;
     mIinv:=inclusion_matrix(I);
-    zbJ:=ZBasis(J);
-    bas:=AbsoluteBasis(A);
-    M:=VerticalJoin([ Transpose( MatrixAtoQ([zj*bas[i] : i in [1..N]])*mIinv) : zj in zbJ] );
+    M:=VerticalJoin([ Transpose( mult_matrix(g)*mIinv ) : g in Generators(J)] );
     d:=Denominator(M);
     P:=(1/d)*crZQ(hnf(crQZ(d*M)));
     P:=Transpose(P)^-1;

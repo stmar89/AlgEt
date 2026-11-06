@@ -15,6 +15,8 @@ declare verbose AlgEtQOrd, 3;
 
 declare type AlgEtQOrd;
 
+import "Elt.m" : CreateAlgEtQElt;
+
 declare attributes AlgEtQ : MaximalOrder,
                            ProductOfEquationOrders,
                            EquationOrder,
@@ -96,19 +98,21 @@ end function;
 
 MatrixQtoA:=function(A,P)
 //given a matrix with Integer or Rational entries, returns a sequence of elements of A, corresponding to the rows.
-    abs:=AbsoluteBasis(A);
-    abs_dim:=AbsoluteDimension(A);
-    N:=#Components(A);
-    rows:=[ Eltseq(r) : r in Rows(P)];
-    Nrow:=#rows;
-    assert #Columns(P) eq abs_dim;
-    // we first do the operations component-wise, and then create the element of A
-    // in this way we save many calls of IsCoercible
-    out_new:=<>;
-    for j in [1..N] do
-        Append(~out_new,[ &+[r[i]*Components(abs[i])[j] : i in [1..abs_dim]] : r in rows]);
+// The absolute basis of A is the concatenation of the bases of the components of A (see AbsoluteBasis).
+// So the j-th component of the element with absolute coordinates s is the element of the j-th number field
+// whose coordinates are the j-th block of s: no arithmetic is needed.
+    nf:=Components(A);
+    assert Ncols(P) eq AbsoluteDimension(A);
+    P:=ChangeRing(P,Rationals());
+    degs:=[ Degree(K) : K in nf ];
+    starts:=[ 1 + &+[ Integers() | degs[k] : k in [1..j-1] ] : j in [1..#nf] ];
+    out:=[];
+    for r in Rows(P) do
+        s:=Eltseq(r);
+        x:=CreateAlgEtQElt(A,< nf[j]!s[starts[j]..starts[j]+degs[j]-1] : j in [1..#nf] >);
+        x`AbsoluteCoordinates:=s;
+        Append(~out,x);
     end for;
-    out:= [ A!<out_new[j][r] : j in [1..N]> : r in [1..Nrow] ];
     return out;
 end function;
 

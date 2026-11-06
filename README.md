@@ -51,6 +51,26 @@ Changelog
 - v1.0.2 : October 22, 2026.
   - Bugfix:
     - A bug occurring while multiplying or taking powers of elements of `AlgEtQICM` has been fixed.  
+- v1.0.3 : November 6, 2026.
+  - New functionalities:
+    - New `Hash` intrinsics for `AlgEtQElt`, `AlgEtQOrd` and `AlgEtQIdl`. Sets, indexed sets and associative arrays of elements, orders and fractional ideals are now much faster, since Magma only compares with `eq` the objects with the same hash value. For orders and ideals the hash value is computed from the sequence returned by `myHash`.
+    - `IsWeakEquivalent` and `IsWeaklyEquivalent` now also return the colon ideals $(I:J)$ and $(J:I)$, over the common multiplicator ring, when $I$ and $J$ are weakly equivalent. `IsIsomorphic` uses them instead of recomputing them.
+    - `MinimalOverOrdersAtPrime` has a new vararg `CheckIsKnownOrder` (default `true`). If set to `false`, the output is not checked against the known orders of the algebra and it is not stored in the attribute `MinimalOverOrders`.
+  - Breaking changes:
+    - The output of `OverOrders`, `FindOverOrders` and `OverOrdersAtPrime` is now sorted by increasing index $[S:R]$, with ties broken using `myHash`. In particular, $R$ is the first entry and the maximal order is the last one, and the output no longer depends on the order in which the overorders are found. The numbering of the vertices of `GraphOverOrders` follows the new order.
+  - Faster algorithms:
+    - `WKICM_bar`, and hence `WKICM`, `WeakEquivalenceClassMonoidAbstract`, `ICM` and `IdealClassMonoidAbstract`: new search for the weak equivalence classes at a singular prime $P$. Generators of the unit group of $(P:P)/P$ are computed directly, the conditions on the multiplicator ring and on the extension to $(P:P)$ are tested with linear algebra over the residue field, and only one subspace per orbit under the units is explored.
+    - `MinimalOverOrdersAtPrime`, and hence `MinimalOverOrders`, `OverOrders` and `GraphOverOrders`: whether a subspace of $(P:P)/R$ comes from an order is tested with linear algebra over the residue field, before creating any order. Non-minimal candidates are discarded without comparing orders.
+    - `PicardGroup`: the representatives of the classes and the discrete logarithm map now use `SmallRepresentative` on the intermediate ideals, which keeps the $\mathbb{Z}$-bases small.
+    - `ZBasisLLL`: if the Hermite normal form of the basis has smaller entries than the basis itself, the LLL algorithm is applied to the Hermite normal form. This makes `SmallRepresentative` much faster on ideals with large $\mathbb{Z}$-bases.
+    - `SmallRepresentative` reuses the inverse of the ideal, if already known.
+    - `ColonIdeal` only uses the generators of the second ideal instead of a full $\mathbb{Z}$-basis.
+    - Faster creation of elements from absolute coordinates, and faster removal of repeated generators when creating ideals.
+  - Bugfix:
+    - `ShortElement` now picks the element whose norm has the smallest absolute value. Before, it picked the one with the smallest norm, which could be negative and large in absolute value.
+  - Documentation and tests:
+    - User manual updated accordingly, and a few typos fixed.
+    - New fast tests (hashing, `ZBasisLLL`, `IsWeakEquivalent`) and new timing tests (`SmallRepresentative`, `ZBasisLLL`). The tests in the source files now attach `../spec` and consistently use `SetAssertions(2)`; the generated fast tests reset the assertion level in each block. Fixed the example command in `generate_tests.m`.
 
 References
 --

@@ -223,9 +223,12 @@ Returns the algebra of the order.
  Let $P$ be the upper triangular Hermite normal form of the integer square matrix $d\cdot M$ where $M$ is the matrix whose rows are the coefficients of a $\mathbb{Z}$-basis of $S$ and $d$ is the least common denominator of its entries.
  The `Hash` of $S$ is defined to be the sequence consisting of the least common denominator of $\frac{1}{d}\cdot P$ and the entries of the upper triangular part of $\frac{1}{d}\cdot P$.
  This hashing method has no collisions and it is independent of the choice of $\mathbb{Z}-basis$ from which we start the procedure.
- We observed that applying the in-built Hash function to the sequence defined above, while giving a smaller hash, it often lead to collisions.
+ We observed that applying the in-built Hash function to the sequence defined above, while giving a smaller hash, it often lead to collisions. For this reason, equality is tested using the whole sequence.
+ The intrinsic `Hash` returns an integer computed from this sequence, which is used by Magma to build sets, indexed sets and associative arrays of orders: only orders with the same hash value are compared with `eq`, so collisions only cost an extra comparison.
 <pre><b> myHash</b>(S::AlgEtQOrd)->SeqEnum[RngInt]</pre>
 Hash function for AlgEtQOrd.
+<pre><b> Hash</b>(S::AlgEtQOrd) -> RngIntElt</pre>
+ Returns a hash value of the order, so that equal orders have the same hash value. It is computed from the sequence returned by `myHash` and it is stored in the attribute `HashValue`. Magma uses it to build sets, indexed sets and associative arrays of orders: only orders with the same hash value are compared with `eq`. Different orders might have the same hash value: this only costs an extra comparison.
 <pre><b> 'eq'</b>(O1::AlgEtQOrd,O2::AlgEtQOrd)->BoolElt</pre>
 Checks equality of orders.
 ## Inclusion and coordinates
@@ -325,9 +328,12 @@ Returns a set of generators of the fractional ideal.
  Let $P$ be the upper triangular Hermite normal form of the integer square matrix $d\cdot M$ where $M$ is the matrix whose rows are the coefficients of a $\mathbb{Z}$-basis of $I$ and $d$ is the least common denominator of its entries.
  The `Hash` of $I$ is defined to be the sequence consisting of the least common denominator of $\frac{1}{d}\cdot P$ and the entries of the upper triangular part of $\frac{1}{d}\cdot P$.
  This hashing method has no collisions and it is independent of the choice of $\mathbb{Z}-basis$ from which we start the procedure.
- We observed that applying the in-built Hash function to the sequence defined above, while giving a smaller hash, it often leads to collisions.
+ We observed that applying the in-built Hash function to the sequence defined above, while giving a smaller hash, it often leads to collisions. For this reason, equality is tested using the whole sequence.
+ The intrinsic `Hash` returns an integer computed from this sequence, which is used by Magma to build sets, indexed sets and associative arrays of fractional ideals: only ideals with the same hash value are compared with `eq`, so collisions only cost an extra comparison.
 <pre><b> myHash</b>(I::AlgEtQIdl)->SeqEnum[RngInt]</pre>
 Hash function.
+<pre><b> Hash</b>(I::AlgEtQIdl) -> RngIntElt</pre>
+ Returns a hash value of the fractional ideal, so that equal ideals have the same hash value. It is computed from the sequence returned by `myHash` and it is stored in the attribute `HashValue`. Magma uses it to build sets, indexed sets and associative arrays of ideals: only ideals with the same hash value are compared with `eq`. Different ideals might have the same hash value: this only costs an extra comparison.
 <pre><b> 'eq'</b>(I::AlgEtQIdl , J::AlgEtQIdl ) -> BoolElt</pre><pre><b> 'eq'</b>(I::AlgEtQIdl, S::AlgEtQOrd) -> BoolElt</pre><pre><b> 'eq'</b>(S::AlgEtQOrd,I::AlgEtQIdl) -> BoolElt</pre>
 Equality testing.
 ## Coordinates with respect to the $\mathbb{Z}$-basis and inclusion

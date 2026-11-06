@@ -31,7 +31,8 @@ declare attributes AlgEtQIdl : Index, //stores the index
                               Factorization,
                               IsProductOfIdeals,
                               TraceDualIdeal,
-                              Hash,
+                              Hash, // the sequence returned by myHash
+                              HashValue, // the integer returned by Hash
                               inclusion_matrix;
 
 import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQtoA , meet_zbasis , inclusion_matrix;
@@ -263,7 +264,8 @@ end intrinsic;
 /// Let $P$ be the upper triangular Hermite normal form of the integer square matrix $d\cdot M$ where $M$ is the matrix whose rows are the coefficients of a $\mathbb{Z}$-basis of $I$ and $d$ is the least common denominator of its entries.
 /// The `Hash` of $I$ is defined to be the sequence consisting of the least common denominator of $\frac{1}{d}\cdot P$ and the entries of the upper triangular part of $\frac{1}{d}\cdot P$.
 /// This hashing method has no collisions and it is independent of the choice of $\mathbb{Z}-basis$ from which we start the procedure.
-/// We observed that applying the in-built Hash function to the sequence defined above, while giving a smaller hash, it often leads to collisions.
+/// We observed that applying the in-built Hash function to the sequence defined above, while giving a smaller hash, it often leads to collisions. For this reason, equality is tested using the whole sequence.
+/// The intrinsic `Hash` returns an integer computed from this sequence, which is used by Magma to build sets, indexed sets and associative arrays of fractional ideals: only ideals with the same hash value are compared with `eq`, so collisions only cost an extra comparison.
 
 intrinsic myHash(I::AlgEtQIdl)->SeqEnum[RngInt]
 {Hash function.}
@@ -279,6 +281,17 @@ intrinsic myHash(I::AlgEtQIdl)->SeqEnum[RngInt]
         I`Hash:=hash;
     end if;
     return I`Hash;
+end intrinsic;
+
+/// Returns a hash value of the fractional ideal, so that equal ideals have the same hash value. It is computed from the sequence returned by `myHash` and it is stored in the attribute `HashValue`. Magma uses it to build sets, indexed sets and associative arrays of ideals: only ideals with the same hash value are compared with `eq`. Different ideals might have the same hash value: this only costs an extra comparison.
+intrinsic Hash(I::AlgEtQIdl) -> RngIntElt
+{Returns a hash value of the fractional ideal, so that equal ideals have the same hash value. It is computed from the sequence returned by myHash and it is stored in the attribute HashValue. Magma uses it to build sets, indexed sets and associative arrays of ideals: only ideals with the same hash value are compared with eq. Different ideals might have the same hash value: this only costs an extra comparison.}
+    if not assigned I`HashValue then
+        // The entries of myHash(I) are integers, but its universe is Rationals().
+        // Since the universe matters, e.g. Hash([1,2]) ne Hash([1/1,2/1]), we make sure it is Integers().
+        I`HashValue:=Hash(ChangeUniverse(myHash(I),Integers()));
+    end if;
+    return I`HashValue;
 end intrinsic;
 
 intrinsic 'eq'(I::AlgEtQIdl , J::AlgEtQIdl ) -> BoolElt
@@ -991,6 +1004,48 @@ end intrinsic;
     assert is_def and I4 eq (I*I)*(I*I);
     is_def,I5:=IsDefined(I`KnownPowers,5);
     assert is_def and I5 eq (I*I)*(I*I)*I;
+    printf ".";
+
+    // testing Hash: sets, indexed sets and associative arrays of ideals, also when the hash values collide
+    _<x>:=PolynomialRing(Integers());
+    A:=EtaleAlgebra((x^4+16)*(x^4-x^2+4));
+    E:=EquationOrder(A);
+    SetSeed(1);
+    ids:=[]; // distinct ideals
+    seen:={};
+    while #ids lt 60 do
+        I:=Ideal(E,[ A!Random(E,3) : i in [1..2] ]);
+        if not myHash(I) in seen then
+            Include(~seen,myHash(I));
+            Append(~ids,I);
+        end if;
+    end while;
+    assert #Seqset(ids) eq #ids and #{@ I : I in ids @} eq #ids;
+    // copies: the same ideals, as new objects whose hash is computed in different ways
+    copies1:=[ Ideal(E,ZBasis(I)) : I in ids ]; // computed later, by myHash
+    copies2:=[ Ideal(E,ZBasis(I) cat [ZBasis(I)[1]+ZBasis(I)[2]]) : I in ids ]; // computed at creation
+    copies3:=[ (1/2)*(2*I) : I in ids ];
+    assert forall{ i : i in [1..#ids] | Hash(copies1[i]) eq Hash(ids[i]) and Hash(copies2[i]) eq Hash(ids[i])
+                                        and Hash(copies3[i]) eq Hash(ids[i]) };
+    X:={@ I : I in ids @};
+    assert forall{ i : i in [1..#ids] | Index(X,copies1[i]) eq i and copies2[i] in X and copies3[i] in X };
+    assert #Seqset(ids cat copies1 cat copies2 cat copies3) eq #ids;
+    AA:=AssociativeArray();
+    for i in [1..#ids] do AA[ids[i]]:=i; end for;
+    assert #Keys(AA) eq #ids;
+    assert forall{ i : i in [1..#ids] | AA[copies1[i]] eq i and AA[copies2[i]] eq i and AA[copies3[i]] eq i };
+    printf ".";
+    // Forced collisions: all the copies get the same hash value, stored in the attribute HashValue.
+    for I in copies1 cat copies2 do J:=I; J`HashValue:=0; end for; // J and I are the same object
+    assert #{ Hash(I) : I in copies1 cat copies2 } eq 1;
+    assert #Seqset(copies1) eq #ids;
+    assert #Seqset(copies1 cat copies2) eq #ids;
+    X:={@ I : I in copies1 @};
+    assert forall{ i : i in [1..#ids] | Index(X,copies2[i]) eq i };
+    AA:=AssociativeArray();
+    for i in [1..#ids] do AA[copies1[i]]:=i; end for;
+    assert #Keys(AA) eq #ids;
+    assert forall{ i : i in [1..#ids] | AA[copies2[i]] eq i };
 
     SetAssertions(1);
     printf " all good!";

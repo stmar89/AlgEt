@@ -381,6 +381,37 @@ assert E1 subset E3;
 assert E3*E4 eq OA;
 assert OA meet E1 eq E1;
 assert not E2 meet E1 eq E2;
+printf ".";
+// testing Hash: sets, indexed sets and associative arrays of orders, also when the hash values collide
+_<x>:=PolynomialRing(Integers());
+A:=EtaleAlgebra((x^2+3)*(x^2+27));
+oo:=FindOverOrders(EquationOrder(A)); // distinct orders
+assert #oo eq 85;
+assert #Seqset(oo) eq #oo and #{@ S : S in oo @} eq #oo;
+// copies: the same orders, as new objects whose hash is computed from scratch
+copies1:=[ Order(ZBasis(S) : Check:=0, CheckIsKnownOrder:=false) : S in oo ];
+copies2:=[ Order(ZBasis(S) cat [One(A)] : CheckIsKnownOrder:=false) : S in oo ];
+assert forall{ i : i in [1..#oo] | Hash(copies1[i]) eq Hash(oo[i]) and Hash(copies2[i]) eq Hash(oo[i]) };
+X:={@ S : S in oo @};
+assert forall{ i : i in [1..#oo] | Index(X,copies1[i]) eq i and copies2[i] in X };
+assert #Seqset(oo cat copies1 cat copies2) eq #oo;
+AA:=AssociativeArray();
+for i in [1..#oo] do AA[oo[i]]:=i; end for;
+assert #Keys(AA) eq #oo;
+assert forall{ i : i in [1..#oo] | AA[copies1[i]] eq i and AA[copies2[i]] eq i };
+printf ".";
+// Forced collisions: all the copies get the same hash value, stored in the attribute HashValue.
+// We do not modify the orders in oo, since they are stored in A`KnownOrders.
+for S in copies1 cat copies2 do T:=S; T`HashValue:=0; end for; // T and S are the same object
+assert #{ Hash(S) : S in copies1 cat copies2 } eq 1;
+assert #Seqset(copies1) eq #oo;
+assert #Seqset(copies1 cat copies2) eq #oo;
+X:={@ S : S in copies1 @};
+assert forall{ i : i in [1..#oo] | Index(X,copies2[i]) eq i };
+AA:=AssociativeArray();
+for i in [1..#oo] do AA[copies1[i]]:=i; end for;
+assert #Keys(AA) eq #oo;
+assert forall{ i : i in [1..#oo] | AA[copies2[i]] eq i };
 SetAssertions(1);
 printf "all good!";
 Sprintf(" time %o", Cputime(time_start_local));
@@ -463,6 +494,47 @@ is_def,I4:=IsDefined(I`KnownPowers,4);
 assert is_def and I4 eq (I*I)*(I*I);
 is_def,I5:=IsDefined(I`KnownPowers,5);
 assert is_def and I5 eq (I*I)*(I*I)*I;
+printf ".";
+// testing Hash: sets, indexed sets and associative arrays of ideals, also when the hash values collide
+_<x>:=PolynomialRing(Integers());
+A:=EtaleAlgebra((x^4+16)*(x^4-x^2+4));
+E:=EquationOrder(A);
+SetSeed(1);
+ids:=[]; // distinct ideals
+seen:={};
+while #ids lt 60 do
+    I:=Ideal(E,[ A!Random(E,3) : i in [1..2] ]);
+    if not myHash(I) in seen then
+        Include(~seen,myHash(I));
+        Append(~ids,I);
+    end if;
+end while;
+assert #Seqset(ids) eq #ids and #{@ I : I in ids @} eq #ids;
+// copies: the same ideals, as new objects whose hash is computed in different ways
+copies1:=[ Ideal(E,ZBasis(I)) : I in ids ]; // computed later, by myHash
+copies2:=[ Ideal(E,ZBasis(I) cat [ZBasis(I)[1]+ZBasis(I)[2]]) : I in ids ]; // computed at creation
+copies3:=[ (1/2)*(2*I) : I in ids ];
+assert forall{ i : i in [1..#ids] | Hash(copies1[i]) eq Hash(ids[i]) and Hash(copies2[i]) eq Hash(ids[i])
+                                    and Hash(copies3[i]) eq Hash(ids[i]) };
+X:={@ I : I in ids @};
+assert forall{ i : i in [1..#ids] | Index(X,copies1[i]) eq i and copies2[i] in X and copies3[i] in X };
+assert #Seqset(ids cat copies1 cat copies2 cat copies3) eq #ids;
+AA:=AssociativeArray();
+for i in [1..#ids] do AA[ids[i]]:=i; end for;
+assert #Keys(AA) eq #ids;
+assert forall{ i : i in [1..#ids] | AA[copies1[i]] eq i and AA[copies2[i]] eq i and AA[copies3[i]] eq i };
+printf ".";
+// Forced collisions: all the copies get the same hash value, stored in the attribute HashValue.
+for I in copies1 cat copies2 do J:=I; J`HashValue:=0; end for; // J and I are the same object
+assert #{ Hash(I) : I in copies1 cat copies2 } eq 1;
+assert #Seqset(copies1) eq #ids;
+assert #Seqset(copies1 cat copies2) eq #ids;
+X:={@ I : I in copies1 @};
+assert forall{ i : i in [1..#ids] | Index(X,copies2[i]) eq i };
+AA:=AssociativeArray();
+for i in [1..#ids] do AA[copies1[i]]:=i; end for;
+assert #Keys(AA) eq #ids;
+assert forall{ i : i in [1..#ids] | AA[copies2[i]] eq i };
 SetAssertions(1);
 printf " all good!";
 Sprintf(" time %o", Cputime(time_start_local));

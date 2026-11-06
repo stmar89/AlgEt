@@ -39,7 +39,8 @@ declare attributes AlgEtQOrd : IsMaximal,
                               Conductor,
                               IsGorenstein,
                               IsBass,
-                              Hash,
+                              Hash, // the sequence returned by myHash
+                              HashValue, // the integer returned by Hash
                               inclusion_matrix;
 
 ///hide-all
@@ -303,7 +304,8 @@ end intrinsic;
 /// Let $P$ be the upper triangular Hermite normal form of the integer square matrix $d\cdot M$ where $M$ is the matrix whose rows are the coefficients of a $\mathbb{Z}$-basis of $S$ and $d$ is the least common denominator of its entries.
 /// The `Hash` of $S$ is defined to be the sequence consisting of the least common denominator of $\frac{1}{d}\cdot P$ and the entries of the upper triangular part of $\frac{1}{d}\cdot P$.
 /// This hashing method has no collisions and it is independent of the choice of $\mathbb{Z}-basis$ from which we start the procedure.
-/// We observed that applying the in-built Hash function to the sequence defined above, while giving a smaller hash, it often lead to collisions.
+/// We observed that applying the in-built Hash function to the sequence defined above, while giving a smaller hash, it often lead to collisions. For this reason, equality is tested using the whole sequence.
+/// The intrinsic `Hash` returns an integer computed from this sequence, which is used by Magma to build sets, indexed sets and associative arrays of orders: only orders with the same hash value are compared with `eq`, so collisions only cost an extra comparison.
 
 intrinsic myHash(S::AlgEtQOrd)->SeqEnum[RngInt]
 {Hash function for AlgEtQOrd.}
@@ -325,6 +327,16 @@ intrinsic myHash(S::AlgEtQOrd)->SeqEnum[RngInt]
         S`Hash:=[d] cat [(Integers()!(d*P[i,j])) : j in [i..dim] , i in [1..dim]];
     end if;
     return S`Hash;
+end intrinsic;
+
+/// Returns a hash value of the order, so that equal orders have the same hash value. It is computed from the sequence returned by `myHash` and it is stored in the attribute `HashValue`. Magma uses it to build sets, indexed sets and associative arrays of orders: only orders with the same hash value are compared with `eq`. Different orders might have the same hash value: this only costs an extra comparison.
+intrinsic Hash(S::AlgEtQOrd) -> RngIntElt
+{Returns a hash value of the order, so that equal orders have the same hash value. It is computed from the sequence returned by myHash and it is stored in the attribute HashValue. Magma uses it to build sets, indexed sets and associative arrays of orders: only orders with the same hash value are compared with eq. Different orders might have the same hash value: this only costs an extra comparison.}
+    if not assigned S`HashValue then
+        // The universe matters, e.g. Hash([1,2]) ne Hash([1/1,2/1]), so we make sure it is Integers().
+        S`HashValue:=Hash(ChangeUniverse(myHash(S),Integers()));
+    end if;
+    return S`HashValue;
 end intrinsic;
 
 intrinsic 'eq'(O1::AlgEtQOrd,O2::AlgEtQOrd)->BoolElt
@@ -732,6 +744,38 @@ end intrinsic;
     assert E3*E4 eq OA;
     assert OA meet E1 eq E1;
     assert not E2 meet E1 eq E2;
+    printf ".";
+
+    // testing Hash: sets, indexed sets and associative arrays of orders, also when the hash values collide
+    _<x>:=PolynomialRing(Integers());
+    A:=EtaleAlgebra((x^2+3)*(x^2+27));
+    oo:=FindOverOrders(EquationOrder(A)); // distinct orders
+    assert #oo eq 85;
+    assert #Seqset(oo) eq #oo and #{@ S : S in oo @} eq #oo;
+    // copies: the same orders, as new objects whose hash is computed from scratch
+    copies1:=[ Order(ZBasis(S) : Check:=0, CheckIsKnownOrder:=false) : S in oo ];
+    copies2:=[ Order(ZBasis(S) cat [One(A)] : CheckIsKnownOrder:=false) : S in oo ];
+    assert forall{ i : i in [1..#oo] | Hash(copies1[i]) eq Hash(oo[i]) and Hash(copies2[i]) eq Hash(oo[i]) };
+    X:={@ S : S in oo @};
+    assert forall{ i : i in [1..#oo] | Index(X,copies1[i]) eq i and copies2[i] in X };
+    assert #Seqset(oo cat copies1 cat copies2) eq #oo;
+    AA:=AssociativeArray();
+    for i in [1..#oo] do AA[oo[i]]:=i; end for;
+    assert #Keys(AA) eq #oo;
+    assert forall{ i : i in [1..#oo] | AA[copies1[i]] eq i and AA[copies2[i]] eq i };
+    printf ".";
+    // Forced collisions: all the copies get the same hash value, stored in the attribute HashValue.
+    // We do not modify the orders in oo, since they are stored in A`KnownOrders.
+    for S in copies1 cat copies2 do T:=S; T`HashValue:=0; end for; // T and S are the same object
+    assert #{ Hash(S) : S in copies1 cat copies2 } eq 1;
+    assert #Seqset(copies1) eq #oo;
+    assert #Seqset(copies1 cat copies2) eq #oo;
+    X:={@ S : S in copies1 @};
+    assert forall{ i : i in [1..#oo] | Index(X,copies2[i]) eq i };
+    AA:=AssociativeArray();
+    for i in [1..#oo] do AA[copies1[i]]:=i; end for;
+    assert #Keys(AA) eq #oo;
+    assert forall{ i : i in [1..#oo] | AA[copies2[i]] eq i };
 
     SetAssertions(1);
     printf "all good!";

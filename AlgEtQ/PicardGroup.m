@@ -307,6 +307,39 @@ intrinsic IsPrincipal(I1::AlgEtQIdl : GRH:=false )->BoolElt, AlgEtQElt
     end if;
 end intrinsic;
 
+small_prod_of_powers:=function(S, gens, exps)
+// Given invertible S-ideals gens and integers exps, returns an ideal in the same ideal class as
+// &*[gens[i]^exps[i]]. Uses repeated squaring and replaces every intermediate ideal by a small
+// representative, so that Z-bases do not blow up.
+    assert #gens eq #exps;
+    // shortcut: a single generator to the power 1 is returned as it is
+    nz:=[ i : i in [1..#exps] | exps[i] ne 0 ];
+    if #nz eq 1 and exps[nz[1]] eq 1 then
+        return gens[nz[1]];
+    end if;
+    res:=OneIdeal(S);
+    for i in [1..#gens] do
+        e:=exps[i];
+        if e eq 0 then continue; end if;
+        B:=gens[i];
+        if e lt 0 then
+            B:=SmallRepresentative(B^-1);
+            e:=-e;
+        end if;
+        while e gt 0 do
+            if IsOdd(e) then
+                res:=SmallRepresentative(res*B);
+            end if;
+            e:=e div 2;
+            if e gt 0 then
+                B:=SmallRepresentative(B*B);
+            end if;
+        end while;
+    end for;
+    res`IsInvertible:=true;
+    return res;
+end function;
+
 PicardGroup_prod_internal:=function( O , GRH )
 //computes the PicardGroup of a product of order in a product of number fields and returns the group (as a direct product) and a sequence of representatives
     if assigned O`PicardGroup then
@@ -369,15 +402,13 @@ PicardGroup_prod_internal:=function( O , GRH )
         rep_idinA:= function(x)
             vprint AlgEtQPicardGroup, 2: "PicardGroup_prod_internal: rep_idinA\n";
             coeff:=Eltseq(x);
-            id:=&*[geninO[i]^coeff[i] : i in [1..#coeff]];
-            return id;
+            return small_prod_of_powers(O, geninO, coeff);
         end function;
         inverse_map:=function(id)
             vprint AlgEtQPicardGroup, 2: "PicardGroup_prod_internal: inverse_map\n";
             assert IsInvertible(id);
-            if not IsIntegral(id) then
-                id:=MakeIntegral(id);
-            end if;
+            // same ideal class, but integral and with a small Z-basis
+            id:=SmallRepresentative(id);
             test,id_asprod:=IsProductOfIdeals(id);
             assert test;
             return &+[g[i](id_asprod[i]@@groups_maps_fields_maps[i,2]) : i in [1..#id_asprod]];
@@ -427,8 +458,8 @@ intrinsic PicardGroup( S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
         mGO_to_S:=function(rep)
             vprint AlgEtQPicardGroup, 3: "PicardGroup: mGO_to_S\n";
             coeff:=Eltseq(rep);
-            idS:=&*[(gens_GO_in_S[i])^coeff[i] : i in [1..#coeff] ];
-            return idS;
+            // only the ideal class of idS matters
+            return small_prod_of_powers(S, gens_GO_in_S, coeff);
         end function;
         mGO_to_O:=function(rep)
             vprint AlgEtQPicardGroup, 3: "PicardGroup: mGO_to_O\n";
@@ -552,7 +583,7 @@ intrinsic PicardGroup( S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
     representative_picard_group := function(rep)
         vprint AlgEtQPicardGroup, 3: "PicardGroup: representative_picard_group\n";
         repseq := Eltseq(rep);
-        return &*[generators_ideals[i]^repseq[i]:i in [1..#generators_ideals]];
+        return small_prod_of_powers(S, generators_ideals, repseq);
     end function;
     vprint AlgEtQPicardGroup, 2: "done\n";
 
@@ -561,6 +592,9 @@ intrinsic PicardGroup( S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
     disc_log_picard_group:=function(id)
     // (crep*id)^-1 is coprime with F
         vprint AlgEtQPicardGroup, 3: "PicardGroup: disc_log_picard_group\n";
+        // replace id with a small representative of the same class: otherwise every step below
+        // (inverses, coprime representatives, principality tests) is very slow for ideals with large Z-bases
+        id:=SmallRepresentative(id);
         crep:=1/(CoprimeRepresentative(id^-1,F));//here we check if id is invertible
         idO:=O!!(crep*id); //idO is coprime with FO
         GOrep:=idO@@gO;

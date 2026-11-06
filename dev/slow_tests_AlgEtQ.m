@@ -108,6 +108,81 @@
 	
     "-------------------------------------------------------------";
     "-------------------------------------------------------------";
+    "---------------SmallRepresentative and ZBasisLLL-------------";
+    "-------------------------------------------------------------";
+    "-------------------------------------------------------------";
+    "SmallRepresentative of an ideal with a huge Z-basis: the ideal cI^n which PicardGroup tests for principality.";
+    "ZBasisLLL reduces the HNF of a*cI^n, which has much smaller entries than a*ZBasis(cI^n).";
+    AttachSpec("../spec");
+    SetClassGroupBounds("GRH");
+    SetSeed(1);
+    _<x>:=PolynomialRing(Integers());
+    f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
+    A:=EtaleAlgebra(f);
+    E:=EquationOrder(A);
+    O:=MaximalOrder(A);
+    GO,gO:=PicardGroup(O : GRH:=true);
+    FO:=O!!Conductor(E);
+    _,cI:=CoprimeRepresentative(gO(GO.1),FO);
+    II:=cI^InvariantFactors(GO)[1];
+    zbII:=ZBasis(II);
+    t1:=0;
+    for i in [1..5] do
+        J:=Ideal(O,Generators(II)); // a fresh copy, since SmallRepresentative is cached
+        J`ZBasis:=zbII;
+        t0:=Cputime();
+            aJ,a:=SmallRepresentative(J);
+        t1+:=Cputime(t0);
+        assert aJ eq a*II;
+        assert aJ subset OneIdeal(O);
+    end for;
+    printf "Current running time = %o \n",t1;
+    tprevbest:=1.430; //on laptop aerox
+    if Abs(t1 - tprevbest) gt 0.1*tprevbest then
+        if t1 lt tprevbest then
+            printf "SmallRepresentative for cI^n got faster. Update the previous best known time\n";
+        elif t1 gt tprevbest then
+            printf "SmallRepresentative for cI^n got slower. The previous code was better.\n";
+        end if;
+    end if;
+
+    "-------------------------------------------------------------";
+    "ZBasisLLL of ideals a*I with small index and huge Z-basis, as in SmallRepresentative, where I is a power of a random ideal.";
+    AttachSpec("../spec");
+    SetSeed(1);
+    _<x>:=PolynomialRing(Integers());
+    f:=(x^8+16)*(x^6 + 8*x^5 + 50*x^4 + 200*x^3 + 1250*x^2 + 5000*x + 15625);
+    A:=EtaleAlgebra(f);
+    R:=EquationOrder(A);
+    zbs:=[];
+    for i in [1..20] do
+        repeat y:=A!Random(R,3); until not IsZeroDivisor(y);
+        I:=Ideal(R,[ (A!Random(R,3))/y : j in [1..3] ])^12;
+        a:=ShortElement(ColonIdeal(R,I));
+        Append(~zbs,[ a*z : z in ZBasis(I) ]);
+    end for;
+    t1:=0;
+    for k in [1..5] do
+        for zb in zbs do
+            J:=Ideal(R,zb); // a fresh copy, since ZBasisLLL does nothing on a reduced basis
+            J`ZBasis:=zb;
+            t0:=Cputime();
+                ZBasisLLL(J);
+            t1+:=Cputime(t0);
+        end for;
+    end for;
+    printf "Current running time = %o \n",t1;
+    tprevbest:=0.180; //on laptop aerox
+    if Abs(t1 - tprevbest) gt tprevbest then //so fast that 10% would be below the precision of Cputime
+        if t1 lt tprevbest then
+            printf "ZBasisLLL for a*I got faster. Update the previous best known time\n";
+        elif t1 gt tprevbest then
+            printf "ZBasisLLL for a*I got slower. The previous code was better.\n";
+        end if;
+    end if;
+
+    "-------------------------------------------------------------";
+    "-------------------------------------------------------------";
     "-----------------OverOrders and GraphOverOrders--------------";
     "-------------------------------------------------------------";
     "-------------------------------------------------------------";

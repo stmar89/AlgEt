@@ -231,6 +231,19 @@ end intrinsic;
     end for;
     facs:=[ Factorization(I) : I in ids ];
     printf ".";
+
+    // testing PlacesAboveRationalPrime: the primes above different rational primes are stored separately
+    _<x>:=PolynomialRing(Integers());
+    A:=EtaleAlgebra((x^2+5)*(x^2+7));
+    O:=MaximalOrder(A);
+    P2:=PlacesAboveRationalPrime(A,2);
+    P3:=PlacesAboveRationalPrime(A,3);
+    assert Seqset(P2) eq Seqset(PrimesAbove(2*O));
+    assert Seqset(P3) eq Seqset(PrimesAbove(3*O));
+    assert Seqset(P2) ne Seqset(P3);
+    assert PlacesAboveRationalPrime(A,2) eq P2; // the stored value
+    assert Keys(A`PlacesAboveRationalPrime) eq {2,3};
+    printf ".";
     SetAssertions(1);
     printf " all good!";
 

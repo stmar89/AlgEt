@@ -1046,6 +1046,25 @@ end intrinsic;
     for i in [1..#ids] do AA[copies1[i]]:=i; end for;
     assert #Keys(AA) eq #ids;
     assert forall{ i : i in [1..#ids] | AA[copies2[i]] eq i };
+    printf ".";
+
+    // testing that eq does not copy the attribute IsZBasisLLLReduced, which depends on the stored ZBasis
+    _<x>:=PolynomialRing(Integers());
+    A:=EtaleAlgebra(x^8+16);
+    E:=EquationOrder(A);
+    SetSeed(2);
+    I:=Ideal(E,[ A!Random(E,50) : i in [1..3] ]);
+    J:=Ideal(E,Generators(I));
+    MJ:=Matrix([ AbsoluteCoordinates(z) : z in ZBasis(J) ]); // an HNF basis...
+    assert LLL(MJ) ne MJ; // ...which is not LLL-reduced
+    ZBasisLLL(I);
+    assert I`IsZBasisLLLReduced;
+    assert J eq I;
+    assert not (assigned J`IsZBasisLLLReduced and J`IsZBasisLLLReduced);
+    ZBasisLLL(J);
+    MJ:=Matrix([ AbsoluteCoordinates(z) : z in ZBasis(J) ]);
+    assert LLL(MJ) eq MJ;
+    printf ".";
 
     SetAssertions(1);
     printf " all good!";

@@ -173,6 +173,7 @@ intrinsic Factorization(I::AlgEtQIdl) -> Tup
             IO:=O !! I;
             facO:=factorizationMaximalOrder(IO);
             primesO:=[ p[1] : p in facO ];
+            //TODO this can be done faster sinec I am computing the intersection twice.
             primesS:=Setseq({ OneIdeal(S) meet (S!!PO) : PO in primesO }); //cancel the doubles
             facS:=<>;
             for i in [1..#primesS] do

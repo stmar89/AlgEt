@@ -543,6 +543,8 @@ intrinsic WKICM(E::AlgEtQOrd)->SeqEnum[AlgEtQIdl]
             // example, they were coming from the recursive-1-single-singular-prime part of the code.
             // In this case, we don't want to add it a second time. Hence we need to keep track of this info.
             // We do it by using nested AssociativeArrays
+            // FIXME this whole block looks weir. I think we can make it faster/simpler, epecially now that
+            // orders are hashed.
             t0:=Cputime();
             vprintf WKICM,2 : "We start populating the varargs OverOrders and WKICM_bar.\n";
             if not assigned E`OverOrders then

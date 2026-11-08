@@ -96,9 +96,9 @@ intrinsic PlacesAboveRationalPrime(E::AlgEtQ,p::RngIntElt)->SeqEnum[AlgEtQIdl]
     end if;
     if not IsDefined(E`PlacesAboveRationalPrime,p) then
         require IsPrime(p) : "The integer p needs to be a prime number";
-        E`PlacesAboveRationalPrime:=PrimesAbove(p*MaximalOrder(E));
+        E`PlacesAboveRationalPrime[p]:=PrimesAbove(p*MaximalOrder(E));
     end if;
-    return E`PlacesAboveRationalPrime;
+    return E`PlacesAboveRationalPrime[p];
 end intrinsic;
 
 intrinsic SingularPrimes(R::AlgEtQOrd) -> SeqEnum[AlgEtQIdl]

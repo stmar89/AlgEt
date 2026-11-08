@@ -308,7 +308,7 @@ intrinsic 'eq'(I::AlgEtQIdl , J::AlgEtQIdl ) -> BoolElt
     end if;
     if out then //we copy the attributes
         for att in GetAttributes(AlgEtQIdl) do
-            if att ne "inclusion_matrix" then // we exclude the attributes that depend on the ZBasis
+            if att notin {"inclusion_matrix","IsZBasisLLLReduced"} then // we exclude the attributes that depend on the ZBasis
                 if assigned I``att and not assigned J``att then
                     J``att:=I``att;
                 elif assigned J``att and not assigned I``att then

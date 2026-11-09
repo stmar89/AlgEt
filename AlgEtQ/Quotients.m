@@ -79,24 +79,59 @@ intrinsic ResidueField(P::AlgEtQIdl) -> FldFin, Map
     if not assigned P`ResidueField then
         assert IsPrime(P);
         S := Order(P);
-        Q,q := ResidueRing(S,P); //q:S->S/P
-        size := #Q;
-        F := FiniteField(size);
-        min_poly := PolynomialRing(Integers())!DefiningPolynomial(F);
-        //the following loop is naive
-        for y in Q do
-            if q(Evaluate(min_poly,y@@q)) eq Zero(Q) then
-                prim_elt_inA := y@@q;
-                break y;
+        A := Algebra(S);
+        Q,q := ResidueRing(S,P); // q:A->Q, where Q=S/P is an abelian group isomorphic to GF(p)^d
+        _,p,d := IsPrimePower(#Q);
+        Fp := GF(p);
+        // We look for a in S whose image generates S/P over GF(p), that is, such that the images of
+        // 1,a,...,a^(d-1) are linearly independent over GF(p). Most elements of S/P have this property.
+        // We try the Z-basis of S first: its elements are small, which keeps the preimages under the output map small.
+        // If needed, we try all the elements of S/P.
+        powers := function(a) // returns 1,a,...,a^d, and their images in S/P = GF(p)^d as the rows of a matrix
+            pows := [ One(A) ];
+            for i in [1..d] do
+                Append(~pows,pows[i]*a);
+            end for;
+            return Matrix(Fp,[ Eltseq(q(z)) : z in pows ]), pows;
+        end function;
+        found := false;
+        for b in ZBasis(S) do
+            M,pows := powers(b);
+            if Rank(RowSubmatrix(M,1,d)) eq d then
+                found := true;
+                break b;
             end if;
         end for;
-        assert assigned prim_elt_inA;
-        //now I need to build  the map
-        G,gGF := AdditiveGroup(F); //g:G->F
-        hGQ := iso<G->Q | [q(prim_elt_inA^i) : i in [0..Degree(min_poly)-1]]>;
-        hQG := Inverse(hGQ);
-        map := q*hQG*gGF;
-        P`ResidueField:=<F, map>;
+        if not found then
+            for y in Q do
+                M,pows := powers(y@@q);
+                if Rank(RowSubmatrix(M,1,d)) eq d then
+                    found := true;
+                    break y;
+                end if;
+            end for;
+            // Here a and its powers can be large: we replace them with small elements with the same images in S/P.
+            pows := [ ShortElementModulo(z,P) : z in pows ];
+        end if;
+        assert found;
+        B := RowSubmatrix(M,1,d);
+        c := Solution(B,M[d+1]); // a^d = c[1] + c[2]*a + ... + c[d]*a^(d-1) in S/P
+        g := Polynomial(Fp,[ -c[i] : i in [1..d] ] cat [ 1 ]); // the minimal polynomial of the image of a
+        // We send a to a root r of g in F: this gives an isomorphism S/P -> F.
+        F := FiniteField(#Q);
+        r := Roots(PolynomialRing(F)!g)[1][1];
+        R := Matrix(Fp,[ Eltseq(r^i) : i in [0..d-1] ]); // the coordinates of 1,r,...,r^(d-1) in F over GF(p)
+        BR := B^-1*R; // from the coordinates in S/P = GF(p)^d to the coordinates in F
+        Rinv := R^-1; // from the coordinates in F to the coordinates with respect to 1,r,...,r^(d-1)
+        toF := function(x)
+            return F!Eltseq(Vector(Fp,Eltseq(q(x)))*BR);
+        end function;
+        fromF := function(z)
+            // z = e[1] + e[2]*r + ... + e[d]*r^(d-1) is lifted to e[1] + e[2]*a + ... + e[d]*a^(d-1), with 0 <= e[i] < p
+            e := Eltseq(Vector(Fp,Eltseq(z))*Rinv);
+            return &+[ (Integers()!e[i])*pows[i] : i in [1..d] ];
+        end function;
+        P`ResidueField:=<F, map< A -> F | x:->toF(x), z:->fromF(z) >>;
     end if;
     return Explode(P`ResidueField);
 end intrinsic;
@@ -244,6 +279,27 @@ end intrinsic;
             assert n eq #QuotientVS(I,PI,P);
             printf ".";
         end for;
+    end for;
+
+    // ResidueField for residue fields of size 13^4 and 2^4: 13 and 2 are inert in Q(zeta_5).
+    // The map O->F is a ring homomorphism, with kernel P and with preimages.
+    K:=EtaleAlgebra(x^4+x^3+x^2+x+1);
+    O:=MaximalOrder(K);
+    for p in [13,2] do
+        P:=p*OneIdeal(O);
+        F,f:=ResidueField(P);
+        assert #F eq p^4;
+        assert f(One(K)) eq One(F);
+        assert forall{ b : b in ZBasis(P) | f(b) eq Zero(F) };
+        for i in [1..10] do
+            a:=Random(O : ZeroDivisorsAllowed:=true);
+            b:=Random(O : ZeroDivisorsAllowed:=true);
+            assert f(a*b) eq f(a)*f(b) and f(a+b) eq f(a)+f(b);
+            z:=Random(F);
+            assert (z@@f) in O and f(z@@f) eq z;
+        end for;
+        assert IsPrimitive(f(PrimitiveElementResidueField(P)));
+        printf ".";
     end for;
 
     SetAssertions(1);

@@ -1,6 +1,6 @@
 # usage:
-# make all          # writes one test file per .m file of the spec in split_tests/, runs them in parallel
-#                   # and reports the ones that failed (default)
+# make all          # writes one test file per .m file of the specs spec, specMod and specMtrx in split_tests/,
+#                   # runs them in parallel and reports the ones that failed (default)
 # make run          # runs again, in parallel, the test files already written
 # make clean        # removes split_tests/
 # make single       # emergency only: writes ../fast_tests_AlgEtQ.m, with all the tests, and runs it in a single
@@ -14,6 +14,8 @@
 .PHONY : all generate run logs summary single clean
 
 inputAlgEtQ = ../../spec
+inputAlgEtQMod = ../../specMod
+inputAlgEtQMtrx = ../../specMtrx
 outfileAlgEtQ = ../fast_tests_AlgEtQ.m
 splitdir = split_tests
 JOBS ?= $(shell nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)
@@ -37,14 +39,16 @@ generate: clean
 	@echo "Writing the test files in $(splitdir)/..."
 	@mkdir -p $(splitdir)
 	@magma -b input:=$(inputAlgEtQ) prefix:=$(splitdir)/test attach_spec:=1 magma_make_fast_tests_AlgEtQ.m < /dev/null
+	@magma -b input:=$(inputAlgEtQMod) prefix:=$(splitdir)/test_Mod attach_spec:=1 also_attach:=$(inputAlgEtQ),$(inputAlgEtQMtrx) magma_make_fast_tests_AlgEtQ.m < /dev/null
+	@magma -b input:=$(inputAlgEtQMtrx) prefix:=$(splitdir)/test_Mtrx attach_spec:=1 also_attach:=$(inputAlgEtQ) magma_make_fast_tests_AlgEtQ.m < /dev/null
 	@ls $(splitdir)/test_*.m > /dev/null 2>&1 || { echo "ERROR: no test file was written"; exit 1; }
 	@echo "...Done: $$(ls $(splitdir)/test_*.m | wc -l) test files."
 
 run:
 	@rm -f $(splitdir)/test_*.log
-	@# Attach the spec once, so that the package files are compiled before the parallel runs:
+	@# Attach the specs once, so that the package files are compiled before the parallel runs:
 	@# otherwise all of them would write the same .sig files at the same time.
-	@echo 'AttachSpec("$(inputAlgEtQ)"); quit;' | magma -b > /dev/null
+	@echo 'AttachSpec("$(inputAlgEtQ)"); AttachSpec("$(inputAlgEtQMod)"); AttachSpec("$(inputAlgEtQMtrx)"); quit;' | magma -b > /dev/null
 	@echo "Running the test files, $(JOBS) at a time..."
 	@$(MAKE) --no-print-directory -j$(JOBS) logs
 	@$(MAKE) --no-print-directory summary

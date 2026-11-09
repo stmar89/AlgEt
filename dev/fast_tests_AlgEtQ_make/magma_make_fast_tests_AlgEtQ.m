@@ -15,16 +15,21 @@
         - output_file:= fast_tests_AlgEtQ.txt
         or 
         - prefix: = a prefix for the output files. If assigned, the output files will be named prefix_filename.txt
+          Each of these files starts with SetQuitOnError(true) and ends by printing the line
+          "### All the tests in this file were run", so that a failed or interrupted run can be detected.
+        - attach_spec: (optional, only with prefix) if assigned, each output file attaches the spec file given in input,
+          so that it can be run on its own. Otherwise, the files do not attach any spec.
 
 
 For example:
     magma -b input:=AlgEtQ.spec prefix:=../../../test/Ring/AlgEtQ/test generate_tests.m
+    magma -b input:=../../spec prefix:=split_tests/test attach_spec:=1 magma_make_fast_tests_AlgEtQ.m
 */
 
 
 assert assigned input;
 assert assigned output_file xor assigned prefix;
-if assigned prefix and not assigned no_attach_spec then
+if assigned prefix and not assigned no_attach_spec and not assigned attach_spec then
     no_attach_spec := true;
 end if;
 SetColumns(0);
@@ -113,9 +118,13 @@ tests := [<filename, generate_test_content_from_file(folder, filename)> : filena
 tests := [elt : elt in tests | elt[2] ne ""];
 
 if assigned prefix then
-    // One standalone file per source file
+    // One standalone file per source file.
+    // SetQuitOnError makes Magma exit with a non-zero status at the first runtime error, and the last line
+    // is printed only if the whole file was run: both are used to detect failures.
     for elt in tests do
-        Write(Sprintf("%o_%o", prefix, elt[1]), header cat elt[2] cat "\nquit;" : Overwrite := true);
+        out := header cat "SetQuitOnError(true);\n" cat elt[2];
+        out cat:= "\nprint \"### All the tests in this file were run\";\nquit;";
+        Write(Sprintf("%o_%o", prefix, elt[1]), out : Overwrite := true);
     end for;
 else
     assert assigned output_file;

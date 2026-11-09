@@ -1,6 +1,8 @@
 *.sig
 *.swp
 tmp_*
+dev/fast_tests_AlgEtQ_make/split_tests/
+dev/fast_tests_AlgEtQ.m
 deprecated/
 Graphs_0.1.m
 NewStuff.m

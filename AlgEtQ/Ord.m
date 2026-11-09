@@ -20,11 +20,10 @@ import "Elt.m" : CreateAlgEtQElt;
 declare attributes AlgEtQ : MaximalOrder,
                            ProductOfEquationOrders,
                            EquationOrder,
-                           KnownOrders; // This is a AssociativeArray indexed by rational numbers q:
-                                        // in the key q we store all orders S in the algebra such that q=Index(S),
-                                        // which is the index with respect to the fixed basis of A.
+                           KnownOrders; // An indexed set containing all the orders in the algebra constructed so far.
                                         // We store them, because to avoid creating multiple copies of the same order.
                                         // In particular, this is more efficient for the attributes.
+                                        // Looking up an order in it uses the intrinsic Hash for orders.
                                         // The attribute is populated at creation of the order.
 
 declare attributes AlgEtQOrd : IsMaximal,
@@ -258,21 +257,20 @@ end intrinsic;
 intrinsic IsKnownOrder(~R::AlgEtQOrd)
 {This procedure checks whether the given order is already in the list of known orders of the parent algebra. If so then it replaces the given order with the stored copy. If not, it adds is added to the storage.}
     A:=Algebra(R);
-    // new with AssociativeArray. Sorting the orders, should make it faster.
+    // A`KnownOrders is an indexed set: looking up R uses the intrinsic Hash for orders.
     if not assigned A`KnownOrders then
-        A`KnownOrders:=AssociativeArray();
-        A`KnownOrders[Index(R)]:={@ R @};
+        A`KnownOrders:={@ R @};
     else
-        ind:=Index(R);
-        if not IsDefined(A`KnownOrders,ind) then
-            A`KnownOrders[ind]:={@ R @};
+        i:=Index(A`KnownOrders,R);
+        if i gt 0 then
+            R:=A`KnownOrders[i];
         else
-            if exists(S){ T : T in A`KnownOrders[ind] | R eq T } then // this equality is done on the Hash level,
-                                                                      // which means that
-                R:=S;
-            else
-                Include(~A`KnownOrders[ind],R);
-            end if;
+            // We take the indexed set out of the attribute, so that Include modifies it in place:
+            // otherwise the whole set is copied, and every order in it hashed again, at every new order.
+            K:=A`KnownOrders;
+            delete A`KnownOrders;
+            Include(~K,R);
+            A`KnownOrders:=K;
         end if;
     end if;
 end intrinsic;
@@ -690,7 +688,7 @@ end intrinsic;
 
     ff:=Conductor(EquationOrder(A));
     T:=MultiplicatorRing(ff);
-    assert T in A`KnownOrders[Index(T)];
+    assert T in A`KnownOrders;
     assert assigned T`IsMaximal and assigned T`IsProductOfOrders; //these two attributes are assigned when we created OA above.
                                                                   // hence T points to the same memory spot of OA
     printf ".";

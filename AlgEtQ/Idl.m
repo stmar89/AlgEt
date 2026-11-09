@@ -33,6 +33,8 @@ declare attributes AlgEtQIdl : Index, //stores the index
                               TraceDualIdeal,
                               Hash, // the sequence returned by myHash
                               HashValue, // the integer returned by Hash
+                              ExtensionToMaximalOrder, // the ideal O!!I, where O is the maximal order: see '!!'
+                              ExtensionToMultiplicatorRing, // the ideal S!!I, where S is MultiplicatorRing(I): see '!!'
                               inclusion_matrix;
 
 import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQtoA , meet_zbasis , inclusion_matrix;
@@ -200,10 +202,26 @@ intrinsic '!!'(T::AlgEtQOrd,I::AlgEtQIdl) -> AlgEtQIdl
         end if;
         return id;
     else //in this case Order(I) is strictly contained in T
+        // The extensions of I to the maximal order and to the multiplicator ring of I are computed often:
+        // we store them in I. The extensions to other orders are not stored, to keep the memory bounded.
+        // We check that the cached orders is ideantical to the passed one with IsIdentical. It has an effect
+        // only when CheckIsKnownOrder:=false. It is very cheap since it is only a pointer check.
+        to_max:=assigned T`IsMaximal and T`IsMaximal;
+        to_mr:=(not to_max) and assigned I`MultiplicatorRing and T eq I`MultiplicatorRing;
+        if to_max and assigned I`ExtensionToMaximalOrder and IsIdentical(Order(I`ExtensionToMaximalOrder),T) then
+            return I`ExtensionToMaximalOrder;
+        elif to_mr and assigned I`ExtensionToMultiplicatorRing and IsIdentical(Order(I`ExtensionToMultiplicatorRing),T) then
+            return I`ExtensionToMultiplicatorRing;
+        end if;
         out:=Ideal(T,Generators(I));
         if (assigned T`IsMaximal and IsMaximal(T)) or (assigned I`IsInvertible and IsInvertible(I)) then
             out`IsInvertible:=true;
             out`MultiplicatorRing:=T;
+        end if;
+        if to_max then
+            I`ExtensionToMaximalOrder:=out;
+        elif to_mr then
+            I`ExtensionToMultiplicatorRing:=out;
         end if;
         return out;
     end if;

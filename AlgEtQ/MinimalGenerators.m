@@ -30,15 +30,19 @@ intrinsic TwoGeneratingSet(I::AlgEtQIdl)
         // end if;
         a:=ShortElement(I);
         S:=Order(I);
-        Q,q:=Quotient(I,[a*z : z in ZBasis(S)]);
+        zbaS:=[a*z : z in ZBasis(S)];
+        Q,q:=Quotient(I,zbaS);
         if IsTrivial(Q) then
             I`Generators:=[a]; //the ideal is principal
         else
+            aS:=Ideal(S,zbaS);
+            aS`ZBasis:=zbaS;
             repeat
                 repeat
                     b:=Random(Q);
                 until b ne Zero(Q);
-                b:=b@@q;
+                // We take b short modulo aS: the generators are used to multiply ideals, which is faster with small generators.
+                b:=ShortElementModulo(b@@q,aS);
             //until I eq Ideal(S,[a,b]);
             until Q eq sub<Q|[q(b*z):z in ZBasis(S)]>;
             I`Generators:=[a,b];
@@ -64,6 +68,21 @@ end intrinsic;
         I:=p(g);
         TwoGeneratingSet(I);
         assert #Generators(I) le 2;
+        printf ".";
+    end for;
+
+    // The second generator is short modulo a*E, where a is the first one.
+    for g in Generators(P) do
+        I:=Ideal(E,ZBasis(p(g))); // with 4 generators, so that TwoGeneratingSet computes new ones
+        TwoGeneratingSet(I);
+        if #Generators(I) eq 2 then
+            a,b:=Explode(Generators(I));
+            zbaE:=[ a*z : z in ZBasis(E) ];
+            aE:=Ideal(E,zbaE);
+            aE`ZBasis:=zbaE;
+            assert ShortElementModulo(b,aE) eq b;
+            assert I eq Ideal(E,[a,b]);
+        end if;
         printf ".";
     end for;
 

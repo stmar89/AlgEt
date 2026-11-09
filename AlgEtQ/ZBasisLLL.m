@@ -77,6 +77,20 @@ intrinsic ZBasisLLL(S::AlgEtQIdl)
   end if;
 end intrinsic;
 
+//------------
+// Short elements modulo a fractional ideal
+//------------
+
+/// Given an element $x$ and a fractional ideal $J$ in the same algebra, returns an element of $x+J$ with small coordinates. It is obtained by subtracting from $x$ the element of $J$ whose coordinates with respect to the stored $\mathbb{Z}$-basis of $J$ are the coordinates of $x$ rounded to the nearest integers. The stored $\mathbb{Z}$-basis of $J$ is first replaced by an LLL-reduced one, see `ZBasisLLL`. The output depends only on the class of $x$ modulo $J$, and it is $0$ if and only if $x$ is in $J$.
+intrinsic ShortElementModulo(x::AlgEtQElt, J::AlgEtQIdl) -> AlgEtQElt
+{Given an element x and a fractional ideal J in the same algebra, returns an element of x+J with small coordinates. It is obtained by subtracting from x the element of J whose coordinates with respect to the stored Z-basis of J are the coordinates of x rounded to the nearest integers. The stored Z-basis of J is first replaced by an LLL-reduced one, see ZBasisLLL. The output depends only on the class of x modulo J, and it is 0 if and only if x is in J.}
+    require Algebra(x) cmpeq Algebra(J) : "the element and the ideal must be in the same algebra";
+    ZBasisLLL(J);
+    c := AbsoluteCoordinates([x],J)[1];
+    // We round with Floor(e+1/2), since it commutes with adding integers: hence the output depends only on x+J.
+    return x - DotProduct([ Floor(e+1/2) : e in c ], ZBasis(J));
+end intrinsic;
+
 /* TESTS
 
   printf "### Testing ZBasisLLL:";
@@ -191,6 +205,26 @@ end intrinsic;
       assert R subset O;
       printf ".";
   end for;
+
+  // ShortElementModulo(y,J) is in y+J, it depends only on y+J, it is 0 on J, and its coordinates are at most half
+  // the sum of the absolute values of the coordinates of the elements of the LLL-reduced Z-basis of J.
+  A:=EtaleAlgebra(x^8+16);
+  E:=EquationOrder(A);
+  pp:=SingularPrimes(E);
+  ids:=[ OneIdeal(E), Conductor(E), 3*OneIdeal(E), (1/2)*Conductor(E) ] cat pp cat [ P^3 : P in pp ];
+  for J in ids do
+      for i in [1..5] do
+          y:=DotProduct([ Random(-10^10,10^10) : j in [1..8] ],AbsoluteBasis(A))/Random(1,100);
+          z:=ShortElementModulo(y,J);
+          assert y-z in J;
+          assert ShortElementModulo(y+Random(J,10^5),J) eq z;
+          bound:=[ (1/2)*&+[ Abs(AbsoluteCoordinates(b)[k]) : b in ZBasis(J) ] : k in [1..8] ];
+          assert forall{ k : k in [1..8] | Abs(AbsoluteCoordinates(z)[k]) le bound[k] };
+      end for;
+      assert ShortElementModulo(Random(J,100),J) eq Zero(A);
+      printf ".";
+  end for;
+
   SetAssertions(1);
   printf " all good!";
 

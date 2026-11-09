@@ -32,12 +32,12 @@ declare attributes AlgEtQIdl: residue_class_ring_unit_subgroup_generators,
 ///
 /// The Picard group and the unit group of the order $R$ can be computed using the well-known exact sequence:
 /// ```math
-/// 1 \to R^\times \to \mathcal{O}_A^\times \to \dfrac{\left( \mathcal{O}/\mathfrak{f} \right)^\times}{\left( \mathcal{O}/\mathfrak{f} \right)^\times} \to \mathrm{Pic}(R)\to \mathrm{Pic}(\mathcal{O}_A) \to 1,
+/// 1 \to R^\times \to \mathcal{O}_A^\times \to \dfrac{\left( \mathcal{O}_A/\mathfrak{f} \right)^\times}{\left( R/\mathfrak{f} \right)^\times} \to \mathrm{Pic}(R)\to \mathrm{Pic}(\mathcal{O}_A) \to 1,
 /// ```
-/// where the first, second and third map are the natural maps, the fourth is induced by $a \mapsto (a\mathcal{O}_A \cap R)$ and the last one is induced by the extension map $I \mapsto I\mathcal{O}_A$.
+/// where $\mathfrak{f}$ is the conductor of $R$, the first, second and third map are the natural maps, the fourth is induced by $a \mapsto (a\mathcal{O}_A \cap R)$ and the last one is induced by the extension map $I \mapsto I\mathcal{O}_A$.
 ///
 /// The following intrinsics allow to compute all the elements of the sequence.
-/// If one wants to perform the computation under the GRH bound one can either use the appropriate parameters of use `SetClassGroupBounds("GRH")` as for number fields.
+/// If one wants to perform the computation under the GRH bound one can either use the appropriate parameters or use `SetClassGroupBounds("GRH")` as for number fields.
 
 
 /// Given an order $S$ and a fractional $S$-ideal $I$, returns the group $(S/I)^\times$ and a map $(S/I)^\times \to  S$ giving representatives. This is implemented only when $S$ is the maximal order.
@@ -116,11 +116,12 @@ intrinsic ResidueRingUnits(I::AlgEtQIdl) -> GrpAb,Map
     return ResidueRingUnits(Order(I),I);
 end intrinsic;
 
-/// Given a fractional $S$-ideal $F$, returns generators of $(S/F)^\times$.
+/// Given an integral $S$-ideal $F$ which is also an ideal of the maximal order of the algebra (for example, the conductor of $S$), returns generators of $(S/F)^\times$.
 intrinsic ResidueRingUnitsSubgroupGenerators(F::AlgEtQIdl) -> SeqEnum[AlgEtQElt]
-{Given a fractional S-ideal F, returns generators of (S/F)^*.}
+{Given an integral S-ideal F which is also an ideal of the maximal order of the algebra (for example, the conductor of S), returns generators of (S/F)^*.}
     if not assigned F`residue_class_ring_unit_subgroup_generators then
         S:=Order(F);
+        require F subset OneIdeal(S) and IsMaximal(MultiplicatorRing(F)) : "F must be an integral ideal of S which is also an ideal of the maximal order.";
         A:=Algebra(S);
         O:=MaximalOrder(A);
         Fm:=O!!F;
@@ -734,8 +735,8 @@ intrinsic IsIsomorphic(I::AlgEtQIdl, J::AlgEtQIdl : GRH:=false ) -> BoolElt, Alg
     if test then
         test2,x:= IsPrincipal(CIJ : GRH:=GRH );
         if test2 then
+            assert2 I eq x*J;
             return test2,x;
-        assert2 I eq x*J;
         else
             return false, _ ;
         end if;

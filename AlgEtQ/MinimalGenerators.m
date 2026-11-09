@@ -56,7 +56,9 @@ end intrinsic;
     f:=x^4-1000*x^3-1000*x^2-1000*x-1000;
     K:=EtaleAlgebra(f);
     E:=EquationOrder(K);
-    P,p:=PicardGroup(E : GRH:=true); //~10 secs
+    SetAssertions(1); // with SetAssertions(2), PicardGroup takes ~100 secs for this order: here we test MinimalGenerators
+    P,p:=PicardGroup(E : GRH:=true);
+    SetAssertions(2);
 
     for g in Generators(P) do
         I:=p(g);

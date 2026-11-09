@@ -49,7 +49,7 @@ intrinsic GraphOverOrders(R:AlgEtQOrd) -> GrphDir
                 // test
                 assert2 forall{ e : e in edges_P | oo_P[e[1]] subset oo_P[e[2]]}; // inclusions
                 // the next test is very time consuming
-                assert2 forall{ e : e in edges_P | [ S : S in oo_P | S ne oo_P[e[1]] and oo_P[e[1]] subset S
+                assert3 forall{ e : e in edges_P | [ S : S in oo_P | S ne oo_P[e[1]] and oo_P[e[1]] subset S
                                 and S subset oo_P[e[2]] ] eq [oo_P[e[2]]]}; // minimal inclusions
                 Append(~edges,edges_P);
             end for;

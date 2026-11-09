@@ -220,7 +220,7 @@ end intrinsic;
 intrinsic 'eq'(I::AlgEtQMod,J::AlgEtQMod) -> BoolElt
 {Equality testing.}
     V,m:=UniverseAlgebra(I);
-    VJ,mJ:=UniverseAlgebra(I); 
+    VJ,mJ:=UniverseAlgebra(J); 
     require V cmpeq VJ : "The modules are not in the same algebra.";
     // one should check that the action is the same, maybe with an assert2
     require Order(I) cmpeq Order(J) : "The modules are not over the same order.";

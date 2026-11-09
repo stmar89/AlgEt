@@ -26,7 +26,8 @@ declare attributes AlgEtQICMElt : Parent,
                                   WEClass,
                                   PicClass,
                                   IsOne,
-                                  IsInvertibleInMultiplicatorRing;
+                                  IsInvertibleInMultiplicatorRing,
+                                  HashValue; // the integer returned by Hash
 
 ///## Abstract representation of the ideal class monoid
 /// The second way method to compute the ideal class monoid of an order $R$, returns an abstract representation of $\mathcal{I}(R)$ with type `AlgEtQICM` together with a map to a set of representatives. Each class has type `AlgEtQICMElt`, and it is internally represented as pair consisting of a weak equivalence class (of type `AlgEtQWECMElt`) and an element of the representation of $\mathrm{Pic}(S)$ (as an abstract abelian group), where $S$ is the corresponding multiplicator ring. This representation is more efficient than the previous one, since it does not need to compute in advance and store a representative for each ideal class.
@@ -113,6 +114,15 @@ end intrinsic;
 intrinsic 'eq'(x::AlgEtQICMElt,y::AlgEtQICMElt)->BoolElt
 {Returns whether the two elements define the same class.}
     return WEClass(x) eq WEClass(y) and PicClass(x) eq PicClass(y);
+end intrinsic;
+
+/// Returns a hash value of the ideal class, computed from its weak equivalence class and from the coordinates of its class in the Picard group, so that equal classes have the same hash value. The value is stored in the attribute `HashValue`. Magma uses it to build sets, indexed sets and associative arrays of ideal classes: only ideal classes with the same hash value are compared with `eq`. Different ideal classes might have the same hash value: this only costs an extra comparison.
+intrinsic Hash(x::AlgEtQICMElt) -> RngIntElt
+{Returns a hash value of the ideal class, computed from its weak equivalence class and from the coordinates of its class in the Picard group, so that equal classes have the same hash value. The value is stored in the attribute HashValue. Magma uses it to build sets, indexed sets and associative arrays of ideal classes: only ideal classes with the same hash value are compared with eq. Different ideal classes might have the same hash value: this only costs an extra comparison.}
+    if not assigned x`HashValue then
+        x`HashValue:=Hash([Hash(WEClass(x))] cat Eltseq(PicClass(x)));
+    end if;
+    return x`HashValue;
 end intrinsic;
 
 //////////////////////////////////////////////
@@ -354,6 +364,37 @@ end intrinsic;
     _:=Random(icm)*Random(icm);
     _:=[Random(icm)^i:i in [1..100]];
     _:=[x*y:x,y in Classes(icm)];
+
+    // testing Hash: sets, indexed sets and associative arrays of ideal classes, also when the hash values collide
+    _<x>:=PolynomialRing(Integers());
+    A:=EtaleAlgebra(x^4+16);
+    E:=EquationOrder(A);
+    icm,m:=IdealClassMonoidAbstract(E);
+    cl:=Classes(icm);
+    assert #icm eq 21;
+    assert #Seqset(cl cat cl) eq #icm and #{@ c : c in cl @} eq #icm;
+    // new objects for the same classes, from other representatives
+    c1:=[ icm!m(c) : c in cl ];
+    c2:=[ icm!(RandomUnit(A)*m(c)) : c in cl ];
+    assert forall{ i : i in [1..#cl] | c1[i] eq cl[i] and c2[i] eq cl[i] };
+    assert forall{ i : i in [1..#cl] | Hash(c1[i]) eq Hash(cl[i]) and Hash(c2[i]) eq Hash(cl[i]) };
+    X:={@ c : c in cl @};
+    assert forall{ i : i in [1..#cl] | Index(X,c1[i]) eq i and Index(X,c2[i]) eq i };
+    assert #Seqset(cl cat c1 cat c2) eq #icm;
+    AA:=AssociativeArray();
+    for i in [1..#cl] do AA[cl[i]]:=i; end for;
+    assert #Keys(AA) eq #icm and forall{ i : i in [1..#cl] | AA[c1[i]] eq i and AA[c2[i]] eq i };
+    printf ".";
+    // forced collisions: the new objects get the same hash value
+    for c in c1 cat c2 do y:=c; y`HashValue:=0; end for; // y and c are the same object
+    assert #{ Hash(c) : c in c1 cat c2 } eq 1;
+    assert #Seqset(c1 cat c2) eq #icm;
+    X:={@ c : c in c1 @};
+    assert forall{ i : i in [1..#cl] | Index(X,c2[i]) eq i };
+    AA:=AssociativeArray();
+    for i in [1..#cl] do AA[c1[i]]:=i; end for;
+    assert #Keys(AA) eq #icm and forall{ i : i in [1..#cl] | AA[c2[i]] eq i };
+    printf ".";
 
     SetAssertions(1);
     printf " all good!";

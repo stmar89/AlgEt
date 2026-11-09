@@ -39,7 +39,8 @@ declare attributes AlgEtQMod : Index, //stores the index
                               Generators,
                               ZBasis,
                               IsDirectSumOfIdeals,
-                              Hash,
+                              Hash, // the sequence returned by myHash
+                              HashValue, // the integer returned by Hash
                               inclusion_matrix;
 
 import "../AlgEtQ/Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQtoA , meet_zbasis , inclusion_matrix;
@@ -236,6 +237,17 @@ intrinsic 'eq'(I::AlgEtQMod,J::AlgEtQMod) -> BoolElt
     return out;
 end intrinsic;
 
+/// Returns a hash value of the module, so that equal modules have the same hash value. It is computed from the sequence returned by `myHash` and it is stored in the attribute `HashValue`. Magma uses it to build sets, indexed sets and associative arrays of modules: only modules with the same hash value are compared with `eq`. Different modules might have the same hash value: this only costs an extra comparison.
+intrinsic Hash(I::AlgEtQMod) -> RngIntElt
+{Returns a hash value of the module, so that equal modules have the same hash value. It is computed from the sequence returned by myHash and it is stored in the attribute HashValue. Magma uses it to build sets, indexed sets and associative arrays of modules: only modules with the same hash value are compared with eq. Different modules might have the same hash value: this only costs an extra comparison.}
+    if not assigned I`HashValue then
+        // The entries of myHash(I) are integers, but its universe is Rationals().
+        // Since the universe matters, e.g. Hash([1,2]) ne Hash([1/1,2/1]), we make sure it is Integers().
+        I`HashValue:=Hash(ChangeUniverse(myHash(I),Integers()));
+    end if;
+    return I`HashValue;
+end intrinsic;
+
 intrinsic 'ne'(I::AlgEtQMod , J::AlgEtQMod ) -> BoolElt
 {Disequality testing.}
     return not I eq J;
@@ -350,5 +362,49 @@ end intrinsic;
 
 
 /* TESTS
-    // see all_tests_AlgEtQMod.m
+
+    printf "### Testing Modules:";
+    //AttachSpec("../spec");
+    //AttachSpec("../specMod");
+    //AttachSpec("../specMtrx");
+    // the other tests for modules are in dev/all_tests_AlgEtQMod.m
+    SetAssertions(2);
+    // testing Hash: sets, indexed sets and associative arrays of modules, also when the hash values collide
+    _<x>:=PolynomialRing(Integers());
+    K1:=NumberField(x^2+5);
+    K:=EtaleAlgebra([K1]);
+    V:=EtaleAlgebra([K1,K1]);
+    m:=NaturalAction(K,V);
+    E:=EquationOrder(K);
+    SetSeed(1);
+    mods:=[]; // distinct modules
+    seen:={};
+    while #mods lt 30 do
+        M:=Module(E,m,[ Random(V) : i in [1..3] ]);
+        if not myHash(M) in seen then
+            Include(~seen,myHash(M));
+            Append(~mods,M);
+        end if;
+    end while;
+    // the same modules, created from their Z-bases
+    copies1:=[ Module(E,m,ZBasis(M)) : M in mods ];
+    copies2:=[ Module(E,m,ZBasis(M)) : M in mods ];
+    assert forall{ i : i in [1..#mods] | Hash(copies1[i]) eq Hash(mods[i]) };
+    X:={@ M : M in mods @};
+    assert #X eq #mods;
+    assert forall{ i : i in [1..#mods] | Index(X,copies1[i]) eq i };
+    assert #Seqset(mods cat copies1) eq #mods;
+    AA:=AssociativeArray();
+    for i in [1..#mods] do AA[mods[i]]:=i; end for;
+    assert #Keys(AA) eq #mods and forall{ i : i in [1..#mods] | AA[copies1[i]] eq i };
+    printf ".";
+    // forced collisions: the copies get the same hash value
+    for M in copies1 cat copies2 do y:=M; y`HashValue:=0; end for; // y and M are the same object
+    assert #{ Hash(M) : M in copies1 cat copies2 } eq 1;
+    assert #Seqset(copies1 cat copies2) eq #mods;
+    X:={@ M : M in copies1 @};
+    assert forall{ i : i in [1..#mods] | Index(X,copies2[i]) eq i };
+    printf ".";
+    SetAssertions(1);
+    printf " all good!";
 */

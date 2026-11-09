@@ -26,7 +26,8 @@ declare attributes AlgEtQWECM : Order,
 declare attributes AlgEtQWECMElt : Parent,
                                    Ideal,
                                    IsOne,
-                                   IsIdempotent;
+                                   IsIdempotent,
+                                   HashValue; // the integer returned by Hash
 
 ///## Abstract representation of the weak equivalence class monoid.
 /// The second method to compute $\mathcal{W}(R)$ returns an abstract representation of the monoid together with a map giving representatives. The monoid is of type `AlgEtQWECM` and each class is of type `AlgEtQWECMElt`. Classes can be created by feeding to the operator `!` a fractional $S$-ideal, when $S$ is an overorder of $R$ or an overorder of $R$.
@@ -110,6 +111,18 @@ intrinsic 'eq'(x::AlgEtQWECMElt,y::AlgEtQWECMElt)->BoolElt
         assert3 not IsWeaklyEquivalent(I,J);
         return false;
     end if;
+end intrinsic;
+
+/// Returns a hash value of the class, computed from the stored representative, so that equal classes have the same hash value. The value is stored in the attribute `HashValue`, and it does not change if the representative is changed with `SetRepresentative`. Magma uses it to build sets, indexed sets and associative arrays of classes, like the multiplication table of the monoid: only classes with the same hash value are compared with `eq`. Different classes might have the same hash value: this only costs an extra comparison.
+intrinsic Hash(x::AlgEtQWECMElt) -> RngIntElt
+{Returns a hash value of the class, computed from the stored representative, so that equal classes have the same hash value. The value is stored in the attribute HashValue, and it does not change if the representative is changed with SetRepresentative. Magma uses it to build sets, indexed sets and associative arrays of classes, like the multiplication table of the monoid: only classes with the same hash value are compared with eq. Different classes might have the same hash value: this only costs an extra comparison.}
+    // Each class is created only once, together with the monoid (see WeakEquivalenceClassMonoidAbstract), and
+    // coercions and products return these objects: equal classes are the same object. Hence the stored value stays
+    // valid when SetRepresentative changes the representative, e.g. for the keys of the multiplication table.
+    if not assigned x`HashValue then
+        x`HashValue:=Hash(Ideal(x));
+    end if;
+    return x`HashValue;
 end intrinsic;
 
 /// Given a class $x$ and a fractional ideal $J$ weakly equivalent to the stored representative, changes the attribute `Ideal` of the class to $J$.
@@ -478,6 +491,47 @@ end intrinsic;
     assert IsBass(E);
     assert IsGeneratingSet(W,Idempotents(W));
     _:=MultiplicationTable(W);
+
+    // testing Hash: sets, indexed sets and associative arrays of classes, also when the hash values collide
+    _<x>:=PolynomialRing(Integers());
+    A:=EtaleAlgebra(x^4+16);
+    E:=EquationOrder(A);
+    W,w:=WeakEquivalenceClassMonoidAbstract(E);
+    cl:=Classes(W);
+    assert #W eq 17;
+    assert #Seqset(cl cat cl) eq #W and #{@ c : c in cl @} eq #W;
+    // the same classes, reached from other representatives
+    X:={@ c : c in cl @};
+    others:=[ W!(RandomUnit(A)*Ideal(c)) : c in cl ];
+    assert forall{ i : i in [1..#cl] | Index(X,others[i]) eq i and Hash(others[i]) eq Hash(cl[i]) };
+    AA:=AssociativeArray();
+    for i in [1..#cl] do AA[cl[i]]:=i; end for;
+    assert #Keys(AA) eq #W and forall{ i : i in [1..#cl] | AA[others[i]] eq i };
+    // the multiplication table has a key {a,b} for each unordered pair of classes
+    T:=MultiplicationTable(W);
+    assert #Keys(T) eq #W*(#W+1) div 2;
+    assert forall{ a : a,b in cl | IsDefined(T,{a,b}) };
+    // a new representative does not change the hash value, so the table is still consistent
+    c:=cl[#cl];
+    h:=Hash(c);
+    SetRepresentative(c,RandomUnit(A)*Ideal(c));
+    assert Hash(c) eq h;
+    assert forall{ a : a in cl | IsDefined(T,{a,c}) };
+    printf ".";
+    // forced collisions: all the classes of a new monoid get the same hash value
+    A:=EtaleAlgebra(x^4+16);
+    E:=EquationOrder(A);
+    W,w:=WeakEquivalenceClassMonoidAbstract(E);
+    cl:=Classes(W);
+    for c in cl do y:=c; y`HashValue:=0; end for; // y and c are the same object
+    assert #{ Hash(c) : c in cl } eq 1;
+    assert #Seqset(cl cat cl) eq #W;
+    X:={@ c : c in cl @};
+    assert forall{ i : i in [1..#cl] | Index(X,cl[i]) eq i and Index(X,W!Ideal(cl[i])) eq i };
+    T:=MultiplicationTable(W);
+    assert #Keys(T) eq #W*(#W+1) div 2;
+    assert forall{ a : a,b in cl | a*b eq (w(a)*w(b))@@w };
+    printf ".";
 
     SetAssertions(1);
     printf " all good!";

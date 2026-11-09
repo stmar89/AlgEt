@@ -45,7 +45,8 @@ declare attributes AlgEtQMtrx :
                                Entries, // SeqEnum[SeqEnum[AlgEtQlt]]
                                Rank,
                                Trace,
-                               Determinant;
+                               Determinant,
+                               HashValue; // the integer returned by Hash
                                // MinimalPolynomial does not work well if there are zerodivisors.
                                // CharacteristicPolynomial require Polynomials over AlgEtQ, not implemented.
 
@@ -293,6 +294,22 @@ intrinsic 'eq'(x1::AlgEtQMtrx,x2::AlgEtQMtrx) -> BoolElt
     else
         return Entries(x1) eq Entries(x2);
     end if;
+end intrinsic;
+
+/// Returns a hash value of the matrix, computed from the rational coordinates of its components, so that equal matrices have the same hash value. The value is stored in the attribute `HashValue`. Magma uses it to build sets, indexed sets and associative arrays of matrices: only matrices with the same hash value are compared with `eq`. Different matrices might have the same hash value: this only costs an extra comparison.
+intrinsic Hash(x::AlgEtQMtrx) -> RngIntElt
+{Returns a hash value of the matrix, computed from the rational coordinates of its components, so that equal matrices have the same hash value. The value is stored in the attribute HashValue. Magma uses it to build sets, indexed sets and associative arrays of matrices: only matrices with the same hash value are compared with eq. Different matrices might have the same hash value: this only costs an extra comparison.}
+    if not assigned x`HashValue then
+        // Components(x) is computed from the entries if needed: the value does not depend on how x was created.
+        coords:=[ Rationals() | NumberOfRows(x), NumberOfColumns(x) ];
+        for M in Components(x) do
+            for e in Eltseq(M) do
+                coords cat:= ChangeUniverse(Eltseq(e),Rationals());
+            end for;
+        end for;
+        x`HashValue:=Hash(coords);
+    end if;
+    return x`HashValue;
 end intrinsic;
 
 // // +
@@ -571,6 +588,34 @@ end intrinsic;
 
     assert &+[ i*R : i in [1..4] ] eq &+[1..4]*R;
     assert &*[ i*R : i in [1..4] ] eq &*[1..4]*R^4;
+
+    // testing Hash: sets, indexed sets and associative arrays of matrices, also when the hash values collide
+    mats:=[]; // distinct matrices
+    while #mats lt 30 do
+        M:=RandomMatrix(A,3,2);
+        if forall{ N : N in mats | N ne M } then
+            Append(~mats,M);
+        end if;
+    end while;
+    // the same matrices, given by their entries only and by their components only
+    e_only:=[ Matrix(Entries(M)) : M in mats ];
+    c_only:=[ M*IdentityMatrix(A,2) : M in mats ];
+    assert forall{ M : M in e_only | not assigned M`Components };
+    assert forall{ M : M in c_only | not assigned M`Entries };
+    assert forall{ i : i in [1..#mats] | Hash(e_only[i]) eq Hash(mats[i]) and Hash(c_only[i]) eq Hash(mats[i]) };
+    X:={@ M : M in mats @};
+    assert #X eq #mats;
+    assert forall{ i : i in [1..#mats] | Index(X,e_only[i]) eq i and Index(X,c_only[i]) eq i };
+    assert #Seqset(mats cat e_only cat c_only) eq #mats;
+    AA:=AssociativeArray();
+    for i in [1..#mats] do AA[mats[i]]:=i; end for;
+    assert #Keys(AA) eq #mats and forall{ i : i in [1..#mats] | AA[e_only[i]] eq i and AA[c_only[i]] eq i };
+    // forced collisions: the copies get the same hash value
+    for M in e_only cat c_only do y:=M; y`HashValue:=0; end for; // y and M are the same object
+    assert #{ Hash(M) : M in e_only cat c_only } eq 1;
+    assert #Seqset(e_only cat c_only) eq #mats;
+    X:={@ M : M in e_only @};
+    assert forall{ i : i in [1..#mats] | Index(X,c_only[i]) eq i };
 
     printf " all good!\n"; 
 

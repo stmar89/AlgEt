@@ -540,8 +540,8 @@ end intrinsic;
 /* TESTS
 
     printf "### Testing Matrices:";
-    AttachSpec("~/AlgEt/spec");
-    AttachSpec("~/AlgEt/specMtrx");
+    //AttachSpec("../spec");
+    //AttachSpec("../specMtrx");
     SetVerbose("AlgEtQMtrx",2);
 
     _<x>:=PolynomialRing(Integers());

@@ -405,6 +405,20 @@ end intrinsic;
     X:={@ M : M in copies1 @};
     assert forall{ i : i in [1..#mods] | Index(X,copies2[i]) eq i };
     printf ".";
+    // regression test: 'eq' raises an error for modules in different algebras.
+    // Before, the algebra of I was compared with itself, and the check never failed.
+    V3:=EtaleAlgebra([K1,K1,K1]);
+    m3:=NaturalAction(K,V3);
+    M:=Module(E,m,AbsoluteBasis(V));
+    M3:=Module(E,m3,AbsoluteBasis(V3));
+    msg:="";
+    try
+        _:=M eq M3;
+    catch e
+        msg:=e`Object;
+    end try;
+    assert "not in the same algebra" in msg;
+    printf ".";
     SetAssertions(1);
     printf " all good!";
 */

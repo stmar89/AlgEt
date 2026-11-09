@@ -105,6 +105,29 @@
             printf "PicardGroup for %o got slower. The previous code was better.\n",f;
         end if;
     end if;
+
+    "-------------------------------------------------------------";
+    "An order in a product of two number fields, whose conductor has primes with residue fields of size 5^4 and 13^4.";
+    "It used to take about 8 seconds, mostly in ResidueField, which searched S/P for a root of a polynomial.";
+    AttachSpec("../spec");
+    SetSeed(1);
+    _<x>:=PolynomialRing(Integers());
+    f:=(x^8+16)*(x^8+81);
+    A:=EtaleAlgebra(f);
+    E:=EquationOrder(A);
+    t0:=Cputime();
+        P,p:=PicardGroup(E : GRH:=true);
+    t1:=Cputime(t0);
+    assert AbelianInvariants(P) eq [ 2, 6, 24, 48, 48, 240 ];
+    printf "Current running time = %o \n",t1;
+    tprevbest:=1.430; //on laptop aerox
+    if Abs(t1 - tprevbest) gt 0.1*tprevbest then
+        if t1 lt tprevbest then
+            printf "PicardGroup for %o got faster. Update the previous best known time\n",f;
+        elif t1 gt tprevbest then
+            printf "PicardGroup for %o got slower. The previous code was better.\n",f;
+        end if;
+    end if;
 	
     "-------------------------------------------------------------";
     "-------------------------------------------------------------";

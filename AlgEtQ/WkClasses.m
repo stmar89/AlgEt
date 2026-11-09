@@ -18,6 +18,7 @@ declare verbose WKICM_bar, 2;
 declare attributes AlgEtQOrd:   WKICM,
                                 WKICM_bar;
 import "LowCohenMacaulayType.m" : wkicm_bar_CM_type2;
+import "OverOrders.m" : sort_overorders;
 
 
 ///# Weak equivalence class monoid
@@ -408,24 +409,20 @@ intrinsic WKICM(E::AlgEtQOrd)->SeqEnum[AlgEtQIdl]
             // There will be a lot of overlap. So we try to do it in a smart way.
             t0:=Cputime();
             vprintf WKICM,2 : "\tWe merge the overorders of the minimal overorders.";
-            oo_E:=AssociativeArray();
+            oo_E:={@ @}; // the repetitions are removed using the intrinsic Hash for orders
             for S in min do
                 for T in OverOrders(S) do
-                    indT:=Index(T);
-                    if not IsDefined(oo_E,indT) then
-                        oo_E[indT]:={@ T @};
-                    else
-                        Include(~oo_E[indT],T);
-                    end if;
+                    Include(~oo_E,T);
                 end for;
             end for;
-            oo_E:=&cat[ Setseq(oo_E[k]) : k in Keys(oo_E) ];
+            oo_E:=IndexedSetToSequence(oo_E); // does not contain E.
             vprintf WKICM,2 : "...Done in %o secs.\n",Cputime(t0);
             assert2 forall{ S : S in oo_E | assigned S`WKICM_bar };
             wk_mins:=&cat[ [ E !! I : I in WKICM_bar(S)] : S in oo_E ];
-            E`OverOrders:=[ E ] cat oo_E;
-            E`WKICM:=wk_mins cat WKICM_bar(E); // here I need to use WKICM_bar(P:P) which is already computed since
-                                               // each for each S in min we have that S c (P:P)
+            oo_E:=[E] cat oo_E;
+            sort_overorders(~oo_E); // as in OverOrders: E comes first
+            E`OverOrders:=oo_E;
+            E`WKICM:=WKICM_bar(E) cat wk_mins;
         else //more then 1 singular prime: divide and patch
             vprintf WKICM,2 : "There are %o singular primes.\n",#pp;
             O:=MaximalOrder(Algebra(E));
@@ -444,17 +441,17 @@ intrinsic WKICM(E::AlgEtQOrd)->SeqEnum[AlgEtQIdl]
                 _,p:=IsPrimePower(Index(E,P));
                 Append(~ps,p);
                 k:=Valuation(Index(O,E),p);
-                EP:=Order(ZBasis(E) cat ZBasis(O!!P^k));
+                EP:=Order(ZBasis(E) cat ZBasis(O!!P^k)); // EP is an overorder of E, locally equal to E at P,
+                                                         // and to the maximal order O at every other prime.
+                                                         // In particular, EP has a unique singular prime,
+                                                         // which is the extension of P.
                 wk_P:=$$(EP); // recursion
-                // wk_P = W_P(E) = W(E+P^k0O) in the notation above
+                // wk_P = W_P(E) = W(E+O!!P^k) in the notation above
                 wk_P:=[ E !! I : I in wk_P];
                 vprintf WKICM,2 : "...Done in %o secs.\n",Cputime(t0);
                 Append(~wk_pp,wk_P);
             end for;
-
-            ///////////////////////////////
             // We now reconstruct W(E) using the P-local parts W_P(E) = W(E+P^kO)
-            //////////////////////////////
             wk_pp_idls:=[];
             pp_pows:=[];
             t1:=Cputime();
@@ -539,47 +536,35 @@ intrinsic WKICM(E::AlgEtQOrd)->SeqEnum[AlgEtQIdl]
 
             // We populate the attributes E`OverOrders and S`WKICM_bar for each overorder.
             // This is needed for the recursion step.
-            // Note that some of the overorders have already the vararg WKICM_bar populated, because, for
-            // example, they were coming from the recursive-1-single-singular-prime part of the code.
-            // In this case, we don't want to add it a second time. Hence we need to keep track of this info.
-            // We do it by using nested AssociativeArrays
-            // FIXME this whole block looks weir. I think we can make it faster/simpler, epecially now that
-            // orders are hashed.
+            // The overorders of E are the multiplicator rings of the classes in wk:
+            // we collect them in an indexed set and sort them as in OverOrders using sort_overorders.
+            // Some of the overorders have already the vararg WKICM_bar populated, because, for
+            // example, they were coming from the recursive-1-single-singular-prime part.
+            // For the ones without WKICM_bar, we collect the classes with that multiplicator ring in an
+            // AssociativeArray, keyed by the order. Both use the intrinsic Hash for orders.
             t0:=Cputime();
             vprintf WKICM,2 : "We start populating the varargs OverOrders and WKICM_bar.\n";
             if not assigned E`OverOrders then
-                oo:=AssociativeArray();
+                oo_E:={@ @};
+                wk_bar:=AssociativeArray();
                 for I in wk do
                     S:=MultiplicatorRing(I);
-                    ind:=Index(S);
-                    if not IsDefined(oo,ind) then
-                        oo[ind]:=AssociativeArray();
-                        oo[ind][true]:={@ @};
-                        oo[ind][false]:=AssociativeArray();
-                        oo[ind][false]["orders"]:=[];
-                        oo[ind][false]["wkicm_bars"]:=[];
-                    end if;
-                    if assigned S`WKICM_bar then
-                        Include(~oo[ind][true],S);
-                    else
-                        indS:=Index(oo[ind][false]["orders"],S);
-                        if indS eq 0 then //this is the first time we see S.
-                            Append(~oo[ind][false]["orders"],S);
-                            Append(~oo[ind][false]["wkicm_bars"],[S!!I]);
+                    Include(~oo_E,S);
+                    if not assigned S`WKICM_bar then
+                        if IsDefined(wk_bar,S) then
+                            Append(~wk_bar[S],S!!I);
                         else
-                            Append(~oo[ind][false]["wkicm_bars"][indS],S!!I);
+                            wk_bar[S]:=[S!!I];
                         end if;
                     end if;
                 end for;
-                oo_E:=[];
-                for ind in Keys(oo) do
-                    oo_E cat:=Setseq(oo[ind][true]);
-                    for iS in [1..#oo[ind][false]["orders"]] do
-                        S:=oo[ind][false]["orders"][iS];
-                        S`WKICM_bar:=oo[ind][false]["wkicm_bars"][iS];
-                        Append(~oo_E,S);
-                    end for;
+                for S in Keys(wk_bar) do
+                    T:=S; // T and S are the same object: attributes cannot be assigned to the loop variable
+                    T`WKICM_bar:=wk_bar[S];
                 end for;
+                oo_E:=IndexedSetToSequence(oo_E);
+                sort_overorders(~oo_E); // as in OverOrders
+                assert2 E in oo_E;
                 E`OverOrders:=oo_E;
             end if;
             vprintf WKICM,2 : "\t...Done in %o secs.\n",Cputime(t0);
@@ -620,6 +605,18 @@ end intrinsic;
     oo:=FindOverOrders(R : populateoo_in_oo:=true); //to avoid any computation related to the OverOrders
     assert #oo eq 19;
     assert #WKICM(R) eq 31;
+
+    // WKICM populates the attribute OverOrders: it must be sorted as the output of OverOrders.
+    // The three orders have 1, 2 and 3 singular primes.
+    for f in [ x^3+31*x^2+43*x+77, x^4-1000*x^3-1000*x^2-1000*x-1000, x^4+291*x^3-988*x^2-1000*x-1000 ] do
+        K:=EtaleAlgebra(f);
+        E:=EquationOrder(K);
+        _:=WKICM(E);
+        K2:=EtaleAlgebra(f); // a new algebra, so that nothing is computed yet
+        E2:=EquationOrder(K2);
+        assert [ myHash(S) : S in OverOrders(E) ] eq [ myHash(S) : S in OverOrders(E2) ];
+        assert &+[ #WKICM_bar(S) : S in OverOrders(E) ] eq #WKICM(E);
+    end for;
 
     SetAssertions(1);
     printf " all good!";

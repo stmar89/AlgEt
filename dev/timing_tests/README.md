@@ -19,7 +19,7 @@ From this folder:
     make list | make check | make clean
 
 Variables: `JOBS` (parallel tests, default 4: keep it well below the number of cores, so that the timings do not
-interfere), `SPEC` (default `../../spec`), `MACHINE` (free text, default `hostname`: use "laptop aerox",
+interfere), `SPEC` (default `../../spec`), `MACHINE` (free text, default `hostname`: eg. "laptop aerox",
 "babbage" and "laplace OvGU"), `LABEL` (a free comment stored in the log), `TIMEOUT` (seconds per test, default 2400),
 `TESTS`, `BASELINE` (the reference release, default v1.0.2, see below).
 
@@ -33,11 +33,6 @@ A test that does not finish within `TIMEOUT` is recorded with status `TIMEOUT(<l
 WKICM_4.7 with v1.0.2, IsPrincipal_6.2 with both trees). A timeout with a commit other than the baseline (`BASELINE`),
 of a test that completed before on the same machine (with any commit), is also a regression: the run prints a
 `REGRESSION:` warning and the case is recorded in `regressions.txt`, to be investigated.
-
-Which runs are needed: every test has at least one run with the baseline and one with each new commit on aerox and on
-babbage (a run that times out counts). So `make all` on both machines for every new commit (the baseline lines stay
-in `timings.log` and are not rerun; rerun them after a Magma upgrade or on a new machine). A new test is run with
-v1.0.2 and with the current commit on every machine.
 
 Only `timings.log` and `regressions.txt` are kept under version control; the per-test logs in `logs/`
 are temporary (they are in `.gitignore`) and are deleted by the next `make all`.

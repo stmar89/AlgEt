@@ -1,0 +1,803 @@
+# date	machine	magma	commit	label	test	seconds	status
+2026-11-09 23:54	laptop aerox	2.30-1	v1.0.2	round1	CohenMacaulay_9.1	9.690	ok
+2026-11-09 23:54	laptop aerox	2.30-1	v1.0.2	round1	CohenMacaulay_9.2	62.730	ok
+2026-11-09 23:54	laptop aerox	2.30-1	v1.0.2	round1	Completion_8.2	5.310	ok
+2026-11-09 23:54	laptop aerox	2.30-1	v1.0.2	round1	GraphOverOrders_3.5	20.530	ok
+2026-11-09 23:54	laptop aerox	2.30-1	v1.0.2	round1	GraphOverOrders_3.6	26.590	ok
+2026-11-09 23:54	laptop aerox	2.30-1	v1.0.2	round1	GraphOverOrders_3.9	61.800	ok
+2026-11-09 23:54	laptop aerox	2.30-1	v1.0.2	round1	ICM_5.1	4.140	ok
+2026-11-09 23:54	laptop aerox	2.30-1	v1.0.2	round1	ICM_5.2	2.000	ok
+2026-11-09 23:54	laptop aerox	2.30-1	v1.0.2	round1	ICM_5.3	41.490	ok
+2026-11-09 23:54	laptop aerox	2.30-1	v1.0.2	round1	IdealsOfIndex_7.2	52.200	ok
+2026-11-09 23:54	laptop aerox	2.30-1	v1.0.2	round1	IntermediateIdeals_7.1	124.030	ok
+2026-11-09 23:54	laptop aerox	2.30-1	v1.0.2	round1	OverOrders_3.2	10.020	ok
+2026-11-09 23:54	laptop aerox	2.30-1	v1.0.2	round1	OverOrders_3.3	15.100	ok
+2026-11-09 23:54	laptop aerox	2.30-1	v1.0.2	round1	OverOrders_3.7	214.180	ok
+2026-11-09 23:54	laptop aerox	2.30-1	v1.0.2	round1	OverOrders_3.8	101.440	ok
+2026-11-09 23:54	laptop aerox	2.30-1	v1.0.2	round1	PicardGroup_1.1	9.550	ok
+2026-11-09 23:54	laptop aerox	2.30-1	v1.0.2	round1	PicardGroup_1.3	9.540	ok
+2026-11-09 23:54	laptop aerox	2.30-1	v1.0.2	round1	TotRealPos_9.3	1.330	ok
+2026-11-09 23:54	laptop aerox	2.30-1	v1.0.2	round1	WKICM_4.10	-	TIMEOUT(2400s)
+2026-11-09 23:54	laptop aerox	2.30-1	v1.0.2	round1	WKICM_4.11	33.500	ok
+2026-11-09 23:54	laptop aerox	2.30-1	v1.0.2	round1	WKICM_4.12	4.080	ok
+2026-11-09 23:54	laptop aerox	2.30-1	v1.0.2	round1	WKICM_4.13	35.700	ok
+2026-11-09 23:54	laptop aerox	2.30-1	v1.0.2	round1	WKICM_4.14	787.940	ok
+2026-11-09 23:54	laptop aerox	2.30-1	v1.0.2	round1	WKICM_4.3	16.420	ok
+2026-11-09 23:54	laptop aerox	2.30-1	v1.0.2	round1	WKICM_4.4	6.740	ok
+2026-11-09 23:54	laptop aerox	2.30-1	v1.0.2	round1	WKICM_4.5	10.410	ok
+2026-11-09 23:54	laptop aerox	2.30-1	v1.0.2	round1	WKICM_4.6	12.060	ok
+2026-11-09 23:54	laptop aerox	2.30-1	v1.0.2	round1	WKICM_4.7	-	TIMEOUT(2400s)
+2026-11-09 23:54	laptop aerox	2.30-1	v1.0.2	round1	WKICM_4.8	39.630	ok
+2026-11-09 23:54	laptop aerox	2.30-1	v1.0.2	round1	WKICM_4.9	-	TIMEOUT(2400s)
+2026-11-09 23:54	laptop aerox	2.30-1	v1.0.2	round1	WkAbstract_5.4	-	TIMEOUT(2400s)
+2026-11-10 00:35	laptop aerox	2.30-1	a2f3804-dirty	round1	CohenMacaulay_9.1	7.300	ok
+2026-11-10 00:35	laptop aerox	2.30-1	a2f3804-dirty	round1	CohenMacaulay_9.2	43.980	ok
+2026-11-10 00:35	laptop aerox	2.30-1	a2f3804-dirty	round1	Completion_8.2	2.680	ok
+2026-11-10 00:35	laptop aerox	2.30-1	a2f3804-dirty	round1	GraphOverOrders_3.5	23.900	ok
+2026-11-10 00:35	laptop aerox	2.30-1	a2f3804-dirty	round1	GraphOverOrders_3.6	30.360	ok
+2026-11-10 00:35	laptop aerox	2.30-1	a2f3804-dirty	round1	GraphOverOrders_3.9	64.820	ok
+2026-11-10 00:35	laptop aerox	2.30-1	a2f3804-dirty	round1	ICM_5.1	11.710	ok
+2026-11-10 00:35	laptop aerox	2.30-1	a2f3804-dirty	round1	ICM_5.2	9.900	ok
+2026-11-10 00:35	laptop aerox	2.30-1	a2f3804-dirty	round1	ICM_5.3	18.210	ok
+2026-11-10 00:35	laptop aerox	2.30-1	a2f3804-dirty	round1	IdealsOfIndex_7.2	47.620	ok
+2026-11-10 00:35	laptop aerox	2.30-1	a2f3804-dirty	round1	IntermediateIdeals_7.1	37.290	ok
+2026-11-10 00:35	laptop aerox	2.30-1	a2f3804-dirty	round1	OverOrders_3.2	6.220	ok
+2026-11-10 00:35	laptop aerox	2.30-1	a2f3804-dirty	round1	OverOrders_3.3	6.680	ok
+2026-11-10 00:35	laptop aerox	2.30-1	a2f3804-dirty	round1	OverOrders_3.7	139.010	ok
+2026-11-10 00:35	laptop aerox	2.30-1	a2f3804-dirty	round1	OverOrders_3.8	4.430	ok
+2026-11-10 00:35	laptop aerox	2.30-1	a2f3804-dirty	round1	PicardGroup_1.1	1.910	ok
+2026-11-10 00:35	laptop aerox	2.30-1	a2f3804-dirty	round1	PicardGroup_1.3	1.700	ok
+2026-11-10 00:35	laptop aerox	2.30-1	a2f3804-dirty	round1	TotRealPos_9.3	1.200	ok
+2026-11-10 00:35	laptop aerox	2.30-1	a2f3804-dirty	round1	WKICM_4.10	236.290	ok
+2026-11-10 00:35	laptop aerox	2.30-1	a2f3804-dirty	round1	WKICM_4.11	23.350	ok
+2026-11-10 00:35	laptop aerox	2.30-1	a2f3804-dirty	round1	WKICM_4.12	2.530	ok
+2026-11-10 00:35	laptop aerox	2.30-1	a2f3804-dirty	round1	WKICM_4.13	2.810	ok
+2026-11-10 00:35	laptop aerox	2.30-1	a2f3804-dirty	round1	WKICM_4.14	239.700	ok
+2026-11-10 00:35	laptop aerox	2.30-1	a2f3804-dirty	round1	WKICM_4.3	5.310	ok
+2026-11-10 00:35	laptop aerox	2.30-1	a2f3804-dirty	round1	WKICM_4.4	3.380	ok
+2026-11-10 00:35	laptop aerox	2.30-1	a2f3804-dirty	round1	WKICM_4.5	2.110	ok
+2026-11-10 00:35	laptop aerox	2.30-1	a2f3804-dirty	round1	WKICM_4.6	2.870	ok
+2026-11-10 00:35	laptop aerox	2.30-1	a2f3804-dirty	round1	WKICM_4.7	821.280	ok
+2026-11-10 00:35	laptop aerox	2.30-1	a2f3804-dirty	round1	WKICM_4.8	26.750	ok
+2026-11-10 00:35	laptop aerox	2.30-1	a2f3804-dirty	round1	WKICM_4.9	227.230	ok
+2026-11-10 00:35	laptop aerox	2.30-1	a2f3804-dirty	round1	WkAbstract_5.4	189.000	ok
+2026-11-10 00:58	laptop aerox	2.30-1	v1.0.2	round2	CohenMacaulay_9.1	8.890	ok
+2026-11-10 00:58	laptop aerox	2.30-1	v1.0.2	round2	CohenMacaulay_9.2	57.070	ok
+2026-11-10 00:58	laptop aerox	2.30-1	v1.0.2	round2	Completion_8.2	4.920	ok
+2026-11-10 00:58	laptop aerox	2.30-1	v1.0.2	round2	GraphOverOrders_3.5	18.350	ok
+2026-11-10 00:58	laptop aerox	2.30-1	v1.0.2	round2	GraphOverOrders_3.6	25.390	ok
+2026-11-10 00:58	laptop aerox	2.30-1	v1.0.2	round2	GraphOverOrders_3.9	57.490	ok
+2026-11-10 00:58	laptop aerox	2.30-1	v1.0.2	round2	ICM_5.1	3.820	ok
+2026-11-10 00:58	laptop aerox	2.30-1	v1.0.2	round2	ICM_5.2	1.740	ok
+2026-11-10 00:58	laptop aerox	2.30-1	v1.0.2	round2	ICM_5.3	38.380	ok
+2026-11-10 00:58	laptop aerox	2.30-1	v1.0.2	round2	IdealsOfIndex_7.2	50.570	ok
+2026-11-10 00:58	laptop aerox	2.30-1	v1.0.2	round2	IntermediateIdeals_7.1	115.130	ok
+2026-11-10 00:58	laptop aerox	2.30-1	v1.0.2	round2	OverOrders_3.2	9.060	ok
+2026-11-10 00:58	laptop aerox	2.30-1	v1.0.2	round2	OverOrders_3.3	13.680	ok
+2026-11-10 00:58	laptop aerox	2.30-1	v1.0.2	round2	OverOrders_3.7	201.780	ok
+2026-11-10 00:58	laptop aerox	2.30-1	v1.0.2	round2	OverOrders_3.8	98.500	ok
+2026-11-10 00:58	laptop aerox	2.30-1	v1.0.2	round2	PicardGroup_1.1	8.470	ok
+2026-11-10 00:58	laptop aerox	2.30-1	v1.0.2	round2	PicardGroup_1.3	8.820	ok
+2026-11-10 00:58	laptop aerox	2.30-1	v1.0.2	round2	TotRealPos_9.3	1.210	ok
+2026-11-10 00:58	laptop aerox	2.30-1	v1.0.2	round2	WKICM_4.11	32.130	ok
+2026-11-10 00:58	laptop aerox	2.30-1	v1.0.2	round2	WKICM_4.12	3.900	ok
+2026-11-10 00:58	laptop aerox	2.30-1	v1.0.2	round2	WKICM_4.13	35.090	ok
+2026-11-10 00:58	laptop aerox	2.30-1	v1.0.2	round2	WKICM_4.14	744.340	ok
+2026-11-10 00:58	laptop aerox	2.30-1	v1.0.2	round2	WKICM_4.3	14.800	ok
+2026-11-10 00:58	laptop aerox	2.30-1	v1.0.2	round2	WKICM_4.4	6.460	ok
+2026-11-10 00:58	laptop aerox	2.30-1	v1.0.2	round2	WKICM_4.5	10.030	ok
+2026-11-10 00:58	laptop aerox	2.30-1	v1.0.2	round2	WKICM_4.6	11.290	ok
+2026-11-10 00:58	laptop aerox	2.30-1	v1.0.2	round2	WKICM_4.8	39.860	ok
+2026-11-10 01:44	laptop aerox	2.30-1	a2f3804-dirty	round2	CohenMacaulay_9.1	7.020	ok
+2026-11-10 01:44	laptop aerox	2.30-1	a2f3804-dirty	round2	CohenMacaulay_9.2	44.500	ok
+2026-11-10 01:44	laptop aerox	2.30-1	a2f3804-dirty	round2	Completion_8.2	3.100	ok
+2026-11-10 01:44	laptop aerox	2.30-1	a2f3804-dirty	round2	GraphOverOrders_3.5	23.710	ok
+2026-11-10 01:44	laptop aerox	2.30-1	a2f3804-dirty	round2	GraphOverOrders_3.6	29.260	ok
+2026-11-10 01:44	laptop aerox	2.30-1	a2f3804-dirty	round2	GraphOverOrders_3.9	65.470	ok
+2026-11-10 01:44	laptop aerox	2.30-1	a2f3804-dirty	round2	ICM_5.1	11.510	ok
+2026-11-10 01:44	laptop aerox	2.30-1	a2f3804-dirty	round2	ICM_5.2	10.270	ok
+2026-11-10 01:44	laptop aerox	2.30-1	a2f3804-dirty	round2	ICM_5.3	18.780	ok
+2026-11-10 01:44	laptop aerox	2.30-1	a2f3804-dirty	round2	IdealsOfIndex_7.2	49.130	ok
+2026-11-10 01:44	laptop aerox	2.30-1	a2f3804-dirty	round2	IntermediateIdeals_7.1	36.780	ok
+2026-11-10 01:44	laptop aerox	2.30-1	a2f3804-dirty	round2	OverOrders_3.2	6.090	ok
+2026-11-10 01:44	laptop aerox	2.30-1	a2f3804-dirty	round2	OverOrders_3.3	6.170	ok
+2026-11-10 01:44	laptop aerox	2.30-1	a2f3804-dirty	round2	OverOrders_3.7	132.110	ok
+2026-11-10 01:44	laptop aerox	2.30-1	a2f3804-dirty	round2	OverOrders_3.8	4.580	ok
+2026-11-10 01:44	laptop aerox	2.30-1	a2f3804-dirty	round2	PicardGroup_1.1	1.990	ok
+2026-11-10 01:44	laptop aerox	2.30-1	a2f3804-dirty	round2	PicardGroup_1.3	1.620	ok
+2026-11-10 01:44	laptop aerox	2.30-1	a2f3804-dirty	round2	TotRealPos_9.3	1.260	ok
+2026-11-10 01:44	laptop aerox	2.30-1	a2f3804-dirty	round2	WKICM_4.10	252.740	ok
+2026-11-10 01:44	laptop aerox	2.30-1	a2f3804-dirty	round2	WKICM_4.11	22.630	ok
+2026-11-10 01:44	laptop aerox	2.30-1	a2f3804-dirty	round2	WKICM_4.12	2.770	ok
+2026-11-10 01:44	laptop aerox	2.30-1	a2f3804-dirty	round2	WKICM_4.13	2.810	ok
+2026-11-10 01:44	laptop aerox	2.30-1	a2f3804-dirty	round2	WKICM_4.14	239.360	ok
+2026-11-10 01:44	laptop aerox	2.30-1	a2f3804-dirty	round2	WKICM_4.3	4.980	ok
+2026-11-10 01:44	laptop aerox	2.30-1	a2f3804-dirty	round2	WKICM_4.4	3.540	ok
+2026-11-10 01:44	laptop aerox	2.30-1	a2f3804-dirty	round2	WKICM_4.5	2.010	ok
+2026-11-10 01:44	laptop aerox	2.30-1	a2f3804-dirty	round2	WKICM_4.6	2.650	ok
+2026-11-10 01:44	laptop aerox	2.30-1	a2f3804-dirty	round2	WKICM_4.7	868.420	ok
+2026-11-10 01:44	laptop aerox	2.30-1	a2f3804-dirty	round2	WKICM_4.8	27.880	ok
+2026-11-10 01:44	laptop aerox	2.30-1	a2f3804-dirty	round2	WKICM_4.9	235.730	ok
+2026-11-10 01:44	laptop aerox	2.30-1	a2f3804-dirty	round2	WkAbstract_5.4	189.800	ok
+2026-11-10 02:07	laptop aerox	2.30-1	v1.0.2	round3	CohenMacaulay_9.1	8.850	ok
+2026-11-10 02:07	laptop aerox	2.30-1	v1.0.2	round3	CohenMacaulay_9.2	56.660	ok
+2026-11-10 02:07	laptop aerox	2.30-1	v1.0.2	round3	Completion_8.2	4.820	ok
+2026-11-10 02:07	laptop aerox	2.30-1	v1.0.2	round3	GraphOverOrders_3.5	18.820	ok
+2026-11-10 02:07	laptop aerox	2.30-1	v1.0.2	round3	GraphOverOrders_3.6	24.860	ok
+2026-11-10 02:07	laptop aerox	2.30-1	v1.0.2	round3	GraphOverOrders_3.9	56.600	ok
+2026-11-10 02:07	laptop aerox	2.30-1	v1.0.2	round3	ICM_5.1	3.710	ok
+2026-11-10 02:07	laptop aerox	2.30-1	v1.0.2	round3	ICM_5.2	1.670	ok
+2026-11-10 02:07	laptop aerox	2.30-1	v1.0.2	round3	ICM_5.3	39.200	ok
+2026-11-10 02:07	laptop aerox	2.30-1	v1.0.2	round3	IdealsOfIndex_7.2	47.600	ok
+2026-11-10 02:07	laptop aerox	2.30-1	v1.0.2	round3	IntermediateIdeals_7.1	111.810	ok
+2026-11-10 02:07	laptop aerox	2.30-1	v1.0.2	round3	OverOrders_3.2	8.990	ok
+2026-11-10 02:07	laptop aerox	2.30-1	v1.0.2	round3	OverOrders_3.3	13.490	ok
+2026-11-10 02:07	laptop aerox	2.30-1	v1.0.2	round3	OverOrders_3.7	199.350	ok
+2026-11-10 02:07	laptop aerox	2.30-1	v1.0.2	round3	OverOrders_3.8	92.730	ok
+2026-11-10 02:07	laptop aerox	2.30-1	v1.0.2	round3	PicardGroup_1.1	8.680	ok
+2026-11-10 02:07	laptop aerox	2.30-1	v1.0.2	round3	PicardGroup_1.3	8.090	ok
+2026-11-10 02:07	laptop aerox	2.30-1	v1.0.2	round3	TotRealPos_9.3	1.320	ok
+2026-11-10 02:07	laptop aerox	2.30-1	v1.0.2	round3	WKICM_4.11	31.940	ok
+2026-11-10 02:07	laptop aerox	2.30-1	v1.0.2	round3	WKICM_4.12	3.800	ok
+2026-11-10 02:07	laptop aerox	2.30-1	v1.0.2	round3	WKICM_4.13	34.410	ok
+2026-11-10 02:07	laptop aerox	2.30-1	v1.0.2	round3	WKICM_4.14	730.020	ok
+2026-11-10 02:07	laptop aerox	2.30-1	v1.0.2	round3	WKICM_4.3	14.830	ok
+2026-11-10 02:07	laptop aerox	2.30-1	v1.0.2	round3	WKICM_4.4	5.990	ok
+2026-11-10 02:07	laptop aerox	2.30-1	v1.0.2	round3	WKICM_4.5	9.610	ok
+2026-11-10 02:07	laptop aerox	2.30-1	v1.0.2	round3	WKICM_4.6	11.320	ok
+2026-11-10 02:07	laptop aerox	2.30-1	v1.0.2	round3	WKICM_4.8	39.960	ok
+2026-11-10 02:53	laptop aerox	2.30-1	a2f3804-dirty	round3	CohenMacaulay_9.1	6.880	ok
+2026-11-10 02:53	laptop aerox	2.30-1	a2f3804-dirty	round3	CohenMacaulay_9.2	42.330	ok
+2026-11-10 02:53	laptop aerox	2.30-1	a2f3804-dirty	round3	Completion_8.2	2.950	ok
+2026-11-10 02:53	laptop aerox	2.30-1	a2f3804-dirty	round3	GraphOverOrders_3.5	23.470	ok
+2026-11-10 02:53	laptop aerox	2.30-1	a2f3804-dirty	round3	GraphOverOrders_3.6	29.920	ok
+2026-11-10 02:53	laptop aerox	2.30-1	a2f3804-dirty	round3	GraphOverOrders_3.9	62.230	ok
+2026-11-10 02:53	laptop aerox	2.30-1	a2f3804-dirty	round3	ICM_5.1	11.810	ok
+2026-11-10 02:53	laptop aerox	2.30-1	a2f3804-dirty	round3	ICM_5.2	10.150	ok
+2026-11-10 02:53	laptop aerox	2.30-1	a2f3804-dirty	round3	ICM_5.3	17.770	ok
+2026-11-10 02:53	laptop aerox	2.30-1	a2f3804-dirty	round3	IdealsOfIndex_7.2	44.900	ok
+2026-11-10 02:53	laptop aerox	2.30-1	a2f3804-dirty	round3	IntermediateIdeals_7.1	37.030	ok
+2026-11-10 02:53	laptop aerox	2.30-1	a2f3804-dirty	round3	OverOrders_3.2	6.070	ok
+2026-11-10 02:53	laptop aerox	2.30-1	a2f3804-dirty	round3	OverOrders_3.3	6.050	ok
+2026-11-10 02:53	laptop aerox	2.30-1	a2f3804-dirty	round3	OverOrders_3.7	133.410	ok
+2026-11-10 02:53	laptop aerox	2.30-1	a2f3804-dirty	round3	OverOrders_3.8	4.740	ok
+2026-11-10 02:53	laptop aerox	2.30-1	a2f3804-dirty	round3	PicardGroup_1.1	1.990	ok
+2026-11-10 02:53	laptop aerox	2.30-1	a2f3804-dirty	round3	PicardGroup_1.3	1.620	ok
+2026-11-10 02:53	laptop aerox	2.30-1	a2f3804-dirty	round3	TotRealPos_9.3	1.270	ok
+2026-11-10 02:53	laptop aerox	2.30-1	a2f3804-dirty	round3	WKICM_4.10	237.830	ok
+2026-11-10 02:53	laptop aerox	2.30-1	a2f3804-dirty	round3	WKICM_4.11	22.400	ok
+2026-11-10 02:53	laptop aerox	2.30-1	a2f3804-dirty	round3	WKICM_4.12	2.700	ok
+2026-11-10 02:53	laptop aerox	2.30-1	a2f3804-dirty	round3	WKICM_4.13	2.960	ok
+2026-11-10 02:53	laptop aerox	2.30-1	a2f3804-dirty	round3	WKICM_4.14	224.420	ok
+2026-11-10 02:53	laptop aerox	2.30-1	a2f3804-dirty	round3	WKICM_4.3	4.990	ok
+2026-11-10 02:53	laptop aerox	2.30-1	a2f3804-dirty	round3	WKICM_4.4	3.410	ok
+2026-11-10 02:53	laptop aerox	2.30-1	a2f3804-dirty	round3	WKICM_4.5	1.980	ok
+2026-11-10 02:53	laptop aerox	2.30-1	a2f3804-dirty	round3	WKICM_4.6	2.720	ok
+2026-11-10 02:53	laptop aerox	2.30-1	a2f3804-dirty	round3	WKICM_4.7	847.530	ok
+2026-11-10 02:53	laptop aerox	2.30-1	a2f3804-dirty	round3	WKICM_4.8	26.160	ok
+2026-11-10 02:53	laptop aerox	2.30-1	a2f3804-dirty	round3	WKICM_4.9	219.050	ok
+2026-11-10 02:53	laptop aerox	2.30-1	a2f3804-dirty	round3	WkAbstract_5.4	188.910	ok
+2026-11-09 23:11	babbage	2.29-10	v1.0.2	round1	CohenMacaulay_9.1	12.090	ok
+2026-11-09 23:11	babbage	2.29-10	v1.0.2	round1	CohenMacaulay_9.2	75.230	ok
+2026-11-09 23:11	babbage	2.29-10	v1.0.2	round1	Completion_8.2	6.760	ok
+2026-11-09 23:11	babbage	2.29-10	v1.0.2	round1	GraphOverOrders_3.5	22.760	ok
+2026-11-09 23:11	babbage	2.29-10	v1.0.2	round1	GraphOverOrders_3.6	31.170	ok
+2026-11-09 23:11	babbage	2.29-10	v1.0.2	round1	GraphOverOrders_3.9	76.920	ok
+2026-11-09 23:11	babbage	2.29-10	v1.0.2	round1	ICM_5.1	5.850	ok
+2026-11-09 23:11	babbage	2.29-10	v1.0.2	round1	ICM_5.2	2.790	ok
+2026-11-09 23:11	babbage	2.29-10	v1.0.2	round1	ICM_5.3	53.290	ok
+2026-11-09 23:11	babbage	2.29-10	v1.0.2	round1	IdealsOfIndex_7.2	66.160	ok
+2026-11-09 23:11	babbage	2.29-10	v1.0.2	round1	IntermediateIdeals_7.1	145.770	ok
+2026-11-09 23:11	babbage	2.29-10	v1.0.2	round1	OverOrders_3.2	12.960	ok
+2026-11-09 23:11	babbage	2.29-10	v1.0.2	round1	OverOrders_3.3	18.930	ok
+2026-11-09 23:11	babbage	2.29-10	v1.0.2	round1	OverOrders_3.7	276.290	ok
+2026-11-09 23:11	babbage	2.29-10	v1.0.2	round1	OverOrders_3.8	129.650	ok
+2026-11-09 23:11	babbage	2.29-10	v1.0.2	round1	PicardGroup_1.1	16.430	ok
+2026-11-09 23:11	babbage	2.29-10	v1.0.2	round1	PicardGroup_1.3	11.650	ok
+2026-11-09 23:11	babbage	2.29-10	v1.0.2	round1	TotRealPos_9.3	1.690	ok
+2026-11-09 23:11	babbage	2.29-10	v1.0.2	round1	WKICM_4.10	-	TIMEOUT(2400s)
+2026-11-09 23:11	babbage	2.29-10	v1.0.2	round1	WKICM_4.11	42.170	ok
+2026-11-09 23:11	babbage	2.29-10	v1.0.2	round1	WKICM_4.12	5.390	ok
+2026-11-09 23:11	babbage	2.29-10	v1.0.2	round1	WKICM_4.13	48.130	ok
+2026-11-09 23:11	babbage	2.29-10	v1.0.2	round1	WKICM_4.14	1232.290	ok
+2026-11-09 23:11	babbage	2.29-10	v1.0.2	round1	WKICM_4.3	21.130	ok
+2026-11-09 23:11	babbage	2.29-10	v1.0.2	round1	WKICM_4.4	8.270	ok
+2026-11-09 23:11	babbage	2.29-10	v1.0.2	round1	WKICM_4.5	13.590	ok
+2026-11-09 23:11	babbage	2.29-10	v1.0.2	round1	WKICM_4.6	16.220	ok
+2026-11-09 23:11	babbage	2.29-10	v1.0.2	round1	WKICM_4.7	-	TIMEOUT(2400s)
+2026-11-09 23:11	babbage	2.29-10	v1.0.2	round1	WKICM_4.8	53.700	ok
+2026-11-09 23:11	babbage	2.29-10	v1.0.2	round1	WKICM_4.9	-	TIMEOUT(2400s)
+2026-11-09 23:11	babbage	2.29-10	v1.0.2	round1	WkAbstract_5.4	-	TIMEOUT(2400s)
+2026-11-09 23:34	babbage	2.29-10	a2f3804	round1	CohenMacaulay_9.1	9.310	ok
+2026-11-09 23:34	babbage	2.29-10	a2f3804	round1	CohenMacaulay_9.2	53.280	ok
+2026-11-09 23:34	babbage	2.29-10	a2f3804	round1	Completion_8.2	3.730	ok
+2026-11-09 23:34	babbage	2.29-10	a2f3804	round1	GraphOverOrders_3.5	29.500	ok
+2026-11-09 23:34	babbage	2.29-10	a2f3804	round1	GraphOverOrders_3.6	37.340	ok
+2026-11-09 23:34	babbage	2.29-10	a2f3804	round1	GraphOverOrders_3.9	81.470	ok
+2026-11-09 23:34	babbage	2.29-10	a2f3804	round1	ICM_5.1	16.610	ok
+2026-11-09 23:34	babbage	2.29-10	a2f3804	round1	ICM_5.2	13.600	ok
+2026-11-09 23:34	babbage	2.29-10	a2f3804	round1	ICM_5.3	23.930	ok
+2026-11-09 23:34	babbage	2.29-10	a2f3804	round1	IdealsOfIndex_7.2	60.610	ok
+2026-11-09 23:34	babbage	2.29-10	a2f3804	round1	IntermediateIdeals_7.1	50.680	ok
+2026-11-09 23:34	babbage	2.29-10	a2f3804	round1	OverOrders_3.2	8.580	ok
+2026-11-09 23:34	babbage	2.29-10	a2f3804	round1	OverOrders_3.3	8.480	ok
+2026-11-09 23:34	babbage	2.29-10	a2f3804	round1	OverOrders_3.7	184.940	ok
+2026-11-09 23:34	babbage	2.29-10	a2f3804	round1	OverOrders_3.8	6.720	ok
+2026-11-09 23:34	babbage	2.29-10	a2f3804	round1	PicardGroup_1.1	2.940	ok
+2026-11-09 23:34	babbage	2.29-10	a2f3804	round1	PicardGroup_1.3	3.220	ok
+2026-11-09 23:34	babbage	2.29-10	a2f3804	round1	TotRealPos_9.3	1.590	ok
+2026-11-09 23:34	babbage	2.29-10	a2f3804	round1	WKICM_4.10	385.260	ok
+2026-11-09 23:34	babbage	2.29-10	a2f3804	round1	WKICM_4.11	29.720	ok
+2026-11-09 23:34	babbage	2.29-10	a2f3804	round1	WKICM_4.12	3.500	ok
+2026-11-09 23:34	babbage	2.29-10	a2f3804	round1	WKICM_4.13	3.840	ok
+2026-11-09 23:34	babbage	2.29-10	a2f3804	round1	WKICM_4.14	318.320	ok
+2026-11-09 23:34	babbage	2.29-10	a2f3804	round1	WKICM_4.3	6.610	ok
+2026-11-09 23:34	babbage	2.29-10	a2f3804	round1	WKICM_4.4	4.600	ok
+2026-11-09 23:34	babbage	2.29-10	a2f3804	round1	WKICM_4.5	3.560	ok
+2026-11-09 23:34	babbage	2.29-10	a2f3804	round1	WKICM_4.6	4.190	ok
+2026-11-09 23:34	babbage	2.29-10	a2f3804	round1	WKICM_4.7	1142.390	ok
+2026-11-09 23:34	babbage	2.29-10	a2f3804	round1	WKICM_4.8	34.940	ok
+2026-11-09 23:34	babbage	2.29-10	a2f3804	round1	WKICM_4.9	370.010	ok
+2026-11-09 23:34	babbage	2.29-10	a2f3804	round1	WkAbstract_5.4	248.690	ok
+2026-11-09 23:52	babbage	2.29-10	v1.0.2	round2	CohenMacaulay_9.1	12.410	ok
+2026-11-09 23:52	babbage	2.29-10	v1.0.2	round2	CohenMacaulay_9.2	74.880	ok
+2026-11-09 23:52	babbage	2.29-10	v1.0.2	round2	Completion_8.2	6.590	ok
+2026-11-09 23:52	babbage	2.29-10	v1.0.2	round2	GraphOverOrders_3.5	22.670	ok
+2026-11-09 23:52	babbage	2.29-10	v1.0.2	round2	GraphOverOrders_3.6	30.480	ok
+2026-11-09 23:52	babbage	2.29-10	v1.0.2	round2	GraphOverOrders_3.9	75.550	ok
+2026-11-09 23:52	babbage	2.29-10	v1.0.2	round2	ICM_5.1	5.600	ok
+2026-11-09 23:52	babbage	2.29-10	v1.0.2	round2	ICM_5.2	3.020	ok
+2026-11-09 23:52	babbage	2.29-10	v1.0.2	round2	ICM_5.3	52.410	ok
+2026-11-09 23:52	babbage	2.29-10	v1.0.2	round2	IdealsOfIndex_7.2	64.170	ok
+2026-11-09 23:52	babbage	2.29-10	v1.0.2	round2	IntermediateIdeals_7.1	144.680	ok
+2026-11-09 23:52	babbage	2.29-10	v1.0.2	round2	OverOrders_3.2	13.150	ok
+2026-11-09 23:52	babbage	2.29-10	v1.0.2	round2	OverOrders_3.3	19.420	ok
+2026-11-09 23:52	babbage	2.29-10	v1.0.2	round2	OverOrders_3.7	275.570	ok
+2026-11-09 23:52	babbage	2.29-10	v1.0.2	round2	OverOrders_3.8	126.580	ok
+2026-11-09 23:52	babbage	2.29-10	v1.0.2	round2	PicardGroup_1.1	16.430	ok
+2026-11-09 23:52	babbage	2.29-10	v1.0.2	round2	PicardGroup_1.3	11.590	ok
+2026-11-09 23:52	babbage	2.29-10	v1.0.2	round2	TotRealPos_9.3	1.920	ok
+2026-11-09 23:52	babbage	2.29-10	v1.0.2	round2	WKICM_4.11	42.870	ok
+2026-11-09 23:52	babbage	2.29-10	v1.0.2	round2	WKICM_4.12	5.490	ok
+2026-11-09 23:52	babbage	2.29-10	v1.0.2	round2	WKICM_4.13	48.660	ok
+2026-11-09 23:52	babbage	2.29-10	v1.0.2	round2	WKICM_4.14	1108.760	ok
+2026-11-09 23:52	babbage	2.29-10	v1.0.2	round2	WKICM_4.3	21.560	ok
+2026-11-09 23:52	babbage	2.29-10	v1.0.2	round2	WKICM_4.4	8.590	ok
+2026-11-09 23:52	babbage	2.29-10	v1.0.2	round2	WKICM_4.5	13.780	ok
+2026-11-09 23:52	babbage	2.29-10	v1.0.2	round2	WKICM_4.6	16.380	ok
+2026-11-09 23:52	babbage	2.29-10	v1.0.2	round2	WKICM_4.8	53.160	ok
+2026-11-10 00:12	babbage	2.29-10	a2f3804	round2	CohenMacaulay_9.1	9.620	ok
+2026-11-10 00:12	babbage	2.29-10	a2f3804	round2	CohenMacaulay_9.2	52.950	ok
+2026-11-10 00:12	babbage	2.29-10	a2f3804	round2	Completion_8.2	3.670	ok
+2026-11-10 00:12	babbage	2.29-10	a2f3804	round2	GraphOverOrders_3.5	29.210	ok
+2026-11-10 00:12	babbage	2.29-10	a2f3804	round2	GraphOverOrders_3.6	37.060	ok
+2026-11-10 00:12	babbage	2.29-10	a2f3804	round2	GraphOverOrders_3.9	83.630	ok
+2026-11-10 00:12	babbage	2.29-10	a2f3804	round2	ICM_5.1	16.420	ok
+2026-11-10 00:12	babbage	2.29-10	a2f3804	round2	ICM_5.2	13.880	ok
+2026-11-10 00:12	babbage	2.29-10	a2f3804	round2	ICM_5.3	24.550	ok
+2026-11-10 00:12	babbage	2.29-10	a2f3804	round2	IdealsOfIndex_7.2	60.560	ok
+2026-11-10 00:12	babbage	2.29-10	a2f3804	round2	IntermediateIdeals_7.1	51.810	ok
+2026-11-10 00:12	babbage	2.29-10	a2f3804	round2	OverOrders_3.2	8.800	ok
+2026-11-10 00:12	babbage	2.29-10	a2f3804	round2	OverOrders_3.3	8.790	ok
+2026-11-10 00:12	babbage	2.29-10	a2f3804	round2	OverOrders_3.7	185.320	ok
+2026-11-10 00:12	babbage	2.29-10	a2f3804	round2	OverOrders_3.8	6.140	ok
+2026-11-10 00:12	babbage	2.29-10	a2f3804	round2	PicardGroup_1.1	2.920	ok
+2026-11-10 00:12	babbage	2.29-10	a2f3804	round2	PicardGroup_1.3	3.080	ok
+2026-11-10 00:12	babbage	2.29-10	a2f3804	round2	TotRealPos_9.3	1.620	ok
+2026-11-10 00:12	babbage	2.29-10	a2f3804	round2	WKICM_4.10	373.260	ok
+2026-11-10 00:12	babbage	2.29-10	a2f3804	round2	WKICM_4.11	29.970	ok
+2026-11-10 00:12	babbage	2.29-10	a2f3804	round2	WKICM_4.12	3.580	ok
+2026-11-10 00:12	babbage	2.29-10	a2f3804	round2	WKICM_4.13	4.000	ok
+2026-11-10 00:12	babbage	2.29-10	a2f3804	round2	WKICM_4.14	315.230	ok
+2026-11-10 00:12	babbage	2.29-10	a2f3804	round2	WKICM_4.3	7.810	ok
+2026-11-10 00:12	babbage	2.29-10	a2f3804	round2	WKICM_4.4	4.670	ok
+2026-11-10 00:12	babbage	2.29-10	a2f3804	round2	WKICM_4.5	2.900	ok
+2026-11-10 00:12	babbage	2.29-10	a2f3804	round2	WKICM_4.6	3.750	ok
+2026-11-10 00:12	babbage	2.29-10	a2f3804	round2	WKICM_4.7	1162.560	ok
+2026-11-10 00:12	babbage	2.29-10	a2f3804	round2	WKICM_4.8	34.490	ok
+2026-11-10 00:12	babbage	2.29-10	a2f3804	round2	WKICM_4.9	358.090	ok
+2026-11-10 00:12	babbage	2.29-10	a2f3804	round2	WkAbstract_5.4	246.690	ok
+2026-11-10 00:31	babbage	2.29-10	v1.0.2	round3	CohenMacaulay_9.1	12.260	ok
+2026-11-10 00:31	babbage	2.29-10	v1.0.2	round3	CohenMacaulay_9.2	74.620	ok
+2026-11-10 00:31	babbage	2.29-10	v1.0.2	round3	Completion_8.2	6.470	ok
+2026-11-10 00:31	babbage	2.29-10	v1.0.2	round3	GraphOverOrders_3.5	22.570	ok
+2026-11-10 00:31	babbage	2.29-10	v1.0.2	round3	GraphOverOrders_3.6	30.620	ok
+2026-11-10 00:31	babbage	2.29-10	v1.0.2	round3	GraphOverOrders_3.9	77.030	ok
+2026-11-10 00:31	babbage	2.29-10	v1.0.2	round3	ICM_5.1	6.210	ok
+2026-11-10 00:31	babbage	2.29-10	v1.0.2	round3	ICM_5.2	2.510	ok
+2026-11-10 00:31	babbage	2.29-10	v1.0.2	round3	ICM_5.3	53.760	ok
+2026-11-10 00:31	babbage	2.29-10	v1.0.2	round3	IdealsOfIndex_7.2	65.490	ok
+2026-11-10 00:31	babbage	2.29-10	v1.0.2	round3	IntermediateIdeals_7.1	142.820	ok
+2026-11-10 00:31	babbage	2.29-10	v1.0.2	round3	OverOrders_3.2	13.060	ok
+2026-11-10 00:31	babbage	2.29-10	v1.0.2	round3	OverOrders_3.3	18.620	ok
+2026-11-10 00:31	babbage	2.29-10	v1.0.2	round3	OverOrders_3.7	275.570	ok
+2026-11-10 00:31	babbage	2.29-10	v1.0.2	round3	OverOrders_3.8	127.360	ok
+2026-11-10 00:31	babbage	2.29-10	v1.0.2	round3	PicardGroup_1.1	16.570	ok
+2026-11-10 00:31	babbage	2.29-10	v1.0.2	round3	PicardGroup_1.3	12.000	ok
+2026-11-10 00:31	babbage	2.29-10	v1.0.2	round3	TotRealPos_9.3	1.740	ok
+2026-11-10 00:31	babbage	2.29-10	v1.0.2	round3	WKICM_4.11	41.740	ok
+2026-11-10 00:31	babbage	2.29-10	v1.0.2	round3	WKICM_4.12	6.100	ok
+2026-11-10 00:31	babbage	2.29-10	v1.0.2	round3	WKICM_4.13	48.680	ok
+2026-11-10 00:31	babbage	2.29-10	v1.0.2	round3	WKICM_4.14	1125.000	ok
+2026-11-10 00:31	babbage	2.29-10	v1.0.2	round3	WKICM_4.3	21.070	ok
+2026-11-10 00:31	babbage	2.29-10	v1.0.2	round3	WKICM_4.4	8.420	ok
+2026-11-10 00:31	babbage	2.29-10	v1.0.2	round3	WKICM_4.5	13.850	ok
+2026-11-10 00:31	babbage	2.29-10	v1.0.2	round3	WKICM_4.6	16.370	ok
+2026-11-10 00:31	babbage	2.29-10	v1.0.2	round3	WKICM_4.8	52.450	ok
+2026-11-10 00:50	babbage	2.29-10	a2f3804	round3	CohenMacaulay_9.1	9.480	ok
+2026-11-10 00:50	babbage	2.29-10	a2f3804	round3	CohenMacaulay_9.2	53.690	ok
+2026-11-10 00:50	babbage	2.29-10	a2f3804	round3	Completion_8.2	3.750	ok
+2026-11-10 00:50	babbage	2.29-10	a2f3804	round3	GraphOverOrders_3.5	29.420	ok
+2026-11-10 00:50	babbage	2.29-10	a2f3804	round3	GraphOverOrders_3.6	36.800	ok
+2026-11-10 00:50	babbage	2.29-10	a2f3804	round3	GraphOverOrders_3.9	85.410	ok
+2026-11-10 00:50	babbage	2.29-10	a2f3804	round3	ICM_5.1	16.470	ok
+2026-11-10 00:50	babbage	2.29-10	a2f3804	round3	ICM_5.2	13.670	ok
+2026-11-10 00:50	babbage	2.29-10	a2f3804	round3	ICM_5.3	24.620	ok
+2026-11-10 00:50	babbage	2.29-10	a2f3804	round3	IdealsOfIndex_7.2	64.070	ok
+2026-11-10 00:50	babbage	2.29-10	a2f3804	round3	IntermediateIdeals_7.1	51.300	ok
+2026-11-10 00:50	babbage	2.29-10	a2f3804	round3	OverOrders_3.2	9.080	ok
+2026-11-10 00:50	babbage	2.29-10	a2f3804	round3	OverOrders_3.3	9.540	ok
+2026-11-10 00:50	babbage	2.29-10	a2f3804	round3	OverOrders_3.7	183.570	ok
+2026-11-10 00:50	babbage	2.29-10	a2f3804	round3	OverOrders_3.8	6.120	ok
+2026-11-10 00:50	babbage	2.29-10	a2f3804	round3	PicardGroup_1.1	2.980	ok
+2026-11-10 00:50	babbage	2.29-10	a2f3804	round3	PicardGroup_1.3	2.890	ok
+2026-11-10 00:50	babbage	2.29-10	a2f3804	round3	TotRealPos_9.3	1.640	ok
+2026-11-10 00:50	babbage	2.29-10	a2f3804	round3	WKICM_4.10	395.190	ok
+2026-11-10 00:50	babbage	2.29-10	a2f3804	round3	WKICM_4.11	30.610	ok
+2026-11-10 00:50	babbage	2.29-10	a2f3804	round3	WKICM_4.12	3.780	ok
+2026-11-10 00:50	babbage	2.29-10	a2f3804	round3	WKICM_4.13	3.930	ok
+2026-11-10 00:50	babbage	2.29-10	a2f3804	round3	WKICM_4.14	325.530	ok
+2026-11-10 00:50	babbage	2.29-10	a2f3804	round3	WKICM_4.3	6.820	ok
+2026-11-10 00:50	babbage	2.29-10	a2f3804	round3	WKICM_4.4	4.890	ok
+2026-11-10 00:50	babbage	2.29-10	a2f3804	round3	WKICM_4.5	2.780	ok
+2026-11-10 00:50	babbage	2.29-10	a2f3804	round3	WKICM_4.6	3.950	ok
+2026-11-10 00:50	babbage	2.29-10	a2f3804	round3	WKICM_4.7	1166.420	ok
+2026-11-10 00:50	babbage	2.29-10	a2f3804	round3	WKICM_4.8	34.900	ok
+2026-11-10 00:50	babbage	2.29-10	a2f3804	round3	WKICM_4.9	371.380	ok
+2026-11-10 00:50	babbage	2.29-10	a2f3804	round3	WkAbstract_5.4	248.460	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	CRT_8.1	4.690	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	CohenMacaulay_9.1	7.400	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	CohenMacaulay_9.2	45.530	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	Completion_8.2	2.810	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	GraphOverOrders_3.5	27.100	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	GraphOverOrders_3.6	33.590	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	GraphOverOrders_3.9	65.200	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	ICMAbstract_5.5	39.910	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	ICM_5.1	12.130	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	ICM_5.2	9.900	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	ICM_5.3	19.250	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	IdealsOfIndex_7.2	45.180	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	IntermediateIdeals_7.1	34.900	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	IsPrincipal_6.1	1.740	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	IsPrincipal_6.2	-	TIMEOUT(2400s)
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	OverOrders_3.2	6.080	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	OverOrders_3.3	6.510	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	OverOrders_3.7	132.770	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	OverOrders_3.8	4.740	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	PicardGroup_1.1	1.860	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	PicardGroup_1.3	1.700	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	PicardGroup_1.4	11.290	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	PicardGroup_1.5	7.530	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	PicardGroup_1.6	1.310	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	SmallRepresentative_2.1	1.290	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	TotRealPos_9.3	1.180	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	WKICM_4.10	209.440	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	WKICM_4.11	23.410	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	WKICM_4.12	2.560	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	WKICM_4.13	2.970	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	WKICM_4.14	255.230	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	WKICM_4.3	5.120	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	WKICM_4.4	3.770	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	WKICM_4.5	2.150	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	WKICM_4.6	2.870	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	WKICM_4.7	907.230	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	WKICM_4.8	27.230	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	WKICM_4.9	212.500	ok
+2026-11-10 09:53	laplace OvGU	2.30-1	a2f3804	round1	WkAbstract_5.4	195.590	ok
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	CRT_8.1	8.130	ok
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	CohenMacaulay_9.1	9.830	ok
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	CohenMacaulay_9.2	62.330	ok
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	Completion_8.2	5.520	ok
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	GraphOverOrders_3.5	22.410	ok
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	GraphOverOrders_3.6	29.170	ok
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	GraphOverOrders_3.9	58.580	ok
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	ICMAbstract_5.5	37.540	ok
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	ICM_5.1	4.020	ok
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	ICM_5.2	1.790	ok
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	ICM_5.3	40.700	ok
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	IdealsOfIndex_7.2	48.360	ok
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	IntermediateIdeals_7.1	113.470	ok
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	IsPrincipal_6.1	2.350	ok
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	IsPrincipal_6.2	-	TIMEOUT(2400s)
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	OverOrders_3.2	9.620	ok
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	OverOrders_3.3	14.940	ok
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	OverOrders_3.7	206.700	ok
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	OverOrders_3.8	94.960	ok
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	PicardGroup_1.1	8.250	ok
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	PicardGroup_1.3	8.090	ok
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	PicardGroup_1.4	-	TIMEOUT(2400s)
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	PicardGroup_1.5	4.970	ok
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	PicardGroup_1.6	-	TIMEOUT(2400s)
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	SmallRepresentative_2.1	1.650	ok
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	TotRealPos_9.3	1.270	ok
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	WKICM_4.10	-	TIMEOUT(2400s)
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	WKICM_4.11	33.230	ok
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	WKICM_4.12	4.010	ok
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	WKICM_4.13	35.250	ok
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	WKICM_4.14	842.280	ok
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	WKICM_4.3	15.220	ok
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	WKICM_4.4	6.900	ok
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	WKICM_4.5	10.290	ok
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	WKICM_4.6	12.100	ok
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	WKICM_4.7	-	TIMEOUT(2400s)
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	WKICM_4.8	42.360	ok
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	WKICM_4.9	-	TIMEOUT(2400s)
+2026-11-10 09:57	laplace OvGU	2.30-1	v1.0.2	round1	WkAbstract_5.4	-	TIMEOUT(2400s)
+2026-11-10 10:10	babbage	2.29-10	a2f3804	round1	CRT_8.1	6.220	ok
+2026-11-10 10:10	babbage	2.29-10	a2f3804	round1	ICMAbstract_5.5	50.860	ok
+2026-11-10 10:10	babbage	2.29-10	a2f3804	round1	IsPrincipal_6.1	2.610	ok
+2026-11-10 10:10	babbage	2.29-10	a2f3804	round1	IsPrincipal_6.2	-	TIMEOUT(2400s)
+2026-11-10 10:10	babbage	2.29-10	a2f3804	round1	PicardGroup_1.4	22.520	ok
+2026-11-10 10:10	babbage	2.29-10	a2f3804	round1	PicardGroup_1.5	10.150	ok
+2026-11-10 10:10	babbage	2.29-10	a2f3804	round1	PicardGroup_1.6	1.780	ok
+2026-11-10 10:10	babbage	2.29-10	a2f3804	round1	SmallRepresentative_2.1	2.100	ok
+2026-11-10 10:25	babbage	2.29-10	v1.0.2	round1	CRT_8.1	9.780	ok
+2026-11-10 10:25	babbage	2.29-10	v1.0.2	round1	ICMAbstract_5.5	58.470	ok
+2026-11-10 10:25	babbage	2.29-10	v1.0.2	round1	IsPrincipal_6.1	2.990	ok
+2026-11-10 10:25	babbage	2.29-10	v1.0.2	round1	IsPrincipal_6.2	-	TIMEOUT(2400s)
+2026-11-10 10:25	babbage	2.29-10	v1.0.2	round1	PicardGroup_1.4	-	TIMEOUT(2400s)
+2026-11-10 10:25	babbage	2.29-10	v1.0.2	round1	PicardGroup_1.5	10.450	ok
+2026-11-10 10:25	babbage	2.29-10	v1.0.2	round1	PicardGroup_1.6	-	TIMEOUT(2400s)
+2026-11-10 10:25	babbage	2.29-10	v1.0.2	round1	SmallRepresentative_2.1	4.520	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	CRT_8.1	4.710	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	CohenMacaulay_9.1	7.410	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	CohenMacaulay_9.2	45.140	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	Completion_8.2	2.820	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	GraphOverOrders_3.5	26.950	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	GraphOverOrders_3.6	33.510	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	GraphOverOrders_3.9	65.330	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	ICMAbstract_5.5	40.520	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	ICM_5.1	12.120	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	ICM_5.2	10.090	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	ICM_5.3	19.030	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	IdealsOfIndex_7.2	44.870	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	IntermediateIdeals_7.1	35.210	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	IsPrincipal_6.1	1.730	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	IsPrincipal_6.2	-	TIMEOUT(2400s)
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	OverOrders_3.2	6.070	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	OverOrders_3.3	6.460	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	OverOrders_3.7	133.200	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	OverOrders_3.8	4.730	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	PicardGroup_1.1	1.860	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	PicardGroup_1.3	1.710	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	PicardGroup_1.4	11.270	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	PicardGroup_1.5	7.520	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	PicardGroup_1.6	1.320	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	SmallRepresentative_2.1	1.320	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	TotRealPos_9.3	1.200	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	WKICM_4.10	210.520	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	WKICM_4.11	23.320	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	WKICM_4.12	2.570	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	WKICM_4.13	2.960	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	WKICM_4.14	255.600	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	WKICM_4.3	5.130	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	WKICM_4.4	3.770	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	WKICM_4.5	2.140	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	WKICM_4.6	2.900	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	WKICM_4.7	904.020	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	WKICM_4.8	27.260	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	WKICM_4.9	211.650	ok
+2026-11-10 10:41	laplace OvGU	2.30-1	a2f3804	round2	WkAbstract_5.4	195.550	ok
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	CRT_8.1	8.090	ok
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	CohenMacaulay_9.1	9.810	ok
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	CohenMacaulay_9.2	62.340	ok
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	Completion_8.2	5.440	ok
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	GraphOverOrders_3.5	22.510	ok
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	GraphOverOrders_3.6	28.890	ok
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	GraphOverOrders_3.9	58.440	ok
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	ICMAbstract_5.5	37.580	ok
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	ICM_5.1	3.970	ok
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	ICM_5.2	1.770	ok
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	ICM_5.3	40.970	ok
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	IdealsOfIndex_7.2	48.530	ok
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	IntermediateIdeals_7.1	113.250	ok
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	IsPrincipal_6.1	2.340	ok
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	OverOrders_3.2	9.610	ok
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	OverOrders_3.3	14.880	ok
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	OverOrders_3.7	206.230	ok
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	OverOrders_3.8	94.540	ok
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	PicardGroup_1.1	8.230	ok
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	PicardGroup_1.3	8.080	ok
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	PicardGroup_1.4	-	TIMEOUT(2400s)
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	PicardGroup_1.5	4.930	ok
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	PicardGroup_1.6	-	TIMEOUT(2400s)
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	SmallRepresentative_2.1	1.670	ok
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	TotRealPos_9.3	1.270	ok
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	WKICM_4.10	-	TIMEOUT(2400s)
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	WKICM_4.11	33.180	ok
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	WKICM_4.12	3.950	ok
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	WKICM_4.13	35.140	ok
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	WKICM_4.14	842.660	ok
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	WKICM_4.3	15.160	ok
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	WKICM_4.4	6.890	ok
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	WKICM_4.5	10.290	ok
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	WKICM_4.6	12.040	ok
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	WKICM_4.7	-	TIMEOUT(2400s)
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	WKICM_4.8	41.960	ok
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	WKICM_4.9	-	TIMEOUT(2400s)
+2026-11-10 10:46	laplace OvGU	2.30-1	v1.0.2	round2	WkAbstract_5.4	-	TIMEOUT(2400s)
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	CRT_8.1	4.700	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	CohenMacaulay_9.1	7.420	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	CohenMacaulay_9.2	45.060	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	Completion_8.2	2.830	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	GraphOverOrders_3.5	26.770	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	GraphOverOrders_3.6	33.590	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	GraphOverOrders_3.9	64.890	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	ICMAbstract_5.5	40.390	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	ICM_5.1	12.260	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	ICM_5.2	9.900	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	ICM_5.3	18.890	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	IdealsOfIndex_7.2	45.010	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	IntermediateIdeals_7.1	34.980	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	IsPrincipal_6.1	1.740	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	IsPrincipal_6.2	-	TIMEOUT(2400s)
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	OverOrders_3.2	6.070	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	OverOrders_3.3	6.460	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	OverOrders_3.7	132.720	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	OverOrders_3.8	4.780	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	PicardGroup_1.1	1.840	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	PicardGroup_1.3	1.700	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	PicardGroup_1.4	11.280	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	PicardGroup_1.5	7.500	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	PicardGroup_1.6	1.330	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	SmallRepresentative_2.1	1.310	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	TotRealPos_9.3	1.200	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	WKICM_4.10	209.680	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	WKICM_4.11	23.390	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	WKICM_4.12	2.560	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	WKICM_4.13	2.960	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	WKICM_4.14	255.420	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	WKICM_4.3	5.100	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	WKICM_4.4	3.760	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	WKICM_4.5	2.120	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	WKICM_4.6	2.900	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	WKICM_4.7	905.230	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	WKICM_4.8	27.240	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	WKICM_4.9	212.200	ok
+2026-11-10 11:30	laplace OvGU	2.30-1	a2f3804	round3	WkAbstract_5.4	195.160	ok
+2026-11-10 11:35	babbage	2.29-10	a2f3804	round2	CRT_8.1	6.260	ok
+2026-11-10 11:35	babbage	2.29-10	a2f3804	round2	ICMAbstract_5.5	49.860	ok
+2026-11-10 11:35	babbage	2.29-10	a2f3804	round2	IsPrincipal_6.1	2.540	ok
+2026-11-10 11:35	babbage	2.29-10	a2f3804	round2	IsPrincipal_6.2	-	TIMEOUT(2400s)
+2026-11-10 11:35	babbage	2.29-10	a2f3804	round2	PicardGroup_1.4	22.800	ok
+2026-11-10 11:35	babbage	2.29-10	a2f3804	round2	PicardGroup_1.5	10.460	ok
+2026-11-10 11:35	babbage	2.29-10	a2f3804	round2	PicardGroup_1.6	1.660	ok
+2026-11-10 11:35	babbage	2.29-10	a2f3804	round2	SmallRepresentative_2.1	2.050	ok
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	CRT_8.1	8.070	ok
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	CohenMacaulay_9.1	9.890	ok
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	CohenMacaulay_9.2	62.160	ok
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	Completion_8.2	5.440	ok
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	GraphOverOrders_3.5	22.400	ok
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	GraphOverOrders_3.6	29.210	ok
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	GraphOverOrders_3.9	58.360	ok
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	ICMAbstract_5.5	37.470	ok
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	ICM_5.1	4.000	ok
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	ICM_5.2	1.780	ok
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	ICM_5.3	40.650	ok
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	IdealsOfIndex_7.2	48.380	ok
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	IntermediateIdeals_7.1	113.550	ok
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	IsPrincipal_6.1	2.330	ok
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	OverOrders_3.2	9.680	ok
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	OverOrders_3.3	14.870	ok
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	OverOrders_3.7	206.400	ok
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	OverOrders_3.8	95.060	ok
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	PicardGroup_1.1	8.270	ok
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	PicardGroup_1.3	8.100	ok
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	PicardGroup_1.4	-	TIMEOUT(2400s)
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	PicardGroup_1.5	4.940	ok
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	PicardGroup_1.6	-	TIMEOUT(2400s)
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	SmallRepresentative_2.1	1.660	ok
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	TotRealPos_9.3	1.270	ok
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	WKICM_4.10	-	TIMEOUT(2400s)
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	WKICM_4.11	33.310	ok
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	WKICM_4.12	3.970	ok
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	WKICM_4.13	35.270	ok
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	WKICM_4.14	853.500	ok
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	WKICM_4.3	15.180	ok
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	WKICM_4.4	6.890	ok
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	WKICM_4.5	10.270	ok
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	WKICM_4.6	12.070	ok
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	WKICM_4.7	-	TIMEOUT(2400s)
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	WKICM_4.8	42.030	ok
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	WKICM_4.9	-	TIMEOUT(2400s)
+2026-11-10 11:35	laplace OvGU	2.30-1	v1.0.2	round3	WkAbstract_5.4	-	TIMEOUT(2400s)
+2026-11-10 11:49	babbage	2.29-10	v1.0.2	round2	CRT_8.1	9.800	ok
+2026-11-10 11:49	babbage	2.29-10	v1.0.2	round2	ICMAbstract_5.5	59.710	ok
+2026-11-10 11:49	babbage	2.29-10	v1.0.2	round2	IsPrincipal_6.1	3.080	ok
+2026-11-10 11:49	babbage	2.29-10	v1.0.2	round2	IsPrincipal_6.2	-	TIMEOUT(2400s)
+2026-11-10 11:49	babbage	2.29-10	v1.0.2	round2	PicardGroup_1.4	-	TIMEOUT(2400s)
+2026-11-10 11:49	babbage	2.29-10	v1.0.2	round2	PicardGroup_1.5	9.620	ok
+2026-11-10 11:49	babbage	2.29-10	v1.0.2	round2	PicardGroup_1.6	-	TIMEOUT(2400s)
+2026-11-10 11:49	babbage	2.29-10	v1.0.2	round2	SmallRepresentative_2.1	2.640	ok
+2026-11-10 12:30	babbage	2.29-10	a2f3804	round3	CRT_8.1	6.620	ok
+2026-11-10 12:30	babbage	2.29-10	a2f3804	round3	ICMAbstract_5.5	50.070	ok
+2026-11-10 12:30	babbage	2.29-10	a2f3804	round3	IsPrincipal_6.1	2.360	ok
+2026-11-10 12:30	babbage	2.29-10	a2f3804	round3	IsPrincipal_6.2	-	TIMEOUT(2400s)
+2026-11-10 12:30	babbage	2.29-10	a2f3804	round3	PicardGroup_1.4	21.780	ok
+2026-11-10 12:30	babbage	2.29-10	a2f3804	round3	PicardGroup_1.5	10.630	ok
+2026-11-10 12:30	babbage	2.29-10	a2f3804	round3	PicardGroup_1.6	1.620	ok
+2026-11-10 12:30	babbage	2.29-10	a2f3804	round3	SmallRepresentative_2.1	1.970	ok
+2026-11-10 12:41	babbage	2.29-10	v1.0.2	round3	CRT_8.1	9.400	ok
+2026-11-10 12:41	babbage	2.29-10	v1.0.2	round3	ICMAbstract_5.5	59.070	ok
+2026-11-10 12:41	babbage	2.29-10	v1.0.2	round3	IsPrincipal_6.1	3.000	ok
+2026-11-10 12:41	babbage	2.29-10	v1.0.2	round3	IsPrincipal_6.2	-	TIMEOUT(2400s)
+2026-11-10 12:41	babbage	2.29-10	v1.0.2	round3	PicardGroup_1.4	-	TIMEOUT(2400s)
+2026-11-10 12:41	babbage	2.29-10	v1.0.2	round3	PicardGroup_1.5	8.680	ok
+2026-11-10 12:41	babbage	2.29-10	v1.0.2	round3	PicardGroup_1.6	-	TIMEOUT(2400s)
+2026-11-10 12:41	babbage	2.29-10	v1.0.2	round3	SmallRepresentative_2.1	2.510	ok
+2026-11-10 14:01	laptop aerox	2.30-1	a2f3804-dirty	round1	CRT_8.1	4.790	ok
+2026-11-10 14:01	laptop aerox	2.30-1	a2f3804-dirty	round1	ICMAbstract_5.5	40.130	ok
+2026-11-10 14:01	laptop aerox	2.30-1	a2f3804-dirty	round1	IsPrincipal_6.1	1.740	ok
+2026-11-10 14:01	laptop aerox	2.30-1	a2f3804-dirty	round1	PicardGroup_1.4	12.670	ok
+2026-11-10 14:01	laptop aerox	2.30-1	a2f3804-dirty	round1	PicardGroup_1.5	7.410	ok
+2026-11-10 14:01	laptop aerox	2.30-1	a2f3804-dirty	round1	PicardGroup_1.6	1.330	ok
+2026-11-10 14:01	laptop aerox	2.30-1	a2f3804-dirty	round1	SmallRepresentative_2.1	1.350	ok
+2026-11-10 14:04	laptop aerox	2.30-1	v1.0.2	round1	CRT_8.1	7.590	ok
+2026-11-10 14:04	laptop aerox	2.30-1	v1.0.2	round1	ICMAbstract_5.5	37.470	ok
+2026-11-10 14:04	laptop aerox	2.30-1	v1.0.2	round1	IsPrincipal_6.1	2.370	ok
+2026-11-10 14:04	laptop aerox	2.30-1	v1.0.2	round1	PicardGroup_1.5	5.360	ok
+2026-11-10 14:04	laptop aerox	2.30-1	v1.0.2	round1	SmallRepresentative_2.1	1.750	ok
+2026-11-10 14:04	laptop aerox	2.30-1	a2f3804-dirty	round2	CRT_8.1	4.840	ok
+2026-11-10 14:04	laptop aerox	2.30-1	a2f3804-dirty	round2	ICMAbstract_5.5	41.210	ok
+2026-11-10 14:04	laptop aerox	2.30-1	a2f3804-dirty	round2	IsPrincipal_6.1	1.870	ok
+2026-11-10 14:04	laptop aerox	2.30-1	a2f3804-dirty	round2	PicardGroup_1.4	13.130	ok
+2026-11-10 14:04	laptop aerox	2.30-1	a2f3804-dirty	round2	PicardGroup_1.5	7.700	ok
+2026-11-10 14:04	laptop aerox	2.30-1	a2f3804-dirty	round2	PicardGroup_1.6	1.370	ok
+2026-11-10 14:04	laptop aerox	2.30-1	a2f3804-dirty	round2	SmallRepresentative_2.1	1.410	ok
+2026-11-10 14:07	laptop aerox	2.30-1	v1.0.2	round2	CRT_8.1	7.800	ok
+2026-11-10 14:07	laptop aerox	2.30-1	v1.0.2	round2	ICMAbstract_5.5	38.710	ok
+2026-11-10 14:07	laptop aerox	2.30-1	v1.0.2	round2	IsPrincipal_6.1	2.240	ok
+2026-11-10 14:07	laptop aerox	2.30-1	v1.0.2	round2	PicardGroup_1.5	5.540	ok
+2026-11-10 14:07	laptop aerox	2.30-1	v1.0.2	round2	SmallRepresentative_2.1	1.660	ok
+2026-11-10 14:07	laptop aerox	2.30-1	a2f3804-dirty	round3	CRT_8.1	4.540	ok
+2026-11-10 14:07	laptop aerox	2.30-1	a2f3804-dirty	round3	ICMAbstract_5.5	37.840	ok
+2026-11-10 14:07	laptop aerox	2.30-1	a2f3804-dirty	round3	IsPrincipal_6.1	1.640	ok
+2026-11-10 14:07	laptop aerox	2.30-1	a2f3804-dirty	round3	PicardGroup_1.4	11.610	ok
+2026-11-10 14:07	laptop aerox	2.30-1	a2f3804-dirty	round3	PicardGroup_1.5	7.080	ok
+2026-11-10 14:07	laptop aerox	2.30-1	a2f3804-dirty	round3	PicardGroup_1.6	1.270	ok
+2026-11-10 14:07	laptop aerox	2.30-1	a2f3804-dirty	round3	SmallRepresentative_2.1	1.390	ok
+2026-11-10 14:10	laptop aerox	2.30-1	v1.0.2	round3	CRT_8.1	7.180	ok
+2026-11-10 14:10	laptop aerox	2.30-1	v1.0.2	round3	ICMAbstract_5.5	35.380	ok
+2026-11-10 14:10	laptop aerox	2.30-1	v1.0.2	round3	IsPrincipal_6.1	2.010	ok
+2026-11-10 14:10	laptop aerox	2.30-1	v1.0.2	round3	PicardGroup_1.5	4.910	ok
+2026-11-10 14:10	laptop aerox	2.30-1	v1.0.2	round3	SmallRepresentative_2.1	1.510	ok
+2026-11-10 14:50	laptop aerox	2.30-1	a2f3804-dirty	round1	IsPrincipal_6.2	-	TIMEOUT(2400s)
+2026-11-10 14:50	laptop aerox	2.30-1	v1.0.2	round1	IsPrincipal_6.2	-	TIMEOUT(2400s)
+2026-11-10 14:50	laptop aerox	2.30-1	v1.0.2	round1	PicardGroup_1.4	-	TIMEOUT(2400s)
+2026-11-10 14:50	laptop aerox	2.30-1	v1.0.2	round1	PicardGroup_1.6	-	TIMEOUT(2400s)
+2026-11-10 15:38	babbage	2.29-10	a2f3804	round1	GraphOverOrders_3.4	6.110	ok
+2026-11-10 15:38	babbage	2.29-10	a2f3804	round1	IdealOps_2.3	7.050	ok
+2026-11-10 15:38	babbage	2.29-10	a2f3804	round1	OverOrders_3.1	7.110	ok
+2026-11-10 15:38	babbage	2.29-10	a2f3804	round1	PicardGroup_1.2	5.010	ok
+2026-11-10 15:38	babbage	2.29-10	a2f3804	round1	WKICM_4.1	6.710	ok
+2026-11-10 15:38	babbage	2.29-10	a2f3804	round1	WKICM_4.2	6.580	ok
+2026-11-10 15:38	babbage	2.29-10	a2f3804	round1	ZBasisLLL_2.2	6.810	ok
+2026-11-10 15:40	babbage	2.29-10	v1.0.2	round1	GraphOverOrders_3.4	2.740	ok
+2026-11-10 15:40	babbage	2.29-10	v1.0.2	round1	IdealOps_2.3	11.520	ok
+2026-11-10 15:40	babbage	2.29-10	v1.0.2	round1	OverOrders_3.1	10.890	ok
+2026-11-10 15:40	babbage	2.29-10	v1.0.2	round1	PicardGroup_1.2	5.180	ok
+2026-11-10 15:40	babbage	2.29-10	v1.0.2	round1	WKICM_4.1	18.040	ok
+2026-11-10 15:40	babbage	2.29-10	v1.0.2	round1	WKICM_4.2	68.460	ok
+2026-11-10 15:40	babbage	2.29-10	v1.0.2	round1	ZBasisLLL_2.2	132.710	ok
+2026-11-10 15:41	babbage	2.29-10	a2f3804	round2	GraphOverOrders_3.4	6.290	ok
+2026-11-10 15:41	babbage	2.29-10	a2f3804	round2	IdealOps_2.3	6.940	ok
+2026-11-10 15:41	babbage	2.29-10	a2f3804	round2	OverOrders_3.1	7.810	ok
+2026-11-10 15:41	babbage	2.29-10	a2f3804	round2	PicardGroup_1.2	4.970	ok
+2026-11-10 15:41	babbage	2.29-10	a2f3804	round2	WKICM_4.1	6.710	ok
+2026-11-10 15:41	babbage	2.29-10	a2f3804	round2	WKICM_4.2	6.290	ok
+2026-11-10 15:41	babbage	2.29-10	a2f3804	round2	ZBasisLLL_2.2	7.340	ok
+2026-11-10 15:43	babbage	2.29-10	v1.0.2	round2	GraphOverOrders_3.4	2.740	ok
+2026-11-10 15:43	babbage	2.29-10	v1.0.2	round2	IdealOps_2.3	12.030	ok
+2026-11-10 15:43	babbage	2.29-10	v1.0.2	round2	OverOrders_3.1	10.750	ok
+2026-11-10 15:43	babbage	2.29-10	v1.0.2	round2	PicardGroup_1.2	5.580	ok
+2026-11-10 15:43	babbage	2.29-10	v1.0.2	round2	WKICM_4.1	18.580	ok
+2026-11-10 15:43	babbage	2.29-10	v1.0.2	round2	WKICM_4.2	67.370	ok
+2026-11-10 15:43	babbage	2.29-10	v1.0.2	round2	ZBasisLLL_2.2	132.560	ok
+2026-11-10 15:43	babbage	2.29-10	a2f3804	round3	GraphOverOrders_3.4	6.560	ok
+2026-11-10 15:43	babbage	2.29-10	a2f3804	round3	IdealOps_2.3	6.890	ok
+2026-11-10 15:43	babbage	2.29-10	a2f3804	round3	OverOrders_3.1	7.170	ok
+2026-11-10 15:43	babbage	2.29-10	a2f3804	round3	PicardGroup_1.2	5.210	ok
+2026-11-10 15:43	babbage	2.29-10	a2f3804	round3	WKICM_4.1	6.280	ok
+2026-11-10 15:43	babbage	2.29-10	a2f3804	round3	WKICM_4.2	6.270	ok
+2026-11-10 15:43	babbage	2.29-10	a2f3804	round3	ZBasisLLL_2.2	6.870	ok
+2026-11-10 15:45	babbage	2.29-10	v1.0.2	round3	GraphOverOrders_3.4	2.640	ok
+2026-11-10 15:45	babbage	2.29-10	v1.0.2	round3	IdealOps_2.3	11.920	ok
+2026-11-10 15:45	babbage	2.29-10	v1.0.2	round3	OverOrders_3.1	10.600	ok
+2026-11-10 15:45	babbage	2.29-10	v1.0.2	round3	PicardGroup_1.2	4.980	ok
+2026-11-10 15:45	babbage	2.29-10	v1.0.2	round3	WKICM_4.1	18.080	ok
+2026-11-10 15:45	babbage	2.29-10	v1.0.2	round3	WKICM_4.2	69.350	ok
+2026-11-10 15:45	babbage	2.29-10	v1.0.2	round3	ZBasisLLL_2.2	132.770	ok
+2026-11-10 16:07	laplace OvGU	2.30-1	a2f3804	round1	GraphOverOrders_3.4	4.780	ok
+2026-11-10 16:07	laplace OvGU	2.30-1	a2f3804	round1	IdealOps_2.3	5.600	ok
+2026-11-10 16:07	laplace OvGU	2.30-1	a2f3804	round1	OverOrders_3.1	5.100	ok
+2026-11-10 16:07	laplace OvGU	2.30-1	a2f3804	round1	PicardGroup_1.2	4.650	ok
+2026-11-10 16:07	laplace OvGU	2.30-1	a2f3804	round1	WKICM_4.1	5.010	ok
+2026-11-10 16:07	laplace OvGU	2.30-1	a2f3804	round1	WKICM_4.2	5.000	ok
+2026-11-10 16:07	laplace OvGU	2.30-1	a2f3804	round1	ZBasisLLL_2.2	5.500	ok
+2026-11-10 16:09	laplace OvGU	2.30-1	v1.0.2	round1	GraphOverOrders_3.4	2.570	ok
+2026-11-10 16:09	laplace OvGU	2.30-1	v1.0.2	round1	IdealOps_2.3	10.080	ok
+2026-11-10 16:09	laplace OvGU	2.30-1	v1.0.2	round1	OverOrders_3.1	7.340	ok
+2026-11-10 16:09	laplace OvGU	2.30-1	v1.0.2	round1	PicardGroup_1.2	4.560	ok
+2026-11-10 16:09	laplace OvGU	2.30-1	v1.0.2	round1	WKICM_4.1	13.890	ok
+2026-11-10 16:09	laplace OvGU	2.30-1	v1.0.2	round1	WKICM_4.2	53.360	ok
+2026-11-10 16:09	laplace OvGU	2.30-1	v1.0.2	round1	ZBasisLLL_2.2	122.800	ok
+2026-11-10 16:10	laplace OvGU	2.30-1	a2f3804	round2	GraphOverOrders_3.4	4.760	ok
+2026-11-10 16:10	laplace OvGU	2.30-1	a2f3804	round2	IdealOps_2.3	5.670	ok
+2026-11-10 16:10	laplace OvGU	2.30-1	a2f3804	round2	OverOrders_3.1	4.970	ok
+2026-11-10 16:10	laplace OvGU	2.30-1	a2f3804	round2	PicardGroup_1.2	4.580	ok
+2026-11-10 16:10	laplace OvGU	2.30-1	a2f3804	round2	WKICM_4.1	5.030	ok
+2026-11-10 16:10	laplace OvGU	2.30-1	a2f3804	round2	WKICM_4.2	5.110	ok
+2026-11-10 16:10	laplace OvGU	2.30-1	a2f3804	round2	ZBasisLLL_2.2	5.600	ok
+2026-11-10 16:12	laplace OvGU	2.30-1	v1.0.2	round2	GraphOverOrders_3.4	2.550	ok
+2026-11-10 16:12	laplace OvGU	2.30-1	v1.0.2	round2	IdealOps_2.3	10.090	ok
+2026-11-10 16:12	laplace OvGU	2.30-1	v1.0.2	round2	OverOrders_3.1	7.200	ok
+2026-11-10 16:12	laplace OvGU	2.30-1	v1.0.2	round2	PicardGroup_1.2	4.470	ok
+2026-11-10 16:12	laplace OvGU	2.30-1	v1.0.2	round2	WKICM_4.1	13.770	ok
+2026-11-10 16:12	laplace OvGU	2.30-1	v1.0.2	round2	WKICM_4.2	53.600	ok
+2026-11-10 16:12	laplace OvGU	2.30-1	v1.0.2	round2	ZBasisLLL_2.2	123.160	ok
+2026-11-10 16:12	laplace OvGU	2.30-1	a2f3804	round3	GraphOverOrders_3.4	4.750	ok
+2026-11-10 16:12	laplace OvGU	2.30-1	a2f3804	round3	IdealOps_2.3	5.590	ok
+2026-11-10 16:12	laplace OvGU	2.30-1	a2f3804	round3	OverOrders_3.1	4.960	ok
+2026-11-10 16:12	laplace OvGU	2.30-1	a2f3804	round3	PicardGroup_1.2	4.570	ok
+2026-11-10 16:12	laplace OvGU	2.30-1	a2f3804	round3	WKICM_4.1	5.080	ok
+2026-11-10 16:12	laplace OvGU	2.30-1	a2f3804	round3	WKICM_4.2	5.150	ok
+2026-11-10 16:12	laplace OvGU	2.30-1	a2f3804	round3	ZBasisLLL_2.2	5.650	ok
+2026-11-10 16:14	laplace OvGU	2.30-1	v1.0.2	round3	GraphOverOrders_3.4	2.560	ok
+2026-11-10 16:14	laplace OvGU	2.30-1	v1.0.2	round3	IdealOps_2.3	10.070	ok
+2026-11-10 16:14	laplace OvGU	2.30-1	v1.0.2	round3	OverOrders_3.1	7.170	ok
+2026-11-10 16:14	laplace OvGU	2.30-1	v1.0.2	round3	PicardGroup_1.2	4.480	ok
+2026-11-10 16:14	laplace OvGU	2.30-1	v1.0.2	round3	WKICM_4.1	13.730	ok
+2026-11-10 16:14	laplace OvGU	2.30-1	v1.0.2	round3	WKICM_4.2	53.800	ok
+2026-11-10 16:14	laplace OvGU	2.30-1	v1.0.2	round3	ZBasisLLL_2.2	122.400	ok
+2026-11-10 16:19	laptop aerox	2.30-1	a2f3804-dirty	round1	GraphOverOrders_3.4	4.600	ok
+2026-11-10 16:19	laptop aerox	2.30-1	a2f3804-dirty	round1	IdealOps_2.3	5.050	ok
+2026-11-10 16:19	laptop aerox	2.30-1	a2f3804-dirty	round1	OverOrders_3.1	5.140	ok
+2026-11-10 16:19	laptop aerox	2.30-1	a2f3804-dirty	round1	PicardGroup_1.2	4.640	ok
+2026-11-10 16:19	laptop aerox	2.30-1	a2f3804-dirty	round1	WKICM_4.1	4.880	ok
+2026-11-10 16:19	laptop aerox	2.30-1	a2f3804-dirty	round1	WKICM_4.2	4.570	ok
+2026-11-10 16:19	laptop aerox	2.30-1	a2f3804-dirty	round1	ZBasisLLL_2.2	5.670	ok
+2026-11-10 16:21	laptop aerox	2.30-1	v1.0.2	round1	GraphOverOrders_3.4	2.190	ok
+2026-11-10 16:21	laptop aerox	2.30-1	v1.0.2	round1	IdealOps_2.3	8.690	ok
+2026-11-10 16:21	laptop aerox	2.30-1	v1.0.2	round1	OverOrders_3.1	7.410	ok
+2026-11-10 16:21	laptop aerox	2.30-1	v1.0.2	round1	PicardGroup_1.2	4.570	ok
+2026-11-10 16:21	laptop aerox	2.30-1	v1.0.2	round1	WKICM_4.1	12.990	ok
+2026-11-10 16:21	laptop aerox	2.30-1	v1.0.2	round1	WKICM_4.2	47.780	ok
+2026-11-10 16:21	laptop aerox	2.30-1	v1.0.2	round1	ZBasisLLL_2.2	104.940	ok
+2026-11-10 16:21	laptop aerox	2.30-1	a2f3804-dirty	round2	GraphOverOrders_3.4	4.310	ok
+2026-11-10 16:21	laptop aerox	2.30-1	a2f3804-dirty	round2	IdealOps_2.3	5.040	ok
+2026-11-10 16:21	laptop aerox	2.30-1	a2f3804-dirty	round2	OverOrders_3.1	5.100	ok
+2026-11-10 16:21	laptop aerox	2.30-1	a2f3804-dirty	round2	PicardGroup_1.2	4.430	ok
+2026-11-10 16:21	laptop aerox	2.30-1	a2f3804-dirty	round2	WKICM_4.1	4.690	ok
+2026-11-10 16:21	laptop aerox	2.30-1	a2f3804-dirty	round2	WKICM_4.2	4.410	ok
+2026-11-10 16:21	laptop aerox	2.30-1	a2f3804-dirty	round2	ZBasisLLL_2.2	5.710	ok
+2026-11-10 16:23	laptop aerox	2.30-1	v1.0.2	round2	GraphOverOrders_3.4	1.940	ok
+2026-11-10 16:23	laptop aerox	2.30-1	v1.0.2	round2	IdealOps_2.3	8.220	ok
+2026-11-10 16:23	laptop aerox	2.30-1	v1.0.2	round2	OverOrders_3.1	6.660	ok
+2026-11-10 16:23	laptop aerox	2.30-1	v1.0.2	round2	PicardGroup_1.2	3.880	ok
+2026-11-10 16:23	laptop aerox	2.30-1	v1.0.2	round2	WKICM_4.1	12.100	ok
+2026-11-10 16:23	laptop aerox	2.30-1	v1.0.2	round2	WKICM_4.2	48.360	ok
+2026-11-10 16:23	laptop aerox	2.30-1	v1.0.2	round2	ZBasisLLL_2.2	109.290	ok
+2026-11-10 16:23	laptop aerox	2.30-1	a2f3804-dirty	round3	GraphOverOrders_3.4	4.690	ok
+2026-11-10 16:23	laptop aerox	2.30-1	a2f3804-dirty	round3	IdealOps_2.3	5.290	ok
+2026-11-10 16:23	laptop aerox	2.30-1	a2f3804-dirty	round3	OverOrders_3.1	5.350	ok
+2026-11-10 16:23	laptop aerox	2.30-1	a2f3804-dirty	round3	PicardGroup_1.2	4.660	ok
+2026-11-10 16:23	laptop aerox	2.30-1	a2f3804-dirty	round3	WKICM_4.1	4.950	ok
+2026-11-10 16:23	laptop aerox	2.30-1	a2f3804-dirty	round3	WKICM_4.2	4.560	ok
+2026-11-10 16:23	laptop aerox	2.30-1	a2f3804-dirty	round3	ZBasisLLL_2.2	5.840	ok
+2026-11-10 16:25	laptop aerox	2.30-1	v1.0.2	round3	GraphOverOrders_3.4	1.940	ok
+2026-11-10 16:25	laptop aerox	2.30-1	v1.0.2	round3	IdealOps_2.3	7.710	ok
+2026-11-10 16:25	laptop aerox	2.30-1	v1.0.2	round3	OverOrders_3.1	6.390	ok
+2026-11-10 16:25	laptop aerox	2.30-1	v1.0.2	round3	PicardGroup_1.2	3.810	ok
+2026-11-10 16:25	laptop aerox	2.30-1	v1.0.2	round3	WKICM_4.1	11.630	ok
+2026-11-10 16:25	laptop aerox	2.30-1	v1.0.2	round3	WKICM_4.2	49.550	ok
+2026-11-10 16:25	laptop aerox	2.30-1	v1.0.2	round3	ZBasisLLL_2.2	109.460	ok

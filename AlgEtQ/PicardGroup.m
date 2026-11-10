@@ -15,7 +15,8 @@ declare verbose AlgEtQPicardGroup, 3;
 declare verbose ResidueRingUnits, 3;
 
 declare attributes AlgEtQOrd: PicardGroup,
-                              UnitGroup;
+                              UnitGroup,
+                              units_mod_conductor_data;
 
 declare attributes AlgEtQIdl: residue_class_ring_unit_subgroup_generators,
                               ResidueRingUnits;
@@ -145,7 +146,7 @@ intrinsic ResidueRingUnitsSubgroupGenerators(F::AlgEtQIdl) -> SeqEnum[AlgEtQElt]
             e1:=ChineseRemainderTheorem(a1a2,rest,One(A),Zero(A));
             e2:=ChineseRemainderTheorem(a1a2,rest,Zero(A),One(A));
             c:=c*e1+e2;
-            // the previous is equivalent to the following, but faster since we can 'reuse'e1 and e2 later.
+            // the previous is equivalent to the following, but faster since we can 'reuse' e1 and e2 later.
             //c:=ChineseRemainderTheorem(a1a2,rest,c,One(A));
             assert2 c - ChineseRemainderTheorem(a1a2,rest,c,One(A)) in a1a2*rest;
             assert2 c - One(A) in rest;
@@ -252,6 +253,53 @@ IsPrincipal_prod_internal:=function( II , GRH )
     return true,gen;
 end function;
 
+// The data of the map h : O^* -> B = (O/FO)^*/(S/F)^*, where O is the maximal order and F the conductor of the
+// non-maximal order S: the kernel of h is S^*. Used by IsPrincipal and UnitGroup, and cached in S.
+// Since K = Kernel(h) has finite index in UO, the exponents on the free generators of UO of the elements of K form a
+// lattice of full rank: it is stored with an LLL-reduced basis (rows of Lmat = T * the rows of the free generators Kfree
+// of K), for reduce_mod_units_of_S.
+units_mod_conductor_fmt:=recformat< O, F, FO, R, r, UO, uO, B, b, h, K, free, Kfree, L, T >;
+
+units_mod_conductor_data:=function(S, GRH)
+    if not assigned S`units_mod_conductor_data then
+        // UO before the residue ring units, as UnitGroup(S) always did: both make random choices, so this order fixes
+        // the generators returned by UnitGroup(S)
+        A:=Algebra(S);
+        O:=MaximalOrder(A);
+        UO,uO:=UnitGroup(O : GRH:=GRH );
+        F:=Conductor(S);
+        FO:=O!!F;
+        R,r:=ResidueRingUnits(O,FO);
+        B,b:=quo<R | [ a@@r : a in ResidueRingUnitsSubgroupGenerators(F) ]>;
+        h:=hom<UO -> B | [ b(uO(UO.i)@@r) : i in [1..Ngens(UO)] ]>;
+        K:=Kernel(h);
+        data:=rec< units_mod_conductor_fmt | O:=O, F:=F, FO:=FO, R:=R, r:=r, UO:=UO, uO:=uO, B:=B, b:=b, h:=h, K:=K >;
+        data`free:=[ i : i in [1..Ngens(UO)] | Order(UO.i) eq 0 ];
+        data`Kfree:=[ UO!K.i : i in [1..Ngens(K)] | Order(K.i) eq 0 ];
+        assert #data`Kfree eq #data`free; // K has finite index in UO
+        if #data`free gt 0 then
+            Lmat,T:=LLL(Matrix(Integers(),[ [ Eltseq(k)[i] : i in data`free ] : k in data`Kfree ]));
+            data`L:=LatticeWithBasis(Lmat);
+            data`T:=T;
+        end if;
+        S`units_mod_conductor_data:=data;
+    end if;
+    return S`units_mod_conductor_data;
+end function;
+
+reduce_mod_units_of_S:=function(u, data)
+// Given u in UO, returns u-k with k in K = Kernel(h) (the units of S) such that the exponents of u-k on the free
+// generators of UO are small: k is the element of K whose exponents are the closest vector to the ones of u.
+    if #data`free eq 0 then
+        return u;
+    end if;
+    v:=Vector([ Eltseq(u)[i] : i in data`free ]);
+    c:=Eltseq(Vector(Coordinates(ClosestVector(data`L,v)))*data`T);
+    k:=&+[ c[i]*data`Kfree[i] : i in [1..#c] ];
+    assert2 data`h(k) eq Zero(data`B);
+    return u-k;
+end function;
+
 /// Returns whether the given fractional ideals is a principal ideal (over its order of definition), and, if so, also a generator.  The parameter `GRH` (default false) can be set to true determines if the test is done under GRH.
 intrinsic IsPrincipal(I1::AlgEtQIdl : GRH:=false )->BoolElt, AlgEtQElt
 {Returns whethere the given fractional ideals is a principal ideal (over its order of definition), and, if so, also a generator.  The parameter GRH (default false) can be set to true determines if the test is done under GRH.}
@@ -283,29 +331,28 @@ intrinsic IsPrincipal(I1::AlgEtQIdl : GRH:=false )->BoolElt, AlgEtQElt
         assert2 gen_IO*S eq I;
         return true, gen_IO*cop^-1;
     end if;
-    UO,uO:=UnitGroup(O : GRH:=GRH );
-    Sgens:=ResidueRingUnitsSubgroupGenerators(F);
-    B,b:=quo<R|[gen@@r : gen in Sgens]>;
-    //B,b:=ResidueRingUnits(F); // it doesn't see that it is related to R.
-    gens_UO_inB:=[ b(uO(UO.i)@@r) : i in [1..#Generators(UO)]  ];
-    h:=hom<UO -> B | gens_UO_inB >;
-    hUO:=Image(h);
-    if not b(gen_IO@@r) in hUO then
+    // I = cop*I1 is integral and coprime to F, so gen_IO, which lies in IO = I*O, is in O and is a unit modulo FO.
+    // Every generator of I generates IO, so it is x = gen_IO/u for some u in O^*. Conversely, such an x generates I
+    // iff its class in (O/FO)^* lies in (S/F)^*: at a prime P of S not containing F we have S_P = O_P, so
+    // x*S_P = x*O_P = I_P; at a prime P with F c P we have I_P = S_P, and x*S_P = S_P iff x is in S_P^*, iff x is
+    // in S_P (x is a unit of O_P, and S_P^* = S_P meet O_P^* because O_P is integral over S_P), iff x mod F_P is in
+    // S_P/F_P. Writing B = (O/FO)^*/(S/F)^* additively, the class of x in B is
+    // b(gen_IO) - h(u), where h : O^* -> B is induced by the reduction modulo FO. Hence I is principal iff
+    // b(gen_IO) = h(u) for some u in O^*, and then gen_IO/u is a generator of I.
+    data:=units_mod_conductor_data(S,GRH);
+    is_princ,u:=HasPreimage(data`b(gen_IO@@r),data`h);
+    if not is_princ then
         return false,_;
     end if;
-    //now we know that IO is principal. let's find a generator
-    UQ,qQ:=quo<UO|Kernel(h)>;  //UQ = O*/S*
-    alpha:=hom<UQ -> B | [UQ.i@@qQ @uO @@r @b : i in [1..#Generators(UQ)]]>;
-    is_princ,elt:=HasPreimage(gen_IO@@r@b,alpha);
-    if is_princ then
-        gen_I:=gen_IO*(A ! (elt@@qQ@uO))^-1;
-        gen_I1:=gen_I*cop^-1;
-        assert2 gen_I1*S eq I1;
-        I1`Generators:=[gen_I1];
-        return true,gen_I1;
-    else
-        return false, _;
-    end if;
+    // u is determined modulo Kernel(h) = S^*. An arbitrary preimage can have huge exponents,
+    // which makes the unit data`uO(u) (a product of powers of the fundamental units of O) huge.
+    // The next call prevents this.
+    u:=reduce_mod_units_of_S(u,data);
+    gen_I:=gen_IO*(A ! data`uO(u))^-1;
+    gen_I1:=gen_I*cop^-1;
+    assert2 gen_I1*S eq I1;
+    I1`Generators:=[gen_I1];
+    return true,gen_I1;
 end intrinsic;
 
 small_prod_of_powers:=function(S, gens, exps)
@@ -688,19 +735,10 @@ intrinsic UnitGroup(S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
     if IsMaximal(S) then return UnitGroup_prod_internal(S,GRH); end if;
     A:=Algebra(S);
     require assigned A`Components: "the order must lie in a product of number fields";
-    O:=MaximalOrder(Algebra(S));
-    UO,uO:=UnitGroup_prod_internal(O, GRH);
-    F:=Conductor(S);
-    FO:=O!!F;
-
-    //Let's build B=(O/FO)^*/(S/F)^*
-    R,r:=ResidueRingUnits(O,FO);
-    gens_SF:=ResidueRingUnitsSubgroupGenerators(F);
-    B,b:=quo<R| [ a@@r : a in gens_SF ]>;
-
-    img_gensUO_in_B:=[ b(uO(UO.i)@@r) : i in [1..#Generators(UO)] ];
-    m:=hom<UO -> B | img_gensUO_in_B >;
-    P:=Kernel(m);
+    // S^* is the kernel of m : O^* -> B=(O/FO)^*/(S/F)^*
+    data:=units_mod_conductor_data(S,GRH);
+    UO:=data`UO; uO:=data`uO; B:=data`B; m:=data`h;
+    P:=data`K;
     gens_P_in_A:=[uO(UO ! P.i) : i in [1..#Generators(P)] ];
     //p_codomain:=Parent(gens_P_in_A[1]);
     p_codomain:=A;
@@ -762,6 +800,26 @@ end intrinsic;
         U,u:=UnitGroup(S);
         printf ".";
     end for;
+
+    // IsPrincipal and UnitGroup for a non-maximal order: E = Z[2000^(1/3)], #Pic(E) = 24, [O^*:E^*] = 40
+    // (Kluners-Pauli). The principal ideals p(g)*p(-g) with their generators, and p(g) for g ne 0.
+    _<x>:=PolynomialRing(Integers());
+    A:=EtaleAlgebra(x^3-2000);
+    E:=EquationOrder(A);
+    P,p:=PicardGroup(E : GRH:=true);
+    assert #P eq 24;
+    for i in [1..10] do
+        g:=Random(P);
+        J:=p(g)*p(-g);
+        test,gen:=IsPrincipal(J : GRH:=true);
+        assert test and gen*E eq J;
+        assert IsPrincipal(p(g) : GRH:=true) eq (g eq Zero(P));
+    end for;
+    U,u:=UnitGroup(E : GRH:=true);
+    UO,uO:=UnitGroup(MaximalOrder(A) : GRH:=true);
+    assert forall{ i : i in [1..Ngens(U)] | u(U.i) in E and u(U.i)^-1 in E };
+    assert #quo<UO | [ u(U.i)@@uO : i in [1..Ngens(U)] ]> eq 40;
+    printf ".";
 
     //AttachSpec("../spec");
     _<x>:=PolynomialRing(Integers());

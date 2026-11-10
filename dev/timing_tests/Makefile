@@ -27,12 +27,19 @@ LOGTZ := CET-1
 
 # The commit of the tree that SPEC points to: the exact tag or the short hash of a git checkout (plus -dirty if there
 # are uncommitted changes outside this folder), or the content of the file COMMIT next to the spec of a `git archive`.
+# COMMIT and MAGMAVER are computed once, when make starts, and exported, so that the sub-makes (logs, summary, log)
+# do not compute them again: a commit made during a run does not change the commit written in timings.log.
 SPECDIR := $(dir $(abspath $(SPEC)))
-COMMIT ?= $(shell cd $(SPECDIR) && if git rev-parse --git-dir > /dev/null 2>&1; then \
+ifndef COMMIT
+COMMIT := $(shell cd $(SPECDIR) && if git rev-parse --git-dir > /dev/null 2>&1; then \
 	c=$$(git describe --exact-match --tags 2>/dev/null || git rev-parse --short HEAD); \
 	git diff --quiet HEAD -- . ':!dev/timing_tests' 2>/dev/null || c=$$c-dirty; echo $$c; \
 	else cat COMMIT 2>/dev/null || echo unknown; fi)
+endif
+ifndef MAGMAVER
 MAGMAVER := $(shell echo 'a,b,c:=GetVersion(); printf "%o.%o-%o\n",a,b,c; quit;' | magma -b 2>/dev/null | tail -1)
+endif
+export COMMIT MAGMAVER
 
 ALLTESTS := $(sort $(wildcard $(TESTDIR)/*.m))
 ifeq ($(strip $(TESTS)),)

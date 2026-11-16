@@ -22,7 +22,7 @@ declare attributes AlgEtQOrd : GraphOverOrders;
 //------------
 
 /// Given an order $R$, returns the graph $G$ of minimal inclusions of the overorders of $R$. The vertices of $G$ are integers between $1$ and the number of overorders of $R$, and there is an edge $[i,j]$ if and only if $j$-th overorder of $R$ is a minimal overorder of the $i$-th.
-intrinsic GraphOverOrders(R:AlgEtQOrd) -> GrphDir
+intrinsic GraphOverOrders(R::AlgEtQOrd) -> GrphDir
 {Given an order R, returns the graph G of minimal inclusions of the overorders of R. The vertices of G are integers between 1 and the number of OverOrders(R), and there is an edge [i,j] if and only if OverOrder(R)[j] is a minimal overorder of OverOrders(R)[i].}
     if not assigned R`GraphOverOrders then
         if IsMaximal(R) then

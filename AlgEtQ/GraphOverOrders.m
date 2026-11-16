@@ -64,7 +64,7 @@ intrinsic GraphOverOrders(R::AlgEtQOrd) -> GrphDir
                 cc:=[ c : c in cc ];
                 // The output of OverOrders(R) is sorted by index (and myHash), so its order does not match
                 // the one of cc. We reconstruct the correspondence cc[i] -> position in output, by rebuilding
-                // the orders as in OverOrders(R) (these are cheap lookups in the known orders) and looking
+                // the orders as in OverOrders(R) (one HNF each, and a lookup in the known orders) and looking
                 // them up by their hash.
                 pos:=AssociativeArray();
                 for i->S in output do
@@ -79,7 +79,8 @@ intrinsic GraphOverOrders(R::AlgEtQOrd) -> GrphDir
                         _,j:=Max(S);
                         T:=oo_at_Ps[j][S[j]];
                     else
-                        T:=Order(&cat[ZBasis(oo_at_Ps[j][S[j]]) : j in [1..#S] | S[j] ne 1]);
+                        // the sum is an order: see OverOrders
+                        T:=Order(&cat[ZBasis(oo_at_Ps[j][S[j]]) : j in [1..#S] | S[j] ne 1] : Check:=0);
                     end if;
                     Append(~cc_to_output,pos[myHash(T)]);
                 end for;

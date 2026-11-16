@@ -343,7 +343,7 @@ intrinsic Localization(W::AlgEtQWECM,P::AlgEtQIdl)->AlgEtQWECM
     O:=MaximalOrder(Algebra(R));
     _,p:=IsPrimePower(Index(R,P));
     k:=Valuation(Index(O,R),p);
-    RP:=Order(ZBasis(R) cat ZBasis(O!!P^k));
+    RP:=Order(ZBasis(R) cat ZBasis(O!!P^k) : Check:=0); // R+P^kO is closed under multiplication
     return WeakEquivalenceClassMonoidAbstract(RP);
 end intrinsic;
 

@@ -277,7 +277,7 @@ intrinsic WKICM_bar(S::AlgEtQOrd) -> SeqEnum[AlgEtQIdl]
                     _,p:=IsPrimePower(Index(S,P));
                     Append(~ps,p);
                     k:=Valuation(Index(O,S),p);
-                    SP:=Order(ZBasis(S) cat ZBasis(O!!P^k));
+                    SP:=Order(ZBasis(S) cat ZBasis(O!!P^k) : Check:=0); // S+P^kO is closed under multiplication
                     wk_P_bar:=$$(SP); // recursion
                     // wk_P = W_P(S) = W(S+P^k0O) in the notation above
                     wk_P_bar:=[ S !! I : I in wk_P_bar];
@@ -441,10 +441,9 @@ intrinsic WKICM(E::AlgEtQOrd)->SeqEnum[AlgEtQIdl]
                 _,p:=IsPrimePower(Index(E,P));
                 Append(~ps,p);
                 k:=Valuation(Index(O,E),p);
-                EP:=Order(ZBasis(E) cat ZBasis(O!!P^k)); // EP is an overorder of E, locally equal to E at P,
-                                                         // and to the maximal order O at every other prime.
-                                                         // In particular, EP has a unique singular prime,
-                                                         // which is the extension of P.
+                // EP=E+P^kO is an overorder of E, locally equal to E at P, and to the maximal order O at every other
+                // prime. In particular, EP has a unique singular prime, which is the extension of P.
+                EP:=Order(ZBasis(E) cat ZBasis(O!!P^k) : Check:=0); // E+P^kO is closed under multiplication
                 wk_P:=$$(EP); // recursion
                 // wk_P = W_P(E) = W(E+O!!P^k) in the notation above
                 wk_P:=[ E !! I : I in wk_P];

@@ -292,8 +292,9 @@ intrinsic OverOrders(R::AlgEtQOrd : populateoo_in_oo:=false) -> SeqEnum[AlgEtQOr
                     _,j:=Max(S); // the position of the non-1 entry
                     S:=oo_at_Ps[j][S[j]]; // the only order in the tuple bigger than R
                 else
+                    // The orders in the tuple are overorders of R at distinct primes of R: their sum is an order.
                     gens:=&cat[ZBasis(oo_at_Ps[j][S[j]]) : j in [1..#S] | S[j] ne 1];
-                    S:=Order(gens);
+                    S:=Order(gens : Check:=0);
                 end if;
                 Append(~output,S);
             end for;

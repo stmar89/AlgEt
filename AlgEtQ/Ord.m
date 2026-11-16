@@ -125,17 +125,22 @@ end function;
 
 ///## Creation
 /// Whenever we create an order, we populate the attributes `Generators` and `ZBasis`.
-/// Unless the parameter `Check` is set to $0$, the `ZBasis` is put in a canonical form (we use the Hermite normal form of the numerators and divide by the denominators). The entries of the corresponding upper triangular matrix uniquely determine the order and are used for hashing it.
+/// The `ZBasis` is put in a canonical form (we use the Hermite normal form of the numerators and divide by the denominators), unless the parameter `Check` is set to $0$ and the given elements are as many as the dimension of the algebra: then they are taken as the `ZBasis`. The entries of the corresponding upper triangular matrix uniquely determine the order and are used for hashing it.
 
-/// Returns the order generated as an algebra over $\mathbb{Z}$ by a given sequence of elements. The parameter `Check` (default $100$) determines how many times the program tries to obtain a multiplicatively closed lattice by adding the product of the given generators. If `Check` is $0$ then this step is skipped. The parameter `CheckIsKnownOrder` determines whether the program checks if the order is already known, i.e. in the attribute `KnownOrders` of the algebra. The default value is true. The stored $\mathbb{Z}$-basis is LLL reduced.
+/// Returns the order generated as an algebra over $\mathbb{Z}$ by a given sequence of elements. The parameter `Check` (default $100$) determines how many times the program tries to obtain a multiplicatively closed lattice by adding the product of the given generators. If `Check` is $0$ then this step is skipped: the $\mathbb{Z}$-span of the given elements is assumed to be closed under multiplication, which is not verified, and it is returned as an order. The parameter `CheckIsKnownOrder` determines whether the program checks if the order is already known, i.e. in the attribute `KnownOrders` of the algebra. The default value is true. The stored $\mathbb{Z}$-basis is LLL reduced.
 intrinsic Order( gens::SeqEnum[AlgEtQElt] : Check:=100 , CheckIsKnownOrder:=true ) -> AlgEtQOrd
-{Returns the order generated as an algebra over ZZ by a given sequence of elements. The parameter Check (default 100) determines how many times the program tries to obtain a multiplicatively closed lattice by adding the product of the given generators. If Check 0 then this step is skipped. The vararg CheckIsKnownOrder determines whether the program checks if the order is already known, i.e. in the attribute KnownOrders of the algebra. The default value is true. The stored ZBasis is LLL-reduced.}
+{Returns the order generated as an algebra over ZZ by a given sequence of elements. The parameter Check (default 100) determines how many times the program tries to obtain a multiplicatively closed lattice by adding the product of the given generators. If Check is 0 then this step is skipped: the ZZ-span of the given elements is assumed to be closed under multiplication, which is not verified, and it is returned as an order. The vararg CheckIsKnownOrder determines whether the program checks if the order is already known, i.e. in the attribute KnownOrders of the algebra. The default value is true. The stored ZBasis is LLL-reduced.}
     A:=Universe(gens);
     gens:=Setseq(Seqset(gens));// we remove duplicates
     dim:=AbsoluteDimension(A);
     R:=New(AlgEtQOrd);
     R`Algebra:=A;
-    require forall{g : g in gens | IsIntegral(g) } : "The elements are not all integral, hence do not generate an order.";
+    if Check gt 0 then
+        require forall{g : g in gens | IsIntegral(g) } : "The elements are not all integral, hence do not generate an order.";
+    else
+        // the Z-span of the elements is assumed to be an order: in particular, they are integral
+        assert2 forall{g : g in gens | IsIntegral(g) };
+    end if;
     if Check gt 0 then
         gens0:=gens;
         if not One(A) in gens then
@@ -171,6 +176,24 @@ intrinsic Order( gens::SeqEnum[AlgEtQElt] : Check:=100 , CheckIsKnownOrder:=true
         R`Hash:=[d] cat [(Integers()!(d*P[i,j])) : j in [i..dim] , i in [1..dim]];
         // UNSAFE R`Hash:=Hash(P);
         zb:=MatrixQtoA(A,P);
+    elif #gens gt dim then
+    // We assume that gens generates over Z a multiplicatively closed lattice: we only need its Z-basis (one HNF).
+    // Examples:
+    // - S_1+...+S_n, for overorders S_i of an order S which differ from S at pairwise distinct primes of S: at each
+    //   prime of S the sum is locally equal to one of the S_i, hence it is closed under multiplication;
+    // - S+I, for an order S and an integral ideal I of an overorder of S.
+        M:=MatrixAtoQ(gens);
+        d:=Denominator(M);
+        P:=crZQ(hnf(crQZ(d*M)))/d;
+        d:=Denominator(P);
+        R`Hash:=[d] cat [(Integers()!(d*P[i,j])) : j in [i..dim] , i in [1..dim]];
+        zb:=MatrixQtoA(A,P);
+        if GetAssertions() ge 2 then
+            // the lattice is closed under multiplication
+            M1:=MatrixAtoQ(zb cat [ z1*z2 : z1,z2 in zb ]);
+            d1:=Denominator(M1);
+            assert crZQ(hnf(crQZ(d1*M1)))/d1 eq P;
+        end if;
     else
     //we assume that gens is a ZBasis of a multiplicativly closed lattice
         zb:=gens;

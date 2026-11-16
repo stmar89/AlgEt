@@ -81,7 +81,7 @@ intrinsic LoadWKICM(str::MonStgElt) -> AlgEtQOrd
     data:=eval(str);
     PP:=PolynomialRing(Rationals());
     ff:=[ PP!f : f in data[1]];
-    A:=EtaleAlgebra([NumberField(f) : f in ff ]);
+    A:=EtaleAlgebra([NumberField(f : DoLinearExtension) : f in ff ]); // DoLinearExtension: for the Q components, as in EtaleAlgebra(f)
     wk:=data[2];
 
     ooR:=[ Order([ A ! s : s in wk[j][1]]) : j in [1..#wk] ];
@@ -161,6 +161,14 @@ end intrinsic;
     R1:=LoadWKICM(str);
     assert #WKICM(R) eq #WKICM(R1);
     assert #FindOverOrders(R) eq #FindOverOrders(R1);
+    printf ".";
+
+    // an algebra with a Q component
+    A:=EtaleAlgebra((x-1)*(x^2+5));
+    E:=EquationOrder(A);
+    E1:=LoadWKICM(PrintWKICM(E));
+    assert #WKICM(E) eq #WKICM(E1);
+    assert #FindOverOrders(E) eq #FindOverOrders(E1);
     printf ".";
 
     SetAssertions(1);

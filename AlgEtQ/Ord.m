@@ -194,8 +194,10 @@ end intrinsic;
 intrinsic Order(A::AlgEtQ , orders::Tup) -> AlgEtQOrd
 {Given an étale algebra and a tuple of orders in the components of the étale algebra, it generates the direct sum order.}
     nf,embs,projs:=Components(A);
+    // ISA, not Type(S) in {...}: the orders of cyclotomic and quadratic fields have the types RngCyc and RngQuad,
+    // which are subtypes of RngOrd.
     require #nf eq #orders and forall{ i : i in [1..#orders] | NumberField(orders[i]) eq nf[i]} and
-forall{ S : S in orders | Type(S) in {RngCyc,RngOrd} } : "The second input should be a sequence of orders in the number fields defining A";
+forall{ S : S in orders | ISA(Type(S),RngOrd) } : "The second input should be a sequence of orders in the number fields defining A";
     gens:=&cat[ [ embs[i](z) : z in AbsoluteBasis(orders[i]) ] : i in [1..#nf] ];
     O:=Order(gens : Check:=0); // the gens given generate a multiplicatively closed lattice in A
     assert2 O eq Order(gens);
@@ -774,6 +776,17 @@ end intrinsic;
     for i in [1..#oo] do AA[copies1[i]]:=i; end for;
     assert #Keys(AA) eq #oo;
     assert forall{ i : i in [1..#oo] | AA[copies2[i]] eq i };
+    printf ".";
+
+    // components given by QuadraticField and CyclotomicField: their maximal orders have types RngQuad and RngCyc
+    A:=EtaleAlgebra([QuadraticField(-5),CyclotomicField(5)]);
+    O:=MaximalOrder(A);
+    assert IsMaximal(O);
+    test,OasProd:=IsProductOfOrders(O);
+    assert test and [ Type(S) : S in OasProd ] eq [ RngQuad, RngCyc ];
+    P:=PicardGroup(O);
+    assert #P eq 2; // the class numbers of Q(sqrt(-5)) and Q(zeta_5) are 2 and 1
+    printf ".";
 
     SetAssertions(1);
     printf "all good!";

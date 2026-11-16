@@ -11,7 +11,7 @@
 
 freeze;
 
-import "Ord.m" : crQZ , crZQ , MatrixAtoQ ;
+import "Ord.m" : crQZ , crZQ , MatrixAtoQ , inclusion_matrix ;
 
 declare verbose Quotients, 1;
 
@@ -26,18 +26,26 @@ declare attributes AlgEtQIdl : ResidueField,PrimitiveElementResidueField;
 // Quotients
 //------------
 
+// The maps returned below use the Z-basis zb of I (an ideal or an order) at creation, and Minv, the inverse of the
+// matrix of zb (the inclusion matrix of I), so that they stay correct if ZBasis(I) is replaced later, for example by
+// ZBasisLLL(I). coords_wrt returns the coordinates of the elements of seq with respect to zb.
+coords_wrt:=function(seq, Minv)
+    return [ Eltseq(r) : r in Rows(MatrixAtoQ(seq)*Minv) ];
+end function;
+
 /// Given a fractional ideal $I$ and the $\mathbb{Z}$-basis of an ideal or order $J$ such that $J \subseteq I$, returns the abelian group $Q=I/J$ together with the quotient map $q:I\to Q$.
 intrinsic Quotient(I::AlgEtQIdl, zbJ::SeqEnum[AlgEtQElt]) -> GrpAb, Map
 {Given a fractional ideal I and the ZBasis of an ideal or order J such that  J subset I, returns the abelian group Q=I/J together with the quotient map q:I->Q.}
     // if J is not inside I, an error occurs while forming Q. so no need to check in advance
     A:=Algebra(I);
-    zbI:=ZBasis(I);
+    require forall{ z : z in zbJ | Algebra(z) cmpeq A } : "the algebra is not the same";
+    Minv,zbI:=inclusion_matrix(I);
     N := #zbI;
     F := FreeAbelianGroup(N);
-    rel := [F ! cc : cc in AbsoluteCoordinates(zbJ,I)];
+    rel := [F ! cc : cc in coords_wrt(zbJ,Minv)];
     //mFI := map<F->A| x:->&+[Eltseq(x)[i]*zbI[i] : i in [1..N]]>;
     mFI := map<F->A| x:->DotProduct(Eltseq(x),zbI)>;
-    mIF := map<A->F| x:-> F ! AbsoluteCoordinates([x],I)[1]>;
+    mIF := map<A->F| x:-> F ! coords_wrt([x],Minv)[1]>;
     Q,qFQ := quo<F|rel>; //q:F->Q. Q is an "abstract" abelian group isomorphic to I/J.
     q:=map< A->Q | x:->qFQ(mIF(x)) , y:-> mFI(y@@qFQ) >;
     return Q,q;
@@ -54,13 +62,14 @@ intrinsic Quotient(S::AlgEtQOrd, zbJ::SeqEnum[AlgEtQElt]) -> GrpAb, Map
 {Given an order S and the ZBasis of an ideal or order J such that J subset S, returns the abelian group Q=S/J together with the quotient map q:S->Q.}
     // if J is not inside S, an error occurs while forming Q. so no need to check in advance
     A:=Algebra(S);
-    zbS:=ZBasis(S);
+    require forall{ z : z in zbJ | Algebra(z) cmpeq A } : "the algebra is not the same";
+    Minv,zbS:=inclusion_matrix(S);
     N := #zbS;
     F := FreeAbelianGroup(N);
-    rel := [F ! cc : cc in AbsoluteCoordinates(zbJ,S)]; // this absolute coordinates uses inclusion_matrix. fast!
+    rel := [F ! cc : cc in coords_wrt(zbJ,Minv)];
     //mFS := map<F->A| x:->&+[Eltseq(x)[i]*zbS[i] : i in [1..N]]>;
     mFS := map<F->A| x:->DotProduct(Eltseq(x),zbS)>;
-    mSF := map<A->F| x:-> F ! AbsoluteCoordinates([x],S)[1]>;
+    mSF := map<A->F| x:-> F ! coords_wrt([x],Minv)[1]>;
     Q,qFQ := quo<F|rel>; //q:F->Q. Q is an "abstract" abelian group isomorphic to S/J.
     q:=map< A->Q | x:->qFQ(mSF(x)) , y:-> mFS(y@@qFQ) >;
     return Q,q;
@@ -194,14 +203,14 @@ intrinsic QuotientVS(I::AlgEtQIdl, J::AlgEtQIdl, P::AlgEtQIdl) -> ModRng, Map
     d := Ilog(#K,Integers() ! (Index(J)/Index(I))); // d = dim(I/J) over (S/P)
     V := KModule(K,d);
     //need to find a basis of I/J over R/P.
-    zbI := ZBasis(I);
+    Minv,zbI := inclusion_matrix(I); // see coords_wrt
     N := #zbI;
     F := FreeAbelianGroup(N);
-    relJ := [F ! cc : cc in AbsoluteCoordinates(ZBasis(J),I)];
+    relJ := [F ! cc : cc in coords_wrt(ZBasis(J),Minv)];
     rel:=relJ;
     //mFI := map<F->A| x:->&+[Eltseq(x)[i]*zbI[i] : i in [1..N]]>;
     mFI := map<F->A| x:->DotProduct(Eltseq(x),zbI)>;
-    mIF := map<A->F| x:-> F ! AbsoluteCoordinates([x],I)[1]>;
+    mIF := map<A->F| x:-> F ! coords_wrt([x],Minv)[1]>;
     Q,q := quo<F|rel>; //q:F->Q. Q is an "abstract" abelian group isomorphic to I/J.
     bas := [];
     for i in [1..d] do
@@ -209,7 +218,7 @@ intrinsic QuotientVS(I::AlgEtQIdl, J::AlgEtQIdl, P::AlgEtQIdl) -> ModRng, Map
         elt_F := (Q.1@@q);
         elt_I := mFI(elt_F);
         Append(~bas,elt_I);
-        rel_i:=[mIF(bb) : bb in ZBasis(Ideal(S,elt_I))];
+        rel_i:=[mIF(elt_I*z) : z in ZBasis(S)]; // a Z-basis of elt_I*S (elt_I might be a zero-divisor)
         rel := rel cat rel_i;
         Q, q := quo<F|rel>; //q:F->Q
     end for;
@@ -237,7 +246,7 @@ intrinsic QuotientVS(I::AlgEtQIdl, J::AlgEtQIdl, P::AlgEtQIdl) -> ModRng, Map
         Append(~new_coords_zbI,zbIk);
     end for;
     mIV:=function(x)
-        xinI:=AbsoluteCoordinates([x],I)[1];
+        xinI:=coords_wrt([x],Minv)[1];
         //coords_inS:=[ &+[xinI[i]*new_coords_zbI[i][k]: i in [1..#zbI]]  : k in [1..d]];
         coords_inS:=[ DotProduct(xinI,[new_coords_zbI[i][k]: i in [1..#zbI]])  : k in [1..d]];
         coords_inK:=[k(c) : c in coords_inS];
@@ -301,6 +310,22 @@ end intrinsic;
         assert IsPrimitive(f(PrimitiveElementResidueField(P)));
         printf ".";
     end for;
+
+    // the maps of Quotient and QuotientVS stay correct when the stored Z-basis of I is replaced later, as ZBasisLLL(I)
+    // does when the basis is not LLL-reduced
+    A:=EtaleAlgebra(x^4+16);
+    E:=EquationOrder(A);
+    I:=Ideal(E,[Random(E,100) : i in [1..3]]);
+    P:=PrimesAbove(Ideal(E,[A!3]))[1];
+    J:=I*P;
+    Q,q:=Quotient(I,J);
+    V,v:=QuotientVS(I,J,P);
+    zb:=ZBasis(I);
+    I`ZBasis:=[ zb[1] ] cat [ zb[i]+(i+1)*zb[1] : i in [2..#zb] ]; // another Z-basis of I
+    delete I`inclusion_matrix; // as ZBasisLLL does
+    assert forall{ y : y in Q | q(y@@q) eq y } and forall{ z : z in ZBasis(J) | q(z) eq Zero(Q) };
+    assert forall{ y : y in V | v(y@@v) eq y } and forall{ z : z in ZBasis(J) | v(z) eq Zero(V) };
+    printf ".";
 
     SetAssertions(1);
     printf " all good!";

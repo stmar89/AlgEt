@@ -73,7 +73,7 @@ end intrinsic;
 intrinsic IntermediateModules(I::AlgEtQMod,J::AlgEtQMod)->SetIndx[AlgEtQMod]
 {Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that J subset K subset I. They are produced recursively using from the minimal ones.}
     V,m:=UniverseAlgebra(I);
-    VJ,mJ:=UniverseAlgebra(I);
+    VJ,mJ:=UniverseAlgebra(J);
     require Order(I) eq Order(J) : "The modules must be over the same order";
     require V eq VJ and forall{b : b in Basis(Algebra(Order(I))) | m(b) eq mJ(b)} : "the modules are not compatible";
     require J subset I : "The module J needs to be inside I";
@@ -153,6 +153,37 @@ intrinsic IntermediateModulesWithTrivialExtension(I::AlgEtQMod,J::AlgEtQMod,O::A
 end intrinsic;
 
 /* TESTS
-    // see all_tests_AlgEtQMod.m
+    // see also all_tests_AlgEtQMod.m
+
+    printf "### Testing IntermediateModules:";
+    //AttachSpec("../spec");
+    //AttachSpec("../specMod");
+    //AttachSpec("../specMtrx");
+    SetAssertions(2);
+    _<x>:=PolynomialRing(Integers());
+    K1:=NumberField(x^2+5);
+    K:=EtaleAlgebra([K1]);
+    E:=EquationOrder(K);
+    V1:=EtaleAlgebra([K1,K1]);
+    V2:=EtaleAlgebra([K1,K1]); // isomorphic to V1, but a different algebra
+    m1:=NaturalAction(K,V1);
+    m2:=NaturalAction(K,V2);
+    M1:=Module(E,m1,[ V1!<K1!1,K1!0>, V1!<K1!0,K1!1> ]);
+    N1:=Module(E,m1,[ V1!<K1!2,K1!0>, V1!<K1!0,K1!2> ]);
+    N2:=Module(E,m2,[ V2!<K1!2,K1!0>, V2!<K1!0,K1!2> ]);
+    IM:=IntermediateModules(M1,N1);
+    assert M1 in IM and N1 in IM and forall{ L : L in IM | N1 subset L and L subset M1 };
+    printf ".";
+    // modules in different algebras are not compatible
+    test:=false;
+    try
+        _:=IntermediateModules(M1,N2);
+    catch err
+        test:="not compatible" in err`Object;
+    end try;
+    assert test;
+    printf ".";
+    SetAssertions(1);
+    printf " all good!";
 
 */

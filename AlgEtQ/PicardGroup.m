@@ -174,6 +174,16 @@ intrinsic ResidueRingUnitsSubgroupGenerators(F::AlgEtQIdl) -> SeqEnum[AlgEtQElt]
     return F`residue_class_ring_unit_subgroup_generators;
 end intrinsic;
 
+class_group_internal:=function(OL, proof)
+// ClassGroup of the maximal order OL of a number field, with the parameter Proof (proof = "GRH" or "Full").
+// The orders of quadratic fields (type RngQuad, e.g. MaximalOrder(QuadraticField(d))) do not accept the parameter:
+// Magma computes their class groups with binary quadratic forms.
+    if Type(OL) eq RngQuad then
+        return ClassGroup(OL);
+    end if;
+    return ClassGroup(OL : Proof := proof);
+end function;
+
 IsPrincipal_prod_internal_old:=function( I , GRH )
 //returns if the argument is a principal ideal; if so the function returns also the generator. It works only for products of ideals
     assert IsMaximal(Order(I)); //this function should be called only for ideals of the maximal order
@@ -191,7 +201,7 @@ IsPrincipal_prod_internal_old:=function( I , GRH )
         OrdIL:=Order(IL);
         assert IsMaximal(OrdIL);
         //The next call is to prevent a bug of the in-built function IsPrincipal (which might have been corrected by now...).
-        OL,oL:=ClassGroup(OrdIL : Proof := proof);
+        OL,oL:=class_group_internal(OrdIL, proof);
         testL,genL:=IsPrincipal(IL);
         assert2 (Zero(OL) eq (IL@@oL)) eq testL;
         if not testL then
@@ -234,7 +244,7 @@ IsPrincipal_prod_internal:=function( II , GRH )
         assert IsMaximal(OrdIL);
         //The next call is to prevent a bug of the in-built function IsPrincipal (which might have been corrected by now...).
         //Also if one wants to use the GRH bound rather than one needs to precompute the class groups, since IsPrincipal does not accepts varargs )
-        OL,oL:=ClassGroup(OrdIL : Proof := proof);
+        OL,oL:=class_group_internal(OrdIL, proof);
         // the next line seems to be the most consuming part of the package.
         // It is 10/20 times slower than the RngOrdIdl version. Need to investigate
         testL,genL:=IsPrincipal(IL);
@@ -404,7 +414,7 @@ PicardGroup_prod_internal:=function( O , GRH )
     proof := GRH select "GRH" else "Full";
     for i in [1..#O_asProd] do
         OL:=O_asProd[i];
-        GL,gL:=ClassGroup(OL : Proof := proof);
+        GL,gL:=class_group_internal(OL, proof);
         assert2 forall{y : y in [gL(z) : z in GL] | MultiplicatorRing(y) eq OL};
         //this is a detector for bugs for the PicardGroup function.
         Append(~groups_maps_fields_maps,<GL,gL,nf[i],embs[i]>);

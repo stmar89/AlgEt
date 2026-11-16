@@ -421,7 +421,27 @@ intrinsic '*'(x1::AlgEtQMtrx,x2::.) -> AlgEtQMtrx
     require bool : "x2 not coercible";
     comp1:=Components(x1);
     comp2:=Components(x2);
+    return CreateMtrxFromComponents(Universe(x1),<comp1[i]*comp2[i] : i in [1..#comp1]> );
+end intrinsic;
+
+// The next two are needed: without them, a*M and M*a with a::AlgEtQElt are dispatched to the intrinsics
+// '*'(x1::AlgEtQElt,x2::.) and '*'(x1::.,x2::AlgEtQElt) of Elt.m, which try to coerce the matrix into the algebra.
+intrinsic '*'(x1::AlgEtQElt,x2::AlgEtQMtrx) -> AlgEtQMtrx
+{x1*x2.}
+    bool,x1:=IsCoercible(Universe(x2),x1);
+    require bool : "x1 not coercible";
+    comp1:=Components(x1);
+    comp2:=Components(x2);
     return CreateMtrxFromComponents(Universe(x2),<comp1[i]*comp2[i] : i in [1..#comp1]> );
+end intrinsic;
+
+intrinsic '*'(x1::AlgEtQMtrx,x2::AlgEtQElt) -> AlgEtQMtrx
+{x1*x2.}
+    bool,x2:=IsCoercible(Universe(x1),x2);
+    require bool : "x2 not coercible";
+    comp1:=Components(x1);
+    comp2:=Components(x2);
+    return CreateMtrxFromComponents(Universe(x1),<comp1[i]*comp2[i] : i in [1..#comp1]> );
 end intrinsic;
 
 intrinsic '*'(x1::RngIntElt,x2::AlgEtQMtrx) -> AlgEtQMtrx
@@ -571,6 +591,9 @@ end intrinsic;
     R:=RandomMatrix(A,30,20);
     assert 2*R eq R*2;
     assert (-1/5)*R eq R*(1/-5);
+    // multiplication by an element of the algebra, on both sides
+    a:=Random(A);
+    assert a*R eq R*a and a*R eq ScalarMatrix(30,a)*R and R*a eq R*ScalarMatrix(20,a);
 
     II:=IdentityMatrix(A,10);
     R:=RandomMatrix(A,10);

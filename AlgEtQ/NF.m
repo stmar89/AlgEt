@@ -21,16 +21,20 @@ intrinsic IsNumberField(A::AlgEtQ) -> BoolElt,FldNum,Map
    if not assigned A`IsNumberField then
         Ks,embs,projs:=Components(A);
         if #Ks gt 1 then
-            return false,_,_;
+            A`IsNumberField:=<false>;
         else
             K:=Ks[1];
             emb:=embs[1];
             proj:=projs[1];
             isom:=map<A->K| x:->proj(x), y:->emb(y) >;
-            return true,K,isom;
+            A`IsNumberField:=<true,K,isom>;
         end if;
    end if;
-   return Explode(A`IsNumberField);
+   if A`IsNumberField[1] then
+       return Explode(A`IsNumberField);
+   else
+       return false,_,_;
+   end if;
 end intrinsic;
 
 /* TESTS
@@ -56,6 +60,13 @@ end intrinsic;
         assert ii(a+b) eq ii(a)+ii(b);
         assert ii(a*b) eq ii(a)*ii(b);
     end for;
+    // the output is stored
+    assert assigned A`IsNumberField;
+    _,K1,i1:=IsNumberField(A);
+    assert K1 cmpeq K and forall{ j : j in [1..10] | i1(a) eq i(a) where a:=Random(A) };
+    B:=EtaleAlgebra((x^2+5)*(x^3-2));
+    assert not IsNumberField(B) and assigned B`IsNumberField and not IsNumberField(B);
+    printf ".";
 
 
 

@@ -237,7 +237,9 @@ bass_factor:=function(gens_input,Rg,mAgs,embs,projs)
     d_A:=Denominator(A);
     AZ:=crQZ(d_A*A); 
     assert #Rows(AZ) eq #gens_JinvM;
-    vect:=Vector([ d_A ] cat [0 : i in [1..n-1] ]);
+    // d_A*1 in the absolute basis of Ag: it is (d_A,0,...,0) only when Ag is a field, since AbsoluteBasis(Ag) is the
+    // concatenation of the bases of the components
+    vect:=Vector(Integers(),[ d_A*c : c in AbsoluteCoordinates(One(Ag)) ]);
     v:=DotProduct(Eltseq(Solution(AZ,vect)),gens_JinvM);
 
     // Define M0=J^-1*N0, where N0 is the set of elements of J^-1*M such that the projection onto u is 0, 
@@ -331,7 +333,9 @@ intrinsic DirectSumRepresentation(M::AlgEtQMod)->SeqEnum[Tup]
                     Aloop,embs_loop,projs_loop:=DirectProduct([Ag : i in [1..rank]]);
                     mAloop_Aold:=Hom(Aloop,Aold, 
                         [ &+[ mAg_Aloop(projs_loop[i](b))*m1[i] : i in [1..rank] ] : b in AbsoluteBasis(Aloop) ]);
-                    assert forall{ i : i in [1..rank] | mAloop_Aold(ort[i]) eq m1[i] where ort:=OrthogonalIdempotents(Aloop)}; //needs to send the orthogonal idempotents to the elts in m1
+                    // mAloop_Aold needs to send the i-th copy of 1_Ag to m1[i]. These copies are the orthogonal
+                    // idempotents of Aloop only when Ag is a field.
+                    assert forall{ i : i in [1..rank] | mAloop_Aold(embs_loop[i](One(Ag))) eq m1[i] };
                     mAloop_Ags:=mAloop_Aold*mAloop_Ags;
                     mAg_Aloop:=NaturalAction(Ag,Aloop);
                     gens_loop:=Rows(Solution(m1_mat,mI0)); //gens_loop*m1 eq mI0, as matrix
@@ -515,7 +519,12 @@ intrinsic StandardDirectSumRepresentation(M::AlgEtQMod)->SeqEnum[Tup],Map
         seq:=[ < Si_s[j],ei_s[j] > : j in [1..s ]];
         //now we build map:
         hom_id:=std_Bass_map([D[1] : D in DRS],UA,isom,embs,projs);
-        hom_vs:=Inverse(Hom(UA,UA,&cat[ [mR(a)*D[2](oneAR):a in Basis(AR)] : D in DRS ] : ComputeInverse:=true));
+        // hom_vs sends mR(a)*D[2](oneAR) to mR(a)*oid[i], for a in Basis(AR) and D the i-th pair of DRS. Hom takes the
+        // images of AbsoluteBasis(UA), which is not ordered copy by copy in general (EtaleAlgebra sorts the components
+        // of UA): we write AbsoluteBasis(UA) in the basis dom of the mR(a)*oid[i].
+        dom:=&cat[ [ mR(a)*oid[i] : a in Basis(AR) ] : i in [1..s] ];
+        img:=&cat[ [ mR(a)*D[2](oneAR) : a in Basis(AR) ] : D in DRS ];
+        hom_vs:=Inverse(Hom(UA,UA,MatrixQtoA(UA,MatrixAtoQ(dom)^-1*MatrixAtoQ(img)) : ComputeInverse:=true));
         map:=Hom(UA,UA,[hom_id(hom_vs(b)):b in Basis(UA)]:ComputeInverse:=true); // not as a composition to make it cleaner.
         M`StandardDirectSumRep:=<seq,map>;
         // TEST 
@@ -576,8 +585,45 @@ intrinsic IsIsomorphicOverBassOrder( M1::AlgEtQMod, M2::AlgEtQMod )->BoolElt,Map
     end if;
 end intrinsic;       
 
-/*
-//TESTS
+/* TESTS
+    // see also all_tests_AlgEtQMod.m
 
-    // see all_tests_AlgEtQMod.m
+    printf "### Testing PowerBass:";
+    //AttachSpec("../spec");
+    //AttachSpec("../specMod");
+    //AttachSpec("../specMtrx");
+    SetAssertions(2);
+    // Modules over a Bass order in an algebra with several components, built from generators, so that
+    // DirectSumRepresentation has to compute the decomposition. Before the fix, bass_factor took (1,0,...,0) for the
+    // coordinates of 1 (they are those of the idempotent of the first component) and IsIsomorphic(M,u*M) failed with
+    // "No solution exists"; StandardDirectSumRepresentation assumed that AbsoluteBasis(UA) is ordered copy by copy.
+    _<x>:=PolynomialRing(Integers());
+    A:=EtaleAlgebra((x^2+5)*(x^2+20));
+    E:=EquationOrder(A);
+    assert IsBass(E);
+    Ks:=Components(A);
+    V:=EtaleAlgebra([Ks[j] : i in [1..2], j in [1..#Ks]]);
+    m:=NaturalAction(A,V);
+    // the two copies of 1_A in V (EtaleAlgebra does not keep the order of the components of A x A)
+    Vp:=[ DefiningPolynomial(L) : L in Components(V) ];
+    Ap:=[ DefiningPolynomial(L) : L in Ks ];
+    pos:=[ [ j : j in [1..#Vp] | Vp[j] eq Ap[i] ] : i in [1..#Ap] ];
+    ones:=[ V!< j in [ p[k] : p in pos ] select 1 else 0 : j in [1..#Vp] > : k in [1..2] ];
+    P,p:=PicardGroup(E);
+    I:=p(P.1);
+    assert not IsPrincipal(I);
+    M1:=Module(E,m,ones); // E+E
+    M2:=Module(E,m,[ones[1]] cat [ m(z)*ones[2] : z in ZBasis(I) ]); // E+I
+    for M in [M1,M2] do
+        assert #DirectSumRepresentation(M) eq 2;
+        repeat u:=Random(V,3); until not IsZeroDivisor(u);
+        N:=Module(E,m,[u*z : z in ZBasis(M)]);
+        test,phi:=IsIsomorphic(M,N);
+        assert test and Module(E,m,[phi(z) : z in ZBasis(M)]) eq N;
+        printf ".";
+    end for;
+    assert not IsIsomorphic(M1,M2);
+    printf ".";
+    SetAssertions(1);
+    printf " all good!";
 */

@@ -348,13 +348,16 @@ intrinsic Quotient(I::AlgEtQMod, J::AlgEtQMod) -> GrpAb, Map
 {Given S-modules J subset I, returns the abelian group Q=I/J together with the quotient map q:I->J.} 
     // if J is not inside I, an error occurs while forming Q. so no need to check in advance
     A:=UniverseAlgebra(I);
-    zbI := ZBasis(I);
+    // The maps use the Z-basis zbI of I at creation and its inclusion matrix Minv, so that they stay correct if
+    // ZBasis(I) is replaced later (as Quotient for ideals in AlgEtQ/Quotients.m).
+    Minv,zbI := inclusion_matrix(I);
+    coords:=func< seq | [ Eltseq(r) : r in Rows(MatrixAtoQ(seq)*Minv) ] >;
     N := #zbI;
     F := FreeAbelianGroup(N);
-    rel := [F ! cc : cc in AbsoluteCoordinates(ZBasis(J),I)]; //using inclusion_matrix. Fast!
+    rel := [F ! cc : cc in coords(ZBasis(J))];
     //mFI := map<F->A| x:->&+[Eltseq(x)[i]*zbI[i] : i in [1..N]]>;
     mFI := map<F->A| x:->DotProduct(Eltseq(x),zbI)>;
-    mIF := map<A->F| x:-> F ! AbsoluteCoordinates([x],I)[1]>;
+    mIF := map<A->F| x:-> F ! coords([x])[1]>;
     Q,qFQ := quo<F|rel>; //q:F->Q. Q is an "abstract" abelian group isomorphic to I/J.
    q:=map< A->Q | x:->qFQ(mIF(x)) , y:-> mFI(y@@qFQ) >; 
    return Q,q;

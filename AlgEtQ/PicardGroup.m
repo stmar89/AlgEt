@@ -19,7 +19,9 @@ declare attributes AlgEtQOrd: PicardGroup,
                               units_mod_conductor_data;
 
 declare attributes AlgEtQIdl: residue_class_ring_unit_subgroup_generators,
-                              ResidueRingUnits;
+                              ResidueRingUnits,
+                              SmallPowers, // see small_power
+                              small_prod_cache; // see small_prod_of_powers
 
 ///# Picard group and unit group
 /// Let $R$ be an order in an étale algebra $A$ over $\mathbb{Q}$ with maximal order $\mathcal{O}_A$.
@@ -365,35 +367,82 @@ intrinsic IsPrincipal(I1::AlgEtQIdl : GRH:=false )->BoolElt, AlgEtQElt
     return true,gen_I1;
 end intrinsic;
 
+small_power:=function(I, e)
+// Given an invertible ideal I and a non-zero integer e, returns an ideal in the same ideal class as I^e, with a small
+// Z-basis: every intermediate ideal is replaced by a small representative, so that the Z-bases do not blow up.
+// The output is stored in the associative array I`SmallPowers, together with the powers met along the way
+// (I^(e-1) for e odd, I^(e div 2) for e even, ..., and a small representative of I^-1 with key -1 for e negative):
+// the representatives of many ideal classes, as needed for example by ICM, use the same powers of the generators
+// of the Picard group over and over. At most 2*n powers are stored if the exponents are smaller than n.
+    if e eq 1 then
+        return I;
+    end if;
+    if not assigned I`SmallPowers then
+        I`SmallPowers:=AssociativeArray();
+    end if;
+    is_def,J:=IsDefined(I`SmallPowers,e);
+    if not is_def then
+        if e eq -1 then
+            J:=SmallRepresentative(I^-1);
+        elif e lt 0 then
+            return $$($$(I,-1),-e); // stored in the small representative of I^-1
+        elif IsOdd(e) then
+            J:=SmallRepresentative($$(I,e-1)*I);
+        else
+            H:=$$(I,e div 2);
+            J:=SmallRepresentative(H*H);
+        end if;
+        J`IsInvertible:=true;
+        I`SmallPowers[e]:=J;
+    end if;
+    return J;
+end function;
+
 small_prod_of_powers:=function(S, gens, exps)
 // Given invertible S-ideals gens and integers exps, returns an ideal in the same ideal class as
-// &*[gens[i]^exps[i]]. Uses repeated squaring and replaces every intermediate ideal by a small
-// representative, so that Z-bases do not blow up.
+// &*[gens[i]^exps[i]], with a small Z-basis: the powers are computed by small_power, which stores them in the
+// ideals of gens, and each product is replaced by a small representative.
+// The product is built from the last generator to the first, and the partial products
+//      sufs[j] = a small representative of the class of &*[gens[i]^exps[i] : i in [j..#gens]]
+// of the last call are stored in the last ideal of gens (attribute small_prod_cache): a call whose exponents
+// agree with the previous ones from some position on starts from there. Magma enumerates the elements of an abelian
+// group with the first coordinate changing fastest, so computing a representative for every class of a Picard group
+// (as ICM does) costs about one product per class.
+// The output might be a stored ideal (for example gens[i], if the only non-zero exponent is exps[i] = 1).
     assert #gens eq #exps;
-    // shortcut: a single generator to the power 1 is returned as it is
-    nz:=[ i : i in [1..#exps] | exps[i] ne 0 ];
-    if #nz eq 1 and exps[nz[1]] eq 1 then
-        return gens[nz[1]];
+    n:=#gens;
+    if forall{ e : e in exps | e eq 0 } then
+        return OneIdeal(S);
     end if;
-    res:=OneIdeal(S);
-    for i in [1..#gens] do
-        e:=exps[i];
-        if e eq 0 then continue; end if;
-        B:=gens[i];
-        if e lt 0 then
-            B:=SmallRepresentative(B^-1);
-            e:=-e;
+    sufs:=[ OneIdeal(S) : j in [1..n+1] ]; // sufs[n+1] is the empty product
+    j0:=n+1; // sufs[j] is known for j ge j0
+    if assigned gens[n]`small_prod_cache then
+        cgens,cexps,csufs:=Explode(gens[n]`small_prod_cache);
+        if cgens eq gens then
+            while j0 gt 1 and exps[j0-1] eq cexps[j0-1] do
+                j0-:=1;
+            end while;
+            for j in [j0..n] do
+                sufs[j]:=csufs[j];
+            end for;
         end if;
-        while e gt 0 do
-            if IsOdd(e) then
-                res:=SmallRepresentative(res*B);
+    end if;
+    for j in [j0-1..1 by -1] do
+        e:=exps[j];
+        if e eq 0 then
+            sufs[j]:=sufs[j+1];
+        else
+            B:=small_power(gens[j],e);
+            if forall{ i : i in [j+1..n] | exps[i] eq 0 } then
+                sufs[j]:=B;
+            else
+                sufs[j]:=SmallRepresentative(sufs[j+1]*B);
             end if;
-            e:=e div 2;
-            if e gt 0 then
-                B:=SmallRepresentative(B*B);
-            end if;
-        end while;
+        end if;
     end for;
+    last:=gens[n];
+    last`small_prod_cache:=<gens,exps,sufs>;
+    res:=sufs[1];
     res`IsInvertible:=true;
     return res;
 end function;
@@ -829,6 +878,22 @@ end intrinsic;
     UO,uO:=UnitGroup(MaximalOrder(A) : GRH:=true);
     assert forall{ i : i in [1..Ngens(U)] | u(U.i) in E and u(U.i)^-1 in E };
     assert #quo<UO | [ u(U.i)@@uO : i in [1..Ngens(U)] ]> eq 40;
+    printf ".";
+
+    // A representative for every class, as ICM computes them: the powers of the generators and the partial products
+    // are stored and reused from one call to the next. Then some classes in a random order.
+    A:=EtaleAlgebra((x^2+5)*(x^2+20));
+    E:=EquationOrder(A);
+    P,p:=PicardGroup(E : GRH:=true);
+    assert #P eq 320;
+    elts:=[ g : g in P ];
+    reps:=[ p(g) : g in elts ];
+    assert forall{ I : I in reps | Order(I) eq E and I subset OneIdeal(E) };
+    assert forall{ i : i in [1..#elts by 8] | reps[i]@@p eq elts[i] };
+    for i in [1..20] do
+        g:=Random(P);
+        assert p(g)@@p eq g;
+    end for;
     printf ".";
 
     //AttachSpec("../spec");

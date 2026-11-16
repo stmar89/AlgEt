@@ -88,10 +88,14 @@ intrinsic NaturalAction(K::AlgEtQ, V::AlgEtQ)->Map
     require #Seqset(Knf) eq #Components(K) : "The number fields defining K are not distinct";
     require Seqset(Knf) eq Seqset(Vnf) : "There is no componentwise diagonal action of K on V";
     ind:=[ Index(Knf,fV) : fV in Vnf]; // there is only one index in Knf for each fV since Knf is a product of distinct number fields
+    // The components of V might be copies of the ones of K (the same defining polynomial, but different objects), to
+    // which Magma does not coerce: we move the elements through their coefficients in the power basis.
+    nfK:=Components(K);
+    nfV:=Components(V);
+    same:=[ nfV[i] cmpeq nfK[ind[i]] : i in [1..#Vnf] ];
     mKV:=function(x)
         cx:=Components(x);
-        y:=< cx[ind[i]] : i in  [1..#Vnf]>;
-        return y;
+        return V!< same[i] select cx[ind[i]] else nfV[i]!Eltseq(cx[ind[i]]) : i in [1..#Vnf] >;
     end function;
     m:=map< K->V | x:->mKV(x)>;
     return m;
@@ -135,6 +139,18 @@ end intrinsic;
     m:=Hom(A,B,[(-pi)^i : i in [0..Dimension(B)-1]]);
     assert Inverse(m)(pi) eq -PrimitiveElement(A);
     assert m(One(A)) eq One(B) and Inverse(m)(One(B)) eq One(A);
+    printf ".";
+    // NaturalAction, also when the components of V are copies of the ones of K (same polynomial, different objects)
+    K1:=NumberField(x^2+5); K2:=NumberField(x^2+5); K3:=NumberField(x^3-2); K4:=NumberField(x^3-2);
+    K:=EtaleAlgebra([K1,K3]);
+    for V in [ EtaleAlgebra([K1,K3,K1]), EtaleAlgebra([K2,K4,K2]) ] do
+        m:=NaturalAction(K,V);
+        nfV:=Components(V);
+        assert m(K!<K1.1,K3!0>) eq V!<nfV[1].1,nfV[2]!0,nfV[3].1>;
+        assert m(K!<K1!0,K3.1>) eq V!<nfV[1]!0,nfV[2].1,nfV[3]!0>;
+        a:=Random(K); b:=Random(K);
+        assert m(a*b) eq m(a)*m(b) and m(a+b) eq m(a)+m(b) and m(One(K)) eq One(V);
+    end for;
     printf ".";
     SetAssertions(1);
     printf " all good!";

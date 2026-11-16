@@ -160,35 +160,45 @@ intrinsic Precision(PHI :: AlgEtQCMType)->RngIntElt
     end if;
 end intrinsic;
 
-/// Given a CM-type and a positive integer, returns the same CM-type but precision set to the given value.
-intrinsic ChangePrecision(PHI0 :: AlgEtQCMType, prec::RngIntElt )->AlgEtQCMType
-{Given a CM-type and a positive integer, returns the same CM-type but precision set to the given value.}
-    require prec gt 0 : "Precision must be a positive integer";
-    PHI:=PHI0;
+change_precision_homs:=function(PHI, prec)
+// Returns the homomorphisms of the CM-type PHI with codomain ComplexField(prec). PHI is not modified.
     if assigned PHI`CMPositiveElement then
         b:=CMPositiveElement(PHI);
         A:=Parent(b);
         homs:=HomsToC(A : Precision := prec);
         phi:=[ ff : ff in homs | Im(ff( b )) gt 0 ];
-        assert #phi eq #homs div 2;
-        PHI`Homs:=phi; //this might over-write the attribute
     elif assigned PHI`Homs then
+        // We match the old homomorphisms with the new ones by their values at the primitive element, up to the smaller
+        // of the two precisions (relative to the size of the value).
         phi0:=Homs(PHI);
         prec0:=Precision(Codomain(phi0[1]));
         A:=Domain(phi0[1]);
         FA:=PrimitiveElement(A);
         homs:=HomsToC(A : Precision := prec);
+        eps:=10^(2-Min(prec,prec0));
         phi:=[];
         for ff in phi0 do
-            guess:=[ gg : gg in homs | Abs(gg(FA)-ff(FA)) lt 10^-(prec0-1)];
+            v:=ff(FA);
+            guess:=[ gg : gg in homs | Abs(gg(FA)-v) lt eps*(1+Abs(v)) ];
             assert #guess eq 1;
             Append(~phi,guess[1]);
         end for;
-        assert #phi eq #homs div 2;
-        PHI`Homs:=phi; //this might over-write the attribute
     else
         error "there is a problem with the definition of the CM-Type";
     end if;
+    assert #phi eq #homs div 2;
+    return phi;
+end function;
+
+/// Given a CM-type and a positive integer, returns a new CM-type, equal to the given one, whose homomorphisms have codomain the complex field with the given precision. The given CM-type is not modified: use `ChangePrecision(~PHI,prec)` for that.
+intrinsic ChangePrecision(PHI0 :: AlgEtQCMType, prec::RngIntElt )->AlgEtQCMType
+{Given a CM-type and a positive integer, returns a new CM-type, equal to the given one, whose homomorphisms have codomain the complex field with the given precision. The given CM-type is not modified: use ChangePrecision(~PHI,prec) for that.}
+    require prec gt 0 : "Precision must be a positive integer";
+    PHI:=New(AlgEtQCMType);
+    if assigned PHI0`CMPositiveElement then
+        PHI`CMPositiveElement:=PHI0`CMPositiveElement;
+    end if;
+    PHI`Homs:=change_precision_homs(PHI0,prec);
     return PHI;
 end intrinsic;
 
@@ -196,30 +206,7 @@ end intrinsic;
 intrinsic ChangePrecision(~PHI :: AlgEtQCMType, prec::RngIntElt )
 {Changes the precision of the given CM-type, that is, the codomain of each homomorphism will be ComplexField(Precision).}
     require prec gt 0 : "Precision must be a positive integer";
-    if assigned PHI`CMPositiveElement then
-        b:=CMPositiveElement(PHI);
-        A:=Parent(b);
-        homs:=HomsToC(A : Precision := prec);
-        phi:=[ ff : ff in homs | Im(ff( b )) gt 0 ];
-        assert #phi eq #homs div 2;
-        PHI`Homs:=phi; //this might over-write the attribute
-    elif assigned PHI`Homs then
-        phi0:=Homs(PHI);
-        prec0:=Precision(Codomain(phi0[1]));
-        A:=Domain(phi0[1]);
-        FA:=PrimitiveElement(A);
-        homs:=HomsToC(A : Precision := prec);
-        phi:=[];
-        for ff in phi0 do
-            guess:=[ gg : gg in homs | Abs(gg(FA)-ff(FA)) lt 10^-(prec0-1)];
-            assert #guess eq 1;
-            Append(~phi,guess[1]);
-        end for;
-        assert #phi eq #homs div 2;
-        PHI`Homs:=phi; //this might over-write the attribute
-    else
-        error "there is a problem with the definition of the CM-Type";
-    end if;
+    PHI`Homs:=change_precision_homs(PHI,prec); //this might over-write the attribute
 end intrinsic;
 
 /////////////////////////////////////////////////////
@@ -270,6 +257,17 @@ end intrinsic;
         assert Precision(all[1]) eq 60;
         printf ".";
     end for;
+    // ChangePrecision of a CM-type given by homomorphisms only, to a lower precision; the functional version does not
+    // modify its input
+    A:=EtaleAlgebra(polys[2]);
+    for PHI0 in AllCMTypes(A : Precision:=100) do
+        PHI:=CMType(Homs(PHI0));
+        PHI2:=ChangePrecision(PHI,20);
+        assert Precision(PHI2) eq 20 and Precision(PHI) eq 100 and PHI2 eq PHI0;
+        ChangePrecision(~PHI,20);
+        assert Precision(PHI) eq 20 and PHI eq PHI0;
+    end for;
+    printf ".";
     SetAssertions(1);
     printf " all good!";
 

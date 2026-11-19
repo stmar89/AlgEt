@@ -29,16 +29,16 @@ intrinsic GraphOverOrders(R::AlgEtQOrd) -> GrphDir
             G:=Digraph< 1 | >;
         else
             pp:=SingularPrimes(R);
-            oo_at_Ps:=[ OverOrdersAtPrime(R,P) : P in pp ]; // 8 secs
-            assert forall{ x : x in oo_at_Ps | x[1] eq R};
+            oo_at_Ps:=[ OverOrdersAtPrime(R,P) : P in pp ];             
+            assert forall{ x : x in oo_at_Ps | x[1] eq R}; //CHECK is this really needed? If so, we should say why.
             edges:=[];
             for iP->P in pp do
                 oo_P:=oo_at_Ps[iP];
                 edges_P:=[ ]; // minimal P-inclusions
                 for i->S in oo_P do
-                    if assigned S`MinimalOverOrders then
+                    if assigned S`MinimalOverOrders then //CHECK are we sure that here S`MinimalOverOrders contains all minimal overorders at primes above P?
                         PS:=S!!P;
-                        min:=&join[ min[2] : min in S`MinimalOverOrders | PS subset min[1] ];
+                        min:=&join[ min[2] : min in S`MinimalOverOrders | PS subset min[1] ]; //CHECK why &join and not &cat? Members of different min's have different conductors min[1], and each min[2] does not contain repetitions.
                         for T in min do
                             j:=Index(oo_P,T);
                             assert j ne 0;
@@ -53,7 +53,7 @@ intrinsic GraphOverOrders(R::AlgEtQOrd) -> GrphDir
                                 and S subset oo_P[e[2]] ] eq [oo_P[e[2]]]}; // minimal inclusions
                 Append(~edges,edges_P);
             end for;
-            // the following is taken from OverOrders()
+            // the following is taken from OverOrders() //CHECK is this comment needed?
             output:=OverOrders(R);
             if #pp eq 1 then
                 min_inclusions:=edges[1];
@@ -66,6 +66,7 @@ intrinsic GraphOverOrders(R::AlgEtQOrd) -> GrphDir
                 // the one of cc. We reconstruct the correspondence cc[i] -> position in output, by rebuilding
                 // the orders as in OverOrders(R) (one HNF each, and a lookup in the known orders) and looking
                 // them up by their hash.
+                //CHECK since now orders have a Hash, is as AssociativeArray still the best/fastest method?
                 pos:=AssociativeArray();
                 for i->S in output do
                     pos[myHash(S)]:=i;
@@ -90,7 +91,7 @@ intrinsic GraphOverOrders(R::AlgEtQOrd) -> GrphDir
                 // - c2[i0] is a minimaloverorder of c1[i0],
                 // which is equivalent to have [c1[i0],c2[i0]] in edges[i0].
                 min_inclusions:=[];
-                for i,j in [1..#output] do
+                for i,j in [1..#output] do //CHECK this double loop implements a cool trick to detect minimal inclusion, but maybe there is a faster method with a simple loop?
                     c1:=cc[i];
                     c2:=cc[j];
                     different_entries:=[ k : k in [1..#c1] | c1[k] ne c2[k] ];

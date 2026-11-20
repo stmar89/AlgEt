@@ -533,7 +533,7 @@ intrinsic WKICM(E::AlgEtQOrd)->SeqEnum[AlgEtQIdl]
 
             E`WKICM:=wk;
 
-            // We populate the attributes E`OverOrders and S`WKICM_bar for each overorder.
+            // We populate the attributes S`WKICM_bar for each overorder S of E, and E`OverOrders.
             // This is needed for the recursion step.
             // The overorders of E are the multiplicator rings of the classes in wk:
             // we collect them in an indexed set and sort them as in OverOrders using sort_overorders.
@@ -541,26 +541,40 @@ intrinsic WKICM(E::AlgEtQOrd)->SeqEnum[AlgEtQIdl]
             // example, they were coming from the recursive-1-single-singular-prime part.
             // For the ones without WKICM_bar, we collect the classes with that multiplicator ring in an
             // AssociativeArray, keyed by the order. Both use the intrinsic Hash for orders.
+            // If E`OverOrders is already assigned, for example because OverOrders(E) was called before WKICM(E),
+            // we keep it, and we assign WKICM_bar to the orders in it: they are the objects returned by
+            // OverOrders(E), which is where the attribute is read, for example by ICM.
             t0:=Cputime();
             vprintf WKICM,2 : "We start populating the varargs OverOrders and WKICM_bar.\n";
-            if not assigned E`OverOrders then
-                oo_E:={@ @};
-                wk_bar:=AssociativeArray();
-                for I in wk do
-                    S:=MultiplicatorRing(I);
-                    Include(~oo_E,S);
-                    if not assigned S`WKICM_bar then
-                        if IsDefined(wk_bar,S) then
-                            Append(~wk_bar[S],S!!I);
-                        else
-                            wk_bar[S]:=[S!!I];
-                        end if;
+            oo_known:=assigned E`OverOrders;
+            if oo_known then
+                oo_E_known:={@ S : S in E`OverOrders @};
+            end if;
+            oo_E:={@ @};
+            wk_bar:=AssociativeArray();
+            for I in wk do
+                S:=MultiplicatorRing(I);
+                if oo_known then
+                    i:=Index(oo_E_known,S);
+                    assert i ne 0; // S is an overorder of E
+                    S:=oo_E_known[i];
+                end if;
+                Include(~oo_E,S);
+                if not assigned S`WKICM_bar then
+                    if IsDefined(wk_bar,S) then
+                        Append(~wk_bar[S],S!!I);
+                    else
+                        wk_bar[S]:=[S!!I];
                     end if;
-                end for;
-                for S in Keys(wk_bar) do
-                    T:=S; // T and S are the same object: attributes cannot be assigned to the loop variable
-                    T`WKICM_bar:=wk_bar[S];
-                end for;
+                end if;
+            end for;
+            for S in Keys(wk_bar) do
+                T:=S; // T and S are the same object: attributes cannot be assigned to the loop variable
+                T`WKICM_bar:=wk_bar[S];
+            end for;
+            if oo_known then
+                assert #oo_E eq #oo_E_known; // every overorder is the multiplicator ring of a class
+            else
                 oo_E:=IndexedSetToSequence(oo_E);
                 sort_overorders(~oo_E); // as in OverOrders
                 assert2 E in oo_E;
@@ -615,6 +629,22 @@ end intrinsic;
         E2:=EquationOrder(K2);
         assert [ myHash(S) : S in OverOrders(E) ] eq [ myHash(S) : S in OverOrders(E2) ];
         assert &+[ #WKICM_bar(S) : S in OverOrders(E) ] eq #WKICM(E);
+    end for;
+
+    // If OverOrders(E) is called before WKICM(E), then WKICM keeps the attribute E`OverOrders, and it must
+    // still populate the attribute WKICM_bar of every overorder. With 2 and 4 singular primes.
+    for f in [ x^4-1000*x^3-1000*x^2-1000*x-1000, (x^2+5)*(x^2+20) ] do
+        K:=EtaleAlgebra(f);
+        E:=EquationOrder(K);
+        oo:=OverOrders(E);
+        wk:=WKICM(E);
+        assert forall{ S : S in oo | assigned S`WKICM_bar };
+        assert &+[ #S`WKICM_bar : S in oo ] eq #wk;
+        assert OverOrders(E) eq oo;
+        K2:=EtaleAlgebra(f); // a new algebra, so that nothing is computed yet
+        E2:=EquationOrder(K2);
+        assert #WKICM(E2) eq #wk;
+        assert [ #S`WKICM_bar : S in OverOrders(E2) ] eq [ #S`WKICM_bar : S in oo ];
     end for;
 
     SetAssertions(1);

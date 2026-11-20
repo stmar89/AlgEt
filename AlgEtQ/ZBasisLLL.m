@@ -74,6 +74,13 @@ intrinsic ZBasisLLL(S::AlgEtQIdl)
     S`ZBasis:=lll_zbasis(Algebra(S),ZBasis(S));
     S`IsZBasisLLLReduced:=true;
     delete S`inclusion_matrix; // this is computed with respect to the old ZBasis!
+    // If the ideal has at least dim generators, for example the old ZBasis when it was created from more than dim
+    // generators, we replace them with the LLL-reduced ZBasis: it generates the ideal, it is not longer, and its
+    // elements are smaller, which makes the operations using Generators faster, e.g. products of ideals.
+    // Fewer generators are kept, since products of ideals with few generators avoid computing a ZBasis.
+    if #Generators(S) ge AbsoluteDimension(Algebra(S)) then
+      S`Generators:=S`ZBasis;
+    end if;
   end if;
 end intrinsic;
 
@@ -224,6 +231,26 @@ end intrinsic;
       assert ShortElementModulo(Random(J,100),J) eq Zero(A);
       printf ".";
   end for;
+
+  // ZBasisLLL replaces the generators of an ideal with the LLL-reduced ZBasis when they are at least dim, and keeps
+  // them when they are fewer.
+  A:=EtaleAlgebra(x^8+16);
+  E:=EquationOrder(A);
+  for k in [2,8,12] do
+      I:=Ideal(E,[ Random(E,10^6) : i in [1..k] ]);
+      gens:=Generators(I);
+      J:=Ideal(E,gens);
+      ZBasisLLL(I);
+      assert I eq J;
+      if k ge 8 then
+          assert Generators(I) eq ZBasis(I);
+      else
+          assert Generators(I) eq gens;
+      end if;
+      assert Ideal(E,Generators(I)) eq J;
+      assert I*I eq J*J and I+OneIdeal(E) eq J+OneIdeal(E);
+  end for;
+  printf ".";
 
   SetAssertions(1);
   printf " all good!";

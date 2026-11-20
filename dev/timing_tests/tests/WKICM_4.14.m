@@ -3,9 +3,8 @@
     polynomial for q = 2 of degree 10: 12096 classes, 2286 overorders.
     Why: 4 components (Q(sqrt(-7)), Q(sqrt(-2)), Q(i) and a quartic CM field), [O:E] = 2^17 3^6, 2 singular primes
     (above 3 with residue field F_9, above 2 with four primes of O above it); E is Gorenstein, Pic(E) has 3072 elements.
-    The largest number of weak classes in the suite after WKICM_4.7 (about 320 s in 2025): a stress test of the
-    recursion over 2286 overorders, of the gluing of two local parts, and of the Hash-based sets of ideals. Compare
-    with GraphOverOrders_3.9 (the same order).
+    A stress test (about 320 s in 2025) of the recursion over 2286 overorders, of the gluing of two local parts, and
+    of the Hash-based sets of ideals. Compare with GraphOverOrders_3.17 (the same order, among others).
 */
 AttachSpec(spec);
 SetSeed(1);

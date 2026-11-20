@@ -2,7 +2,7 @@
 #
 # make all [JOBS=4] [SPEC=../../spec] [MACHINE="laptop aerox"] [LABEL=...] [TIMEOUT=2400]
 #     runs every test in tests/, JOBS at a time, prints a summary and appends one line per test to timings.log.
-# make run TESTS="PicardGroup_1.1 OverOrders_3.*"   runs a subset (globs on the test names are allowed).
+# make run TESTS="PicardGroup_1.7 OverOrders_3.*"   runs a subset (globs on the test names are allowed).
 # make summary                                       prints the table of the current logs/ again.
 # make compare A=<commit> B=<commit> [MACHINE=...]    side-by-side medians from timings.log (same machine).
 # make list | make clean
@@ -15,8 +15,9 @@ TIMEOUT ?= 2400
 MACHINE ?= $(shell hostname)
 LABEL ?= -
 TESTS ?=
-# The reference release: a timeout of this commit is never a regression (see the target log).
-BASELINE ?= v1.0.2
+# The reference commit: a timeout of this commit is never a regression (see the target log). Until 2026-11-20 it
+# was the release v1.0.2.
+BASELINE ?= d65a92f
 
 TESTDIR := tests
 LOGDIR ?= logs

@@ -15,6 +15,8 @@ declare verbose GraphOverOrders, 1;
 
 declare attributes AlgEtQOrd : GraphOverOrders;
 
+import "OverOrders.m" : overorders_from_local;
+
 ///## Lattice of inclusions of the overorders
 
 //------------
@@ -37,27 +39,26 @@ intrinsic GraphOverOrders(R::AlgEtQOrd) -> GrphDir
             // overorder of S_1+...+S_n if and only if
             //  - S_k eq T_k for all indices k but one, say k0, and
             //  - T_k0 is a minimal overorder of S_k0.
-            // Hence we get the graph of R from the graphs of the L_k's, which are much smaller. We proceed in 4 steps:
-            //  1) we compute the L_k's;
+            // Hence we get the graph of R from the graphs of the L_k's, which are much smaller. We proceed in 3 steps:
+            //  1) we get the L_k's, and the position in OverOrders(R) of the overorder corresponding to each tuple;
             //  2) we compute the minimal inclusions in each L_k;
-            //  3) we find the position in OverOrders(R) of the overorder corresponding to each tuple;
-            //  4) we combine the minimal inclusions of the L_k's into the minimal inclusions of the overorders of R.
+            //  3) we combine the minimal inclusions of the L_k's into the minimal inclusions of the overorders of R.
             O:=MaximalOrder(Algebra(R));
             pp:=SingularPrimes(R);
             n:=#pp;
 
-            // Step 1: oo_at_Ps[k] is L_k, as a sequence.
-            vprintf GraphOverOrders,1 : "Computing the overorders at each singular prime...";
+            // Step 1: oo_at_Ps[k] is L_k, as a sequence, with R as first entry. An overorder is encoded by a sequence of
+            // positions c=[c_1,...,c_n], which stands for the sum of the orders oo_at_Ps[k][c_k], and pos[c] is its
+            // position in OverOrders(R). See overorders_from_local in OverOrders.m: this is computed by OverOrders(R),
+            // or when it is needed for the first time if the overorders were assigned in another way, for example
+            // by WKICM or LoadWKICM.
+            vprintf GraphOverOrders,1 : "Computing the overorders at each singular prime, as sums...";
             t0:=Cputime();
-            oo_at_Ps:=[ OverOrdersAtPrime(R,P) : P in pp ];
+            output:=OverOrders(R);
+            oo_at_Ps,pos:=overorders_from_local(R);
+            assert #Keys(pos) eq #output;
             vprintf GraphOverOrders,1 : "Done in %o secs.\n",Cputime(t0);
             vprintf GraphOverOrders,1 : "Number of P-overorders for each singular prime P: %o\n",[ #x : x in oo_at_Ps ];
-            // We encode an overorder by a tuple of positions [c_1,...,c_n], which stands for the sum of the orders
-            // oo_at_Ps[k][c_k]. In Steps 3 and 4, we use that c_k eq 1 means that the overorder is equal to R
-            // locally at P_k. Hence we need R to be the first element of each oo_at_Ps[k]. This is guaranteed
-            // by OverOrdersAtPrime, whose output is sorted by decreasing Index: we check it since everything
-            // below depends on it.
-            assert forall{ x : x in oo_at_Ps | x[1] eq R };
 
             // Step 2: min_at_Ps[k][i] is the sequence of the positions j such that oo_at_Ps[k][j] is a minimal
             // overorder of oo_at_Ps[k][i].
@@ -108,41 +109,12 @@ intrinsic GraphOverOrders(R::AlgEtQOrd) -> GrphDir
             vprintf GraphOverOrders,1 : "Number of minimal inclusions for each singular prime: %o\n",
                                         [ &+[ #x : x in min_P ] : min_P in min_at_Ps ];
 
-            // Step 3: pos[c] is the position in OverOrders(R) of the overorder corresponding to the tuple c.
-            // OverOrders(R) is sorted by Index and myHash, so the position cannot be deduced from c. We rebuild
-            // the overorder as in OverOrders(R), which costs one HNF, and we look it up in an indexed set, using
-            // its Hash.
-            vprintf GraphOverOrders,1 : "Matching the tuples of P-overorders with the overorders...";
-            t0:=Cputime();
-            output:=OverOrders(R);
-            output_set:={@ S : S in output @};
-            cc:=[ [ c[k] : k in [1..n] ] : c in CartesianProduct([ [1..#x] : x in oo_at_Ps ]) ];
-            pos:=AssociativeArray();
-            for c in cc do
-                not_R:=[ k : k in [1..n] | c[k] ne 1 ]; // the primes where the overorder is not equal to R
-                if #not_R eq 0 then
-                    T:=R;
-                elif #not_R eq 1 then
-                    k:=not_R[1];
-                    T:=oo_at_Ps[k][c[k]];
-                else
-                    // The orders are overorders of R at distinct primes of R: their sum is an order, and it is
-                    // generated as a lattice by their ZBasis. See OverOrders.
-                    T:=Order(&cat[ ZBasis(oo_at_Ps[k][c[k]]) : k in not_R ] : Check:=0);
-                end if;
-                i:=Index(output_set,T);
-                assert i ne 0;
-                pos[c]:=i;
-            end for;
-            assert { pos[c] : c in cc } eq { 1..#output }; // the tuples are in bijection with the overorders
-            vprintf GraphOverOrders,1 : "Done in %o secs.\n",Cputime(t0);
-
-            // Step 4: the minimal overorders of the overorder corresponding to the tuple c correspond to the tuples
+            // Step 3: the minimal overorders of the overorder corresponding to the tuple c correspond to the tuples
             // obtained from c by replacing exactly one entry c[k] with an element of min_at_Ps[k][c[k]].
             vprintf GraphOverOrders,1 : "Computing the minimal inclusions of the overorders...";
             t0:=Cputime();
             min_inclusions:=[];
-            for c in cc do
+            for c in Keys(pos) do
                 i:=pos[c];
                 for k in [1..n] do
                     for j in min_at_Ps[k][c[k]] do

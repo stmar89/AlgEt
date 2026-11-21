@@ -15,6 +15,22 @@ declare attributes AlgEtQ:TotallyRealSubAlgebra;
 declare attributes AlgEtQOrd:TotallyRealUnitGroup;
 declare attributes AlgEtQOrd:TotallyRealPositiveUnitGroup;
 
+import "PicardGroup.m" : units_mod_conductor_data;
+
+units_of_S_in_units_of_O:=function(S)
+// Given an order S, returns US,uS:=UnitGroup(S) and the unit group UK,uK of the maximal order, such that US is a
+// subgroup of UK. No unit of S is computed: for a non-maximal S, UnitGroup(S) is the kernel of a map from UK
+// (see units_mod_conductor_data in PicardGroup.m). This matters when the index of US in UK is huge: then the units of
+// S have huge exponents on the generators of UK, and they cannot be written down as elements of the algebra.
+    US,uS:=UnitGroup(S);
+    if IsMaximal(S) then
+        return US,uS,US,uS;
+    end if;
+    data:=units_mod_conductor_data(S,false); // already computed by UnitGroup(S)
+    assert IsIdentical(US,data`K); // US is the subgroup data`K of data`UO
+    return US,uS,data`UO,data`uO;
+end function;
+
 //////////////////////////
 // IsTotallyReal, IsTotallyRealPositive
 //////////////////////////
@@ -65,13 +81,11 @@ intrinsic TotallyRealUnitGroup(S::AlgEtQOrd) -> Grp
         OF:=MaximalOrder(F); // computing OF is not optimal, and possibly avoidable
                                 // on the other hand, to compute US, one needs OK
         UF,uF:=UnitGroup(OF); // uF:UF->F
-        UK,uK:=UnitGroup(MaximalOrder(K));
+        US,uS,UK,uK:=units_of_S_in_units_of_O(S); // US is a subgroup of UK
         UFtoUK:=hom< UF->UK | [ (FtoK(uF(UF.i))@@uK) : i in [1..Ngens(UF)]]>;
-        US,uS:=UnitGroup(S);
-        US_in_UK:=sub<UK| [(US.i)@uS@@uK : i in [1..Ngens(US)]]>;
-
-        S_tot_real_in_UK:=Image(UFtoUK) meet US_in_UK;
-        S_tot_real_in_US:=sub<US| [ (uK(S_tot_real_in_UK.i))@@uS : i in [1..Ngens(S_tot_real_in_UK)] ]>;
+        // The intersection is taken in UK, and written in US by coercion: no unit of S is computed.
+        S_tot_real_in_UK:=Image(UFtoUK) meet US;
+        S_tot_real_in_US:=sub<US| [ US!(UK!S_tot_real_in_UK.i) : i in [1..Ngens(S_tot_real_in_UK)] ]>;
         S`TotallyRealUnitGroup:=S_tot_real_in_US;
     end if;
     return S`TotallyRealUnitGroup;
@@ -120,10 +134,8 @@ intrinsic TotallyRealPositiveUnitGroup(S::AlgEtQOrd) -> Grp
         OF:=MaximalOrder(F); // computing OF is not optimal, and possibly avoidable
                                 // on the other hand, to compute US, one needs OK
         UF,uF:=UnitGroup(OF); // uF:UF->F
-        UK,uK:=UnitGroup(MaximalOrder(K));
+        US,uS,UK,uK:=units_of_S_in_units_of_O(S); // US is a subgroup of UK
         UFtoUK:=hom< UF->UK | [ (FtoK(uF(UF.i))@@uK) : i in [1..Ngens(UF)]]>;
-        US,uS:=UnitGroup(S);
-        US_in_UK:=sub<UK| [(US.i)@uS@@uK : i in [1..Ngens(US)]]>;
 
         FF2:=FiniteField(2);
         signs:=Matrix([[ Re(h(uF(UF.i))) gt 0 select (FF2!0) else (FF2!1) : h in HomsToC(F) ] : i in [1..Ngens(UF)]]);
@@ -131,8 +143,9 @@ intrinsic TotallyRealPositiveUnitGroup(S::AlgEtQOrd) -> Grp
         UF_tot_pos_gens:=   [ 2*UF.i : i in [1..Ngens(UF)] ] cat
                             [ &+[ sol[i]+k[i] eq 1 select UF.i else 0*UF.i : i in [1..Ngens(UF)] ] : k in Basis(ker)] ;
         assert2 debug_test(OF,sub<UF|UF_tot_pos_gens>);
-        S_tot_pos_in_UK:=sub<UK| [ g@uF@FtoK@@uK : g in UF_tot_pos_gens ]> meet US_in_UK;
-        S_tot_pos_in_US:=sub<US| [ (uK(S_tot_pos_in_UK.i))@@uS : i in [1..Ngens(S_tot_pos_in_UK)] ]>;
+        // The intersection is taken in UK, and written in US by coercion: no unit of S is computed.
+        S_tot_pos_in_UK:=sub<UK| [ g@uF@FtoK@@uK : g in UF_tot_pos_gens ]> meet US;
+        S_tot_pos_in_US:=sub<US| [ US!(UK!S_tot_pos_in_UK.i) : i in [1..Ngens(S_tot_pos_in_UK)] ]>;
         assert2 debug_test(S,S_tot_pos_in_US);
         S`TotallyRealPositiveUnitGroup:=S_tot_pos_in_US;
     end if;
@@ -146,6 +159,35 @@ end intrinsic;
     PP<x>:=PolynomialRing(Integers());
     SetAssertions(2);
 
+    // The method used before 2026-11: compute the units of S and take their discrete logarithm in the unit group
+    // of the maximal order. Now US is used directly as a subgroup of it. The two must give the same subgroups.
+    old_tot_real:=function(S)
+        K:=Algebra(S);
+        F,FtoK:=TotallyRealSubAlgebra(K);
+        UF,uF:=UnitGroup(MaximalOrder(F));
+        UK,uK:=UnitGroup(MaximalOrder(K));
+        UFtoUK:=hom< UF->UK | [ (FtoK(uF(UF.i))@@uK) : i in [1..Ngens(UF)]]>;
+        US,uS:=UnitGroup(S);
+        US_in_UK:=sub<UK| [(US.i)@uS@@uK : i in [1..Ngens(US)]]>;
+        T:=Image(UFtoUK) meet US_in_UK;
+        return sub<US| [ (uK(T.i))@@uS : i in [1..Ngens(T)] ]>;
+    end function;
+    old_tot_pos:=function(S)
+        K:=Algebra(S);
+        F,FtoK:=TotallyRealSubAlgebra(K);
+        UF,uF:=UnitGroup(MaximalOrder(F));
+        UK,uK:=UnitGroup(MaximalOrder(K));
+        US,uS:=UnitGroup(S);
+        US_in_UK:=sub<UK| [(US.i)@uS@@uK : i in [1..Ngens(US)]]>;
+        FF2:=FiniteField(2);
+        signs:=Matrix([[ Re(h(uF(UF.i))) gt 0 select (FF2!0) else (FF2!1) : h in HomsToC(F) ] : i in [1..Ngens(UF)]]);
+        sol,ker:=Solution( signs , Vector([FF2!0 : i in [1..Dimension(F)]]));
+        gens:=[ 2*UF.i : i in [1..Ngens(UF)] ] cat
+              [ &+[ sol[i]+k[i] eq 1 select UF.i else 0*UF.i : i in [1..Ngens(UF)] ] : k in Basis(ker)];
+        T:=sub<UK| [ g@uF@FtoK@@uK : g in gens ]> meet US_in_UK;
+        return sub<US| [ (uK(T.i))@@uS : i in [1..Ngens(T)] ]>;
+    end function;
+
     f:=x^8+16;
     A:=EtaleAlgebra(f);
     F:=PrimitiveElement(A);
@@ -153,9 +195,21 @@ end intrinsic;
     oo:=FindOverOrders(R);
     for iS in [1..#oo] do
         S:=oo[iS];
-        _:=TotallyRealUnitGroup(S);
-        _:=TotallyRealPositiveUnitGroup(S);
+        tr:=TotallyRealUnitGroup(S);
+        tp:=TotallyRealPositiveUnitGroup(S);
+        assert tr eq old_tot_real(S);
+        assert tp eq old_tot_pos(S);
     end for;
+
+    // An order whose unit group has huge index in the one of the maximal order: [O^*:E^*] has 20 digits. Its units
+    // of infinite order cannot be written down as elements, so the old method fails, while the subgroups are computed
+    // inside the unit group of the maximal order. With assertions at level 1, since debug_test (assert2) computes the
+    // units of E.
+    SetAssertions(1);
+    A:=EtaleAlgebra([NumberField(x^4+x^2+529),NumberField(x^8+16)]);
+    E:=EquationOrder(A);
+    assert Invariants(TotallyRealUnitGroup(E)) eq [2,0,0,0,0];
+    assert Invariants(TotallyRealPositiveUnitGroup(E)) eq [0,0,0,0];
     SetAssertions(1);
     printf " all good!";
 */

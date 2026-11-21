@@ -798,15 +798,23 @@ intrinsic UnitGroup(S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
     data:=units_mod_conductor_data(S,GRH);
     UO:=data`UO; uO:=data`uO; B:=data`B; m:=data`h;
     P:=data`K;
-    gens_P_in_A:=[uO(UO ! P.i) : i in [1..#Generators(P)] ];
-    //p_codomain:=Parent(gens_P_in_A[1]);
     p_codomain:=A;
 
+    // The units of S are computed only when the map is evaluated, from their exponents on the generators of O^*.
+    // When the index [O^*:S^*] is huge, these exponents are huge, already for the generators of P, and such a unit
+    // cannot be written down as an element of A: for the equation order of (x^5-x-1)(x^4+x^2+529)(x^3-2000) the
+    // generators of P have exponents up to 10^25 (10^10 after an LLL reduction). So UnitGroup(S) computes only P,
+    // which is enough for the inverse map and for the structure of S^*.
     map_P_to_S:=function(rep)
         vprint AlgEtQPicardGroup, 2: "UnitGroup: map_P_to_S\n";
-        coeff:=Eltseq(rep);
-        assert #coeff eq #gens_P_in_A;
-        elt:=&*[gens_P_in_A[i]^coeff[i] : i in [1..#coeff]];
+        u:=UO!rep;
+        // Magma computes x^n only for |n| < 2^30: a power of a non-torsion unit with such an exponent would have
+        // billions of digits anyway.
+        max_exp:=Max([ Abs(c) : c in Eltseq(u) ]);
+        if max_exp ge 2^30 then
+            error Sprintf("UnitGroup: this unit of the order is too large to be computed: its exponents on the generators of the unit group of the maximal order have up to %o digits. This happens when the index of the unit group of the order in the one of the maximal order is huge.", #Sprint(max_exp));
+        end if;
+        elt:=uO(u);
         assert2 elt in S and elt^-1 in S;
         return elt;
     end function;
@@ -821,7 +829,7 @@ intrinsic UnitGroup(S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
     p:=map<P -> p_codomain | x:->map_P_to_S(x), y:->map_S_to_P(y)  >;
     S`UnitGroup:=<P,p>;
     vprintf AlgEtQPicardGroup, 2:"UnitGroup:\n
-                                gens_P_in_A = %o\n",PrintSeqAlgEtQElt(gens_P_in_A);
+                                exponents of the generators on the ones of O^* = %o\n",[ Eltseq(UO!P.i) : i in [1..Ngens(P)] ];
     return P,p;
 end intrinsic;
 
@@ -878,6 +886,32 @@ end intrinsic;
     UO,uO:=UnitGroup(MaximalOrder(A) : GRH:=true);
     assert forall{ i : i in [1..Ngens(U)] | u(U.i) in E and u(U.i)^-1 in E };
     assert #quo<UO | [ u(U.i)@@uO : i in [1..Ngens(U)] ]> eq 40;
+    printf ".";
+
+    // UnitGroup of an order whose unit group has huge index in the one of the maximal order: [O^*:E^*] has 30 digits.
+    // UnitGroup(E) computes the group, and a unit only when the map is evaluated: the torsion units and the
+    // discrete logarithm work, while the generators of infinite order are too large to be written down.
+    K:=NumberField(x^4+x^2+529);
+    M:=NumberField(x^3-2000);
+    A:=EtaleAlgebra([K,K,M]);
+    E:=EquationOrder(A);
+    U,u:=UnitGroup(E : GRH:=true);
+    UO,uO:=UnitGroup(MaximalOrder(A) : GRH:=true);
+    assert TorsionFreeRank(U) eq TorsionFreeRank(UO) and TorsionFreeRank(U) eq 3;
+    assert #Sprint(Index(UO,U)) eq 30;
+    for i in [ i : i in [1..Ngens(U)] | Order(U.i) ne 0 ] do
+        y:=u(U.i);
+        assert y in E and y^-1 in E and y@@u eq U.i;
+    end for;
+    assert (-One(A))@@u in U;
+    i:=[ i : i in [1..Ngens(U)] | Order(U.i) eq 0 ][1];
+    try
+        _:=u(U.i);
+        too_large:=false;
+    catch err
+        too_large:=Position(err`Object,"too large to be computed") gt 0;
+    end try;
+    assert too_large;
     printf ".";
 
     // A representative for every class, as ICM computes them: the powers of the generators and the partial products

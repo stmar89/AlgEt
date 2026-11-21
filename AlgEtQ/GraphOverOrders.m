@@ -28,7 +28,7 @@ intrinsic GraphOverOrders(R::AlgEtQOrd) -> GrphDir
 {Given an order R, returns the graph G of minimal inclusions of the overorders of R. The vertices of G are integers between 1 and the number of OverOrders(R), and there is an edge [i,j] if and only if OverOrders(R)[j] is a minimal overorder of OverOrders(R)[i].}
     if not assigned R`GraphOverOrders then
         if IsMaximal(R) then
-            G:=Digraph< 1 | >;
+            G:=Digraph< 1 | : SparseRep:=true >; // sparse, as below
         else
             // Let P_1,...,P_n be the singular primes of R. For each k, let L_k be the set consisting of R and of
             // the P_k-overorders of R, that is, the overorders S of R such that S/R is supported only at P_k.
@@ -131,7 +131,9 @@ intrinsic GraphOverOrders(R::AlgEtQOrd) -> GrphDir
             assert3 forall{ incl : incl in min_inclusions | [ S : S in output |
                             S ne output[incl[1]] and output[incl[1]] subset S
                                 and S subset output[incl[2]] ] eq [ output[incl[2]] ] }; // minimal inclusions
-            G:=Digraph< #output | min_inclusions >;
+            // The sparse representation: the dense one (an adjacency matrix) is refused by Magma for 100000 vertices
+            // or more ("Dimension too big to create graph"), and these graphs have only a few edges per vertex.
+            G:=Digraph< #output | min_inclusions : SparseRep:=true >;
         end if;
         R`GraphOverOrders:=G;
     end if;

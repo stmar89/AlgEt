@@ -8,21 +8,40 @@
 /////////////////////////////////////////////////////
 
 
-// Copyright 2023, S. Marseglia
-/////////////////////////////////////////////////////
-
 freeze;
 
 declare verbose OverOrders, 1;
 
-declare attributes AlgEtQOrd : MinimalOverOrders, // a sequence of tuples <P,{@ T1,...,Tn @}>, where
-                                                  // P is a singular prime of the order R, and
-                                                  // T1,..,Tn are all the minimal overorders with conductor (R:Ti)=P.
-                               OverOrdersAtPrimes, // a sequence of tuples <P,[ T1,...,Tn ]>, where
-                                                  // P is a singular prime of the order R, and
-                                                  // T1,..,Tn are all the overorders with P-primary conductor (R:Ti), plus R
-                               OverOrders,        // all overorders
-                               TuplesOfOverOrders; // a tuple <oo_at_Ps, pos>, see overorders_from_local
+// Attributes of an order R, with the only functions that write them.
+declare attributes AlgEtQOrd : MinimalOverOrders, // An AssociativeArray keyed by the singular primes P of R: 
+                                                  // the value at P is the indexed set of all the minimal overorders
+                                                  // T of R with conductor (R:T) = P. Keyed by the ideal, using the
+                                                  // Hash of ideals:
+                                                  // P need not be the same object as in SingularPrimes(R). Written 
+                                                  // by MinimalOverOrdersAtPrime.
+                               LocalOverOrders,   // A record in local_overorders_fmt: the overorders of R at each
+                                                  // singular prime, and how their sums correspond to OverOrders(R).
+                                                  // Field at_primes written by OverOrdersAtPrime, field pos by
+                                                  // OverOrders and positions_of_overorders.
+                               OverOrders;        // All the overorders of R, sorted with sort_overorders. Written 
+                                                  // by OverOrders (also for the overorders of R, with 
+                                                  // populateoo_in_oo) and by store_overorders, which WKICM and 
+                                                  // LoadWKICM use to store the overorders they find.
+
+local_overorders_fmt:=recformat< at_primes, pos >;
+// Let P_1,...,P_n be the singular primes of R, in the order of SingularPrimes(R), and let L_k be the set consisting
+// of R and of the P_k-overorders of R, that is, the overorders S of R such that S/R is supported only at P_k.
+//  - at_primes: an AssociativeArray: at_primes[k] is L_k as a sequence, sorted with sort_overorders (so R is its
+//               first entry). The entry k is defined once OverOrdersAtPrime(R,P_k) has been computed: the primes 
+//               are computed one at a time, unless the overorders of R are already known.
+//  - pos:       an AssociativeArray, assigned once all the L_k's and OverOrders(R) are known: for every sequence
+//               c=[c_1,...,c_n] with c_k in [1..#L_k], OverOrders(R)[pos[c]] is the sum of the orders L_k[c_k].
+// By Hofmann-Sircana, the map
+//      L_1 x ... x L_n -> { overorders of R }       (S_1,...,S_n) :-> S_1+...+S_n
+// is a bijection which respects inclusions in both directions: S_1+...+S_n is the unique overorder of R which is
+// equal to S_k locally at P_k, for each k. The overorders are encoded by positions in the L_k's, rather than by the
+// sequences of orders [S_1,...,S_n], because looking up a sequence of integers in an AssociativeArray is about 5 times
+// faster than looking up a sequence of orders, and populateoo_in_oo does millions of lookups.
 
 sort_key:=func< S | [1/Index(S)] cat myHash(S) >;
 // The key used to sort the overorders, see sort_overorders. Distinct orders have distinct keys.
@@ -37,9 +56,87 @@ sort_overorders:=procedure(~oo)
     ParallelSort(~keys,~oo);
 end procedure;
 
+store_overorders:=procedure(R,oo)
+// Given an order R and the sequence oo of all its overorders, in any order, stores them in R`OverOrders, sorted with
+// sort_overorders. If R`OverOrders is already assigned, it is kept: the objects in it may carry attributes, and the
+// positions in R`LocalOverOrders`pos refer to its order. This is how the overorders found by other means (WKICM,
+// LoadWKICM) are stored.
+    if not assigned R`OverOrders then
+        sort_overorders(~oo);
+        assert2 R eq oo[1];
+        R`OverOrders:=oo;
+    else
+        assert2 #oo eq #R`OverOrders and { S : S in oo } eq { S : S in R`OverOrders };
+    end if;
+end procedure;
+
+local_overorders:=function(R)
+// Returns the record R`LocalOverOrders, after creating it empty if needed.
+    if not assigned R`LocalOverOrders then
+        R`LocalOverOrders:=rec< local_overorders_fmt | at_primes:=AssociativeArray() >;
+    end if;
+    return R`LocalOverOrders;
+end function;
+
+p_overorders_from_known:=function(R)
+// Given a non-maximal order R whose overorders are known (R`OverOrders is assigned), returns the sequence of the
+// L_k's, see local_overorders_fmt, selected from R`OverOrders.
+// An overorder S of R is a P-overorder if and only if the R-module S/R is supported only at P. The support of S/R
+// consists of the primes containing its annihilator, which is the colon ideal (R:S). These primes are singular, since
+// S/R is zero locally at the other primes. So each overorder is tested once, for all the singular primes.
+    pp:=SingularPrimes(R);
+    oo_at_Ps:=[ [ R ] : P in pp ];
+    for S in R`OverOrders do
+        if S ne R then
+            cS:=ColonIdeal(R,R!!OneIdeal(S));
+            supp:=[ k : k in [1..#pp] | cS subset pp[k] ];
+            assert #supp ge 1; // since S ne R
+            if #supp eq 1 then
+                Append(~oo_at_Ps[supp[1]],S);
+            end if;
+        end if;
+    end for;
+    for k in [1..#pp] do
+        L:=oo_at_Ps[k];
+        sort_overorders(~L);
+        oo_at_Ps[k]:=L;
+    end for;
+    return oo_at_Ps;
+end function;
+
+p_overorders_from_minimal:=function(R,P)
+// Given an order R and a singular prime P of R, returns R and the P-overorders of R, sorted with sort_overorders.
+// They are produced recursively from R, adding at each step the minimal Q-overorders of the orders found so far, for
+// the primes Q above P (Hofmann-Sircana).
+    ppO:=PrimesAbove(MaximalOrder(Algebra(R))!!P);
+    queue := {@ R @};
+    output:={@ R @};
+    done:={@ @};
+    while #queue gt 0 do
+        pot_new:={@ @};
+        for T in queue do
+            pp:={@ OneIdeal(T) meet T!!Q : Q in ppO @};
+            for i in [1..#pp] do
+                Q:=pp[i];
+                Q`IsPrime:=true;
+            end for;
+            for Q in pp do
+                pot_new join:=MinimalOverOrdersAtPrime(T,Q);
+            end for;
+        end for;
+        output join:=pot_new;
+        done join:=queue;
+        queue := pot_new diff done;
+    end while;
+    output:=Setseq(output);
+    sort_overorders(~output);
+    assert2 forall{S : S in output | S eq R or PrimesAbove(ColonIdeal(R,R!!OneIdeal(S))) eq [ P ]};
+    return output;
+end function;
+
 sum_of_local_overorders:=function(R,oo_at_Ps,c)
-// Given an order R, the sequence oo_at_Ps of OverOrdersAtPrime(R,P) for P in SingularPrimes(R), and a sequence c of
-// positions, one for each singular prime, returns the sum of the orders oo_at_Ps[k][c[k]].
+// Given an order R, the sequence oo_at_Ps of the L_k's (see local_overorders_fmt), and a sequence c of positions, one
+// for each singular prime, returns the sum of the orders oo_at_Ps[k][c[k]].
 // Since oo_at_Ps[k][1] eq R, the entries c[k] eq 1 can be skipped.
     not_R:=[ k : k in [1..#c] | c[k] ne 1 ]; // the primes where the sum is not equal to R
     if #not_R eq 0 then
@@ -54,60 +151,37 @@ sum_of_local_overorders:=function(R,oo_at_Ps,c)
     end if;
 end function;
 
-overorders_from_local:=function(R)
-// Let R be a non-maximal order with singular primes P_1,...,P_n, and let L_k be the set consisting of R and of the
-// P_k-overorders of R, that is, the overorders S of R such that S/R is supported only at P_k. By Hofmann-Sircana,
-// the map
-//      L_1 x ... x L_n -> { overorders of R }       (S_1,...,S_n) :-> S_1+...+S_n
-// is a bijection which respects inclusions in both directions: S_1+...+S_n is the unique overorder of R which is
-// equal to S_k locally at P_k, for each k.
-// This function computes the overorders of R in this way, and stores them in R`OverOrders, sorted with
-// sort_overorders, unless R`OverOrders is already assigned (for example by WKICM or LoadWKICM). It returns:
-//  - oo_at_Ps: the sequence of the L_k's, that is, of OverOrdersAtPrime(R,P_k);
-//  - pos: an AssociativeArray such that, for every sequence c=[c_1,...,c_n] with c_k in [1..#oo_at_Ps[k]],
-//         OverOrders(R)[pos[c]] is the sum of the orders oo_at_Ps[k][c_k].
-// We encode the overorders by positions in the L_k's, rather than by the sequences of orders [S_1,...,S_n],
-// because looking up a sequence of integers in an AssociativeArray is about 5 times faster than looking up a
-// sequence of orders, and populateoo_in_oo does millions of lookups.
-// The output is stored in R`TuplesOfOverOrders.
-    if not assigned R`TuplesOfOverOrders then
-        pp:=SingularPrimes(R);
-        n:=#pp;
-        vtime OverOrders,2 : oo_at_Ps:=[ OverOrdersAtPrime(R,P) : P in pp ];
-        vprintf OverOrders,2 : "P-overorders for each P %o\n",[#x : x in oo_at_Ps];
-        vprintf OverOrders,2 : "total number of overorders %o\n",&*[#x : x in oo_at_Ps];
-        // R is the first entry of each L_k (OverOrdersAtPrime sorts by Index): below, c_k eq 1 means that the
-        // sum is equal to R locally at P_k.
-        assert forall{ x : x in oo_at_Ps | x[1] eq R };
-        cs:=[ [ c[k] : k in [1..n] ] : c in CartesianProduct([ [1..#x] : x in oo_at_Ps ]) ];
-        sums:=[ sum_of_local_overorders(R,oo_at_Ps,c) : c in cs ]; // sums[i] corresponds to cs[i]
+all_sums_of_local_overorders:=function(R,oo_at_Ps)
+// Returns the sequence cs of all the sequences of positions c=[c_1,...,c_n] with c_k in [1..#oo_at_Ps[k]], and the
+// sequence sums, where sums[i] is the sum corresponding to cs[i] (see sum_of_local_overorders).
+    n:=#oo_at_Ps;
+    cs:=[ [ c[k] : k in [1..n] ] : c in CartesianProduct([ [1..#x] : x in oo_at_Ps ]) ];
+    sums:=[ sum_of_local_overorders(R,oo_at_Ps,c) : c in cs ];
+    return cs,sums;
+end function;
+
+positions_of_overorders:=function(R)
+// Given a non-maximal order R, returns the sequence oo_at_Ps of the L_k's and the AssociativeArray pos, see
+// local_overorders_fmt. If OverOrders(R) computed the overorders, pos is already known. Otherwise, for example if
+// the overorders were stored by WKICM or LoadWKICM, every sum is computed again (one HNF each) and looked up in
+// OverOrders(R) with an indexed set, which uses the Hash of the orders. The result is stored in R`LocalOverOrders.
+    oo:=OverOrders(R);
+    oo_at_Ps:=[ OverOrdersAtPrime(R,P) : P in SingularPrimes(R) ];
+    data:=local_overorders(R);
+    if not assigned data`pos then
+        cs,sums:=all_sums_of_local_overorders(R,oo_at_Ps);
+        oo_set:={@ S : S in oo @};
         pos:=AssociativeArray();
-        if not assigned R`OverOrders then
-            // We sort the sums as in sort_overorders, and cs in the same way: then the positions are known.
-            keys:=[ sort_key(S) : S in sums ];
-            perm:=[1..#sums];
-            ParallelSort(~keys,~perm); // the i-th overorder is sums[perm[i]]
-            oo:=[ sums[j] : j in perm ];
-            for i->j in perm do
-                pos[cs[j]]:=i;
-            end for;
-            assert2 R in oo;
-            assert2 MaximalOrder(Algebra(R)) in oo;
-            R`OverOrders:=oo;
-        else
-            // The overorders are already known: we find the positions of the sums in OverOrders(R) with an indexed
-            // set, which uses the Hash of the orders.
-            oo_set:={@ S : S in R`OverOrders @};
-            for i->c in cs do
-                j:=Index(oo_set,sums[i]);
-                assert j ne 0;
-                pos[c]:=j;
-            end for;
-            assert #oo_set eq #cs; // the bijection
-        end if;
-        R`TuplesOfOverOrders:=<oo_at_Ps,pos>;
+        for i->c in cs do
+            j:=Index(oo_set,sums[i]);
+            assert j ne 0;
+            pos[c]:=j;
+        end for;
+        assert #oo_set eq #cs; // the bijection
+        data`pos:=pos;
+        R`LocalOverOrders:=data;
     end if;
-    return Explode(R`TuplesOfOverOrders);
+    return oo_at_Ps,data`pos;
 end function;
 
 ///# Overorders
@@ -137,10 +211,8 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl : CheckIsKnownOrde
     require IsPrime(P) : "The ideal P must be prime.";
     require Order(P) eq R : "P must be an ideal of R";
 
-    if assigned R`MinimalOverOrders and exists(output){ tup : tup in R`MinimalOverOrders | tup[1] eq P } then
-    // early exit if already computed
-        output := output[2];
-        return output;
+    if assigned R`MinimalOverOrders and IsDefined(R`MinimalOverOrders,P) then
+        return R`MinimalOverOrders[P]; // already computed
     end if;
 
     output:={@ Universe({@ R @}) | @}; //empty set
@@ -264,11 +336,9 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl : CheckIsKnownOrde
         // Otherwise, the attribute would contain copies of orders which do not share their attributes
         // with the known ones.
         if CheckIsKnownOrder then
-            if not assigned R`MinimalOverOrders then
-                R`MinimalOverOrders:=[<P,output>];
-            else
-                Append(~R`MinimalOverOrders,<P,output>);
-            end if;
+            mins:=assigned R`MinimalOverOrders select R`MinimalOverOrders else AssociativeArray();
+            mins[P]:=output;
+            R`MinimalOverOrders:=mins;
         end if;
     end if;
     return output;
@@ -288,89 +358,31 @@ intrinsic MinimalOverOrders(R::AlgEtQOrd) -> SetIndx[AlgEtQOrd]
 end intrinsic;
 
 
-// Given an order $R$ and prime $P$ of $R$, returns $R$ and the overorders $S$ of $R$ with conductor $(R:S)$ which is $P$-primary. We recursively produce the minimal $Q$-overorders where $Q$ are primes above $P$. The output is sorted by decreasing `Index(S)`, which is the same as increasing index $[S:R]$, with ties broken using `myHash(S)`. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.
+/// Given an order $R$ and prime $P$ of $R$, returns $R$ and the overorders $S$ of $R$ with conductor $(R:S)$ which is $P$-primary. We recursively produce the minimal $Q$-overorders where $Q$ are primes above $P$. The output is sorted by decreasing `Index(S)`, which is the same as increasing index $[S:R]$, with ties broken using `myHash(S)`. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.
 intrinsic OverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SeqEnum[AlgEtQOrd]
 {Given an order R and prime P of R, returns R and the overorders S of R with conductor (R:S) which is P-primary. We recursively produce the minimal PP-overorders where PP are primes above P. The output is sorted by decreasing Index(S), which is the same as increasing index [S:R], with ties broken using myHash(S). Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.}
     require IsPrime(P) : "The ideal P must be prime.";
     require Order(P) eq R : "P must be an ideal of R";
-
-    if assigned R`OverOrdersAtPrimes and exists(output){ tup : tup in R`OverOrdersAtPrimes | tup[1] eq P } then
-    // early exit if already computed
-        output := output[2];
-        return output;
+    k:=Index(SingularPrimes(R),P);
+    if k eq 0 then
+        return [ R ]; // R is maximal at P
     end if;
-
-    if assigned R`OverOrders then
-    // Early exit if all the overorders are already known, for example when they have been assigned by WKICM or
-    // LoadWKICM. We get the P-overorders by selecting them from R`OverOrders.
-    // An overorder S of R is a P-overorder if and only if the R-module S/R is supported only at P. The support of S/R
-    // consists of the primes containing its annihilator, which is the colon ideal (R:S). These primes are singular,
-    // since S/R is zero locally at the other primes.
-    // We sort all the overorders according to the support of S/R in one pass, and we store the result for every
-    // singular prime of R: each overorder is tested only once, whichever prime is asked next.
-        pp:=SingularPrimes(R);
-        iP:=Index(pp,P);
-        if iP eq 0 then
-            return [ R ]; // R is maximal at P
-        end if;
-        oo_at_Ps:=[ [ R ] : Q in pp ];
-        for S in R`OverOrders do
-            if S ne R then
-                cS:=ColonIdeal(R,R!!OneIdeal(S));
-                supp:=[ k : k in [1..#pp] | cS subset pp[k] ];
-                assert #supp ge 1; // since S ne R
-                if #supp eq 1 then
-                    Append(~oo_at_Ps[supp[1]],S);
+    data:=local_overorders(R);
+    if not IsDefined(data`at_primes,k) then
+        if assigned R`OverOrders then
+            // The overorders are known, for example from WKICM or LoadWKICM: we select the P-overorders from them,
+            // for all the singular primes at once.
+            for j->L in p_overorders_from_known(R) do
+                if not IsDefined(data`at_primes,j) then
+                    data`at_primes[j]:=L;
                 end if;
-            end if;
-        end for;
-        for k->Q in pp do
-            output:=oo_at_Ps[k];
-            sort_overorders(~output);
-            oo_at_Ps[k]:=output;
-            if not assigned R`OverOrdersAtPrimes then
-                R`OverOrdersAtPrimes:=[<Q,output>];
-            elif not exists{ tup : tup in R`OverOrdersAtPrimes | tup[1] eq Q } then
-                Append(~R`OverOrdersAtPrimes,<Q,output>);
-            end if;
-        end for;
-        return oo_at_Ps[iP];
-    end if;
-
-    if IsMaximalAtPrime(R,P) then
-        return [ R ];
-    end if;
-
-    ppO:=PrimesAbove(MaximalOrder(Algebra(R))!!P);
-
-    queue := {@ R @};
-    output:={@ R @};
-    done:={@ @};
-    while #queue gt 0 do
-        pot_new:={@ @};
-        for T in queue do
-            pp:={@ OneIdeal(T) meet T!!Q : Q in ppO @};
-            for i in [1..#pp] do
-                Q:=pp[i];
-                Q`IsPrime:=true;
             end for;
-            for Q in pp do
-                pot_new join:=MinimalOverOrdersAtPrime(T,Q);
-            end for;
-        end for;
-        output join:=pot_new;
-        done join:=queue;
-        queue := pot_new diff done;
-    end while;
-    output:=Setseq(output);
-    sort_overorders(~output);
-    assert2 forall{S : S in output | S eq R or PrimesAbove(ColonIdeal(R,R!!OneIdeal(S))) eq [ P ]};
-    if not assigned R`OverOrdersAtPrimes then
-        R`OverOrdersAtPrimes:=[<P,output>];
-    else
-        Append(~R`OverOrdersAtPrimes,<P,output>);
+        else
+            data`at_primes[k]:=p_overorders_from_minimal(R,P);
+        end if;
+        R`LocalOverOrders:=data;
     end if;
-    return output;
+    return data`at_primes[k];
 end intrinsic;
 
 /// Returns the overorders of $R$, sorted by decreasing `Index(S)`, which is the same as increasing index $[S:R]$, with ties broken using `myHash`. The parameter `populateoo_in_oo` (default false) determines whether the algorithms fills the attribute `OverOrders` for each overorder of $R$. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.
@@ -380,18 +392,37 @@ intrinsic OverOrders(R::AlgEtQOrd : populateoo_in_oo:=false) -> SeqEnum[AlgEtQOr
         if IsMaximal(R) then
             R`OverOrders:=[R];
         else
-            // The overorders of R are the sums of the overorders of R at each singular prime:
-            // overorders_from_local computes them and assigns R`OverOrders.
-            _:=overorders_from_local(R);
+            // The overorders of R are the sums of its overorders at each singular prime: see local_overorders_fmt.
+            oo_at_Ps:=[ OverOrdersAtPrime(R,P) : P in SingularPrimes(R) ];
+            vprintf OverOrders,2 : "P-overorders for each P %o\n",[#x : x in oo_at_Ps];
+            vprintf OverOrders,2 : "total number of overorders %o\n",&*[#x : x in oo_at_Ps];
+            // sum_of_local_overorders uses that R is the first entry of each L_k
+            assert forall{ x : x in oo_at_Ps | x[1] eq R };
+            cs,sums:=all_sums_of_local_overorders(R,oo_at_Ps);
+            // We sort the sums as in sort_overorders, and cs in the same way: then their positions are known.
+            keys:=[ sort_key(S) : S in sums ];
+            perm:=[1..#sums];
+            ParallelSort(~keys,~perm); // the i-th overorder is sums[perm[i]]
+            pos:=AssociativeArray();
+            for i->j in perm do
+                pos[cs[j]]:=i;
+            end for;
+            oo:=[ sums[j] : j in perm ];
+            assert2 R in oo;
+            assert2 MaximalOrder(Algebra(R)) in oo;
+            R`OverOrders:=oo;
+            data:=local_overorders(R);
+            data`pos:=pos;
+            R`LocalOverOrders:=data;
         end if;
     end if;
     if populateoo_in_oo and not IsMaximal(R) then
-        // Write S=S_1+...+S_n and T=T_1+...+T_n as in overorders_from_local. Then S subset T if and only if
+        // Write S=S_1+...+S_n and T=T_1+...+T_n as in local_overorders_fmt. Then S subset T if and only if
         // S_k subset T_k for every k, since the inclusion can be checked locally at each P_k, where S and T are
         // equal to S_k and T_k. Hence we only need the inclusions in each L_k: #L_1^2+...+#L_n^2 inclusion tests
         // instead of (#L_1*...*#L_n)^2.
         oo:=R`OverOrders;
-        oo_at_Ps,pos:=overorders_from_local(R);
+        oo_at_Ps,pos:=positions_of_overorders(R);
         n:=#oo_at_Ps;
         // up[k][a] is the sequence of the positions b such that oo_at_Ps[k][a] subset oo_at_Ps[k][b], a included.
         up:=[ [ [ b : b in [1..#L] | L[a] subset L[b] ] : a in [1..#L] ] : L in oo_at_Ps ];
@@ -409,7 +440,7 @@ intrinsic OverOrders(R::AlgEtQOrd : populateoo_in_oo:=false) -> SeqEnum[AlgEtQOr
 end intrinsic;
 
 ///ditto
-intrinsic FindOverOrders(R::AlgEtQOrd : populateoo_in_oo:=false) -> SetIndx[AlgEtQOrd]
+intrinsic FindOverOrders(R::AlgEtQOrd : populateoo_in_oo:=false) -> SeqEnum[AlgEtQOrd]
 {Returns the overorders of R, sorted by decreasing Index(S), which is the same as increasing index [S:R], with ties broken using myHash(S). Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana. The parameter "populateoo_in_oo" (default false) determines whether we should fill the attribute T`OverOrders for every overorder T of R.}
     return OverOrders(R : populateoo_in_oo:=populateoo_in_oo);
 end intrinsic;
@@ -453,6 +484,12 @@ end intrinsic;
     E:=EquationOrder(A);
     oo:=FindOverOrders(E);
     assert #oo eq 11;
+    // the minimal overorders are stored keyed by the prime: an equal prime which is a different object finds them
+    P:=SingularPrimes(E)[1];
+    min:=MinimalOverOrdersAtPrime(E,P);
+    P2:=Ideal(E,ZBasis(P));
+    assert not IsIdentical(P,P2) and P2 eq P;
+    assert IsDefined(E`MinimalOverOrders,P2) and MinimalOverOrdersAtPrime(E,P2) eq min;
 
     // populateoo_in_oo, computed from the overorders at each singular prime, against the inclusion test between all
     // pairs of overorders; and OverOrdersAtPrime when the overorders are already known (after LoadWKICM), against the
@@ -475,6 +512,18 @@ end intrinsic;
         end for;
         oo2:=OverOrders(E2 : populateoo_in_oo:=true);
         assert forall{ S : S in oo2 | S`OverOrders eq [ T : T in oo2 | S subset T ] };
+        // OverOrdersAtPrime at one prime only, then WKICM, which stores the overorders: the overorders at the other
+        // primes are then selected from them. Everything must be as computed directly.
+        E3:=EquationOrder(EtaleAlgebra(f));
+        pp3:=SingularPrimes(E3);
+        _:=OverOrdersAtPrime(E3,pp3[1]);
+        _:=WKICM(E3);
+        for P3 in pp3 do
+            i:=[ i : i in [1..#pp] | myHash(pp[i]) eq myHash(P3) ];
+            assert #i eq 1;
+            assert [ myHash(S) : S in OverOrdersAtPrime(E3,P3) ] eq [ myHash(S) : S in oo_at_Ps[i[1]] ];
+        end for;
+        assert [ myHash(S) : S in OverOrders(E3) ] eq [ myHash(S) : S in oo ];
     end for;
 
     SetAssertions(1);

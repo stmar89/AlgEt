@@ -18,7 +18,7 @@ declare verbose WKICM_bar, 2;
 declare attributes AlgEtQOrd:   WKICM,
                                 WKICM_bar;
 import "LowCohenMacaulayType.m" : wkicm_bar_CM_type2;
-import "OverOrders.m" : sort_overorders;
+import "OverOrders.m" : store_overorders;
 
 
 ///# Weak equivalence class monoid
@@ -394,7 +394,7 @@ intrinsic WKICM(E::AlgEtQOrd)->SeqEnum[AlgEtQIdl]
     if not assigned E`WKICM then
         pp:=SingularPrimes(E);
         if #pp eq 0 then
-            E`OverOrders:=[E];
+            store_overorders(E,[E]);
             E`WKICM:=[OneIdeal(E)]; // the order is maximal
             E`WKICM_bar:=[OneIdeal(E)]; // the order is maximal
         elif #pp eq 1 then // 1 singular prime: go for the recursion
@@ -419,9 +419,7 @@ intrinsic WKICM(E::AlgEtQOrd)->SeqEnum[AlgEtQIdl]
             vprintf WKICM,2 : "...Done in %o secs.\n",Cputime(t0);
             assert2 forall{ S : S in oo_E | assigned S`WKICM_bar };
             wk_mins:=&cat[ [ E !! I : I in WKICM_bar(S)] : S in oo_E ];
-            oo_E:=[E] cat oo_E;
-            sort_overorders(~oo_E); // as in OverOrders: E comes first
-            E`OverOrders:=oo_E;
+            store_overorders(E,[E] cat oo_E); // sorted as in OverOrders; kept if already known
             E`WKICM:=WKICM_bar(E) cat wk_mins;
         else //more then 1 singular prime: divide and patch
             vprintf WKICM,2 : "There are %o singular primes.\n",#pp;
@@ -575,10 +573,7 @@ intrinsic WKICM(E::AlgEtQOrd)->SeqEnum[AlgEtQIdl]
             if oo_known then
                 assert #oo_E eq #oo_E_known; // every overorder is the multiplicator ring of a class
             else
-                oo_E:=IndexedSetToSequence(oo_E);
-                sort_overorders(~oo_E); // as in OverOrders
-                assert2 E in oo_E;
-                E`OverOrders:=oo_E;
+                store_overorders(E,IndexedSetToSequence(oo_E)); // sorted as in OverOrders
             end if;
             vprintf WKICM,2 : "\t...Done in %o secs.\n",Cputime(t0);
             assert2 &+[ #S`WKICM_bar : S in OverOrders(E) ] eq #wk;

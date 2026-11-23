@@ -11,6 +11,8 @@
 
 freeze;
 
+import "OverOrders.m" : store_overorders;
+
 RemoveBlanks:=function(str)
 // given a string str removes the blank spaces
     return &cat(Split(str," "));
@@ -122,7 +124,7 @@ intrinsic LoadWKICM(str::MonStgElt) -> AlgEtQOrd
         end for;
         S`WKICM_bar:=wkS;
     end for;
-    R`OverOrders:=ooR;
+    store_overorders(R,ooR); // sorted as in OverOrders
     R`WKICM:=wkR;
     return R;
 end intrinsic;

@@ -15,7 +15,7 @@ declare verbose GraphOverOrders, 1;
 
 declare attributes AlgEtQOrd : GraphOverOrders;
 
-import "OverOrders.m" : overorders_from_local;
+import "OverOrders.m" : positions_of_overorders;
 
 ///## Lattice of inclusions of the overorders
 
@@ -49,13 +49,13 @@ intrinsic GraphOverOrders(R::AlgEtQOrd) -> GrphDir
 
             // Step 1: oo_at_Ps[k] is L_k, as a sequence, with R as first entry. An overorder is encoded by a sequence of
             // positions c=[c_1,...,c_n], which stands for the sum of the orders oo_at_Ps[k][c_k], and pos[c] is its
-            // position in OverOrders(R). See overorders_from_local in OverOrders.m: this is computed by OverOrders(R),
-            // or when it is needed for the first time if the overorders were assigned in another way, for example
-            // by WKICM or LoadWKICM.
+            // position in OverOrders(R). See local_overorders_fmt and positions_of_overorders in OverOrders.m: pos is
+            // computed by OverOrders(R), or when it is needed for the first time if the overorders were found in
+            // another way, for example by WKICM or LoadWKICM.
             vprintf GraphOverOrders,1 : "Computing the overorders at each singular prime, as sums...";
             t0:=Cputime();
             output:=OverOrders(R);
-            oo_at_Ps,pos:=overorders_from_local(R);
+            oo_at_Ps,pos:=positions_of_overorders(R);
             assert #Keys(pos) eq #output;
             vprintf GraphOverOrders,1 : "Done in %o secs.\n",Cputime(t0);
             vprintf GraphOverOrders,1 : "Number of P-overorders for each singular prime P: %o\n",[ #x : x in oo_at_Ps ];

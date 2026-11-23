@@ -79,14 +79,13 @@ intrinsic GraphOverOrders(R::AlgEtQOrd) -> GrphDir
                 ppO:=PrimesAbove(O!!P); // the primes of O above P
                 min_P:=[];
                 for S in oo_P do
-                    // The primes of S above P are the contractions to S of the primes of O above P. We
-                    // construct them as in OverOrdersAtPrime. Distinct primes of O might have the same
-                    // contraction: the indexed set removes the repetitions.
-                    qq:={@ OneIdeal(S) meet S!!QO : QO in ppO @};
+                    // The primes of S above P are the primes of S below the primes of O above P. Distinct primes
+                    // of O might be above the same prime of S: the indexed set removes the repetitions. PrimeBelow
+                    // returns the primes stored in S by OverOrdersAtPrime, so the minimal overorders stored in S
+                    // under them are found at once.
+                    qq:={@ PrimeBelow(S,QO) : QO in ppO @};
                     min_S:=[];
-                    for l in [1..#qq] do
-                        Q:=qq[l]; // not the loop variable, since we assign an attribute
-                        Q`IsPrime:=true;
+                    for Q in qq do
                         // The next line returns the empty set if S is maximal at Q.
                         for T in MinimalOverOrdersAtPrime(S,Q) do
                             j:=Index(oo_P_set,T);

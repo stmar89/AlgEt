@@ -13,7 +13,11 @@ freeze;
 
 declare verbose FactPrimes, 3;
 
-declare attributes AlgEtQOrd : SingularPrimes;
+declare attributes AlgEtQOrd : SingularPrimes,
+                               PrimesBelow; // The cache of PrimeBelow: an AssociativeArray keyed by the orders T
+                                            // containing S, whose value at T is an AssociativeArray keyed by the
+                                            // primes P of T, with value PrimeBelow(S,P). The primes are grouped by
+                                            // their order because ideals over different orders cannot be compared.
 
 declare attributes AlgEtQ : PlacesAboveRationalPrime;
 
@@ -51,6 +55,29 @@ intrinsic IsMaximalIdeal(I::AlgEtQIdl) -> BoolElt
     return IsPrime(I);
 end intrinsic;
 
+/// Given an order $S$ and a prime $P$ of an order $T$ containing $S$, returns the prime $S \cap P$ of $S$ below $P$. The output is stored in $S$: asking again for the same prime returns the same ideal, with all its attributes.
+intrinsic PrimeBelow(S::AlgEtQOrd, P::AlgEtQIdl) -> AlgEtQIdl
+{Given an order S and a prime P of an order T containing S, returns the prime S meet P of S below P. The output is stored in S: asking again for the same prime returns the same ideal, with all its attributes.}
+    T:=Order(P);
+    if T eq S then
+        return P;
+    end if;
+    if assigned S`PrimesBelow and IsDefined(S`PrimesBelow,T) and IsDefined(S`PrimesBelow[T],P) then
+        return S`PrimesBelow[T][P];
+    end if;
+    require IsPrime(P) : "the ideal must be prime";
+    require S subset T : "the order must be contained in the order of the prime";
+    // S/(S meet P) embeds in the finite field T/P, so it is a finite domain, hence a field: S meet P is a prime of S.
+    Q:=OneIdeal(S) meet S!!P;
+    Q`IsPrime:=true;
+    cache:=assigned S`PrimesBelow select S`PrimesBelow else AssociativeArray();
+    below:=IsDefined(cache,T) select cache[T] else AssociativeArray();
+    below[P]:=Q;
+    cache[T]:=below;
+    S`PrimesBelow:=cache;
+    return Q;
+end intrinsic;
+
 /// Given an integral fractional $S$-ideal $I$, returns the sequence of primes of $S$ containing $I$.
 intrinsic PrimesAbove(I::AlgEtQIdl) -> SeqEnum[AlgEtQIdl]
 {Given an integral fractional S-ideal I, returns the sequence of primes of S containing I.}
@@ -71,7 +98,7 @@ intrinsic PrimesAbove(I::AlgEtQIdl) -> SeqEnum[AlgEtQIdl]
                 O:=MaximalOrder(Algebra(I));
                 IO:=O!!I;
                 fac:=Factorization(IO);
-                primes:= Setseq({ OneIdeal(S) meet (S!!PO[1]) : PO in fac }); //remove doubles
+                primes:= Setseq({ PrimeBelow(S,PO[1]) : PO in fac }); //remove doubles
                 for i in [1..#primes] do
                     P:=primes[i];
                     P`IsPrime:=true;
@@ -177,7 +204,7 @@ intrinsic Factorization(I::AlgEtQIdl) -> Tup
             // since S and O are equal locally at P. Hence we only need to intersect each PO with S.
             facS:=<>;
             for pO in facO do
-                P:=OneIdeal(S) meet (S!!pO[1]);
+                P:=PrimeBelow(S,pO[1]);
                 ZBasisLLL(P);
                 P`IsPrime:=true;
                 Append(~facS, <P,pO[2]>);
@@ -252,6 +279,35 @@ end intrinsic;
     assert Seqset(P2) ne Seqset(P3);
     assert PlacesAboveRationalPrime(A,2) eq P2; // the stored value
     assert Keys(A`PlacesAboveRationalPrime) eq {2,3};
+    printf ".";
+
+    // PrimeBelow: the prime S meet P of S below a prime P of an order T containing S. It is stored: the same ideal
+    // object is returned again, also for an equal prime which is a different object. Primes of the maximal order and
+    // of an intermediate order T, in an algebra with two components.
+    A:=EtaleAlgebra((x^2+5)*(x^3-2000));
+    E:=EquationOrder(A);
+    O:=MaximalOrder(A);
+    T:=[ S : S in OverOrders(E) | S ne E and S ne O ][1];
+    for P in PrimesAbove(Conductor(E)) do
+        for U in [ O, T ] do
+            for Q in PrimesAbove(U!!P) do
+                Q2:=PrimeBelow(E,Q);
+                assert Order(Q2) eq E and IsPrime(Q2) and Q2 eq OneIdeal(E) meet E!!Q;
+                assert Q2 eq P; // E has a unique prime below Q, and P is a prime of E below Q
+                assert IsIdentical(PrimeBelow(E,Q),Q2);
+                Q3:=Ideal(U,ZBasis(Q)); // equal to Q, a different object
+                assert not IsIdentical(Q,Q3) and IsIdentical(PrimeBelow(E,Q3),Q2);
+            end for;
+        end for;
+    end for;
+    assert IsIdentical(PrimeBelow(T,PrimesAbove(Conductor(T))[1]),PrimesAbove(Conductor(T))[1]); // P of T itself
+    try
+        _:=PrimeBelow(O,PrimesAbove(Conductor(E))[1]); // O is not contained in E
+        ok:=false;
+    catch err
+        ok:=true;
+    end try;
+    assert ok;
     printf ".";
     SetAssertions(1);
     printf " all good!";

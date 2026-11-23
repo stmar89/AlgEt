@@ -115,11 +115,7 @@ p_overorders_from_minimal:=function(R,P)
     while #queue gt 0 do
         pot_new:={@ @};
         for T in queue do
-            pp:={@ OneIdeal(T) meet T!!Q : Q in ppO @};
-            for i in [1..#pp] do
-                Q:=pp[i];
-                Q`IsPrime:=true;
-            end for;
+            pp:={@ PrimeBelow(T,Q) : Q in ppO @}; // the primes of T above P
             for Q in pp do
                 pot_new join:=MinimalOverOrdersAtPrime(T,Q);
             end for;

@@ -37,7 +37,8 @@ declare attributes AlgEtQIdl : Index, //stores the index
                               ExtensionToMultiplicatorRing, // the ideal S!!I, where S is MultiplicatorRing(I): see '!!'
                               inclusion_matrix;
 
-import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQtoA , meet_zbasis , inclusion_matrix;
+import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQtoA , meet_zbasis , inclusion_matrix ,
+                 lattice_hnf , hash_from_hnf;
 
 ///# Ideals of orders in étale algebras over $\mathbb{Q}$
 /// Let $R$ be an order in an étale algebra $A$ over $\mathbb{Q}$.
@@ -85,17 +86,10 @@ CreateAlgEtQIdl:=function(S,gens : ZSpan:=false)
             vprint AlgEtQIdl,3: "CreateAlgEtQIdl: too many gens";
             gens:=[g*s : g in gens, s in ZBasis(S) ];
         end if;
-        dim:=AbsoluteDimension(A);
-        M:=MatrixAtoQ(gens);
-        d:=Denominator(M);
-        P:=hnf(crQZ(d*M));
-        P:=(1/d)*crZQ(P);
-        d:=Denominator(P); //this d might be different from Denomintor(M)
-        hash:=[d] cat [(d*P[i,j]) : j in [i..dim] , i in [1..dim]];
-        // UNSAFE hash:=Hash(P);
-        zb:=MatrixQtoA(A,P);
+        H,d:=lattice_hnf(gens);
+        zb:=MatrixQtoA(A,(1/d)*crZQ(H));
         assert #zb eq AbsoluteDimension(A);
-        I`Hash:=hash;
+        I`Hash:=hash_from_hnf(H,d);
         I`ZBasis:=zb;
         gens:=zb;
     end if;
@@ -207,6 +201,13 @@ intrinsic '!!'(T::AlgEtQOrd,I::AlgEtQIdl) -> AlgEtQIdl
         if assigned I`MultiplicatorRing then
             id`MultiplicatorRing:=I`MultiplicatorRing; //..as well as the MultiplicatorRing
         end if;
+        // ..and the hash, which depends only on the lattice
+        if assigned I`Hash then
+            id`Hash:=I`Hash;
+        end if;
+        if assigned I`HashValue then
+            id`HashValue:=I`HashValue;
+        end if;
         return id;
     else //in this case Order(I) is strictly contained in T
         // The extensions of I to the maximal order and to the multiplicator ring of I are computed often:
@@ -258,17 +259,10 @@ intrinsic ZBasis(I::AlgEtQIdl)->SeqEnum[AlgEtQElt]
         if #Generators(I) eq 1 then
             zb:=gens; //gens is a ZBasis of I
         else
-            dim:=AbsoluteDimension(A);
-            M:=MatrixAtoQ(gens);
-            d:=Integers()!Denominator(M);
-            P:=hnf(crQZ(d*M));
-            P:=(1/d)*crZQ(P);
-            d:=Denominator(P); //this d might be different from Denomintor(M)
-            hash:=[d] cat [(d*P[i,j]) : j in [i..dim] , i in [1..dim]];
-            // UNSAFE hash:=Hash(P);
-            zb:=MatrixQtoA(A,P);
+            H,d:=lattice_hnf(gens);
+            zb:=MatrixQtoA(A,(1/d)*crZQ(H));
             assert #zb eq AbsoluteDimension(A);
-            I`Hash:=hash;
+            I`Hash:=hash_from_hnf(H,d);
         end if;
         I`ZBasis:=zb;
     end if;
@@ -295,15 +289,9 @@ end intrinsic;
 intrinsic myHash(I::AlgEtQIdl)->SeqEnum[RngInt]
 {Hash function.}
     if not assigned I`Hash then
-        dim:=AbsoluteDimension(Algebra(I));
-        P:=MatrixAtoQ(ZBasis(I));
-        d:=Integers() ! Denominator(P);
-        P:=(1/d)*crZQ(hnf(crQZ(d*P)));
-        assert2 IsUpperTriangular(P);
-        d:=Denominator(P); //this d might be different from Denomintor(M)
-        hash:=[d] cat [(d*P[i,j]) : j in [i..dim] , i in [1..dim]];
-        // UNSAFE hash:=Hash(P);
-        I`Hash:=hash;
+        H,d:=lattice_hnf(ZBasis(I));
+        assert2 IsUpperTriangular(H);
+        I`Hash:=hash_from_hnf(H,d);
     end if;
     return I`Hash;
 end intrinsic;
@@ -476,6 +464,11 @@ intrinsic OneIdeal(S::AlgEtQOrd) -> AlgEtQIdl
     S`OneIdeal := Ideal(S,One(S));
     S`OneIdeal`IsInvertible:=true;
     S`OneIdeal`MultiplicatorRing:=S;
+    // the lattice of S`OneIdeal is S: if the hash of S is known, its ZBasis and hash are known too
+    if assigned S`Hash then
+      S`OneIdeal`ZBasis:=ZBasis(S);
+      S`OneIdeal`Hash:=S`Hash;
+    end if;
   end if;
   return S`OneIdeal;
 end intrinsic;
@@ -735,9 +728,10 @@ intrinsic 'meet'(I::AlgEtQIdl, J::AlgEtQIdl) -> AlgEtQIdl
     if J subset I then
         return J;
     end if;
-    zb:=meet_zbasis(ZBasis(I),ZBasis(J));
+    zb,hash:=meet_zbasis(ZBasis(I),ZBasis(J));
     id:=Ideal(Order(I),zb);
     id`ZBasis:=zb;
+    id`Hash:=hash; // free: see meet_zbasis
     return id;
 end intrinsic;
 

@@ -11,7 +11,7 @@
 
 freeze;
 
-import "Ord.m" : crQZ , crZQ , MatrixAtoQ , inclusion_matrix ;
+import "Ord.m" : crQZ , crZQ , MatrixAtoQ , inclusion_matrix , hash_from_hnf ;
 
 declare verbose Quotients, 1;
 
@@ -232,6 +232,9 @@ intrinsic QuotientVS(I::AlgEtQIdl, J::AlgEtQIdl, P::AlgEtQIdl) -> ModRng, Map
     dmat:=crQZ(den*mat);
     H,Tr:=HermiteForm(dmat);//Tr*M eq H
     HI,TrI:=HermiteForm(crQZ(den*MatrixAtoQ(zbI)));
+    if not assigned I`Hash then
+        I`Hash:=hash_from_hnf(HI,Integers()!den); // HI is the HNF of den times a matrix of I: its hash is free
+    end if;
     TrI:=crZQ(TrI);
     Tr1:=crZQ(Matrix(Rows(Tr)[1..#zbI]));
     C:=TrI^-1*Tr1;

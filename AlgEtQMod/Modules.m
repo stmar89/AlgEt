@@ -43,7 +43,8 @@ declare attributes AlgEtQMod : Index, //stores the index
                               HashValue, // the integer returned by Hash
                               inclusion_matrix;
 
-import "../AlgEtQ/Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQtoA , meet_zbasis , inclusion_matrix;
+import "../AlgEtQ/Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQtoA , meet_zbasis , inclusion_matrix ,
+                           lattice_hnf , hash_from_hnf;
 import "PowerBass.m" : is_pure_power_internal;
 
 /*TODO
@@ -66,17 +67,10 @@ CreateAlgEtQMod:=function(S,m,gens)
         ZZ:=Integers();
         vprintf AlgEtQIdl,3: "too many gens";
         gens:=[g*m(s) : g in gens, s in ZBasis(S) ];
-        dim:=AbsoluteDimension(V);
-        M:=MatrixAtoQ(gens);
-        d:=Denominator(M);
-        P:=hnf(crQZ(d*M));
-        P:=(1/d)*crZQ(P);
-        d:=Denominator(P); //this d might be different from Denomintor(M)
-        hash:=[d] cat [(d*P[i,j]) : j in [i..dim] , i in [1..dim]];
-        // UNSAFE hash:=Hash(P);
-        zb:=MatrixQtoA(V,P);
+        H,d:=lattice_hnf(gens);
+        zb:=MatrixQtoA(V,(1/d)*crZQ(H));
         assert #zb eq AbsoluteDimension(V);
-        I`Hash:=hash;
+        I`Hash:=hash_from_hnf(H,d);
         I`ZBasis:=zb;
         gens:=zb;
     end if;
@@ -181,17 +175,10 @@ intrinsic ZBasis(I::AlgEtQMod)->SeqEnum[AlgEtQElt]
         V,m:=UniverseAlgebra(I);
         S:=Order(I);
         gens:=[g*m(s) : g in Generators(I) , s in ZBasis(S) ];
-        dim:=AbsoluteDimension(V);
-        M:=MatrixAtoQ(gens);
-        d:=Integers()!Denominator(M);
-        P:=hnf(crQZ(d*M));
-        P:=(1/d)*crZQ(P);
-        d:=Denominator(P); //this d might be different from Denomintor(M)
-        hash:=[d] cat [(d*P[i,j]) : j in [i..dim] , i in [1..dim]];
-        // UNSAFE hash:=Hash(P);
-        zb:=MatrixQtoA(V,P);
+        H,d:=lattice_hnf(gens);
+        zb:=MatrixQtoA(V,(1/d)*crZQ(H));
         assert #zb eq AbsoluteDimension(V);
-        I`Hash:=hash;
+        I`Hash:=hash_from_hnf(H,d);
         I`ZBasis:=zb;
     end if;
     return I`ZBasis;
@@ -200,15 +187,9 @@ end intrinsic;
 intrinsic myHash(I::AlgEtQMod)->RngInt
 {Hash function.}
     if not assigned I`Hash then
-        dim:=AbsoluteDimension(UniverseAlgebra(I));
-        P:=MatrixAtoQ(ZBasis(I));
-        d:=Integers() ! Denominator(P);
-        P:=(1/d)*crZQ(hnf(crQZ(d*P)));
-        assert2 IsUpperTriangular(P);
-        d:=Denominator(P); //this d might be different from Denomintor(M)
-        hash:=[d] cat [(d*P[i,j]) : j in [i..dim] , i in [1..dim]];
-        // UNSAFE hash:=Hash(P);
-        I`Hash:=hash;
+        H,d:=lattice_hnf(ZBasis(I));
+        assert2 IsUpperTriangular(H);
+        I`Hash:=hash_from_hnf(H,d);
     end if;
     return I`Hash;
 end intrinsic;

@@ -16,7 +16,7 @@ declare verbose ZBasisLLL, 2;
 declare attributes AlgEtQIdl : IsZBasisLLLReduced;
 declare attributes AlgEtQOrd : IsZBasisLLLReduced;
 
-import "Ord.m" : MatrixAtoQ , MatrixQtoA, crQZ, crZQ;
+import "Ord.m" : MatrixAtoQ , MatrixQtoA, crQZ, crZQ, hash_from_hnf, hnf_from_hash;
 
 ///# LLL-reduction of $\mathbb{Z}$-bases
 /// Whenever we call the intrinsic `ZBasis` for an order or a fractional ideal, we are computing a $\mathbb{Z}$-basis. This is produced directly from the known generators. This elements might have large coefficients making certain operation considerable slower. One can then reduce the given basis using the LLL algorithm to get better coefficients. While this procedure might cost some time, it is often convenient to perform this reduction if the ideal or the order are supposed to be used further.
@@ -33,19 +33,28 @@ max_abs:=function(X)
     return Max(Max(E),-Min(E));
 end function;
 
-lll_zbasis:=function(A,zb)
-// Given a Z-basis zb of a lattice in A, returns an LLL-reduced Z-basis of the same lattice.
+lll_zbasis:=function(A,zb,hash)
+// Given a Z-basis zb of a lattice in A, and its hash (see hash_from_hnf in Ord.m) or [] if it is not known, returns an
+// LLL-reduced Z-basis of the same lattice, and the hash.
 // Let M be the matrix of the coordinates of zb and d its denominator.
 // The entries of the HNF of d*M are bounded by its pivots, while the entries of d*M are not:
 // if the HNF has smaller entries, we LLL-reduce it instead, which is much faster.
 // Otherwise, for example if zb is already (almost) reduced, we LLL-reduce d*M itself,
 // since starting from the HNF would undo the reduction already present in zb.
 // Working with the integer matrix d*M is also faster than calling LLL on M.
+// The HNF of d*M is d times the HNF of the lattice, which can be read from the hash, if known: otherwise we compute it,
+// and the hash comes for free.
     M:=MatrixAtoQ(zb);
-    d:=Denominator(M);
+    d:=Integers()!Denominator(M);
     MZ:=crQZ(d*M);
-    H:=HermiteForm(MZ); // MZ is square of full rank, so H has no zero rows
-    assert2 Rank(H) eq Nrows(H);
+    if #hash gt 0 then
+        H:=hnf_from_hash(hash,d);
+        assert2 H eq HermiteForm(MZ);
+    else
+        H:=HermiteForm(MZ); // MZ is square of full rank, so H has no zero rows
+        assert2 Rank(H) eq Nrows(H);
+        hash:=hash_from_hnf(H,d);
+    end if;
     use_hnf:=max_abs(H) lt max_abs(MZ);
     vprintf ZBasisLLL, 2 : "lll_zbasis: max entry of the basis has %o bits, of the HNF %o bits. Using the %o.\n",
                             Ilog2(max_abs(MZ)+1), Ilog2(max_abs(H)+1), use_hnf select "HNF" else "basis";
@@ -54,14 +63,17 @@ lll_zbasis:=function(A,zb)
     end if;
     L:=LLL(MZ);
     assert2 HermiteForm(L) eq H; // same lattice
-    return MatrixQtoA(A,(1/d)*crZQ(L));
+    return MatrixQtoA(A,(1/d)*crZQ(L)),hash;
 end function;
 
 /// A procedure that replaces the stored $\mathbb{Z}$-basis with an LLL-reduced one.
 intrinsic ZBasisLLL(S::AlgEtQOrd)
 {A procedure that replaces the stored ZBasis with an LLL-reduced one. Note: the attribute inclusion matrix, which depends on the ZBasis is deleted.}
   if (not assigned S`IsZBasisLLLReduced) or (not S`IsZBasisLLLReduced) then
-    S`ZBasis:=lll_zbasis(Algebra(S),ZBasis(S));
+    // the hash depends only on the lattice: it is used if known, and stored if computed
+    zb,hash:=lll_zbasis(Algebra(S),ZBasis(S),assigned S`Hash select S`Hash else []);
+    S`ZBasis:=zb;
+    S`Hash:=hash;
     S`IsZBasisLLLReduced:=true;
     delete S`inclusion_matrix; // this is computed with respect to the old ZBasis!
   end if;
@@ -71,7 +83,10 @@ end intrinsic;
 intrinsic ZBasisLLL(S::AlgEtQIdl)
 { " } // "
   if (not assigned S`IsZBasisLLLReduced) or (not S`IsZBasisLLLReduced) then
-    S`ZBasis:=lll_zbasis(Algebra(S),ZBasis(S));
+    // the hash depends only on the lattice: it is used if known, and stored if computed
+    zb,hash:=lll_zbasis(Algebra(S),ZBasis(S),assigned S`Hash select S`Hash else []);
+    S`ZBasis:=zb;
+    S`Hash:=hash;
     S`IsZBasisLLLReduced:=true;
     delete S`inclusion_matrix; // this is computed with respect to the old ZBasis!
     // If the ideal has at least dim generators, for example the old ZBasis when it was created from more than dim

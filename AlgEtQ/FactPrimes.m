@@ -30,8 +30,8 @@ declare attributes AlgEtQ : PlacesAboveRationalPrime;
 
 intrinsic IsPrime(I::AlgEtQIdl) -> BoolElt
 {Returns whether the given integral fractional ideal is a prime of its order of definition.}
-    require IsIntegral(I): "the ideal must be integral";
     if not assigned I`IsPrime then
+        require IsIntegral(I): "the ideal must be integral";
         prim:=PrimesAbove(I);
         if #prim eq 1 and I eq prim[1] then
             bool:=true;
@@ -66,7 +66,9 @@ intrinsic PrimeBelow(S::AlgEtQOrd, P::AlgEtQIdl) -> AlgEtQIdl
         return S`PrimesBelow[T][P];
     end if;
     require IsPrime(P) : "the ideal must be prime";
-    require S subset T : "the order must be contained in the order of the prime";
+    // The inclusion test is skipped when T is the maximal order, which contains every order: this is the main use,
+    // and with many orders S the test would cost more than the intersection itself.
+    require (assigned T`IsMaximal and T`IsMaximal) or S subset T : "the order must be contained in the order of the prime";
     // S/(S meet P) embeds in the finite field T/P, so it is a finite domain, hence a field: S meet P is a prime of S.
     Q:=OneIdeal(S) meet S!!P;
     Q`IsPrime:=true;

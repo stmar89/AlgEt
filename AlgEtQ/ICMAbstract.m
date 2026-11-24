@@ -18,7 +18,10 @@ declare attributes AlgEtQOrd: ICMAbstractRep;
 declare type AlgEtQICM[AlgEtQICMElt];
 
 declare attributes AlgEtQICM : Order,
-                               ExtensionMapsPics, // an associative array with extension maps Pic(S)->Pic(T)
+                               GRH, // whether GRH is assumed for the Picard groups, see
+                                    // IdealClassMonoidAbstract
+                               ExtensionMapsPics, // an associative array with extension maps
+                                                  // Pic(S)->Pic(T)
                                Map,
                                One;
 
@@ -39,7 +42,9 @@ declare attributes AlgEtQICMElt : Parent,
 
 ///hide-all
 function CreateAlgEtQICMElt(icm,yw,y_inv,pT)
-// given the ideal class monoid of R, a weak equivalence class of R, an element of the (abstract) picard group of an overorder of R, with its map pT:=Pic(T)-> ideals, it creates the corresponding ideal class.
+// given the ideal class monoid of R, a weak equivalence class of R, an element of the (abstract)
+// picard group of an overorder of R, with its map pT:=Pic(T)-> ideals, it creates the corresponding
+// ideal class.
     x:=New(AlgEtQICMElt);
     x`Parent:=icm;
     x`WEClass:=yw;
@@ -138,7 +143,7 @@ ext_map_Pic:=function(icm,S)
     end if;
     test,map:=IsDefined(icm`ExtensionMapsPics,S);
     if not test then
-        icm`ExtensionMapsPics[S]:=ExtensionHomPicardGroups(Order(icm),S);
+        icm`ExtensionMapsPics[S]:=ExtensionHomPicardGroups(Order(icm),S : GRH:=icm`GRH);
     end if;
     return icm`ExtensionMapsPics[S];
 end function;
@@ -151,7 +156,7 @@ intrinsic '*'(x::AlgEtQICMElt,y::AlgEtQICMElt)->AlgEtQICMElt
     Sy:=MultiplicatorRing(y);
     wxy:=WEClass(x)*WEClass(y);
     Sxy:=MultiplicatorRing(wxy);
-    _,pxy:=PicardGroup(Sxy);
+    _,pxy:=PicardGroup(Sxy : GRH:=icm`GRH);
     ext_x:=ext_map_Pic(icm,Sx);
     ext_y:=ext_map_Pic(icm,Sy);
     ext_xy:=ext_map_Pic(icm,Sxy);
@@ -180,13 +185,14 @@ end intrinsic;
 // icm //
 /////////
 
-/// Returns the ideal class monoid of the given order together with a map (with preimages) sending each class to a representative (determined by `WeakEquivalenceClassMonoid` and `PicardGroup`).
-intrinsic IdealClassMonoidAbstract(R::AlgEtQOrd) -> AlgEtQICM,Map
-{Returns the ideal class monoid of the given order together with a map (with preimages) sending each class to a representative (determined by WeakEquivalenceClassMonoid and PicardGroup).}
-    if not assigned R`ICMAbstractRep then
+/// Returns the ideal class monoid of the given order together with a map (with preimages) sending each class to a representative (determined by `WeakEquivalenceClassMonoid` and `PicardGroup`). The parameter `GRH` (default false) can be set to true to assume GRH: it is used for all the Picard groups of the overorders, also by the operations on the classes. The output is stored in $R$: a monoid computed without GRH is returned also when GRH is assumed, while one computed under GRH is computed again when it is asked without GRH (as for `PicardGroup`).
+intrinsic IdealClassMonoidAbstract(R::AlgEtQOrd : GRH:=false) -> AlgEtQICM,Map
+{Returns the ideal class monoid of the given order together with a map (with preimages) sending each class to a representative (determined by WeakEquivalenceClassMonoid and PicardGroup). The parameter GRH (default false) can be set to true to assume GRH: it is used for all the Picard groups of the overorders, also by the operations on the classes. The output is stored in R: a monoid computed without GRH is returned also when GRH is assumed, while one computed under GRH is computed again when it is asked without GRH (as for PicardGroup).}
+    if not assigned R`ICMAbstractRep or not (GRH or not R`ICMAbstractRep`GRH) then
         icm:=New(AlgEtQICM);
         W,w:=WeakEquivalenceClassMonoidAbstract(R);
         icm`Order:=R;
+        icm`GRH:=GRH;
 
         img:=function(x)
             xw:=WEClass(x);
@@ -198,7 +204,7 @@ intrinsic IdealClassMonoidAbstract(R::AlgEtQOrd) -> AlgEtQICM,Map
             yw:=y@@w;
             y_inv:=ColonIdeal(y,Ideal(yw)); // Ideal(yw)*y_inv = y
             T:=MultiplicatorRing(y);
-            _,pT:=PicardGroup(T);
+            _,pT:=PicardGroup(T : GRH:=GRH);
             y_inv:=(T!!y_inv)@@pT;
             return CreateAlgEtQICMElt(icm,yw,y_inv,pT);
         end function;
@@ -261,7 +267,7 @@ intrinsic '#'(icm::AlgEtQICM)->RngInt
     size:=0;
     W:=WeakEquivalenceClassMonoidAbstract(Order(icm));
     for T->v in Array(W) do
-        size +:= #v*#PicardGroup(T);
+        size +:= #v*#PicardGroup(T : GRH:=icm`GRH);
     end for;
     return size;
 end intrinsic;
@@ -271,7 +277,7 @@ intrinsic Classes(icm::AlgEtQICM)->SeqEnum[AlgEtQICMElt]
     W:=WeakEquivalenceClassMonoidAbstract(Order(icm));
     output:=[];
     for T->WT in Array(W) do
-        PT,pT:=PicardGroup(T);
+        PT,pT:=PicardGroup(T : GRH:=icm`GRH);
         output cat:=[CreateAlgEtQICMElt(icm,w,z,pT):w in WT, z in PT];
     end for;
     return output;
@@ -365,7 +371,8 @@ end intrinsic;
     _:=[Random(icm)^i:i in [1..100]];
     _:=[x*y:x,y in Classes(icm)];
 
-    // testing Hash: sets, indexed sets and associative arrays of ideal classes, also when the hash values collide
+    // testing Hash: sets, indexed sets and associative arrays of ideal classes, also when the hash
+    // values collide
     _<x>:=PolynomialRing(Integers());
     A:=EtaleAlgebra(x^4+16);
     E:=EquationOrder(A);
@@ -394,6 +401,22 @@ end intrinsic;
     AA:=AssociativeArray();
     for i in [1..#cl] do AA[c1[i]]:=i; end for;
     assert #Keys(AA) eq #icm and forall{ i : i in [1..#cl] | AA[c2[i]] eq i };
+    printf ".";
+
+    // GRH: the classes, their products and the size use the Picard groups computed with the GRH of
+    // the monoid. A monoid computed under GRH is computed again without GRH, and one computed
+    // without GRH is used also under GRH (as for PicardGroup).
+    _<x>:=PolynomialRing(Integers());
+    E:=EquationOrder(EtaleAlgebra(x^4+291*x^3-988*x^2-1000*x-1000));
+    icm1,w1:=IdealClassMonoidAbstract(E : GRH:=true);
+    cl:=Classes(icm1);
+    assert forall{ c : c in cl | IsIdentical(Parent(PicClass(c)),PicardGroup(MultiplicatorRing(c) : GRH:=true)) };
+    assert forall{ c : c in [ a*b : a,b in cl[1..4] ] |
+                                IsIdentical(Parent(PicClass(c)),PicardGroup(MultiplicatorRing(c) : GRH:=true)) };
+    assert #icm1 eq #cl;
+    icm2:=IdealClassMonoidAbstract(E);
+    icm3:=IdealClassMonoidAbstract(E : GRH:=true);
+    assert not IsIdentical(icm1,icm2) and IsIdentical(icm2,icm3) and #icm2 eq #icm1;
     printf ".";
 
     SetAssertions(1);

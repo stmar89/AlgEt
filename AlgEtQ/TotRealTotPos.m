@@ -15,19 +15,19 @@ declare attributes AlgEtQ:TotallyRealSubAlgebra;
 declare attributes AlgEtQOrd:TotallyRealUnitGroup;
 declare attributes AlgEtQOrd:TotallyRealPositiveUnitGroup;
 
-import "PicardGroup.m" : units_mod_conductor_data;
+import "PicardGroup.m" : conductor_sequence;
 
 units_of_S_in_units_of_O:=function(S)
 // Given an order S, returns US,uS:=UnitGroup(S) and the unit group UK,uK of the maximal order, such
 // that US is a subgroup of UK. No unit of S is computed: for a non-maximal S, UnitGroup(S) is the
-// kernel of a map from UK (see units_mod_conductor_data in PicardGroup.m). This matters when the
+// kernel of a map from UK (see conductor_sequence in PicardGroup.m). This matters when the
 // index of US in UK is huge: then the units of S have huge exponents on the generators of UK, and
 // they cannot be written down as elements of the algebra.
     US,uS:=UnitGroup(S);
     if IsMaximal(S) then
         return US,uS,US,uS;
     end if;
-    data:=units_mod_conductor_data(S,false); // already computed by UnitGroup(S)
+    data:=conductor_sequence(S,false); // already computed by UnitGroup(S)
     assert IsIdentical(US,data`K); // US is the subgroup data`K of data`UO
     return US,uS,data`UO,data`uO;
 end function;

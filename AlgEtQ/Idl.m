@@ -752,15 +752,28 @@ intrinsic ColonIdeal(I::AlgEtQIdl,J::AlgEtQIdl)->AlgEtQIdl
     // Since I is an O-module, x*J c I if and only if x*g in I for every generator g of J over O.
     // So we only need the multiplication matrices of the generators of J (see RepresentationMatrix
     // in Elt.m): at most N of them, often only 2.
+    // The matrix M of these conditions is built with integer arithmetic: the inclusion matrix of I
+    // and the multiplication matrices of the generators have small denominators, and d below is a
+    // common denominator of all the blocks of M. Any common denominator gives the same result,
+    // since the HNF is homogeneous: HNF(c*X) = c*HNF(X) for an integer c>0. This is faster than
+    // computing the denominator of the rational matrix M.
     N:=AbsoluteDimension(A);
     mIinv:=inclusion_matrix(I);
-    M:=VerticalJoin([ Transpose( RepresentationMatrix(g)*mIinv ) : g in Generators(J)] );
-    d:=Denominator(M);
-    P:=(1/d)*crZQ(hnf(crQZ(d*M)));
-    P:=Transpose(P)^-1;
+    dI:=Integers()!Denominator(mIinv);
+    ZIinv:=crQZ(dI*mIinv);
+    Rs:=[ RepresentationMatrix(g) : g in Generators(J) ];
+    dRs:=[ Integers()!Denominator(R) : R in Rs ];
+    d:=dI*LCM(dRs);
+    M:=VerticalJoin([ Transpose( (d div (dI*dRs[k]))*crQZ(dRs[k]*Rs[k])*ZIinv ) : k in [1..#Rs] ]);
+    H:=hnf(M); // N x N and upper triangular: M has rank N
+    // The rows of ((1/d)*H)^-T = d*Transpose(H^-1) are a Z-basis of (I:J). Since H is triangular,
+    // H^-1 = Adjoint(H)/det(H) with det(H) the product of the diagonal entries: this is faster than
+    // inverting a rational matrix.
+    det:=&*[ H[i,i] : i in [1..N] ];
+    P:=(d/det)*crZQ(Transpose(Adjoint(H)));
     zbIJ:=MatrixQtoA(A,P);
-    IJ:=Ideal(O,zbIJ);
-    IJ`ZBasis:=zbIJ; //we know that zbIJ is a ZBasis
+    IJ:=CreateAlgEtQIdl(O,zbIJ); // zbIJ is a Z-basis: no need to check the generators as Ideal does
+    IJ`ZBasis:=zbIJ;
     assert2 IJ*J subset I;
     return IJ;
 end intrinsic;
@@ -1405,6 +1418,51 @@ end intrinsic;
         check_coprime_rep(I,J6);
     end for;
     printf ".";
+
+    // ColonIdeal: the same Z-basis as with the rational computation used until 2026-11 (the
+    // denominator of the rational matrix M, and the inverse of a rational matrix), on pairs of
+    // ideals of equation and maximal orders, in a product of fields and in K x K, also with a big
+    // index.
+    old_colon_zbasis:=function(I,J)
+        A:=Algebra(I);
+        mIinv:=Matrix([ AbsoluteCoordinates(z) : z in ZBasis(I) ])^-1;
+        M:=VerticalJoin([ Transpose(RepresentationMatrix(g)*mIinv) : g in Generators(J) ]);
+        d:=Denominator(M);
+        H:=HermiteForm(ChangeRing(d*M,Integers()));
+        H:=RowSubmatrix(H,1,Ncols(H));
+        P:=Transpose((1/d)*ChangeRing(H,Rationals()))^-1;
+        return [ &+[ P[r,i]*AbsoluteBasis(A)[i] : i in [1..Ncols(P)] ] : r in [1..Nrows(P)] ];
+    end function;
+    K:=NumberField(x^4+x^2+529);
+    for A in [ EtaleAlgebra((x^2+5)*(x^3-2000)), EtaleAlgebra([K,K]) ] do
+        for S in [ EquationOrder(A), MaximalOrder(A) ] do
+            s:=1;
+            ids:=[];
+            while #ids lt 5 do
+                gs:=[];
+                for k in [1..2] do
+                    cs:=[];
+                    for i in [1..Dimension(A)] do
+                        s:=(48271*s) mod (2^31-1);
+                        Append(~cs,(s mod 7)-3);
+                    end for;
+                    Append(~gs,DotProduct(cs,AbsoluteBasis(A)));
+                end for;
+                if not IsZeroDivisor(gs[1]) then
+                    Append(~ids,Ideal(S,gs));
+                end if;
+            end while;
+            Append(~ids,ids[1]*ids[2]*ids[3]^3); // a big index
+            // the same ideals, given with 3 generators
+            ids:=[ Ideal(S,Generators(I) cat [ZBasis(I)[1]+ZBasis(I)[2]]) : I in ids ] cat ids;
+            for I,J in ids do
+                if #Generators(J) gt 1 then
+                    assert ZBasis(ColonIdeal(I,J)) eq old_colon_zbasis(I,J);
+                end if;
+            end for;
+            printf ".";
+        end for;
+    end for;
 
     SetAssertions(1);
     printf " all good!";

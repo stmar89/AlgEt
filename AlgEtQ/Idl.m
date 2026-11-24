@@ -477,6 +477,10 @@ intrinsic Conductor(O::AlgEtQOrd) ->AlgEtQIdl
         A:=Algebra(O);
         OA:=MaximalOrder(A);
         cc:=ColonIdeal(O,O!!OneIdeal(OA));
+        // The conductor is also an ideal of the maximal order, so its multiplicator ring contains
+        // OA, hence it is OA. In particular it is invertible if and only if O is maximal.
+        cc`MultiplicatorRing:=OA;
+        cc`IsInvertible:=IsMaximal(O);
         ZBasisLLL(cc);
         O`Conductor:=cc;
     end if;
@@ -1442,6 +1446,20 @@ end intrinsic;
             printf ".";
         end for;
     end for;
+
+    // Conductor: its multiplicator ring is the maximal order, stored when it is computed, and it is
+    // invertible only for the maximal order. A copy computes the multiplicator ring from scratch.
+    for f in [ (x^2+5)*(x^3-2000), x^4-1000*x^3-1000*x^2-1000*x-1000 ] do
+        A:=EtaleAlgebra(f);
+        E:=EquationOrder(A);
+        O:=MaximalOrder(A);
+        F:=Conductor(E);
+        assert assigned F`MultiplicatorRing and F`MultiplicatorRing eq O and not F`IsInvertible;
+        F2:=Ideal(E,ZBasis(F));
+        assert MultiplicatorRing(F2) eq O and not IsInvertible(F2);
+        assert Conductor(O) eq OneIdeal(O) and IsInvertible(Conductor(O));
+    end for;
+    printf ".";
 
     SetAssertions(1);
     printf " all good!";

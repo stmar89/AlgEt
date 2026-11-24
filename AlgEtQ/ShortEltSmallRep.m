@@ -107,6 +107,17 @@ intrinsic SmallRepresentative(I::AlgEtQIdl) ->AlgEtQIdl,AlgEtQElt
         // Since aI is contained in R with small index, its HNF has small entries even if ZBasis(I)
         // is huge, and ZBasisLLL will use it: this is much faster than the LLL of a*ZBasis(I).
         ZBasisLLL(aI);
+        // If I is known to be invertible, then the inverse of aI is free: (aI)^-1 = a^-1*I^-1, and
+        // I^-1 = (R:I). The two ideals are stored as inverses of each other, as Inverse does.
+        if assigned I`IsInvertible and I`IsInvertible then
+            aI`IsInvertible:=true;
+            aI`MultiplicatorRing:=R;
+            aIinv:=(1/a)*cRI;
+            aIinv`IsInvertible:=true;
+            aIinv`MultiplicatorRing:=R;
+            aIinv`Inverse:=aI;
+            aI`Inverse:=aIinv;
+        end if;
         vprintf ShortEltSmallRep,2: "SmallRepresentative:\n
                                 I = %o\n,aI = %o\n",PrintSeqAlgEtQElt(ZBasis(I)),PrintSeqAlgEtQElt(ZBasis(aI));
         I`SmallRepresentative:=<aI,a>;
@@ -144,6 +155,34 @@ end intrinsic;
             assert IsIdentical(aI2,aI) and a2 eq a;
             if IsInvertible(I) then
                 assert Index(OneIdeal(R),aI) eq Index(ColonIdeal(R,I),a*OneIdeal(R));
+            end if;
+        end for;
+        printf ".";
+    end for;
+
+    // SmallRepresentative of an ideal known to be invertible: the inverse of aI is stored, it is
+    // (R:aI), and its stored inverse is aI.
+    s:=1;
+    for R in [ E ] cat oo[1..Min(5,#oo)] do
+        AR:=Algebra(R);
+        for k in [1..4] do
+            gs:=[];
+            for j in [1..2] do
+                cs:=[];
+                for i in [1..AbsoluteDimension(AR)] do
+                    s:=(48271*s) mod (2^31-1);
+                    Append(~cs,(s mod 7)-3);
+                end for;
+                Append(~gs,DotProduct(cs,ZBasis(R)));
+            end for;
+            if IsZeroDivisor(gs[1]) then
+                continue;
+            end if;
+            I:=Ideal(R,gs);
+            if IsInvertible(I) then
+                aI,a:=SmallRepresentative(I);
+                assert assigned aI`Inverse and aI`Inverse eq ColonIdeal(R,aI);
+                assert aI*aI`Inverse eq OneIdeal(R) and IsIdentical(aI`Inverse`Inverse,aI);
             end if;
         end for;
         printf ".";

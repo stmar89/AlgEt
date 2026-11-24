@@ -71,9 +71,9 @@ intrinsic RamificationIndex(P::AlgEtQIdl) -> RngIntElt
     return P`RamificationIndex;
 end intrinsic;
 
-/// Given a sequence of primes $P$ of the maximal order, it returns a sequence of elements $t_P$ such that $t_P$ is a uniformizer at $P$ and a unit at every other prime in the sequence.
+/// Given a sequence of primes $P$ of the maximal order, it returns a sequence of elements $t_P$ such that $t_P$ is a uniformizer at $P$ and a unit at every other prime in the sequence. The output does not depend on the random state.
 intrinsic Uniformizers(PPs::SeqEnum[AlgEtQIdl]) -> SeqEnum
-{Given a sequence of primess P of the maximal order, it returns a sequence of elements t_P such that t_P is a uniformizer at P and a unit at every other prime in the sequence.}
+{Given a sequence of primes P of the maximal order, it returns a sequence of elements t_P such that t_P is a uniformizer at P and a unit at every other prime in the sequence. The output does not depend on the random state.}
     OO:=Order(PPs[1]);
     require IsMaximal(OO) and forall{P : P in PPs | IsPrime(P)} : "The input needs to be a sequence of primess of the maximal order.";
     vprintf nice_unif,2 : "nice_uniformizers: %o primes\n",#PPs;
@@ -83,15 +83,20 @@ intrinsic Uniformizers(PPs::SeqEnum[AlgEtQIdl]) -> SeqEnum
     for iP->P in PPs do
         vprintf nice_unif,2 : "nice_uniformizers: %o-th prime...",iP;
         P2:=PPs2[iP];
-        Q,q:=Quotient(P,P2);
-        repeat
-            t:=Random(Q);
-        until t ne Zero(Q);
-        vprintf nice_unif,2 : "got non-zero elt...";
-        tP:=t@@q;
-        while IsZeroDivisor(tP) do
-            tP +:=Random(P2);
+        // An element of P not in P^2 has valuation 1 at P. We take the first one in the LLL-reduced
+        // Z-basis of P obtained from its HNF, which depends only on P: some element of a Z-basis of
+        // P is not in P^2, since P ne P^2.
+        ZBasisLLL(P : FromHNF:=true);
+        tP:=[ z : z in ZBasis(P) | not z in P2 ][1];
+        vprintf nice_unif,2 : "got an element of valuation 1...";
+        // Adding a multiple of the smallest positive integer m in P^2 does not change the class
+        // modulo P^2, and tP+k*m is a zero-divisor for at most one k per component.
+        m:=MinimalInteger(P2);
+        k:=0;
+        while IsZeroDivisor(tP+k*m) do
+            k+:=1;
         end while;
+        tP:=tP+k*m;
         vprintf nice_unif,2 : "got non-zerodivisor...";
         assert2 tP in P and not tP in P2;
         elts:=[ i eq iP select tP else one : i in [1..#PPs] ];
@@ -140,6 +145,10 @@ end intrinsic;
             end for;
             ts:=Uniformizers(pp);
             assert forall{ 0 : i,j in [1..#pp] | Valuation(ts[i],pp[j]) eq (i eq j select 1 else 0) };
+            // not random: the same uniformizers with another seed, for equal primes created again
+            SetSeed(2);
+            assert Uniformizers([ Ideal(O,ZBasis(P)) : P in pp ]) eq ts;
+            SetSeed(1);
         end for;
         printf ".";
     end for;

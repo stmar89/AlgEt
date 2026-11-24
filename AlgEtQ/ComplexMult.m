@@ -20,7 +20,10 @@ declare verbose ComplexMult, 1;
 declare attributes AlgEtQ : AllCMTypes;
 declare type AlgEtQCMType;
 declare attributes AlgEtQCMType : Homs, // homs from Q(Frob) of the isogeny class to CC
-                                 CMPositiveElement; // a totally imaginary element b in Q(Frob), which is positive for the cm-type. such b is not unique: b and b' define the same cm-type iff b/b' is totally positive
+                                 CMPositiveElement; // a totally imaginary element b in Q(Frob),
+                                                    // which is positive for the cm-type. such b is
+                                                    // not unique: b and b' define the same cm-type
+                                                    // iff b/b' is totally positive
 
 ///# CM-types of a CM-étale algebra
 /// Let $A$ be a CM-étale algebra of dimension $2g$ over $\mathbb{Q}$. Then complex conjugation acts of $\mathrm{Homs}(A,\mathbb(C))$. We denote this action with $\overline{\cdot}$. A `CM-type` $\Phi$ of $A$ is a set of $g$ elements of $\mathrm{Homs}(A,\mathbb(C))$ such that $\mathrm{Homs}(A,\mathbb(C)) = \Phi \sqcup \overline{\Phi}$.
@@ -78,9 +81,9 @@ intrinsic Print( PHI :: AlgEtQCMType)
 end intrinsic;
 ///hide-none
 
-/// Given a CMType $\Phi$ returns a totally imaginary $\Phi$-positive element.
+/// Given a CMType $\Phi$ returns a totally imaginary $\Phi$-positive element. The output does not depend on the random state.
 intrinsic CMPositiveElement( PHI::AlgEtQCMType )->AlgEtQElt
-{Given a CMType PHI returns a totally imaginary PHI-positive element (which uniquely determines PHI).}
+{Given a CMType PHI returns a totally imaginary PHI-positive element (which uniquely determines PHI). The output does not depend on the random state.}
     if not assigned PHI`CMPositiveElement then
         A:=Domain(Homs(PHI)[1]);
         F:=PrimitiveElement(A);
@@ -89,12 +92,22 @@ intrinsic CMPositiveElement( PHI::AlgEtQCMType )->AlgEtQElt
         if forall{ff: ff in Homs(PHI) | Im(ff(e)) gt 0 } then cm_pos_elt:=e;
         elif forall{ff: ff in Homs(PHI) | Im(ff(-e)) gt 0} then cm_pos_elt:=-e;
         else
-          R:=EquationOrder(A);
+          // We try e1-conj(e1) for elements e1 of the equation order in a fixed order: combinations
+          // of its Z-basis with coefficients in [-bb..bb] from a Lehmer generator with a fixed
+          // initial state, doubling bb every 100 tries. The output does not depend on the random
+          // state.
+          zR:=ZBasis(EquationOrder(A));
           bb:=5;
           counter:=0;
+          s:=1;
           go:=false;
           repeat
-            e1:=Random(R : CoeffRange:=bb);
+            cs:=[];
+            for i in [1..#zR] do
+                s:=(48271*s) mod (2^31-1);
+                Append(~cs,(s mod (2*bb+1))-bb);
+            end for;
+            e1:=DotProduct(cs,zR);
             e:=e1-ComplexConjugate(e1);
             if not IsZeroDivisor(e) and forall{ff: ff in Homs(PHI) | Im(ff(e)) gt 0} then
                 go:=true;
@@ -161,15 +174,16 @@ intrinsic Precision(PHI :: AlgEtQCMType)->RngIntElt
 end intrinsic;
 
 change_precision_homs:=function(PHI, prec)
-// Returns the homomorphisms of the CM-type PHI with codomain ComplexField(prec). PHI is not modified.
+// Returns the homomorphisms of the CM-type PHI with codomain ComplexField(prec). PHI is not
+// modified.
     if assigned PHI`CMPositiveElement then
         b:=CMPositiveElement(PHI);
         A:=Parent(b);
         homs:=HomsToC(A : Precision := prec);
         phi:=[ ff : ff in homs | Im(ff( b )) gt 0 ];
     elif assigned PHI`Homs then
-        // We match the old homomorphisms with the new ones by their values at the primitive element, up to the smaller
-        // of the two precisions (relative to the size of the value).
+        // We match the old homomorphisms with the new ones by their values at the primitive
+        // element, up to the smaller of the two precisions (relative to the size of the value).
         phi0:=Homs(PHI);
         prec0:=Precision(Codomain(phi0[1]));
         A:=Domain(phi0[1]);
@@ -246,7 +260,15 @@ end intrinsic;
     for f in polys do
         A:=EtaleAlgebra(f);
         all:=AllCMTypes(A);
-        _:=[ CMPositiveElement(PHI) : PHI in all ];
+        pos:=[ CMPositiveElement(PHI) : PHI in all ];
+        // totally imaginary and PHI-positive, and not random: the same elements with another seed
+        assert forall{ i : i in [1..#all] | ComplexConjugate(pos[i]) eq -pos[i] and
+                        forall{ h : h in Homs(all[i]) | Im(h(pos[i])) gt 0 } };
+        SetSeed(2);
+        A2:=EtaleAlgebra(f);
+        assert [ AbsoluteCoordinates(CMPositiveElement(PHI)) : PHI in AllCMTypes(A2) ] eq
+               [ AbsoluteCoordinates(e) : e in pos ];
+        SetSeed(1);
         for i,j in [1..#all] do
             assert (i eq j) eq (all[i] eq all[j]);
         end for;
@@ -257,8 +279,8 @@ end intrinsic;
         assert Precision(all[1]) eq 60;
         printf ".";
     end for;
-    // ChangePrecision of a CM-type given by homomorphisms only, to a lower precision; the functional version does not
-    // modify its input
+    // ChangePrecision of a CM-type given by homomorphisms only, to a lower precision; the
+    // functional version does not modify its input
     A:=EtaleAlgebra(polys[2]);
     for PHI0 in AllCMTypes(A : Precision:=100) do
         PHI:=CMType(Homs(PHI0));

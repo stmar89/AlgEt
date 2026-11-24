@@ -35,16 +35,21 @@ declare verbose AlgEtQMod, 3;
 declare type AlgEtQMod;
 declare attributes AlgEtQMod : Index, //stores the index
                               Order, // an order R
-                              UniverseAlgebra, // A pair <V,m> where V is the algebra where M lives in, and m is the action Algebra(R)->V
+                              UniverseAlgebra, // A pair <V,m> where V is the algebra where M lives
+                                               // in, and m is the action Algebra(R)->V
                               Generators,
                               ZBasis,
                               IsDirectSumOfIdeals,
                               Hash, // the sequence returned by myHash
                               HashValue, // the integer returned by Hash
-                              inclusion_matrix;
+                              inclusion_matrix,
+                              IsZBasisLLLReduced, // these two are set by ZBasisLLL, see ZBasisLLL
+                                                  // for ideals
+                              IsZBasisLLLFromHNF;
 
 import "../AlgEtQ/Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQtoA , meet_zbasis , inclusion_matrix ,
                            lattice_hnf , hash_from_hnf;
+import "../AlgEtQ/ZBasisLLL.m" : lll_zbasis;
 import "PowerBass.m" : is_pure_power_internal;
 
 /*TODO
@@ -124,7 +129,8 @@ intrinsic ModuleFromDirectSum(R::AlgEtQOrd,m::Map,seq::SeqEnum[Tup])->AlgEtQMod
         gens:=[];
         basisAR:=AbsoluteBasis(AR);
         for I in seq do 
-            mI:=Hom(AR,UA,[m(basisAR[i])*I[2] : i in [1..Dimension(AR)] ] : ComputeInverse:=false);  //map that sends one to I[2] 
+            // map that sends one to I[2]
+            mI:=Hom(AR,UA,[m(basisAR[i])*I[2] : i in [1..Dimension(AR)] ] : ComputeInverse:=false);
             Append(~dsr,<I[1],mI>);
             gens cat:=[ mI(z) : z in ZBasis(I[1]) ];
         end for;
@@ -194,6 +200,28 @@ intrinsic myHash(I::AlgEtQMod)->RngInt
     return I`Hash;
 end intrinsic;
 
+/// A procedure that replaces the stored $\mathbb{Z}$-basis of the module with an LLL-reduced one, if this has not been done before. With the vararg `FromHNF:=true`, the LLL reduction starts from the Hermite normal form, so that the new $\mathbb{Z}$-basis depends only on the module, and not on the stored one. The attribute `inclusion_matrix`, which depends on the stored $\mathbb{Z}$-basis, is deleted. See `ZBasisLLL` for ideals.
+intrinsic ZBasisLLL(M::AlgEtQMod : FromHNF:=false)
+{A procedure that replaces the stored ZBasis of the module with an LLL-reduced one, if this has not been done before. With the vararg FromHNF:=true, the LLL reduction starts from the Hermite normal form, so that the new ZBasis depends only on the module, and not on the stored one. The attribute inclusion_matrix, which depends on the stored ZBasis, is deleted. See ZBasisLLL for ideals.}
+    reduced:=assigned M`IsZBasisLLLReduced and M`IsZBasisLLLReduced;
+    from_hnf:=assigned M`IsZBasisLLLFromHNF and M`IsZBasisLLLFromHNF;
+    if not reduced or (FromHNF and not from_hnf) then
+        V:=UniverseAlgebra(M);
+        // the hash depends only on the lattice: it is used if known, and stored if computed
+        zb,hash,from_hnf:=lll_zbasis(V,ZBasis(M),assigned M`Hash select M`Hash else [] : FromHNF:=FromHNF);
+        M`ZBasis:=zb;
+        M`Hash:=hash;
+        M`IsZBasisLLLReduced:=true;
+        M`IsZBasisLLLFromHNF:=from_hnf;
+        delete M`inclusion_matrix; // this is computed with respect to the old ZBasis!
+        // as for ideals: at least dim generators, for example the old ZBasis, are replaced with the
+        // new ZBasis, which is not longer and has smaller elements
+        if #Generators(M) ge AbsoluteDimension(V) then
+            M`Generators:=zb;
+        end if;
+    end if;
+end intrinsic;
+
 //----------
 // Inclusion and equality
 //----------
@@ -223,7 +251,8 @@ intrinsic Hash(I::AlgEtQMod) -> RngIntElt
 {Returns a hash value of the module, so that equal modules have the same hash value. It is computed from the sequence returned by myHash and it is stored in the attribute HashValue. Magma uses it to build sets, indexed sets and associative arrays of modules: only modules with the same hash value are compared with eq. Different modules might have the same hash value: this only costs an extra comparison.}
     if not assigned I`HashValue then
         // The entries of myHash(I) are integers, but its universe is Rationals().
-        // Since the universe matters, e.g. Hash([1,2]) ne Hash([1/1,2/1]), we make sure it is Integers().
+        // Since the universe matters, e.g. Hash([1,2]) ne Hash([1/1,2/1]), we make sure it is
+        // Integers().
         I`HashValue:=Hash(ChangeUniverse(myHash(I),Integers()));
     end if;
     return I`HashValue;
@@ -329,8 +358,8 @@ intrinsic Quotient(I::AlgEtQMod, J::AlgEtQMod) -> GrpAb, Map
 {Given S-modules J subset I, returns the abelian group Q=I/J together with the quotient map q:I->J.} 
     // if J is not inside I, an error occurs while forming Q. so no need to check in advance
     A:=UniverseAlgebra(I);
-    // The maps use the Z-basis zbI of I at creation and its inclusion matrix Minv, so that they stay correct if
-    // ZBasis(I) is replaced later (as Quotient for ideals in AlgEtQ/Quotients.m).
+    // The maps use the Z-basis zbI of I at creation and its inclusion matrix Minv, so that they
+    // stay correct if ZBasis(I) is replaced later (as Quotient for ideals in AlgEtQ/Quotients.m).
     Minv,zbI := inclusion_matrix(I);
     coords:=func< seq | [ Eltseq(r) : r in Rows(MatrixAtoQ(seq)*Minv) ] >;
     N := #zbI;
@@ -353,7 +382,8 @@ end intrinsic;
     //AttachSpec("../specMtrx");
     // the other tests for modules are in dev/all_tests_AlgEtQMod.m
     SetAssertions(2);
-    // testing Hash: sets, indexed sets and associative arrays of modules, also when the hash values collide
+    // testing Hash: sets, indexed sets and associative arrays of modules, also when the hash values
+    // collide
     _<x>:=PolynomialRing(Integers());
     K1:=NumberField(x^2+5);
     K:=EtaleAlgebra([K1]);
@@ -402,6 +432,25 @@ end intrinsic;
         msg:=e`Object;
     end try;
     assert "not in the same algebra" in msg;
+    printf ".";
+    // ZBasisLLL: the same module and hash, with an LLL-reduced Z-basis; with FromHNF the Z-basis
+    // depends only on the module; a quotient map created before the reduction stays correct.
+    for M in mods[1..10] do
+        zb:=ZBasis(M);
+        N1:=Module(E,m,zb); // the HNF basis
+        N2:=Module(E,m,zb);
+        // another Z-basis of the same module
+        N2`ZBasis:=[ zb[1] ] cat [ zb[i]+(i+7)*zb[1] : i in [2..#zb] ];
+        J:=Module(E,m,[ 3*z : z in zb ]); // 3M, contained in M
+        Q,q:=Quotient(N2,J);
+        ZBasisLLL(N1 : FromHNF:=true);
+        ZBasisLLL(N2);
+        assert N2`IsZBasisLLLReduced and myHash(N2) eq myHash(M) and N2 eq M;
+        ZBasisLLL(N2 : FromHNF:=true);
+        assert N2`IsZBasisLLLFromHNF and ZBasis(N2) eq ZBasis(N1);
+        assert forall{ z : z in zb | z in N2 }; // the inclusion matrix is the one of the new ZBasis
+        assert forall{ z : z in ZBasis(N2) | q(z)@@q - z in J } and forall{ z : z in ZBasis(J) | q(z) eq Zero(Q) };
+    end for;
     printf ".";
     SetAssertions(1);
     printf " all good!";

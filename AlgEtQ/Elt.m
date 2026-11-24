@@ -41,7 +41,8 @@ end intrinsic;
 ///## Creation
 
 function CreateAlgEtQElt(A,comp)
-// given an AlgEtQ A and a Tup comp containing the components in the number fields of A, returns the corresponding element
+// given an AlgEtQ A and a Tup comp containing the components in the number fields of A, returns the
+// corresponding element
     x1:=New(AlgEtQElt);
     x1`Algebra:=A;
     x1`Components:=comp;
@@ -172,6 +173,26 @@ intrinsic AbsoluteCoordinates(seq::SeqEnum[AlgEtQElt] , basis::SeqEnum[AlgEtQElt
     vprintf AlgEtQElt,3 : "Mbasis=\n%o\nMseq=\n%o\nMcoeff=\n%o\nout=\n%o\n",Mbasis,Mseq,Mcoeff,out;
     assert2 forall{i : i in [1..#seq] | seq[i] eq &+[out[i][j]*basis[j] : j in [1..#basis]]};
     return out;
+end intrinsic;
+
+/// Returns the matrix of the multiplication by the element with respect to the absolute basis of the algebra: its $i$-th row contains the absolute coordinates of $x$ times the $i$-th element of the absolute basis. It is block diagonal, with blocks the representation matrices of the components of $x$.
+intrinsic RepresentationMatrix(x::AlgEtQElt) -> AlgMatElt
+{Returns the matrix of the multiplication by the element with respect to the absolute basis of the algebra: its i-th row contains the absolute coordinates of x times the i-th element of the absolute basis. It is block diagonal, with blocks the representation matrices of the components of x.}
+    return AbsoluteRepresentationMatrix(x);
+end intrinsic;
+
+///ditto
+intrinsic AbsoluteRepresentationMatrix(x::AlgEtQElt) -> AlgMatElt
+{ " } // "
+    // The absolute basis of the algebra is the concatenation of the bases of the components, which
+    // are absolute number fields. DiagonalJoin accepts a sequence of matrices only if they have the
+    // same size (otherwise they have no common universe), so we join the blocks one at a time.
+    comps:=Components(x);
+    M:=RepresentationMatrix(comps[1]);
+    for i in [2..#comps] do
+        M:=DiagonalJoin(M,RepresentationMatrix(comps[i]));
+    end for;
+    return M;
 end intrinsic;
 
 ///## Special elements
@@ -311,8 +332,7 @@ intrinsic 'eq'(x1::AlgEtQElt,x2::AlgEtQElt) -> BoolElt
 {True iff x1 equals x2.}
     A:=Parent(x1);
     require A cmpeq Parent(x2): "The elements must belong to the same algebra.";
-    return (Components(x1) eq Components(x2)); // first part is faster for negatives
-                                                                        // and second is safer for positive
+    return (Components(x1) eq Components(x2));
 end intrinsic;
 
 ///ditto
@@ -343,7 +363,8 @@ end intrinsic;
 intrinsic Hash(x::AlgEtQElt) -> RngIntElt
 {Returns a hash value of the element, computed from its absolute coordinates, so that equal elements have the same hash value. The value is stored in the attribute Hash. Magma uses it to build sets, indexed sets and associative arrays of elements: only elements with the same hash value are compared with eq. Different elements might have the same hash value: this only costs an extra comparison.}
     if not assigned x`Hash then
-        // The universe matters, e.g. Hash([1,2]) ne Hash([1/1,2/1]), so we make sure it is Rationals().
+        // The universe matters, e.g. Hash([1,2]) ne Hash([1/1,2/1]), so we make sure it is
+        // Rationals().
         x`Hash:=Hash(ChangeUniverse(AbsoluteCoordinates(x),Rationals()));
     end if;
     return x`Hash;
@@ -619,7 +640,9 @@ intrinsic '&*'(seq::SeqEnum[AlgEtQElt]) -> AlgEtQElt
 end intrinsic;
 
 
-// The following intrinsics do the same as &+[a[i]*b[i]:i in [1..#a]] BUT without creating #a elements in the sequence before summing. Essentially, they do the dot-products componentwise in number fields -- which is much faster -- then create a single AlgEtQElt at the end.
+// The following intrinsics do the same as &+[a[i]*b[i]:i in [1..#a]] BUT without creating #a
+// elements in the sequence before summing. Essentially, they do the dot-products componentwise in
+// number fields -- which is much faster -- then create a single AlgEtQElt at the end.
 
 /// Given two sequences of $n$ elements $[a_1,\ldots,a_n]$ and $[b_1,\ldots,b_n]$ returns $\sum_{i=1}^n a_i\cdot b_i$.
 intrinsic _DotProduct(a::SeqEnum[AlgEtQElt], b::SeqEnum[AlgEtQElt]) -> AlgEtQElt
@@ -910,6 +933,33 @@ end intrinsic;
     I:=Ideal(E,[ A!Random(E,3) : i in [1..3] ]);
     ZBasisLLL(I); // the elements of the new ZBasis are created from their coordinates
     assert forall{ z : z in ZBasis(I) | Hash(z) eq Hash(A!Components(z)) };
+    printf ".";
+
+    // RepresentationMatrix: the i-th row contains the coordinates of x times the i-th element of
+    // the absolute basis; in an algebra with components of different degrees, one of which is Q.
+    A:=EtaleAlgebra([ NumberField(x^2+5), NumberField(x^3-2), NumberField(x-3 : DoLinearExtension) ]);
+    s:=1;
+    elts:=[]; // from a Lehmer generator
+    for n in [1..20] do
+        cs:=[];
+        for i in [1..AbsoluteDimension(A)] do
+            s:=(48271*s) mod (2^31-1);
+            Append(~cs,(s mod 7)-3);
+        end for;
+        Append(~elts,DotProduct(cs,AbsoluteBasis(A)));
+    end for;
+    for n in [1..10] do
+        a:=elts[2*n-1];
+        b:=elts[2*n];
+        Ma:=RepresentationMatrix(a);
+        assert Nrows(Ma) eq 6 and Ncols(Ma) eq 6;
+        assert Eltseq(Ma) eq &cat[ AbsoluteCoordinates(a*z) : z in AbsoluteBasis(A) ];
+        assert Eltseq(Vector(AbsoluteCoordinates(b))*Ma) eq AbsoluteCoordinates(a*b);
+        assert RepresentationMatrix(a*b) eq Ma*RepresentationMatrix(b);
+        assert RepresentationMatrix(a+b) eq Ma+RepresentationMatrix(b);
+        assert AbsoluteRepresentationMatrix(a) eq Ma;
+    end for;
+    assert IsOne(RepresentationMatrix(One(A))) and IsZero(RepresentationMatrix(Zero(A)));
     printf ".";
 
     SetAssertions(1);

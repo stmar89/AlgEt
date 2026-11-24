@@ -60,18 +60,6 @@ intrinsic Print(I::AlgEtQIdl)
   printf"Ideal of %o", Order(I);
 end intrinsic;
 
-mult_matrix:=function(x)
-// Given an element x of A, returns the matrix of the multiplication by x with respect to
-// AbsoluteBasis(A): the i-th row contains the AbsoluteCoordinates of x*AbsoluteBasis(A)[i].
-// The matrix is block diagonal, with blocks the representation matrices of the components of x.
-    comps:=Components(x);
-    M:=RepresentationMatrix(comps[1]);
-    for i in [2..#comps] do
-        M:=DiagonalJoin(M,RepresentationMatrix(comps[i]));
-    end for;
-    return M;
-end function;
-
 CreateAlgEtQIdl:=function(S,gens : ZSpan:=false)
 // Given S::AlgEtQOrd and some generators, creates the new object.
 // The ZBasis is computed only if there are more generators than the dimension of the algebra, or if
@@ -762,11 +750,11 @@ intrinsic ColonIdeal(I::AlgEtQIdl,J::AlgEtQIdl)->AlgEtQIdl
     end if;
     // based on jv code
     // Since I is an O-module, x*J c I if and only if x*g in I for every generator g of J over O.
-    // So we only need the multiplication matrices of the generators of J: at most N of them, often
-    // only 2.
+    // So we only need the multiplication matrices of the generators of J (see RepresentationMatrix
+    // in Elt.m): at most N of them, often only 2.
     N:=AbsoluteDimension(A);
     mIinv:=inclusion_matrix(I);
-    M:=VerticalJoin([ Transpose( mult_matrix(g)*mIinv ) : g in Generators(J)] );
+    M:=VerticalJoin([ Transpose( RepresentationMatrix(g)*mIinv ) : g in Generators(J)] );
     d:=Denominator(M);
     P:=(1/d)*crZQ(hnf(crQZ(d*M)));
     P:=Transpose(P)^-1;

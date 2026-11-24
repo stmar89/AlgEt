@@ -75,11 +75,17 @@ end intrinsic;
 intrinsic Uniformizers(PPs::SeqEnum[AlgEtQIdl]) -> SeqEnum
 {Given a sequence of primes P of the maximal order, it returns a sequence of elements t_P such that t_P is a uniformizer at P and a unit at every other prime in the sequence. The output does not depend on the random state.}
     OO:=Order(PPs[1]);
-    require IsMaximal(OO) and forall{P : P in PPs | IsPrime(P)} : "The input needs to be a sequence of primess of the maximal order.";
+    require IsMaximal(OO) and forall{P : P in PPs | IsPrime(P)} : "The input needs to be a sequence of primes of the maximal order.";
     vprintf nice_unif,2 : "nice_uniformizers: %o primes\n",#PPs;
     one:=One(Algebra(PPs[1]));
     nice_unifs:=[];
     PPs2:=[ P^2 : P in PPs];
+    // Only the classes of t_P modulo the P_i^2 matter, so t_P is replaced at the end by a short
+    // element of its class modulo L, the product of the P_i^2 (their intersection, since they are
+    // coprime): the LLL reduction of the HNF of L, so that the output depends only on the primes.
+    L:=&meet PPs2;
+    ZBasisLLL(L : FromHNF:=true);
+    mL:=MinimalInteger(L);
     for iP->P in PPs do
         vprintf nice_unif,2 : "nice_uniformizers: %o-th prime...",iP;
         P2:=PPs2[iP];
@@ -89,18 +95,18 @@ intrinsic Uniformizers(PPs::SeqEnum[AlgEtQIdl]) -> SeqEnum
         ZBasisLLL(P : FromHNF:=true);
         tP:=[ z : z in ZBasis(P) | not z in P2 ][1];
         vprintf nice_unif,2 : "got an element of valuation 1...";
-        // Adding a multiple of the smallest positive integer m in P^2 does not change the class
-        // modulo P^2, and tP+k*m is a zero-divisor for at most one k per component.
-        m:=MinimalInteger(P2);
-        k:=0;
-        while IsZeroDivisor(tP+k*m) do
-            k+:=1;
-        end while;
-        tP:=tP+k*m;
-        vprintf nice_unif,2 : "got non-zerodivisor...";
         assert2 tP in P and not tP in P2;
         elts:=[ i eq iP select tP else one : i in [1..#PPs] ];
         tP:=CRT(PPs2,elts);
+        tP:=ShortElementModulo(tP,L);
+        // Adding a multiple of the smallest positive integer mL in L does not change the classes
+        // modulo the P_i^2, and tP+k*mL is a zero-divisor for at most one k per component.
+        k:=0;
+        while IsZeroDivisor(tP+k*mL) do
+            k+:=1;
+        end while;
+        tP:=tP+k*mL;
+        vprintf nice_unif,2 : "got a short non-zerodivisor...";
         vprintf nice_unif,2 : "asserts";
         assert2 tP in P and not tP in P2;
         vprintf nice_unif,2 : ".";
@@ -144,6 +150,12 @@ end intrinsic;
                 assert forall{ y : y in elts | Valuation(y*OneIdeal(O),P) eq Valuation(y,P) };
             end for;
             ts:=Uniformizers(pp);
+            // short: the reduction modulo L, the product of the P^2, plus k times the smallest integer
+            // of L, with k at most the number of components
+            L:=&meet[ P^2 : P in pp ];
+            ZBasisLLL(L : FromHNF:=true); // the basis used by Uniformizers
+            assert forall{ t : t in ts | exists{ k : k in [0..#Components(A)] |
+                                            t-ShortElementModulo(t,L) eq k*MinimalInteger(L) } };
             assert forall{ 0 : i,j in [1..#pp] | Valuation(ts[i],pp[j]) eq (i eq j select 1 else 0) };
             // not random: the same uniformizers with another seed, for equal primes created again
             SetSeed(2);

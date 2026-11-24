@@ -258,7 +258,10 @@ end intrinsic;
     ids:=[];
     for I in ids0 do
         _,J:=CoprimeRepresentative(I,Conductor(E1));
-        Append(~ids,J);
+        // J can be E1 itself, for example when the inverse of a generator of I is short
+        if J ne OneIdeal(E1) then
+            Append(~ids,J);
+        end if;
     end for;
     facs:=[* Factorization(I) : I in ids *]; // a list: tuples of different lengths are not in the same universe
     // an ideal with many prime factors, coprime with the conductor.

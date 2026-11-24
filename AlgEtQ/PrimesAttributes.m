@@ -103,7 +103,8 @@ intrinsic Uniformizers(PPs::SeqEnum[AlgEtQIdl]) -> SeqEnum
         vprintf nice_unif,2 : ".";
         assert2 forall{ Q : Q in [ Q : Q in PPs | Q ne P ] | not tP in Q };
         vprintf nice_unif,2 : ".";
-        assert3 Seqset(PrimesAbove(tP*MaximalOrder(Algebra(tP)))) meet Seqset(PPs) eq {P}; //for some reason this is very time consuming
+        // for some reason this is very time consuming
+        assert3 Seqset(PrimesAbove(tP*MaximalOrder(Algebra(tP)))) meet Seqset(PPs) eq {P};
         vprintf nice_unif,2 : ".";
         assert not IsZeroDivisor(tP);
         vprintf nice_unif,2 : "all passed\n";
@@ -113,4 +114,36 @@ intrinsic Uniformizers(PPs::SeqEnum[AlgEtQIdl]) -> SeqEnum
 end intrinsic;
 
 /* TESTS
+
+    printf "### Testing PrimesAttributes:";
+    //AttachSpec("../spec");
+    SetAssertions(2);
+    _<x>:=PolynomialRing(Integers());
+    // For the primes P of the maximal order above p: sum of e_P*f_P is the dimension, [O:P] =
+    // p^f_P, the valuation of p at P is e_P, valuations are additive, and the uniformizers have
+    // valuation 1 at their prime and 0 at the others.
+    for f in [ x^4-1000*x^3-1000*x^2-1000*x-1000, (x^2+5)*(x^3-2000), (x-1)*(x^2+7) ] do
+        A:=EtaleAlgebra(f);
+        O:=MaximalOrder(A);
+        F:=PrimitiveElement(A);
+        elts:=[ F+1, F^2-3, 2*F+5 ];
+        elts:=[ y : y in elts | not IsZeroDivisor(y) ];
+        for p in [2,3,5,7] do
+            pp:=PrimesAbove(p*O);
+            assert &+[ RamificationIndex(P)*InertiaDegree(P) : P in pp ] eq AbsoluteDimension(A);
+            for P in pp do
+                assert Index(O,P) eq p^InertiaDegree(P);
+                assert Valuation(A!p,P) eq RamificationIndex(P);
+                assert Valuation(p*O,P) eq RamificationIndex(P);
+                assert forall{ 0 : y,z in elts | Valuation(y*z,P) eq Valuation(y,P)+Valuation(z,P) };
+                assert forall{ y : y in elts | Valuation(y*OneIdeal(O),P) eq Valuation(y,P) };
+            end for;
+            ts:=Uniformizers(pp);
+            assert forall{ 0 : i,j in [1..#pp] | Valuation(ts[i],pp[j]) eq (i eq j select 1 else 0) };
+        end for;
+        printf ".";
+    end for;
+    SetAssertions(1);
+    printf " all good!";
+
 */

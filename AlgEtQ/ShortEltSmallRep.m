@@ -133,6 +133,22 @@ end intrinsic;
         ff:=Conductor(S);
         _:=ShortElement(ff);
     end for;
+    // SmallRepresentative: aI = a*I is integral, a is a non-zero-divisor in (R:I), the output is
+    // stored, and for invertible I the index of aI in R is the index of a*R in (R:I) = I^-1.
+    for R in [ E ] cat oo[1..Min(5,#oo)] do
+        cR:=Conductor(R);
+        for I in [ cR, OneIdeal(R), 7*cR, (1/3)*cR, cR^2 ] do
+            aI,a:=SmallRepresentative(I);
+            assert aI eq a*I and IsIntegral(aI) and not IsZeroDivisor(a) and a in ColonIdeal(R,I);
+            aI2,a2:=SmallRepresentative(I);
+            assert IsIdentical(aI2,aI) and a2 eq a;
+            if IsInvertible(I) then
+                assert Index(OneIdeal(R),aI) eq Index(ColonIdeal(R,I),a*OneIdeal(R));
+            end if;
+        end for;
+        printf ".";
+    end for;
+
     // ShortElement is not random: in a product of number fields, the LLL-reduced Z-basis of an
     // ideal of the maximal order consists of zero-divisors, and combinations of it are used. The
     // output is the same for another seed.

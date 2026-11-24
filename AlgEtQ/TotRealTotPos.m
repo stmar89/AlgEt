@@ -18,10 +18,11 @@ declare attributes AlgEtQOrd:TotallyRealPositiveUnitGroup;
 import "PicardGroup.m" : units_mod_conductor_data;
 
 units_of_S_in_units_of_O:=function(S)
-// Given an order S, returns US,uS:=UnitGroup(S) and the unit group UK,uK of the maximal order, such that US is a
-// subgroup of UK. No unit of S is computed: for a non-maximal S, UnitGroup(S) is the kernel of a map from UK
-// (see units_mod_conductor_data in PicardGroup.m). This matters when the index of US in UK is huge: then the units of
-// S have huge exponents on the generators of UK, and they cannot be written down as elements of the algebra.
+// Given an order S, returns US,uS:=UnitGroup(S) and the unit group UK,uK of the maximal order, such
+// that US is a subgroup of UK. No unit of S is computed: for a non-maximal S, UnitGroup(S) is the
+// kernel of a map from UK (see units_mod_conductor_data in PicardGroup.m). This matters when the
+// index of US in UK is huge: then the units of S have huge exponents on the generators of UK, and
+// they cannot be written down as elements of the algebra.
     US,uS:=UnitGroup(S);
     if IsMaximal(S) then
         return US,uS,US,uS;
@@ -97,14 +98,16 @@ end intrinsic;
 
 debug_test:=function(S,S_tot_pos_in_US)
 // this test is quite costly!
-// it loops over the subgroups of S*/<v*bar(v) : v in S^*> meet S^* to find the totally positive units
+// it loops over the subgroups of S*/<v*bar(v) : v in S^*> meet S^* to find the totally positive
+// units
     K:=Algebra(S);
     zbS:=ZBasis(S);
     T:=Order(zbS cat [ ComplexConjugate(z) : z in zbS ]); // T=S*bar(S)
     UT,uT:=UnitGroup(T); //uT:UT->T
     US, uS := UnitGroup(S); //uS:US->S
     gensUinS:=[ uS(US.i) : i in [1..Ngens(US)]];
-    USUSb:=sub< UT | [ (g*ComplexConjugate(g))@@uT : g in gensUinS ]>; // <v*bar(v) : v in S^*> in UT
+    // <v*bar(v) : v in S^*> in UT
+    USUSb:=sub< UT | [ (g*ComplexConjugate(g))@@uT : g in gensUinS ]>;
     USinUT:=sub<UT | [ g@@uT : g in gensUinS ]>;
     Q,q:=quo< USinUT | USinUT meet USUSb >; // q:=USinUT->Q
                                             // Q = S*/<v bar(v) : v in S*> meet S* in UT
@@ -159,8 +162,9 @@ end intrinsic;
     PP<x>:=PolynomialRing(Integers());
     SetAssertions(2);
 
-    // The method used before 2026-11: compute the units of S and take their discrete logarithm in the unit group
-    // of the maximal order. Now US is used directly as a subgroup of it. The two must give the same subgroups.
+    // The method used before 2026-11: compute the units of S and take their discrete logarithm in
+    // the unit group of the maximal order. Now US is used directly as a subgroup of it. The two
+    // must give the same subgroups.
     old_tot_real:=function(S)
         K:=Algebra(S);
         F,FtoK:=TotallyRealSubAlgebra(K);
@@ -199,12 +203,16 @@ end intrinsic;
         tp:=TotallyRealPositiveUnitGroup(S);
         assert tr eq old_tot_real(S);
         assert tp eq old_tot_pos(S);
+        // the generators are totally real, and totally positive
+        US,uS:=UnitGroup(S);
+        assert forall{ g : g in Generators(tr) | IsTotallyReal(uS(US!g)) };
+        assert forall{ g : g in Generators(tp) | IsTotallyRealPositive(uS(US!g)) };
     end for;
 
-    // An order whose unit group has huge index in the one of the maximal order: [O^*:E^*] has 20 digits. Its units
-    // of infinite order cannot be written down as elements, so the old method fails, while the subgroups are computed
-    // inside the unit group of the maximal order. With assertions at level 1, since debug_test (assert2) computes the
-    // units of E.
+    // An order whose unit group has huge index in the one of the maximal order: [O^*:E^*] has 20
+    // digits. Its units of infinite order cannot be written down as elements, so the old method
+    // fails, while the subgroups are computed inside the unit group of the maximal order. With
+    // assertions at level 1, since debug_test (assert2) computes the units of E.
     SetAssertions(1);
     A:=EtaleAlgebra([NumberField(x^4+x^2+529),NumberField(x^8+16)]);
     E:=EquationOrder(A);

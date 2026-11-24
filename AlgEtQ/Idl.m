@@ -43,6 +43,7 @@ declare attributes AlgEtQIdl : Index, //stores the index
 
 import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQtoA , meet_zbasis , inclusion_matrix ,
                  lattice_hnf , hash_from_hnf , hnf_from_hash;
+import "ShortEltSmallRep.m" : short_non_zero_divisors;
 
 ///# Ideals of orders in étale algebras over $\mathbb{Q}$
 /// Let $R$ be an order in an étale algebra $A$ over $\mathbb{Q}$.
@@ -989,28 +990,6 @@ intrinsic MinimalInteger(I::AlgEtQIdl) -> RngIntElt
 end intrinsic;
 
 
-coprime_rep_candidates:=function(zb,N)
-// Given a short Z-basis zb of a fractional ideal, returns short elements of the ideal which are not
-// zero-divisors, in a fixed order: the elements of zb, then N combinations of them with
-// coefficients in [-3..3] from a Lehmer generator with a fixed initial state. The combinations are
-// needed in products of number fields, where the elements of zb can all be zero-divisors (for
-// example for an ideal of the maximal order). The output depends only on zb.
-    cands:=[ z : z in zb | not IsZeroDivisor(z) ];
-    s:=1;
-    for k in [1..N] do
-        cs:=[];
-        for i in [1..#zb] do
-            s:=(48271*s) mod (2^31-1);
-            Append(~cs,(s mod 7)-3);
-        end for;
-        z:=DotProduct(cs,zb);
-        if not IsZeroDivisor(z) then
-            Append(~cands,z);
-        end if;
-    end for;
-    return cands;
-end function;
-
 coprime_rep_from_primes:=function(I,Iinv,zb,pp)
 // Given an invertible fractional S-ideal I, its inverse Iinv, a short Z-basis zb of Iinv and the
 // sequence pp of the primes of S containing an integral ideal J, returns x in Iinv, not a
@@ -1114,7 +1093,7 @@ intrinsic CoprimeRepresentative(I::AlgEtQIdl,J::AlgEtQIdl) -> AlgEtQElt,AlgEtQId
         ZBasisLLL(Iinv : FromHNF:=true);
         zb:=ZBasis(Iinv);
         found:=false;
-        for z in coprime_rep_candidates(zb,30) do
+        for z in short_non_zero_divisors(zb,30) do
             if is_good(z) then
                 x:=z;
                 found:=true;

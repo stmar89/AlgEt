@@ -24,26 +24,50 @@ declare attributes AlgEtQIdl : ShortElement, SmallRepresentative;
 // ShortElement
 //------------
 
-/// Given a fractional ideal $I$, returns a non-zerodivisor in $I$ with small coefficients (in the LLL sense). This is achieved by picking, among the non-zerodivisors in an LLL-reduced $\mathbb{Z}$-basis of $I$ (in the absolute coordinates), one whose norm has the smallest absolute value. If all the elements of this basis are zerodivisors, then random combinations with small coefficients are used instead. If the stored ZBasis is not LLL-reduced, it will be changed to an LLL-reduced one.
+short_non_zero_divisors:=function(zb,N)
+// Given a short Z-basis zb of a fractional ideal, returns short elements of the ideal which are not
+// zero-divisors, in a fixed order: the elements of zb which are not zero-divisors, then the ones
+// among N combinations of the elements of zb with coefficients in [-3..3] from a Lehmer generator
+// with a fixed initial state. The combinations are needed in products of number fields, where the
+// elements of zb can all be zero-divisors (for example for an ideal of the maximal order). The
+// output depends only on zb: it is not random.
+    cands:=[ z : z in zb | not IsZeroDivisor(z) ];
+    s:=1;
+    for k in [1..N] do
+        cs:=[];
+        for i in [1..#zb] do
+            s:=(48271*s) mod (2^31-1);
+            Append(~cs,(s mod 7)-3);
+        end for;
+        z:=DotProduct(cs,zb);
+        if not IsZeroDivisor(z) then
+            Append(~cands,z);
+        end if;
+    end for;
+    return cands;
+end function;
+
+/// Given a fractional ideal $I$, returns a non-zerodivisor in $I$ with small coefficients (in the LLL sense). This is achieved by picking, among the non-zerodivisors in an LLL-reduced $\mathbb{Z}$-basis of $I$ (in the absolute coordinates), one whose norm has the smallest absolute value. If all the elements of this basis are zerodivisors, then combinations of them with small coefficients, in a fixed order, are used instead: the output is not random. If the stored ZBasis is not LLL-reduced, it will be changed to an LLL-reduced one.
 intrinsic ShortElement(I::AlgEtQIdl) ->AlgEtQElt
-{Given a fractional ideal I, returns a non-zerodivisor in I with small coefficients (in the LLL sense). This is achieved by picking, among the non-zerodivisors in an LLL-reduced Z-basis of I (in the absolute coordinates), one whose norm has the smallest absolute value. If all the elements of this basis are zerodivisors, then random combinations with small coefficients are used instead. If the stored ZBasis is not LLL-reduced, it will be changed to an LLL-reduced one.}
+{Given a fractional ideal I, returns a non-zerodivisor in I with small coefficients (in the LLL sense). This is achieved by picking, among the non-zerodivisors in an LLL-reduced Z-basis of I (in the absolute coordinates), one whose norm has the smallest absolute value. If all the elements of this basis are zerodivisors, then combinations of them with small coefficients, in a fixed order, are used instead: the output is not random. If the stored ZBasis is not LLL-reduced, it will be changed to an LLL-reduced one.}
     if not assigned I`ShortElement then
         ZBasisLLL(I);
         B := ZBasis(I);
-        bd:=1;
         elts:=[ x : x in B | not IsZeroDivisor(x) ];
-        while #elts eq 0 do //if all ZeroDiv
-            rndm_coeffs:=[ [Random([-bd..bd]) : i in [1..#B]] : j in [1..10]];
-            elts:=[ DotProduct(rndm,B) : rndm in rndm_coeffs];
-            elts:=[ x : x in elts | not IsZeroDivisor(x) ];
-            bd +:=1;
+        // If all the elements of B are zero-divisors, which happens in products of number fields
+        // (for example for ideals of the maximal order), we use combinations of them (see
+        // short_non_zero_divisors): 30 are almost always enough, otherwise we take more.
+        N:=30;
+        while #elts eq 0 do
+            elts:=short_non_zero_divisors(B,N);
+            N*:=2;
         end while;
         _,i:=Min([Abs(Norm(x)) : x in elts]);
         elt:=elts[i];
 
-        // // The following is deterministic, but does not always work. Also, enumerating all short vectors is too much, and too memory extensive.
-        // L:=Lattice(MatrixAtoQ(ZBasis(I)));
-        // // b:=Basis(LLL(L)); //we reduce above, so it is cached.
+        // // The following is deterministic, but does not always work. Also, enumerating all short
+        // vectors is too much, and too memory extensive. L:=Lattice(MatrixAtoQ(ZBasis(I))); //
+        // b:=Basis(LLL(L)); //we reduce above, so it is cached.
         // b:=Basis(L);
         // b:=[ Norm(c) : c in b ];
         // k:=0;
@@ -80,8 +104,8 @@ intrinsic SmallRepresentative(I::AlgEtQIdl) ->AlgEtQIdl,AlgEtQElt
         a:=ShortElement(cRI);
         aI:=a*I;
         // The ZBasis of aI might be very big. We make it smaller.
-        // Since aI is contained in R with small index, its HNF has small entries even if ZBasis(I) is huge,
-        // and ZBasisLLL will use it: this is much faster than the LLL of a*ZBasis(I).
+        // Since aI is contained in R with small index, its HNF has small entries even if ZBasis(I)
+        // is huge, and ZBasisLLL will use it: this is much faster than the LLL of a*ZBasis(I).
         ZBasisLLL(aI);
         vprintf ShortEltSmallRep,2: "SmallRepresentative:\n
                                 I = %o\n,aI = %o\n",PrintSeqAlgEtQElt(ZBasis(I)),PrintSeqAlgEtQElt(ZBasis(aI));
@@ -109,6 +133,23 @@ end intrinsic;
         ff:=Conductor(S);
         _:=ShortElement(ff);
     end for;
+    // ShortElement is not random: in a product of number fields, the LLL-reduced Z-basis of an
+    // ideal of the maximal order consists of zero-divisors, and combinations of it are used. The
+    // output is the same for another seed.
+    A:=EtaleAlgebra([ NumberField(x^2+1), NumberField(x^2-2), NumberField(x^3-5) ]);
+    O:=MaximalOrder(A);
+    for I in [ OneIdeal(O), 3*OneIdeal(O), &*PrimesAbove(6*O) ] do
+        ZBasisLLL(I);
+        SetSeed(1);
+        I1:=Ideal(O,ZBasis(I));
+        a:=ShortElement(I1);
+        assert a in I and not IsZeroDivisor(a);
+        SetSeed(2);
+        I2:=Ideal(O,ZBasis(I));
+        assert ShortElement(I2) eq a;
+        printf ".";
+    end for;
+    SetSeed(1);
     SetAssertions(1);
     printf " all good!";
 */

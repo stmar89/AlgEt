@@ -16,12 +16,14 @@ declare verbose AlgEtQIdl, 3;
 declare type AlgEtQIdl;
 
 declare attributes AlgEtQIdl : Index, //stores the index
-                              Order, //order of definition. it might be smaller than the multiplicator ring
+                              Order, // order of definition. it might be smaller than the
+                                     // multiplicator ring
                               Algebra,
                               MultiplicatorRing,
                               Generators,
                               ZBasis,
-                              KnownPowers, //an associative array storing the known powers of an ideal
+                              KnownPowers, // an associative array storing the known powers of an
+                                           // ideal
                               IsPrime,
                               IsInvertible,
                               Inverse,
@@ -33,12 +35,14 @@ declare attributes AlgEtQIdl : Index, //stores the index
                               TraceDualIdeal,
                               Hash, // the sequence returned by myHash
                               HashValue, // the integer returned by Hash
-                              ExtensionToMaximalOrder, // the ideal O!!I, where O is the maximal order: see '!!'
-                              ExtensionToMultiplicatorRing, // the ideal S!!I, where S is MultiplicatorRing(I): see '!!'
+                              ExtensionToMaximalOrder, // the ideal O!!I, where O is the maximal
+                                                       // order: see '!!'
+                              ExtensionToMultiplicatorRing, // the ideal S!!I, where S is
+                                                            // MultiplicatorRing(I): see '!!'
                               inclusion_matrix;
 
 import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQtoA , meet_zbasis , inclusion_matrix ,
-                 lattice_hnf , hash_from_hnf;
+                 lattice_hnf , hash_from_hnf , hnf_from_hash;
 
 ///# Ideals of orders in étale algebras over $\mathbb{Q}$
 /// Let $R$ be an order in an étale algebra $A$ over $\mathbb{Q}$.
@@ -57,8 +61,8 @@ intrinsic Print(I::AlgEtQIdl)
 end intrinsic;
 
 mult_matrix:=function(x)
-// Given an element x of A, returns the matrix of the multiplication by x with respect to AbsoluteBasis(A):
-// the i-th row contains the AbsoluteCoordinates of x*AbsoluteBasis(A)[i].
+// Given an element x of A, returns the matrix of the multiplication by x with respect to
+// AbsoluteBasis(A): the i-th row contains the AbsoluteCoordinates of x*AbsoluteBasis(A)[i].
 // The matrix is block diagonal, with blocks the representation matrices of the components of x.
     comps:=Components(x);
     M:=RepresentationMatrix(comps[1]);
@@ -69,16 +73,17 @@ mult_matrix:=function(x)
 end function;
 
 CreateAlgEtQIdl:=function(S,gens : ZSpan:=false)
-// Given S::AlgEtQOrd and some generators creates the new object
-// The ZBasis is computed only if there are more generators than the dimension of the algebra, or if ZSpan is true.
-// If ZSpan is true then the elements of gens are assumed to generate the ideal also as a Z-module: the ZBasis is
-// computed from them, without multiplying them by ZBasis(S).
+// Given S::AlgEtQOrd and some generators, creates the new object.
+// The ZBasis is computed only if there are more generators than the dimension of the algebra, or if
+// ZSpan is true. If ZSpan is true then the elements of gens are assumed to generate the ideal also
+// as a Z-module: the ZBasis is computed from them, without multiplying them by ZBasis(S).
     A:=Algebra(S);
     I:=New(AlgEtQIdl);
     I`Algebra:=A;
     I`Order:=S;
     // We remove the repeated generators. This is fast since AlgEtQElt has a Hash intrinsic.
-    // An indexed set keeps the order of the generators: changing it can make the HNFs computed later slower.
+    // An indexed set keeps the order of the generators: changing it can make the HNFs computed
+    // later slower.
     gens:=IndexedSetToSequence({@ g : g in gens @});
     if ZSpan or #gens gt AbsoluteDimension(A) then
         ZZ:=Integers();
@@ -118,7 +123,8 @@ intrinsic Ideal(S::AlgEtQOrd, gens::SeqEnum) -> AlgEtQIdl
     end for;
     id:=CreateAlgEtQIdl(S,gensA); // it removes the repeated generators
     if #id`Generators eq 1 then
-        // a fractional ideal has full rank: this fails for a single zero-divisor, which CreateAlgEtQIdl marks invertible
+        // a fractional ideal has full rank: this fails for a single zero-divisor, which
+        // CreateAlgEtQIdl marks invertible
         require not IsZeroDivisor(id`Generators[1]) : "a single generator must not be a zero-divisor";
         id`MultiplicatorRing:=S;
     end if;
@@ -210,10 +216,11 @@ intrinsic '!!'(T::AlgEtQOrd,I::AlgEtQIdl) -> AlgEtQIdl
         end if;
         return id;
     else //in this case Order(I) is strictly contained in T
-        // The extensions of I to the maximal order and to the multiplicator ring of I are computed often:
-        // we store them in I. The extensions to other orders are not stored, to keep the memory bounded.
-        // We check that the cached orders is ideantical to the passed one with IsIdentical. It has an effect
-        // only when CheckIsKnownOrder:=false. It is very cheap since it is only a pointer check.
+        // The extensions of I to the maximal order and to the multiplicator ring of I are computed
+        // often: we store them in I. The extensions to other orders are not stored, to keep the
+        // memory bounded. We check that the cached order is identical to the passed one with
+        // IsIdentical. It has an effect only when CheckIsKnownOrder:=false. It is very cheap since
+        // it is only a pointer check.
         to_max:=assigned T`IsMaximal and T`IsMaximal;
         to_mr:=(not to_max) and assigned I`MultiplicatorRing and T eq I`MultiplicatorRing;
         if to_max and assigned I`ExtensionToMaximalOrder and IsIdentical(Order(I`ExtensionToMaximalOrder),T) then
@@ -301,7 +308,8 @@ intrinsic Hash(I::AlgEtQIdl) -> RngIntElt
 {Returns a hash value of the fractional ideal, so that equal ideals have the same hash value. It is computed from the sequence returned by myHash and it is stored in the attribute HashValue. Magma uses it to build sets, indexed sets and associative arrays of ideals: only ideals with the same hash value are compared with eq. Different ideals might have the same hash value: this only costs an extra comparison.}
     if not assigned I`HashValue then
         // The entries of myHash(I) are integers, but its universe is Rationals().
-        // Since the universe matters, e.g. Hash([1,2]) ne Hash([1/1,2/1]), we make sure it is Integers().
+        // Since the universe matters, e.g. Hash([1,2]) ne Hash([1/1,2/1]), we make sure it is
+        // Integers().
         I`HashValue:=Hash(ChangeUniverse(myHash(I),Integers()));
     end if;
     return I`HashValue;
@@ -321,7 +329,7 @@ intrinsic 'eq'(I::AlgEtQIdl , J::AlgEtQIdl ) -> BoolElt
     end if;
     if out then //we copy the attributes
         // The attributes that depend on the ZBasis are copied only together with the ZBasis itself.
-        zb_dep:={"inclusion_matrix","IsZBasisLLLReduced"};
+        zb_dep:={"inclusion_matrix","IsZBasisLLLReduced","IsZBasisLLLFromHNF"};
         zbI:=assigned I`ZBasis;
         zbJ:=assigned J`ZBasis;
         for att in GetAttributes(AlgEtQIdl) do
@@ -511,9 +519,10 @@ intrinsic '+'(I::AlgEtQIdl , J::AlgEtQIdl ) -> AlgEtQIdl
         // few generators: the ideal is created without computing its ZBasis
         return Ideal(S,gens);
     end if;
-    // The tests above computed the ZBasis of I and J. As a Z-module, I+J is spanned by ZBasis(I) cat ZBasis(J):
-    // 2*dim elements, while Ideal(S,gens) would compute the HNF of the #gens*dim products of the generators with
-    // ZBasis(S). The HNF is the same, hence also ZBasis and Hash of the output.
+    // The tests above computed the ZBasis of I and J. As a Z-module, I+J is spanned by ZBasis(I)
+    // cat ZBasis(J): 2*dim elements, while Ideal(S,gens) would compute the HNF of the #gens*dim
+    // products of the generators with ZBasis(S). The HNF is the same, hence also ZBasis and Hash of
+    // the output.
     return CreateAlgEtQIdl(S,ZBasis(I) cat ZBasis(J) : ZSpan:=true);
 end intrinsic;
 
@@ -539,12 +548,15 @@ intrinsic '*'(I::AlgEtQIdl , J::AlgEtQIdl ) -> AlgEtQIdl
             // few generators: the Z-basis of the product is computed only when it is needed
             out:=Ideal(S,[i*j : i in gI, j in gJ ]);
         else
-            // I*J is the Z-span of the products x*z, for x in a set of generators of one of the two ideals and z in
-            // a Z-basis of the other. These are much fewer than the products i*j*s, for s in ZBasis(S), from which
-            // Ideal(S,[i*j : i in gI, j in gJ ]) would compute the Z-basis, and give the same one (it is an HNF).
-            // We make the cheaper of the two choices, counting also the cost of a Z-basis which is not known yet.
-            costIJ:=#gI*dim + (assigned J`ZBasis select 0 else #gJ*dim); // generators of I, Z-basis of J
-            costJI:=#gJ*dim + (assigned I`ZBasis select 0 else #gI*dim); // generators of J, Z-basis of I
+            // I*J is the Z-span of the products x*z, for x in a set of generators of one of the two
+            // ideals and z in a Z-basis of the other. These are much fewer than the products i*j*s,
+            // for s in ZBasis(S), from which Ideal(S,[i*j : i in gI, j in gJ ]) would compute the
+            // Z-basis, and give the same one (it is an HNF). We make the cheaper of the two
+            // choices, counting also the cost of a Z-basis which is not known yet.
+            // generators of I, Z-basis of J
+            costIJ:=#gI*dim + (assigned J`ZBasis select 0 else #gJ*dim);
+            // generators of J, Z-basis of I
+            costJI:=#gJ*dim + (assigned I`ZBasis select 0 else #gI*dim);
             if costIJ le costJI then
                 zgens:=[ i*z : i in gI, z in ZBasis(J) ];
             else
@@ -626,8 +638,9 @@ intrinsic '^'(I::AlgEtQIdl, n::RngIntElt) -> AlgEtQIdl
     // Lemma:
     // Let I be an invertible fractional S-ideal generated globally by I=aS+bS.
     // For every integer N, we have I^N=a^NS+b^NS.
-    // Proof: we will show it locally at every prime. Since I is invertible, then it is locally principal.
-    // Pick a prime P. Then by Nakayama's Lemma I_P=(a/1)S_P or I_P=(b/1)S_P. wlog assume the first. Then I_P^N=(a^N/1)S_P. QED.
+    // Proof: we will show it locally at every prime. Since I is invertible, then it is locally
+    // principal. Pick a prime P. Then by Nakayama's Lemma I_P=(a/1)S_P or I_P=(b/1)S_P. wlog assume
+    // the first. Then I_P^N=(a^N/1)S_P. QED.
     //
     // Remark: this trick does not work for product of invertible ideals I and J.
     // One can have I_P1=(a) J_P1=(c) but I_P2=(a), J_P2=(d) so one cannot avoid the mixed products.
@@ -718,8 +731,9 @@ end intrinsic;
 
 intrinsic 'meet'(I::AlgEtQIdl, J::AlgEtQIdl) -> AlgEtQIdl
 {Given two fractional ideals over the same order, returns their intersection.}
-// this code is inspired by H.Cohen "Advanced Topics in ...", page 36.]
-// note that the hnf in Magma is not the same as in the book. This is why the matrix M and P are take in a slightly different way compared to the reference.
+// this code is inspired by H.Cohen "Advanced Topics in ...", page 36.
+// Note that the hnf in Magma is not the same as in the book. This is why the matrix M and P are
+// taken in a slightly different way compared to the reference.
     require Order(I) eq Order(J): "the ideals must be defined over the same order";
     A:=Algebra(I);
     if I subset J then
@@ -748,7 +762,8 @@ intrinsic ColonIdeal(I::AlgEtQIdl,J::AlgEtQIdl)->AlgEtQIdl
     end if;
     // based on jv code
     // Since I is an O-module, x*J c I if and only if x*g in I for every generator g of J over O.
-    // So we only need the multiplication matrices of the generators of J: at most N of them, often only 2.
+    // So we only need the multiplication matrices of the generators of J: at most N of them, often
+    // only 2.
     N:=AbsoluteDimension(A);
     mIinv:=inclusion_matrix(I);
     M:=VerticalJoin([ Transpose( mult_matrix(g)*mIinv ) : g in Generators(J)] );
@@ -860,15 +875,17 @@ intrinsic '&+'(seq::SeqEnum[AlgEtQIdl])->AlgEtQIdl
         // few generators: the ideal is created without computing its ZBasis
         return Ideal(S,gens);
     end if;
-    // Ideal(S,gens) would compute the HNF of the #gens*dim products of the generators with ZBasis(S).
-    // As a Z-module, the sum is spanned by the ZBasis of the summands: we use it when it is known, and the products
-    // of the generators with ZBasis(S) for the other summands. The HNF is the same, hence also ZBasis and Hash of
-    // the output. E.g. in WKICM the summands have a known LLL-reduced ZBasis, which shares no element with the others,
-    // so the repeated generators removed by Ideal are rare.
+    // Ideal(S,gens) would compute the HNF of the #gens*dim products of the generators with
+    // ZBasis(S). As a Z-module, the sum is spanned by the ZBasis of the summands: we use it when it
+    // is known, and the products of the generators with ZBasis(S) for the other summands. The HNF
+    // is the same, hence also ZBasis and Hash of the output. E.g. in WKICM the summands have a
+    // known LLL-reduced ZBasis, which shares no element with the others, so the repeated generators
+    // removed by Ideal are rare.
     zgens:=&cat[ assigned I`ZBasis select I`ZBasis else [ g*s : g in Generators(I), s in ZBasis(S) ] : I in seq ];
     return CreateAlgEtQIdl(S,zgens : ZSpan:=true);
 end intrinsic;
-// an analogous definition of &* seems to be very slow, probably because the number of generators grows too fast.
+// an analogous definition of &* seems to be very slow, probably because the number of generators
+// grows too fast.
 ///hide-none
 
 /// Returns a random element of the given fractional ideal with coefficients with respect to the stored $\mathbb{Z}$-basis bounded by `bd`. One can allow zero-divisors using the parameter `ZeroDivisorsAllowed`, which is set to false by default.
@@ -971,18 +988,145 @@ intrinsic MinimalInteger(I::AlgEtQIdl) -> RngIntElt
 end intrinsic;
 
 
-/// Given an invertible fractional ideal $I$ and an integral ideal $J$, defined over the same order, returns a unit $x$ of the parent algebra such that $x\cdot I$ is an integral fractional ideal coprime with $J$, together with the product $x\cdot I$.
+coprime_rep_candidates:=function(zb,N)
+// Given a short Z-basis zb of a fractional ideal, returns short elements of the ideal which are not
+// zero-divisors, in a fixed order: the elements of zb, then N combinations of them with
+// coefficients in [-3..3] from a Lehmer generator with a fixed initial state. The combinations are
+// needed in products of number fields, where the elements of zb can all be zero-divisors (for
+// example for an ideal of the maximal order). The output depends only on zb.
+    cands:=[ z : z in zb | not IsZeroDivisor(z) ];
+    s:=1;
+    for k in [1..N] do
+        cs:=[];
+        for i in [1..#zb] do
+            s:=(48271*s) mod (2^31-1);
+            Append(~cs,(s mod 7)-3);
+        end for;
+        z:=DotProduct(cs,zb);
+        if not IsZeroDivisor(z) then
+            Append(~cands,z);
+        end if;
+    end for;
+    return cands;
+end function;
+
+coprime_rep_from_primes:=function(I,Iinv,zb,pp)
+// Given an invertible fractional S-ideal I, its inverse Iinv, a short Z-basis zb of Iinv and the
+// sequence pp of the primes of S containing an integral ideal J, returns x in Iinv, not a
+// zero-divisor, such that x*I is coprime to J, that is, x is not in Q*Iinv for any Q in pp. It is
+// built prime by prime, without the CRT (whose idempotents cost a CRT over all the primes each, too
+// much when there are many primes):
+//  - xs[k] is an element of Iinv not in pp[k]*Iinv;
+//  - es[k] is a product of elements of S, one in each pp[j] with j ne k but not in pp[k], so es[k]
+//    is in every pp[j] with j ne k and, pp[k] being prime, not in pp[k].
+// Then x:=&+[ es[k]*xs[k] ] is congruent to es[k]*xs[k] modulo pp[k]*Iinv, and es[k]*xs[k] is not
+// in pp[k]*Iinv: locally at pp[k], Iinv is generated by one element w (I is invertible), xs[k]=u*w
+// with u a unit at pp[k], and es[k]*u is not in pp[k]. Finally x is replaced by a short element of
+// its class modulo L:=(Q_1...Q_r)*Iinv, which does not change its class modulo any pp[k]*Iinv. The
+// choices use only data which depend on the lattices (zb, which in CoprimeRepresentative depends
+// only on Iinv, the minimal integers and the HNF bases of the primes), so the output depends only
+// on I and pp.
+    A:=Algebra(I);
+    // the smallest positive integer in a full lattice L: the lcm of the denominators of the
+    // coordinates of 1
+    min_int:=func< L | LCM([ Denominator(c) : c in AbsoluteCoordinates([One(A)],L)[1] ]) >;
+    if #pp eq 0 then
+        return A!min_int(Iinv); // J = S: any non-zero-divisor of Iinv works, for example an integer
+    end if;
+    gI:=Generators(I);
+    // x is in Q*Iinv if and only if x*g is in Q for every generator g of I, since I is invertible
+    not_in_QIinv:=func< x,Q | exists{ g : g in gI | not x*g in Q } >;
+    // xs[k] is an element of Iinv not in pp[k]*Iinv: it exists since pp[k]*Iinv ne Iinv
+    xs:=[ [ z : z in zb | not_in_QIinv(z,Q) ][1] : Q in pp ];
+    // An element of the prime P not in the prime Q ne P: the rational prime below P if Q is above
+    // another one; otherwise an element of the HNF basis of P (whose entries are smaller than the
+    // rational prime), which exists since P is not contained in Q.
+    r:=#pp;
+    ps:=[ MinimalInteger(P) : P in pp ];
+    hnf_basis:=function(P)
+        if assigned P`Hash then
+            d:=P`Hash[1]; // the denominator of the lattice
+            H:=hnf_from_hash(P`Hash,d); // free
+        else
+            H,d:=lattice_hnf(ZBasis(P));
+        end if;
+        return MatrixQtoA(A,(1/d)*crZQ(H));
+    end function;
+    hnfs:=[ ps[j] in Remove(ps,j) select hnf_basis(pp[j]) else [] : j in [1..r] ]; // only if needed
+    elt_in_not_in:=func< j,k | ps[j] ne ps[k] select A!ps[j] else [ z : z in hnfs[j] | not z in pp[k] ][1] >;
+    if r eq 1 then
+        x:=xs[1];
+    else
+        es:=[ &*[ elt_in_not_in(j,k) : j in [1..r] | j ne k ] : k in [1..r] ];
+        x:=&+[ es[k]*xs[k] : k in [1..r] ];
+    end if;
+    // Adding an element of L does not change the class of x modulo any pp[k]*Iinv.
+    L:=(&*pp)*Iinv;
+    // the LLL reduction of the HNF of L, so that the short element depends only on L
+    ZBasisLLL(L : FromHNF:=true);
+    x:=ShortElementModulo(x,L);
+    if IsZeroDivisor(x) then
+        // This can happen only if J has no prime in some component of A: then x is not determined
+        // there modulo L. We add a multiple of the smallest positive integer y in L: x+t*y is a
+        // zero-divisor for at most one t per component.
+        y:=min_int(L);
+        t:=1;
+        while IsZeroDivisor(x+t*y) do
+            t+:=1;
+        end while;
+        x:=x+t*y;
+    end if;
+    assert2 forall{ Q : Q in pp | not_in_QIinv(x,Q) };
+    return x;
+end function;
+
+/// Given an invertible fractional ideal $I$ and an integral ideal $J$, defined over the same order, returns a unit $x$ of the parent algebra such that $x\cdot I$ is an integral fractional ideal coprime with $J$, together with the product $x\cdot I$. The output depends only on $I$ and $J$ (it is not random), and $x$ is a short element of $I^{-1}$, so $x\cdot I$ is small.
 intrinsic CoprimeRepresentative(I::AlgEtQIdl,J::AlgEtQIdl) -> AlgEtQElt,AlgEtQIdl
-{Given an invertible fractional ideal I and an integral ideal J, defined over the same order, returns a unit x of the parent algebra such that x*I is an integral fractional ideal coprime with J, together with the product x*I.}
+{Given an invertible fractional ideal I and an integral ideal J, defined over the same order, returns a unit x of the parent algebra such that x*I is an integral fractional ideal coprime with J, together with the product x*I. The output depends only on I and J (it is not random), and x is a short element of I^-1, so x*I is small.}
     require IsIntegral(J) : "the second ideal must be integral";
     S:=Order(I);
     require S eq Order(J): "the ideals must be defined over the same order";
-    x:=One(Algebra(I));
-    xI:=I;
-    while not (IsIntegral(xI) and IsCoprime(xI,J)) do
-        x:=Random(Inverse(I)); //Inverse is cached
-        xI:=x*I;
-    end while;
+    A:=Algebra(I);
+    // Let Q_1,...,Q_r be the primes of S containing J. For x in I^-1, x*I is integral, and x*I+J=S
+    // if and only if x is not in Q_k*I^-1 for every k, that is, if and only if for every k some
+    // x*g, with g a generator of I, is not in Q_k. We try candidates in a fixed order: 1 if I is
+    // integral, then short elements of I^-1, from the LLL reduction of the HNF of I^-1, which
+    // depends only on the lattice (see the vararg FromHNF of ZBasisLLL).
+    // If the primes of J are known (for example for the conductor, see SingularPrimes) a candidate
+    // is tested with the memberships above; otherwise with IsCoprime, which does not need them: J
+    // is factored only if no candidate works (then x is built prime by prime, see
+    // coprime_rep_from_primes), which can happen when there are many primes with small residue
+    // fields.
+    known_primes:=assigned J`PrimesAbove or assigned J`Factorization;
+    if known_primes then
+        pp:=PrimesAbove(J);
+        gI:=Generators(I);
+        is_good:=func< x | forall{ Q : Q in pp | exists{ g : g in gI | not x*g in Q } } >;
+    else
+        is_good:=func< x | IsCoprime(x eq One(A) select I else x*I,J) >;
+    end if;
+    if IsIntegral(I) and is_good(One(A)) then
+        x:=One(A);
+    else
+        Iinv:=Inverse(I); // cached
+        // the LLL reduction of the HNF of Iinv, stored in Iinv: it depends only on the lattice
+        ZBasisLLL(Iinv : FromHNF:=true);
+        zb:=ZBasis(Iinv);
+        found:=false;
+        for z in coprime_rep_candidates(zb,30) do
+            if is_good(z) then
+                x:=z;
+                found:=true;
+                break;
+            end if;
+        end for;
+        if not found then
+            vprintf AlgEtQIdl,2: "CoprimeRepresentative: no candidate works, we build one prime by prime\n";
+            x:=coprime_rep_from_primes(I,Iinv,zb,PrimesAbove(J));
+        end if;
+    end if;
+    xI:=x eq One(A) select I else x*I;
+    assert2 IsIntegral(xI) and IsCoprime(xI,J) and not IsZeroDivisor(x);
     vprintf AlgEtQIdl,2: "CoprimeRepresentative:\n
                             I = %o\n,xI = %o\n",PrintSeqAlgEtQElt(ZBasis(I)),PrintSeqAlgEtQElt(ZBasis(xI));
     return x,xI;
@@ -1073,7 +1217,8 @@ end intrinsic;
     assert is_def and I5 eq (I*I)*(I*I)*I;
     printf ".";
 
-    // testing Hash: sets, indexed sets and associative arrays of ideals, also when the hash values collide
+    // testing Hash: sets, indexed sets and associative arrays of ideals, also when the hash values
+    // collide
     _<x>:=PolynomialRing(Integers());
     A:=EtaleAlgebra((x^4+16)*(x^4-x^2+4));
     E:=EquationOrder(A);
@@ -1090,7 +1235,8 @@ end intrinsic;
     assert #Seqset(ids) eq #ids and #{@ I : I in ids @} eq #ids;
     // copies: the same ideals, as new objects whose hash is computed in different ways
     copies1:=[ Ideal(E,ZBasis(I)) : I in ids ]; // computed later, by myHash
-    copies2:=[ Ideal(E,ZBasis(I) cat [ZBasis(I)[1]+ZBasis(I)[2]]) : I in ids ]; // computed at creation
+    // computed at creation
+    copies2:=[ Ideal(E,ZBasis(I) cat [ZBasis(I)[1]+ZBasis(I)[2]]) : I in ids ];
     copies3:=[ (1/2)*(2*I) : I in ids ];
     assert forall{ i : i in [1..#ids] | Hash(copies1[i]) eq Hash(ids[i]) and Hash(copies2[i]) eq Hash(ids[i])
                                         and Hash(copies3[i]) eq Hash(ids[i]) };
@@ -1115,7 +1261,8 @@ end intrinsic;
     assert forall{ i : i in [1..#ids] | AA[copies2[i]] eq i };
     printf ".";
 
-    // testing that eq does not copy the attribute IsZBasisLLLReduced, which depends on the stored ZBasis
+    // testing that eq does not copy the attribute IsZBasisLLLReduced, which depends on the stored
+    // ZBasis
     _<x>:=PolynomialRing(Integers());
     A:=EtaleAlgebra(x^8+16);
     E:=EquationOrder(A);
@@ -1133,9 +1280,10 @@ end intrinsic;
     assert LLL(MJ) eq MJ;
     printf ".";
 
-    // I*J for ideals with few and many generators, with and without a known Z-basis: when the products of the
-    // generators are more than the dimension, '*' computes the Z-basis from the products of the generators of one
-    // ideal with a Z-basis of the other. We compare with the ideal generated by the products of the generators.
+    // I*J for ideals with few and many generators, with and without a known Z-basis: when the
+    // products of the generators are more than the dimension, '*' computes the Z-basis from the
+    // products of the generators of one ideal with a Z-basis of the other. We compare with the
+    // ideal generated by the products of the generators.
     for f in [ x^4+16, (x^2+5)*(x^3-2) ] do
         A:=EtaleAlgebra(f);
         dim:=Dimension(A);
@@ -1152,8 +1300,9 @@ end intrinsic;
                 assert forall{ g : g in gens | g in IJ };
             end for;
             assert forall{ I : I in ids[1..3] | (I*I)*I eq I*(I*I) and I^3 eq (I*I)*I };
-            // I+J: when the generators are more than the dimension, '+' computes the Z-basis from ZBasis(I) and
-            // ZBasis(J). We compare with the ideal generated by the generators: same HNF, hence same ZBasis and Hash.
+            // I+J: when the generators are more than the dimension, '+' computes the Z-basis from
+            // ZBasis(I) and ZBasis(J). We compare with the ideal generated by the generators: same
+            // HNF, hence same ZBasis and Hash.
             for I,J in ids do
                 gens:=Generators(I) cat Generators(J);
                 IpJ:=I+J;
@@ -1174,7 +1323,8 @@ end intrinsic;
         printf ".";
     end for;
 
-    // IsCoprime(I,I) holds only for I = S. An ideal needs a generator, and a single generator cannot be a zero-divisor.
+    // IsCoprime(I,I) holds only for I = S. An ideal needs a generator, and a single generator
+    // cannot be a zero-divisor.
     A:=EtaleAlgebra((x^2+5)*(x^3-2));
     S:=EquationOrder(A);
     assert IsCoprime(OneIdeal(S),OneIdeal(S));
@@ -1200,6 +1350,72 @@ end intrinsic;
     assert not assigned J`ZBasis;
     assert I eq J;
     assert ZBasis(J) eq ZBasis(I) and assigned J`IsZBasisLLLReduced and J`IsZBasisLLLReduced;
+    assert assigned J`IsZBasisLLLFromHNF and J`IsZBasisLLLFromHNF eq I`IsZBasisLLLFromHNF;
+    printf ".";
+
+    // CoprimeRepresentative: x*I is integral and coprime to J, x is not a zero-divisor, and the
+    // output does not depend on the random state nor on the stored Z-basis of I. For J the
+    // conductor (its primes are known, tested with memberships), a copy of it (primes not known,
+    // tested with IsCoprime), and J = S.
+    check_coprime_rep:=procedure(I,J)
+        x,xI:=CoprimeRepresentative(I,J);
+        assert xI eq x*I and IsIntegral(xI) and IsCoprime(xI,J) and not IsZeroDivisor(x);
+        SetSeed(7);
+        I2:=Ideal(Order(I),[ 2*z : z in ZBasis(I) ] cat ZBasis(I)); // equal to I, another Z-basis
+        assert I2 eq I;
+        x2:=CoprimeRepresentative(I2,J);
+        assert x2 eq x;
+        SetSeed(1);
+    end procedure;
+    for f in [ (x^2+5)*(x^3-2000), x^4-1000*(x^3+x^2+x+1) ] do
+        A:=EtaleAlgebra(f);
+        E:=EquationOrder(A);
+        F:=Conductor(E);
+        _:=SingularPrimes(E); // the primes of F are stored in F
+        F2:=Ideal(E,ZBasis(F)); // equal to F, its primes are not known
+        s:=1;
+        ids:=[];
+        while #ids lt 6 do
+            gs:=[];
+            for k in [1..2] do
+                cs:=[];
+                for i in [1..Dimension(A)] do
+                    s:=(48271*s) mod (2^31-1);
+                    Append(~cs,(s mod 7)-3);
+                end for;
+                Append(~gs,DotProduct(cs,AbsoluteBasis(A)));
+            end for;
+            I:=Ideal(E,gs);
+            if not IsZeroDivisor(gs[1]) and IsInvertible(I) then
+                Append(~ids,I);
+            end if;
+        end while;
+        for I in ids do
+            for J in [ F, F2, OneIdeal(E) ] do
+                check_coprime_rep(I,J);
+            end for;
+        end for;
+        printf ".";
+    end for;
+    // The construction prime by prime, used when no candidate works: in a product of four imaginary
+    // quadratic fields where 2 splits, J = 2O has eight primes of norm 2, so a candidate works with
+    // probability 1/256 and the candidates usually all fail. With J = 6O, there are also five
+    // primes above 3.
+    A:=EtaleAlgebra([ NumberField(x^2-x+k) : k in [2,4,6,8] ]);
+    O:=MaximalOrder(A);
+    J:=2*O;
+    assert #PrimesAbove(J) eq 8;
+    // the primes above 2 are principal only in Q(sqrt(-7)), the first component
+    np:=[ P : P in PrimesAbove(J) | not IsPrincipal(P) ];
+    assert #np eq 6;
+    for I in [ J, J^2, np[1], np[1]*np[3]^2 ] do
+        check_coprime_rep(I,J);
+    end for;
+    J6:=6*O;
+    assert #PrimesAbove(J6) eq 13;
+    for I in [ J6, np[2], np[2]*PrimesAbove(3*O)[1] ] do
+        check_coprime_rep(I,J6);
+    end for;
     printf ".";
 
     SetAssertions(1);

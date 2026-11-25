@@ -8,6 +8,18 @@
 /////////////////////////////////////////////////////
 freeze;
 declare verbose IntermediateIdeals, 2;
+
+import "Ord.m" : MatrixAtoQ, MatrixQtoA;
+import "Idl.m" : CreateAlgEtQIdl;
+
+lift_map:=function(A,Q,q)
+// Given the quotient q:I->Q=I/J of fractional ideals in A, returns a function sending a sequence
+// of elements of Q to a sequence of elements of I mapping onto them: the integer combinations of
+// fixed lifts of the generators of Q, computed with one matrix product (instead of a preimage
+// under q for each element).
+    L:=MatrixAtoQ([ Q.j@@q : j in [1..Ngens(Q)] ]);
+    return func< ys | #ys eq 0 select [A|] else MatrixQtoA(A,Matrix(Rationals(),[ Eltseq(y) : y in ys ])*L) >;
+end function;
 ///# Intermediate fractional ideals
 /// Let $I$ and $J$ be orders or fractional ideals in an étale algebra over $\mathbb{Q}$ satisfying $J \subseteq I$.
 /// Since the quotient $I/J$ is finite, there are finitely many fractional ideals $K$ (over a fixed order) such that $J \subseteq K \subseteq I$.
@@ -22,8 +34,9 @@ intrinsic _MinimalIntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQI
     if J eq I then
         return {@ @};
     else
-        gens_J_over_S:=Generators(J);
         Q,q:=Quotient(I,J);
+        lift:=lift_map(Algebra(I),Q,q);
+        zbJ:=ZBasis(J);
         min_ideals:={@ @};
         // Following code is based on the following Lemma.
         // LEMMA: Let M be a finite non-zero S-module (eg I/J). Let N be a minimal submodule of M
@@ -48,8 +61,10 @@ intrinsic _MinimalIntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQI
             matrices:=Setseq(Seqset(matrices)); //possibly there are repetiions.
             Qp_Rmod:=RModule(matrices);
             min_Rmod:=MinimalSubmodules(Qp_Rmod);
-            min_ideals join:={@ Ideal(S, gens_J_over_S cat
-                                    [(Q!(Qp!Eltseq(Qp_Rmod!b)))@@q : b in Basis(min)]) : min in min_Rmod @};
+            // K/J = min, so K is the Z-span of ZBasis(J) and lifts of a basis of min: no products with
+            // ZBasis(S) are needed
+            min_ideals join:={@ CreateAlgEtQIdl(S, zbJ cat lift([ Q!(Qp!Eltseq(Qp_Rmod!b)) : b in Basis(min) ]) : ZSpan:=true)
+                                    : min in min_Rmod @};
         end for;
         return min_ideals;
     end if;
@@ -110,11 +125,12 @@ intrinsic _MaximalIntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQI
         // prime P of S. In particular, if p is the characteristic of S/P, then p*I c K c I.
         // Note that I/pI is an Fp-vector space.
         Q,q:=Quotient(I,J);
-        gens_J_over_S:=Generators(J);
+        lift:=lift_map(Algebra(I),Q,q);
+        zbJ:=ZBasis(J);
         max_ideals:={@ @};
         for p in PrimeDivisors(#Q) do
             mp:=[ p*(Q.j) : j in [1..Ngens(Q)] ];
-            mp_in_I:=[ x@@q : x in mp  ] cat gens_J_over_S;
+            mp_in_I:=lift(mp) cat zbJ; // Z-spans p*I+J
             Qp,qp:=quo<Q|mp>;
             rk:=Ngens(Qp);
             assert #Qp eq p^rk;
@@ -128,8 +144,10 @@ intrinsic _MaximalIntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQI
             matrices:=Setseq(Seqset(matrices)); //possibly there are repetiions.
             Qp_Rmod:=RModule(matrices);
             max_Rmod:=MaximalSubmodules(Qp_Rmod);
-            max_ideals join:={@ Ideal(S, mp_in_I cat
-                                    [(Qp!Eltseq(Qp_Rmod!b))@@qp@@q : b in Basis(max)]) : max in max_Rmod @};
+            // K/(p*I+J) = max, so K is the Z-span of mp_in_I and lifts of a basis of max: no products
+            // with ZBasis(S) are needed
+            max_ideals join:={@ CreateAlgEtQIdl(S, mp_in_I cat lift([ (Qp!Eltseq(Qp_Rmod!b))@@qp : b in Basis(max) ]) : ZSpan:=true)
+                                    : max in max_Rmod @};
         end for;
         return max_ideals;
     end if;

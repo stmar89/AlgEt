@@ -340,7 +340,13 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl : CheckIsKnownOrde
             // F, since [B:F] is prime.
             // Hence S is minimal if and only if W contains none of the lines spanned by type1_ws.
             dims := PrimesUpTo(dV+1); //the plus one is to prevent issues when d=2.
-            subs_type2 := Submodules(V : CodimensionLimit := dV-2); //we exclude dim 0 and 1
+            // B=S/P is closed under x:->x^q, so W=B/F is invariant under qpow: only the qpow-invariant
+            // subspaces are enumerated, as the submodules of V with qpow acting (an F[X]-module). This
+            // is much faster than enumerating all the subspaces of V (B4 case 1, Z+3O in Q(3^(1/8)):
+            // 14250 invariant subspaces of F_3^7 against 2051562).
+            Vq:=RModule([ MatrixAlgebra(F,dV)!Matrix(qpow) ]);
+            subs_type2 := [ sub<V|[ V!Eltseq(Vq!b) : b in Basis(W) ]> :
+                                W in Submodules(Vq : CodimensionLimit := dV-2) ]; //we exclude dim 0 and 1
             for W in subs_type2 do
                 if Dimension(W)+1 in dims and
                         not exists{ w : w in type1_ws | w in W } and

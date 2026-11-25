@@ -889,7 +889,13 @@ picard_group_non_maximal:=function(S, GRH)
     vprintf AlgEtQPicardGroup, 2: "PicardGroup: ker(mDP) = %o\n",Kernel(mDP);
     gens_P_in_D:=picard_small_generators(D,mDH,P,mDP);
     if #P eq 1 then
-        return P,map<P->Parent(OneIdeal(S)) | rep:->OneIdeal(S), id:->Zero(P)>;
+        trivial_log:=function(id)
+            // as in the maximal case: the ideal must be over S (and invertible)
+            assert Order(id) eq S;
+            assert2 IsInvertible(id);
+            return Zero(P);
+        end function;
+        return P,map<P->Parent(OneIdeal(S)) | rep:->OneIdeal(S), id:->trivial_log(id) >;
     end if;
 
     data:=rec< picard_fmt | S:=S, O:=O, F:=F, FO:=FO, r:=r, GO:=GO, gO:=gO, gens_GO_in_S:=gens_GO_in_S,
@@ -909,6 +915,8 @@ picard_group_non_maximal:=function(S, GRH)
     data`generators_ideals:=generators_ideals;
     cod:=Parent(picard_representative(data,Zero(P)));
     p:=map<P -> cod | rep:->picard_representative(data,rep), id:->picard_discrete_log(data,id) >;
+    // as in the maximal case: the discrete logarithm inverts the representatives
+    assert2 forall{ g : g in Generators(P) | p(g)@@p eq g };
     vprintf AlgEtQPicardGroup, 2:"PicardGroup: computation is concluded\n
                         generators_ideals = %o\n",
                         [PrintSeqAlgEtQElt(ZBasis(I)) : I in generators_ideals];

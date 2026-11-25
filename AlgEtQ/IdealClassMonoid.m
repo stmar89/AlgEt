@@ -73,12 +73,13 @@ intrinsic ICM_bar(S::AlgEtQOrd : GRH:=false ) -> SeqEnum
         used_GRH:=S`PicardGroup[3]; // the stored Picard group can be one computed without GRH
         repS:=[gS(x) : x in GS];
         ICM_barS := &cat[[I*J : I in seqWKS_bar] : J in repS];
+        // the multiplicator rings computed on fresh copies, before the attribute is set below
+        assert2 forall{J : J in ICM_barS | MultiplicatorRing(Ideal(S,ZBasis(J))) eq S};
         for iI in [1..#ICM_barS] do
             I:=ICM_barS[iI];
             I`MultiplicatorRing:=S;
             ZBasisLLL(I);
         end for;
-        assert2 forall{J : J in ICM_barS | MultiplicatorRing(J) eq S};
         assert forall{J : J in ICM_barS | Order(J) eq S};
         S`ICM_bar:=<ICM_barS,used_GRH>;
     end if;

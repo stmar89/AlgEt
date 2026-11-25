@@ -57,7 +57,7 @@ intrinsic _MinimalIntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQI
             // More precisely, given generators ai of S over Z, to find the (minimal) sub-S-modules,
             // it is enough to look at Qp as module over Fp[ai]. In matrices we store the matrix
             // representations of the action of the ZBasis of S on Qp.
-            matrices:=[Matrix(Fp,[ Eltseq(Qp!(q(zS*(Qp.j@@q)))) : j in [1..Ngens(Qp)]]) : zS in ZBasis(S) ];
+            matrices:=[Matrix(Fp,[ Eltseq(Qp!(q(zS*(Qp.j@@q)))) : j in [1..Ngens(Qp)]]) : zS in Generators(S) ]; // ring generators of S suffice
             matrices:=Setseq(Seqset(matrices)); //possibly there are repetiions.
             Qp_Rmod:=RModule(matrices);
             min_Rmod:=MinimalSubmodules(Qp_Rmod);
@@ -140,7 +140,7 @@ intrinsic _MaximalIntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQI
             // More precisely, given generators ai of S over Z, to find the (minimal) sub-S-modules,
             // it is enough to look at Qp as module over Fp[ai]. In matrices we store the matrix
             // representations of the action of the ZBasis of S on Qp.
-            matrices:=[Matrix(Fp,[ Eltseq(qp(q(zS*(Qp.j@@qp@@q)))) : j in [1..Ngens(Qp)]]) : zS in ZBasis(S) ];
+            matrices:=[Matrix(Fp,[ Eltseq(qp(q(zS*(Qp.j@@qp@@q)))) : j in [1..Ngens(Qp)]]) : zS in Generators(S) ]; // ring generators of S suffice
             matrices:=Setseq(Seqset(matrices)); //possibly there are repetiions.
             Qp_Rmod:=RModule(matrices);
             max_Rmod:=MaximalSubmodules(Qp_Rmod);

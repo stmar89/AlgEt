@@ -76,8 +76,9 @@ end intrinsic;
 /// Given a sequence of primes $P$ of the maximal order, it returns a sequence of elements $t_P$ such that $t_P$ is a uniformizer at $P$ and a unit at every other prime in the sequence. The output does not depend on the random state.
 intrinsic Uniformizers(PPs::SeqEnum[AlgEtQIdl]) -> SeqEnum
 {Given a sequence of primes P of the maximal order, it returns a sequence of elements t_P such that t_P is a uniformizer at P and a unit at every other prime in the sequence. The output does not depend on the random state.}
+    require #PPs gt 0 : "The sequence must not be empty.";
     OO:=Order(PPs[1]);
-    require IsMaximal(OO) and forall{P : P in PPs | IsPrime(P)} : "The input needs to be a sequence of primes of the maximal order.";
+    require IsMaximal(OO) and forall{P : P in PPs | Order(P) eq OO and IsPrime(P)} : "The input needs to be a sequence of primes of the maximal order.";
     require #Seqset(PPs) eq #PPs : "The primes must be distinct.";
     vprintf Uniformizers,2 : "nice_uniformizers: %o primes\n",#PPs;
     one:=One(Algebra(PPs[1]));
@@ -172,6 +173,12 @@ end intrinsic;
     A:=EtaleAlgebra(x^2+1); O:=MaximalOrder(A);
     P:=PrimesAbove(2*OneIdeal(O))[1];
     failed:=false; try _:=Uniformizers([P,P]); catch e failed:=true; end try; assert failed;
+    printf ".";
+    // the primes must be of the same maximal order
+    _<x>:=PolynomialRing(Integers());
+    O1:=MaximalOrder(EtaleAlgebra(x^2+1)); O2:=MaximalOrder(EtaleAlgebra(x^2+1));
+    failed:=false; try _:=Uniformizers([PrimesAbove(2*OneIdeal(O1))[1],PrimesAbove(5*OneIdeal(O2))[1]]); catch e failed:=true; end try; assert failed;
+    failed:=false; try _:=Uniformizers([Universe([PrimesAbove(2*OneIdeal(O1))[1]])|]); catch e failed:=true; end try; assert failed;
     printf ".";
     SetAssertions(1);
     printf " all good!";

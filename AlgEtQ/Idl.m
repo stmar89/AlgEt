@@ -788,6 +788,7 @@ intrinsic ColonIdeal(I::AlgEtQIdl,J::AlgEtQIdl)->AlgEtQIdl
     d:=dI*LCM(dRs);
     M:=VerticalJoin([ Transpose( (d div (dI*dRs[k]))*crQZ(dRs[k]*Rs[k])*ZIinv ) : k in [1..#Rs] ]);
     H:=hnf(M); // N x N and upper triangular: M has rank N
+    assert Nrows(H) eq N; // a degenerate J would fail later with an index error
     // The rows of ((1/d)*H)^-T = d*Transpose(H^-1) are a Z-basis of (I:J). Since H is triangular,
     // H^-1 = Adjoint(H)/det(H) with det(H) the product of the diagonal entries: this is faster than
     // inverting a rational matrix.

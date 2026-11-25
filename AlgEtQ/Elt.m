@@ -167,9 +167,10 @@ intrinsic AbsoluteCoordinates(seq::SeqEnum[AlgEtQElt] , basis::SeqEnum[AlgEtQElt
     require forall{ b : b in basis | Algebra(b) cmpeq A } : "the basis must be in the algebra of the elements";
     Mbasis:=Matrix([ AbsoluteCoordinates(b) : b in basis ]);
     require #basis eq AbsoluteDimension(A) and Determinant(Mbasis) ne 0: "the elements given do not form a basis";
-    Mseq:=[ Matrix([AbsoluteCoordinates(b)]) : b in seq ];
-    Mcoeff:=[ Solution(Mbasis,S) : S in Mseq ];
-    out:=[ Eltseq(C) : C in Mcoeff ];
+    // one inversion for the whole sequence, instead of one system per element
+    Mseq:=Matrix([ AbsoluteCoordinates(b) : b in seq ]);
+    Mcoeff:=Mseq*Mbasis^-1;
+    out:=[ Eltseq(r) : r in Rows(Mcoeff) ];
     vprintf AlgEtQElt,3 : "Mbasis=\n%o\nMseq=\n%o\nMcoeff=\n%o\nout=\n%o\n",Mbasis,Mseq,Mcoeff,out;
     assert2 forall{i : i in [1..#seq] | seq[i] eq &+[out[i][j]*basis[j] : j in [1..#basis]]};
     return out;

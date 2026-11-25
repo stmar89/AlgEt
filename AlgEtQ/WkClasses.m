@@ -378,6 +378,8 @@ intrinsic WKICM_bar(S::AlgEtQOrd) -> SeqEnum[AlgEtQIdl]
         elif CohenMacaulayType(S) eq 2 then
             vprintf WKICM_bar,2 : " Cohen Macaulay type 2 case\n";
             S`WKICM_bar:=wkicm_bar_CM_type2(S,NonGorensteinPrimes(S));
+            // the multiplicator rings computed again, on fresh copies of the ideals
+            assert2 forall{ J : J in S`WKICM_bar | MultiplicatorRing(Ideal(S,ZBasis(J))) eq S };
         else
             vprintf WkClasses,2:"Order of CohenMacaulayType = %o\n",CohenMacaulayType(S);
             // general case
@@ -426,6 +428,8 @@ intrinsic WKICM_bar(S::AlgEtQOrd) -> SeqEnum[AlgEtQIdl]
                 end for;
                 // We now reconstruct W_bar(S) using the P-local parts W_P_bar(S) = W_bar(S+P^kO)
                 wk:=patch_local_parts(S,pp,ps,wk_pp,"WKICM_bar");
+                // the multiplicator rings computed again, on fresh copies of the ideals
+                assert2 forall{ J : J in wk | MultiplicatorRing(Ideal(S,ZBasis(J))) eq S };
                 S`WKICM_bar:=wk;
             end if;
         end if;

@@ -147,6 +147,7 @@ hash_from_hnf:=function(H,d)
 // entries of the upper triangular part of (e/d)*H, row by row. With g the gcd of d and of the
 // entries of H, e = d/g and (e/d)*H = H/g.
     dim:=Nrows(H);
+    assert Ncols(H) eq dim; // a lattice of full rank: a degenerate one would get a truncated hash
     g:=GCD(d,GCD(Eltseq(H)));
     entries:=&cat[ Eltseq(H[i])[i..dim] : i in [1..dim] ];
     if g ne 1 then
@@ -292,7 +293,8 @@ intrinsic Order( gens::SeqEnum[AlgEtQElt] : Check:=100 , CheckIsKnownOrder:=true
         go:=false;
         repeat
             P_old:=P;
-            gens0 cat:= [(g1*g2) : g1,g2 in gens0];
+            // the algebra is commutative: the products g_i*g_j with i le j suffice
+            gens0 cat:= &cat[ [ gens0[i]*gens0[j] : j in [i..#gens0] ] : i in [1..#gens0] ];
             M:=MatrixAtoQ(gens0);
             d:=Denominator(M);
             M:=crQZ(M*d);
@@ -333,6 +335,12 @@ intrinsic Order( gens::SeqEnum[AlgEtQElt] : Check:=100 , CheckIsKnownOrder:=true
     //we assume that gens is a ZBasis of a multiplicativly closed lattice
         require #gens eq AbsoluteDimension(A) : "with Check:=0 at least as many elements as the dimension are needed";
         zb:=gens;
+        // as in the branch above: a lattice of full rank, closed under multiplication
+        if GetAssertions() ge 2 then
+            H,d:=lattice_hnf(zb);
+            H2,d2:=lattice_hnf(zb cat [ z1*z2 : z1,z2 in zb ]);
+            assert hash_from_hnf(H2,d2) eq hash_from_hnf(H,d);
+        end if;
     end if;
 
     return create_order(A,gens,zb,hash,CheckIsKnownOrder);

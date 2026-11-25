@@ -104,7 +104,10 @@ intrinsic TotallyRealSubAlgebra(K::AlgEtQ) -> AlgEtQ,Map
         bF_pows:=[i gt 1 select Self(i-1)*bF else One(F) : i in [1..dim]];
         b_pows:=[i gt 1 select Self(i-1)*b else One(K) : i in [1..dim]];
         assert Dimension(K)/Dimension(F) eq 2;
-        FtoK:=map<F->K | x:->DotProduct(b_pows,AbsoluteCoordinates([x],bF_pows)[1]) >;
+        // the coordinates in the power basis of bF, with the inverse computed once (not a system at
+        // every evaluation)
+        Minv:=Matrix([ AbsoluteCoordinates(z) : z in bF_pows ])^-1;
+        FtoK:=map<F->K | x:->DotProduct(b_pows,Eltseq(Vector(AbsoluteCoordinates(x))*Minv)) >;
         //FtoK:=hom<F->K | [&+[b^i*coord[j][i+1] : i in [0..dim-1]] : j in [1..dim] ] >;
         assert FtoK(PrimitiveElement(F)) eq b;
         K`TotallyRealSubAlgebra:=<F,FtoK>;

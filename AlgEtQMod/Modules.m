@@ -119,6 +119,8 @@ intrinsic ModuleFromDirectSum(R::AlgEtQOrd,m::Map,seq::SeqEnum[Tup])->AlgEtQMod
     require AR eq Domain(m) : "the map does not have Algebra(R) as domain";
     require m(One(AR)) eq One(UA) : "the map must be unital";
     require forall{I : I in seq | Order(I[1]) eq R } : "the fractional ideals are not R ideals";
+    // the DirectSumRep attribute assumes (J_i:J_i) c (J_i+1:J_i+1)
+    require forall{ i : i in [2..#seq] | MultiplicatorRing(seq[i-1][1]) subset MultiplicatorRing(seq[i][1]) } : "the multiplicator rings of the ideals must form a chain";
     with_maps:=forall{I : I in seq | Type(I[2]) eq Map };
     require with_maps or forall{I : I in seq | Type(I[2]) eq AlgEtQElt } : "the sequence is not valid for this constructor";
     if with_maps then
@@ -309,6 +311,7 @@ end intrinsic;
 
 intrinsic Index(J::AlgEtQMod, I::AlgEtQMod) -> Any
 {Given modules J and I defined over the same order returns [J:I] = [J:J cap I]/[I : J cap I].}
+  require UniverseAlgebra(I) cmpeq UniverseAlgebra(J) : "the modules must be in the same universe algebra";
   out:=Index(I)/Index(J);
   if IsCoercible(Integers(),out) then
     out:=Integers()!out;
@@ -347,6 +350,7 @@ end intrinsic;
 
 intrinsic Quotient(I::AlgEtQMod, J::AlgEtQMod) -> GrpAb, Map
 {Given S-modules J subset I, returns the abelian group Q=I/J together with the quotient map q:I->J.} 
+    require UniverseAlgebra(I) cmpeq UniverseAlgebra(J) : "the modules must be in the same universe algebra";
     // The maps use the Z-basis zbI of I at creation and its inclusion matrix Minv, so that they
     // stay correct if ZBasis(I) is replaced later (see quotient_from_zbases in Quotients.m).
     Minv,zbI := inclusion_matrix(I);
@@ -446,6 +450,19 @@ end intrinsic;
     K:=EtaleAlgebra(x^2+1); O:=MaximalOrder(K); i:=PrimitiveElement(K); R:=Order([9*i]); m:=NaturalAction(K,K);
     assert not Module(O,m,[K!3]) subset Module(R,m,[One(K)]); // 3O is not contained in Z[9i]
     assert Module(R,m,[K!9]) subset Module(O,m,[One(K)]);
+    printf ".";
+    // Index and Quotient need the same universe algebra; ModuleFromDirectSum needs a chain of
+    // multiplicator rings
+    _<x>:=PolynomialRing(Integers());
+    K:=EtaleAlgebra(x^2+20); R:=EquationOrder(K); O:=MaximalOrder(K);
+    V1:=EtaleAlgebra([NumberField(x^2+20)]); V2:=EtaleAlgebra([NumberField(x^2+20)]);
+    M1:=Module(R,NaturalAction(K,V1),AbsoluteBasis(V1)); M2:=Module(R,NaturalAction(K,V2),AbsoluteBasis(V2));
+    failed:=false; try _:=Index(M1,M2); catch e failed:=true; end try; assert failed;
+    failed:=false; try _:=Quotient(M1,M2); catch e failed:=true; end try; assert failed;
+    V:=EtaleAlgebra([NumberField(x^2+20),NumberField(x^2+20)]); m:=NaturalAction(K,V);
+    e:=OrthogonalIdempotents(V);
+    failed:=false; try _:=ModuleFromDirectSum(R,m,[<Ideal(R,ZBasis(O)),e[1]>,<OneIdeal(R),e[2]>]); catch e failed:=true; end try; assert failed;
+    _:=ModuleFromDirectSum(R,m,[<OneIdeal(R),e[1]>,<Ideal(R,ZBasis(O)),e[2]>]); // (R:R) c (O:O): a chain
     printf ".";
     SetAssertions(1);
     printf " all good!";

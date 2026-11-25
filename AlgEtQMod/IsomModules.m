@@ -92,8 +92,8 @@ Method should be of the form "julia -J /tmp/Hecke.so ~/path/to/AlgEt/" (the ".so
     // multiplcition by pi are Z-conjugate.
     // The Z-bases are not LLL-reduced first: on modules over Z+3O in a cubic field, AreGLConjugate
     // was 43% slower with the LLL-reduced bases (ZBasisLLL).
-    matI:=crQZ(Matrix(AbsoluteCoordinates([pi*z : z in ZBasis(I)],ZBasis(I))));
-    matJ:=crQZ(Matrix(AbsoluteCoordinates([pi*z : z in ZBasis(J)],ZBasis(J))));
+    matI:=crQZ(Matrix(AbsoluteCoordinates([pi*z : z in ZBasis(I)],I))); // via the inclusion matrix of I
+    matJ:=crQZ(Matrix(AbsoluteCoordinates([pi*z : z in ZBasis(J)],J)));
     if Method eq "Magma" then
         test,T:=AreGLConjugate(matI,matJ);
         if test then
@@ -149,6 +149,10 @@ To use the latter option, install julia, add the package Hecke and build the pac
 Detailed instructions are provided in the example file in the GitHub repository.
 Method should be of the form "julia -J /tmp/Hecke.so ~/path/to/AlgEt/" (the ".so" might be different according to your SO, according to the output of the julia command "Hecke.build()").}
     require Method eq "Magma" or Method[1..5] eq "julia" : "Method should be Magma or julia or a string of julia command";
+    // the code below assumes that m is the natural action of K on V (it matches the components of K
+    // and V by their defining polynomials)
+    require Domain(m) cmpeq Algebra(R) : "the domain of the map must be the algebra of the order";
+    require forall{ b : b in AbsoluteBasis(Domain(m)) | m(b) eq NaturalAction(Domain(m),Codomain(m))(b) } : "the map must be the natural action of the algebra of the order";
 
     if UseSpecializedMethod then
         if Codomain(m) eq Domain(m) and forall{b:b in AbsoluteBasis(Domain(m))|m(b) eq b} then 
@@ -174,7 +178,7 @@ Method should be of the form "julia -J /tmp/Hecke.so ~/path/to/AlgEt/" (the ".so
     Knfpoly:=[ DefiningPolynomial(L) : L in Components(K) ];
     Vnfpoly:=[ DefiningPolynomial(L) : L in Vnf ];
     MO:=Module(R,m,<1*MaximalOrder(Vnf[i]) : i in [1..#Vnf]>);
-    mat:=Matrix(AbsoluteCoordinates([pi*z : z in ZBasis(MO)],ZBasis(MO)));
+    mat:=Matrix(AbsoluteCoordinates([pi*z : z in ZBasis(MO)],MO));
     min_poly:=MinimalPolynomial(mat);
     char_poly:=CharacteristicPolynomial(mat);
     ff:=O!!Conductor(R);
@@ -206,7 +210,7 @@ Method should be of the form "julia -J /tmp/Hecke.so ~/path/to/AlgEt/" (the ".so
         file:="tmp_" cat ID cat ".txt";
         str:="[\n";
         for i->I in candidates do
-            mat:=Matrix(AbsoluteCoordinates([pi*z : z in ZBasis(I)],ZBasis(I)));
+            mat:=Matrix(AbsoluteCoordinates([pi*z : z in ZBasis(I)],I));
             assert2 MinimalPolynomial(mat) eq min_poly;
             assert2 CharacteristicPolynomial(mat) eq char_poly;
             str cat:=Sprintf("%o,\n", Eltseq(mat));

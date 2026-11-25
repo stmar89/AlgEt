@@ -81,6 +81,7 @@ intrinsic LoadWKICM(str::MonStgElt) -> AlgEtQOrd
 {Given a string produced with PrintWKICM it returns the corresponding order R with populated attributes regarding overorders and weak equivalence classes. These can be recovered with the appropriate intrinsics.}
 
     data:=eval(str);
+    require #data eq 2 : "the string is not in the format of PrintWKICM";
     PP:=PolynomialRing(Rationals());
     ff:=[ PP!f : f in data[1]];
     // DoLinearExtension: for the Q components, as in EtaleAlgebra(f)
@@ -88,7 +89,10 @@ intrinsic LoadWKICM(str::MonStgElt) -> AlgEtQOrd
     wk:=data[2];
 
     ooR:=[ Order([ A ! s : s in wk[j][1]]) : j in [1..#wk] ];
+    require #{@ S : S in ooR @} eq #ooR : "the string contains repeated overorders";
     indices:=[ Index(S,ooR[1]) : S in ooR ];
+    require forall{ i : i in indices | Denominator(i) eq 1 } : "the first order must be contained in the others";
+    assert2 forall{ S : S in ooR | ooR[1] subset S };
     max,indO:=Max(indices);
     assert #[ i : i in indices | i eq max ] eq 1; //sanity check
     O:=ooR[indO]; // this is the maximal order of A
@@ -101,6 +105,7 @@ intrinsic LoadWKICM(str::MonStgElt) -> AlgEtQOrd
         OL`MaximalOrder:=OL;
     end for;
     O`IsGorenstein:=true;
+    assert2 O eq MaximalOrder(A); // computed before the attribute is set below
     A`MaximalOrder:=O;
     if #wk gt 1 then
         R:=ooR[1]; // the first one is R
@@ -116,6 +121,8 @@ intrinsic LoadWKICM(str::MonStgElt) -> AlgEtQOrd
         for iI->I in dataS do
             zbI:=[A!s : s in I];
             IS:=Ideal(S,zbI);
+            // the first ideal of each overorder is the order itself (the invertible class)
+            require iI ne 1 or Index(IS) eq Index(S) : "the first ideal of each overorder must be the order";
             IS`MultiplicatorRing:=S;
             IS`ZBasis:=zbI;
             IS`IsInvertible:=iI eq 1; //only the first is invertible
@@ -174,6 +181,9 @@ end intrinsic;
     assert #FindOverOrders(E) eq #FindOverOrders(E1);
     printf ".";
 
+    // a string which is not the output of PrintWKICM
+    failed:=false; try _:=LoadWKICM("<[1,2,3]>"); catch e failed:=true; end try; assert failed;
+    printf ".";
     SetAssertions(1);
     printf " all good!";
 */

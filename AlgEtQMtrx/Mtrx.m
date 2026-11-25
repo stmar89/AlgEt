@@ -442,6 +442,7 @@ end intrinsic;
 intrinsic '&+'(seq::SeqEnum[AlgEtQMtrx]) -> AlgEtQMtrx
 {Given a sequence of AlgEtQMtrx returns the sum of the matrices.}
     require #seq ne 0 : "The sequence should be non-empty.";
+    require forall{ x : x in seq | Universe(x) cmpeq Universe(seq[1]) } : "the matrices must be over the same algebra";
     if #seq eq 1 then
         out:=seq[1];
     else
@@ -456,6 +457,7 @@ end intrinsic;
 intrinsic '&*'(seq::SeqEnum[AlgEtQMtrx]) -> AlgEtQMtrx
 {Given a sequence of AlgEtQMtrx returns the product of the matrices.}
     require #seq ne 0 : "The sequence should be non-empty.";
+    require forall{ x : x in seq | Universe(x) cmpeq Universe(seq[1]) } : "the matrices must be over the same algebra";
     if #seq eq 1 then
         out:=seq[1];
     else
@@ -474,6 +476,7 @@ end intrinsic;
 intrinsic InsertBlock(x::AlgEtQMtrx,y::AlgEtQMtrx,i::RngIntElt,j::RngIntElt) -> AlgEtQMtrx
 {Return the matrix obtained by inserting matrix Y in X at position [i,j].}
     A:=Universe(x);
+    require Universe(y) cmpeq A : "the matrices must be over the same algebra";
     x:=Components(x);
     y:=Components(y);
     n:=#x;
@@ -488,6 +491,7 @@ end intrinsic;
 intrinsic Solution(x::AlgEtQMtrx,y::AlgEtQMtrx)->AlgEtQMtrx
 {Returns a solution V to the system V.x=y.}
     A:=Universe(x);
+    require Universe(y) cmpeq A : "the matrices must be over the same algebra";
     N:=#Components(x);
     x:=Components(x);
     y:=Components(y);
@@ -586,6 +590,15 @@ end intrinsic;
     X:={@ M : M in e_only @};
     assert forall{ i : i in [1..#mats] | Index(X,c_only[i]) eq i };
 
+    // matrices over different algebras are refused
+    _<x>:=PolynomialRing(Integers());
+    A1:=EtaleAlgebra(x^2+1); A2:=EtaleAlgebra(x^2+2);
+    M1:=Matrix([[One(A1)]]); M2:=Matrix([[One(A2)]]);
+    failed:=false; try _:=&+[M1,M2]; catch e failed:=true; end try; assert failed;
+    failed:=false; try _:=&*[M1,M2]; catch e failed:=true; end try; assert failed;
+    failed:=false; try _:=InsertBlock(M1,M2,1,1); catch e failed:=true; end try; assert failed;
+    failed:=false; try _:=Solution(M1,M2); catch e failed:=true; end try; assert failed;
+    printf ".";
     printf " all good!\n"; 
 
 

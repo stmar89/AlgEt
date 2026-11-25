@@ -74,7 +74,11 @@ declare attributes AlgEtQMod :
                                                       // M is an S-module
 
 
-is_pure_power_internal:=function(m)
+// The stored outputs of is_pure_power_internal, one entry for each action map m with codomain the
+// algebra: <m,true,oneKs,isom,embs,projs> or <m,false>.
+declare attributes AlgEtQ : PurePowerData;
+
+is_pure_power_compute:=function(m)
 //Given a m:K->V module returns whether V is isomorphic to K^r, for some r, and, if so, also a
 //sequence of elements of V which are the r distinct copies if 1_K in V and an isomorphism K^r->V,
 //together with embeddings K->Kr and projections Kr->K.
@@ -117,6 +121,33 @@ is_pure_power_internal:=function(m)
         return false,_,_,_,_;
     else
         return true,oneKs,isom,embs,projs;
+    end if;
+end function;
+
+is_pure_power_internal:=function(m)
+// As is_pure_power_compute, whose outputs (a direct product and an invertible Hom) are stored in
+// V:=Codomain(m), for the map m: the modules pass their stored action map, so the same object comes
+// back, and the maps are compared with IsIdentical.
+    V:=Codomain(m);
+    if not assigned V`PurePowerData then
+        V`PurePowerData:=[* *];
+    end if;
+    for t in V`PurePowerData do
+        if IsIdentical(t[1],m) then
+            if t[2] then
+                return true,t[3],t[4],t[5],t[6];
+            else
+                return false,_,_,_,_;
+            end if;
+        end if;
+    end for;
+    test,oneKs,isom,embs,projs:=is_pure_power_compute(m);
+    if test then
+        Append(~V`PurePowerData,<m,true,oneKs,isom,embs,projs>);
+        return true,oneKs,isom,embs,projs;
+    else
+        Append(~V`PurePowerData,<m,false>);
+        return false,_,_,_,_;
     end if;
 end function;
 
@@ -468,9 +499,16 @@ intrinsic IsomorphismClassesOverBassOrder(R::AlgEtQOrd, map::Map )->SeqEnum[AlgE
     for seq in seqs do
         assert #seq eq #ones;
         seqid:=[ Ideal(R,ZBasis(seq[i])) : i in [1..#seq] ];
-        assert2 forall{ i : i in [2..#seqid] | MultiplicatorRing(seqid[i-1]) subset MultiplicatorRing(seqid[i])};
-        // the conditions asserted in the previous condition is assumed by the DirectSumRep
-        // attribute
+        // the multiplicator rings are known: the first entries are overorders (an order is its own
+        // multiplicator ring), the last one is an invertible ideal of its order. They are set, so
+        // that the check of the chain in ModuleFromDirectSum is free here.
+        for i in [1..#seq-1] do
+            seqid[i]`MultiplicatorRing:=seq[i];
+        end for;
+        seqid[#seq]`MultiplicatorRing:=Order(seq[#seq]);
+        // the chain (J_i:J_i) c (J_i+1:J_i+1), assumed by the DirectSumRep attribute, checked on
+        // fresh copies
+        assert2 forall{ i : i in [2..#seqid] | MultiplicatorRing(Ideal(R,ZBasis(seqid[i-1]))) subset MultiplicatorRing(Ideal(R,ZBasis(seqid[i])))};
         M:=ModuleFromDirectSum(R,map,[<seqid[i],ones[i]> : i in [1..#seq]]);
         Append(~output,M);
     end for;

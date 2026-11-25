@@ -297,37 +297,34 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl : CheckIsKnownOrde
             q:=Index(R,P);
             // This map V->V sends x:->x^q. It is well-def.
             qpow:=hom<V->V | [mVTtoV(pow(v@@mVTtoV,q)) : v in Basis(V)]>;
-            eigen_vals:=[e[1] : e in Setseq(Eigenvalues(Matrix(qpow)))];
-            eigen_spaces:=[Kernel(hom<V->V | [qpow(v)-e*v : v in Basis(V)]>): e in eigen_vals]; 
-
             F:=BaseField(V);
-            type1_ws:=[V|]; // the images in V of the generators of the minimal overorders S with
-                            // dim_F(S/R)=1.
-            for E in eigen_spaces do
-                n:=Dimension(E);
-                // The following loop generates all generators of 1-dimensional subspaces of E.
-                for pivot := 1 to n do
-                    // Pre-pivot elements are 0, pivot is 1, post-pivot elements vary over F
-                    tail_tuples := CartesianPower(F, n - pivot);
-                    for t in tail_tuples do
-                        w := V!E!([F!0 : j in [1..pivot-1]] cat [F!1] cat [F!x : x in t]);
-                        if q eq 2 then
-                            // for q eq 2 being a subspace of the eigenspace guarantees that it
-                            // is mult closed
-                            S:=Order([w@@mTV] cat zbR : CheckIsKnownOrder:=CheckIsKnownOrder);
-                            Include(~output,S);// necessarily minimal, because it has dim 1
-                            Append(~type1_ws,w);
-                        else
-                            wVT:=w@@mVTtoV;
-                            w_square:=pow(wVT,2)@mVTtoV;
-                            if Rank(Matrix([w,w_square])) eq 1 then
-                                S:=Order(Append(zbR,wVT@@mTtoVT) : CheckIsKnownOrder:=CheckIsKnownOrder);
-                                Include(~output,S); // necessarily minimal, because it has dim 1
-                                Append(~type1_ws,w);
-                            end if;
-                        end if;
-                    end for;
-                end for;
+            // All the minimal overorders S come from qpow-invariant subspaces W of V: B=S/P is closed
+            // under x:->x^q, so W=B/F is invariant under qpow. We enumerate them once, as the
+            // submodules of V with qpow acting (an F[X]-module), by increasing dimension. This is much
+            // faster than enumerating all the subspaces of V (B4 case 1, Z+3O in Q(3^(1/8)): 14250
+            // invariant subspaces of F_3^7 against 2051562).
+            Vq:=RModule([ MatrixAlgebra(F,dV)!Matrix(qpow) ]);
+            subs:=[ sub<V|[ V!Eltseq(Vq!b) : b in Basis(W) ]> : W in Submodules(Vq) ];
+            // Type 1: the minimal overorders S with dim_F(S/R)=1, i.e. the invariant lines Fw (the
+            // eigenvectors of qpow) such that F+Fw is closed under multiplication.
+            type1_ws:=[V|]; // the generators w of the lines of type 1
+            for W in [ W : W in subs | Dimension(W) eq 1 ] do
+                w:=Basis(W)[1];
+                if q eq 2 then
+                    // for q eq 2 being an invariant line, hence in the eigenspace of 1, guarantees that
+                    // it is mult closed
+                    S:=Order([w@@mTV] cat zbR : CheckIsKnownOrder:=CheckIsKnownOrder);
+                    Include(~output,S);// necessarily minimal, because it has dim 1
+                    Append(~type1_ws,w);
+                else
+                    wVT:=w@@mVTtoV;
+                    w_square:=pow(wVT,2)@mVTtoV;
+                    if Rank(Matrix([w,w_square])) eq 1 then
+                        S:=Order(Append(zbR,wVT@@mTtoVT) : CheckIsKnownOrder:=CheckIsKnownOrder);
+                        Include(~output,S); // necessarily minimal, because it has dim 1
+                        Append(~type1_ws,w);
+                    end if;
+                end if;
             end for;
             ////////////////////////////////////////////////////////////////////////////
             // The other minimal overorders S of R are such that S/P is a finite field extension of
@@ -340,13 +337,7 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl : CheckIsKnownOrde
             // F, since [B:F] is prime.
             // Hence S is minimal if and only if W contains none of the lines spanned by type1_ws.
             dims := PrimesUpTo(dV+1); //the plus one is to prevent issues when d=2.
-            // B=S/P is closed under x:->x^q, so W=B/F is invariant under qpow: only the qpow-invariant
-            // subspaces are enumerated, as the submodules of V with qpow acting (an F[X]-module). This
-            // is much faster than enumerating all the subspaces of V (B4 case 1, Z+3O in Q(3^(1/8)):
-            // 14250 invariant subspaces of F_3^7 against 2051562).
-            Vq:=RModule([ MatrixAlgebra(F,dV)!Matrix(qpow) ]);
-            subs_type2 := [ sub<V|[ V!Eltseq(Vq!b) : b in Basis(W) ]> :
-                                W in Submodules(Vq : CodimensionLimit := dV-2) ]; //we exclude dim 0 and 1
+            subs_type2 := [ W : W in subs | Dimension(W) ge 2 ];
             for W in subs_type2 do
                 if Dimension(W)+1 in dims and
                         not exists{ w : w in type1_ws | w in W } and

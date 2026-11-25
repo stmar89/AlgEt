@@ -750,7 +750,18 @@ compact_rep:=function(X, FO, r)
 // a short element of X^-1 also when X is already integral and coprime to FO, as the products in
 // compact_power are.
     a,K:=CoprimeRepresentative(X,FO : MakeSmall:=true);
-    return K,a@@r;
+    O:=Order(FO);
+    if a in O then
+        return K,a@@r;
+    end if;
+    // a is in X^-1, which contains O when X is integral: it can have denominators, at primes not
+    // above FO, while r accepts only elements of O. D = O meet a^-1*O is the ideal of the elements
+    // e of O with e*a in O. It is coprime to FO, since a is a unit at the primes above FO. With e
+    // in D and e = 1 modulo FO, e*a is in O and has the same class as a in R.
+    A:=Algebra(O);
+    D:=OneIdeal(O) meet ((1/a)*OneIdeal(O));
+    e:=ChineseRemainderTheorem(D,FO,Zero(A),One(A));
+    return K,(e*a)@@r;
 end function;
 
 compact_power:=function(g, e, FO, r)
@@ -1175,5 +1186,21 @@ end intrinsic;
     U3:=UnitGroup(E : GRH:=true);
     assert not IsIdentical(U1,U2) and IsIdentical(U2,U3) and Invariants(U1) eq Invariants(U2);
     printf ".";
+
+    // compact_rep: the element a of CoprimeRepresentative(X,FO : MakeSmall) is in X^-1, which
+    // contains O when X is integral, so it can have denominators. Its class in (O/FO)^* was taken
+    // with r directly, which accepts only elements of O: PicardGroup of this overorder (from
+    // PicardGroup_1.8) failed with "Element is not in the codomain of the map".
+    SetAssertions(2);
+    A:=EtaleAlgebra(x^6-3*x^5-3*x^4+65*x^3-48*x^2-768*x+4096);
+    assert [ DefiningPolynomial(K) : K in Components(A) ] eq [ x^2-7*x+16, x^4+4*x^3+9*x^2+64*x+256 ];
+    zb:=[ <[ 0, 0 ], [ -2/9, -1/6, 0, -1/18 ]>, <[ 0, 0 ], [ -1/9, 1/6, 0, -5/18 ]>,
+          <[ 0, 0 ], [ 0, 1/6, 1/3, 1/6 ]>, <[ 0, 0 ], [ 2/9, -1/6, 1/3, -5/18 ]>,
+          <[ 1, 0 ], [ 0, 0, 0, 0 ]>, <[ 0, 1 ], [ 0, 0, 0, 0 ]> ];
+    S:=Order([ A!t : t in zb ]);
+    P,p:=PicardGroup(S : GRH:=true);
+    assert Invariants(P) eq [ 2, 8 ] and forall{ g : g in P | p(g)@@p eq g };
+    printf ".";
+    SetAssertions(1);
     printf " all good!";
 */

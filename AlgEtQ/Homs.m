@@ -28,10 +28,12 @@ intrinsic HomsToC(A::AlgEtQ : Precision:=_Precision(GetDefaultRealField()))->Seq
 {Returns the sequence of homomorphisms from the étale algebra to the complex field. The precision of the target can be set by the parameter "Precision".}
     if not assigned A`HomsToC or (Precision ne _Precision(Codomain(A`HomsToC[1]))) then
         CC:=ComplexField(Precision);
-        images:=function(x)
-            return &cat[[CC ! z : z in Conjugates(y : Precision:=Precision)] : y in Components(x)];
-        end function;
-        maps:=[ map< A -> CC | x:-> images(x)[k] > : k in [1..Dimension(A)]];
+        // The k-th map is the j-th embedding of the i-th component, in the order of the components:
+        // it computes the conjugates of the i-th component of x only.
+        degs:=[ AbsoluteDegree(K) : K in Components(A) ];
+        ij:=&cat[ [ <i,j> : j in [1..degs[i]] ] : i in [1..#degs] ];
+        maps:=[ map< A -> CC | x:-> CC ! Conjugates(Components(x)[t[1]] : Precision:=Precision)[t[2]] >
+                : t in ij ];
         A`HomsToC:=maps;
     end if;
     return A`HomsToC;
@@ -154,6 +156,15 @@ end intrinsic;
         a:=Random(K); b:=Random(K);
         assert m(a*b) eq m(a)*m(b) and m(a+b) eq m(a)+m(b) and m(One(K)) eq One(V);
     end for;
+    printf ".";
+    // HomsToC: the k-th map is the j-th conjugate of the i-th component, in the order of the
+    // components
+    A:=EtaleAlgebra([NumberField(x^2+5),NumberField(x^3-2),NumberField(x-3 : DoLinearExtension)]);
+    a:=A!<[1,2],[1/2,0,3],[5]>;
+    hh:=HomsToC(A);
+    old:=&cat[ [ ComplexField() ! z : z in Conjugates(y) ] : y in Components(a) ];
+    assert #hh eq 6 and [ h(a) : h in hh ] eq old;
+    assert forall{ h : h in hh | Abs(h(a*a)-h(a)^2) lt 10^-20 };
     printf ".";
     SetAssertions(1);
     printf " all good!";

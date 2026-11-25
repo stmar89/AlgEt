@@ -187,10 +187,12 @@ intrinsic '^'(x::AlgEtQWECMElt,n::RngIntElt)->AlgEtQWECMElt
         return x;
     elif assigned x`IsIdempotent and IsIdempotent(x) then
         return x;
-    elif n eq 2 then
-        return x*x; //using the multiplication table
     else
-        return Parent(x)!(Ideal(x)^n);
+        // Repeated squaring through '*', which uses the multiplication table, instead of forming
+        // Ideal(x)^n.
+        y:=x^(n div 2);
+        y:=y*y;
+        return IsOdd(n) select y*x else y;
     end if;
 end intrinsic;
 
@@ -551,6 +553,15 @@ end intrinsic;
     E:=EquationOrder(A);
     W,w:=WeakEquivalenceClassMonoidAbstract(E);
     assert forall{ I : I in WKICM(E) | IsWeakEquivalent(w(I@@w),I) };
+    printf ".";
+
+    // powers of weak classes, against the powers of the ideals
+    SetAssertions(1);
+    for a in Classes(W) do
+        for n in [0,1,2,3,5,6] do
+            assert a^n eq (n eq 0 select One(W) else W!(w(a)^n));
+        end for;
+    end for;
     printf ".";
 
     SetAssertions(1);

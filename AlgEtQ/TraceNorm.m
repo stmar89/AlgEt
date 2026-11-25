@@ -86,6 +86,7 @@ intrinsic TraceDualIdeal(I::AlgEtQIdl) -> AlgEtQIdl
         end if;
         ZBasisLLL(It);
         I`TraceDualIdeal:=It;
+        It`TraceDualIdeal:=I; // (I^t)^t = I
     end if;
     return I`TraceDualIdeal;
 end intrinsic;
@@ -162,6 +163,15 @@ end intrinsic;
         assert TraceDualIdeal(E) eq TraceDualIdeal(OneIdeal(E));
         printf ".";
     end for;
+    // (I^t)^t is I itself, in a fresh algebra (eq copies attributes between equal ideals)
+    A:=EtaleAlgebra((x^2+5)*(x^3-2));
+    E:=EquationOrder(A);
+    pi:=PrimitiveElement(A);
+    I:=Ideal(E,[ A!3, pi^2+1 ]);
+    It:=TraceDualIdeal(I);
+    assert IsIdentical(TraceDualIdeal(It),I);
+    assert TraceDualIdeal(Ideal(E,ZBasis(It))) eq I;
+    printf ".";
     SetAssertions(1);
     printf " all good!";
 */

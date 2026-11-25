@@ -35,7 +35,7 @@ end intrinsic;
 ///## Attributes
 
 ///### Components, equality testing and defining polynomial
-/// Two étale algebras are defined to be equal if the ordered sequence of their components are the same.
+/// Two étale algebras are equal if and only if they are the same object: two algebras created separately, even from the same number fields, are different, and their elements cannot be coerced into each other.
 
 /// Returns the number fields of which $A$ is a product of, together with embeddings and projections.
 intrinsic Components(A::AlgEtQ) -> SeqEnum,SeqEnum,SeqEnum
@@ -44,15 +44,14 @@ intrinsic Components(A::AlgEtQ) -> SeqEnum,SeqEnum,SeqEnum
 end intrinsic;
 
 intrinsic 'eq'(A1::AlgEtQ,A2::AlgEtQ) -> BoolElt
-{Two étale algebras are defined to be equal if they have the same components.}
-   // The same object: this is the common case (every equality of elements, orders and ideals starts
-   // by comparing their algebras), and comparing the components costs much more.
-   if IsIdentical(A1,A2) then
-       return true;
-   end if;
-   c1,e1,p1:=Components(A1);
-   c2,e2,p2:=Components(A2);
-   return <c1,e1,p1> eq <c2,e2,p2>;
+{Two étale algebras are equal if and only if they are the same object.}
+   // Elements, orders, ideals and the data cached on an algebra (for example its known orders and
+   // its maximal order) belong to one algebra object: two different objects built from the same
+   // number fields are different algebras, and their elements cannot be coerced into each other.
+   // This is also a pointer comparison, while comparing the components, the embeddings and the
+   // projections was costly (and the embeddings and projections are new maps for each algebra, so
+   // two different objects were never equal anyway).
+   return IsIdentical(A1,A2);
 end intrinsic;
 
 /// Returns the defining polynomial of $A$, if the components are distinct number fields.
@@ -139,6 +138,11 @@ end intrinsic;
     assert A eq A;
     assert A cmpeq A;
     assert not A cmpeq B;
+    // two algebras built from the same number fields are different algebras too
+    K1:=NumberField(x^2+5); K2:=NumberField(x^3-2);
+    A:=EtaleAlgebra([K1,K2]);
+    B:=EtaleAlgebra([K1,K2]);
+    assert Components(A) eq Components(B) and A ne B and not IsCoercible(A,B!<K1.1,K2.1>);
     SetAssertions(1);
     printf " all good!";
 

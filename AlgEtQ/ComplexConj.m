@@ -17,6 +17,8 @@ declare attributes AlgEtQ : HasComplexConjugate;
 declare attributes AlgEtQOrd : IsConjugateStable;
 declare attributes AlgEtQIdl : IsConjugateStable;
 
+import "Ord.m" : lattice_hnf, hash_from_hnf, MatrixQtoA, crZQ;
+
 ///# Complex Conjugation and CM-étale algebras
 /// Let $A$ be an étale algebra over $\mathbb{Q}$ with components $K_1\times\cdots\times K_n$.
 /// We say that $A$ is a `CM-étale algebra` if every component $K_i$ is a CM-field, that is, $K_i$ has involution that acts as applying complex conjugation after applying any homomorphism to the complex numbers. If $A$ is a CM-étale algebra, then it has an involution with the same property. For this reason, we call this involution `complex conjugation` and denote as $\overline{\cdot}$.
@@ -70,7 +72,13 @@ intrinsic IsConjugateStable(I::AlgEtQIdl) -> BoolElt,AlgEtQIdl
     if not assigned I`IsConjugateStable then
         O:=Order(I);
         is_stableO,Ob:=IsConjugateStable(O);
-        Ib:=Ideal(Ob,[ ComplexConjugate(x) : x in ZBasis(I)]);
+        conj:=[ ComplexConjugate(x) : x in ZBasis(I) ];
+        Ib:=Ideal(Ob,conj);
+        // conj is a Z-basis of Ib: its HNF gives the ZBasis and the hash that ZBasis(Ib) would
+        // compute from the dim^2 products of conj with ZBasis(Ob).
+        H,d:=lattice_hnf(conj);
+        Ib`ZBasis:=MatrixQtoA(Algebra(I),(1/d)*crZQ(H));
+        Ib`Hash:=hash_from_hnf(H,d);
         if not is_stableO then
             is_stable:=false; //can't compare I and Ib since they are defined over different orders
         else
@@ -115,6 +123,22 @@ end intrinsic;
     assert IsConjugateStable(S);
     assert IsConjugateStable(TraceDualIdeal(S));
     assert not IsConjugateStable(EquationOrder(K));
+    printf ".";
+    // the ZBasis and the hash of the conjugate ideal, set from the conjugates of a Z-basis, are the
+    // ones computed from its generators
+    // (for a conjugate stable ideal the second output is the ideal itself)
+    E:=EquationOrder(K);
+    pi:=PrimitiveElement(K);
+    checked:=0;
+    for I in [ TraceDualIdeal(E), Ideal(E,[ K!2, pi+1 ]), Ideal(E,[ K!3, pi^2+pi+1 ]) ] do
+        stable,Ib:=IsConjugateStable(I);
+        if not stable then
+            Ib2:=Ideal(Order(Ib),Generators(Ib));
+            assert ZBasis(Ib) eq ZBasis(Ib2) and myHash(Ib) eq myHash(Ib2);
+            checked+:=1;
+        end if;
+    end for;
+    assert checked gt 0;
     printf ".";
     SetAssertions(1);
     printf " all good!";

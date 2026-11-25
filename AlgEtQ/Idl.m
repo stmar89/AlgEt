@@ -202,6 +202,15 @@ intrinsic '!!'(T::AlgEtQOrd,I::AlgEtQIdl) -> AlgEtQIdl
         if assigned I`HashValue then
             id`HashValue:=I`HashValue;
         end if;
+        // The same holds for the index, and the inclusion matrix depends only on the ZBasis, which
+        // is the same object. Not MinimalInteger: it requires the ideal to be integral over its
+        // order, which I might be over Order(I) and not over T.
+        if assigned I`Index then
+            id`Index:=I`Index;
+        end if;
+        if assigned I`inclusion_matrix then
+            id`inclusion_matrix:=I`inclusion_matrix;
+        end if;
         return id;
     else //in this case Order(I) is strictly contained in T
         // The extensions of I to the maximal order and to the multiplicator ring of I are computed
@@ -1479,6 +1488,23 @@ end intrinsic;
         assert MultiplicatorRing(F2) eq O and not IsInvertible(F2);
         assert Conductor(O) eq OneIdeal(O) and IsInvertible(Conductor(O));
     end for;
+    printf ".";
+
+    // products with the unit ideal, and attributes kept by T!!I
+    A:=EtaleAlgebra((x^2+5)*(x^2+7));
+    E:=EquationOrder(A);
+    O:=MaximalOrder(A);
+    pi:=PrimitiveElement(A);
+    I:=Ideal(E,[ 2*pi+1, 3*pi^2 ]);
+    assert IsIdentical(I*OneIdeal(E),I) and IsIdentical(OneIdeal(E)*I,I) and IsIdentical(I*Ideal(E,One(A)),I);
+    S1:=Ideal(E,ZBasis(E)); // the unit ideal, given by a Z-basis: the product is computed
+    assert S1*I eq I and I*S1 eq I;
+    J:=O!!I;
+    _:=Index(J); _:=MinimalInteger(J); _:=AbsoluteCoordinates([One(A)],J);
+    J2:=E!!J;
+    assert assigned J2`Index and assigned J2`inclusion_matrix and not assigned J2`MinimalInteger;
+    assert J2`Index eq Index(Ideal(E,ZBasis(J)));
+    assert J2 eq Ideal(E,ZBasis(J)) and AbsoluteCoordinates([One(A)],J2) eq AbsoluteCoordinates([One(A)],J);
     printf ".";
 
     SetAssertions(1);

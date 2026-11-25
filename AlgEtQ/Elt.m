@@ -721,10 +721,12 @@ end intrinsic;
 intrinsic Evaluate(f::RngUPolElt,a::AlgEtQElt) -> AlgEtQElt
 {Evaluate the polynomial f at the element a.}
     A:=Algebra(a);
-    coeff:=Coefficients(f);
-    pow_a:=[ i gt 1 select Self(i-1)*a else One(A) : i in [1..#coeff]];
-    //Self makes it much more efficient
-    return A!&+[ coeff[i]*pow_a[i] : i in [1..#coeff] ];
+    // Horner's rule
+    out:=Zero(A);
+    for c in Reverse(Coefficients(f)) do
+        out:=out*a+c;
+    end for;
+    return out;
 end intrinsic;
 
 ///# Example 1
@@ -957,6 +959,17 @@ end intrinsic;
         assert AbsoluteRepresentationMatrix(a) eq Ma;
     end for;
     assert IsOne(RepresentationMatrix(One(A))) and IsZero(RepresentationMatrix(Zero(A)));
+    printf ".";
+
+    // Evaluate, against the sum of the powers
+    _<y>:=PolynomialRing(Rationals());
+    A:=EtaleAlgebra([NumberField(x^2+5),NumberField(x^3-2)]);
+    a:=A!<[1,2],[1/2,0,3]>;
+    for f in [ y^5-3/2*y^2+7, y-1, 3+0*y, 0*y ] do
+        c:=Coefficients(f);
+        assert Evaluate(f,a) eq &+([ c[i]*a^(i-1) : i in [1..#c] ] cat [Zero(A)]);
+    end for;
+    assert Evaluate(MinimalPolynomial(a),a) eq Zero(A);
     printf ".";
 
     SetAssertions(1);

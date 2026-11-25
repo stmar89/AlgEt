@@ -331,6 +331,7 @@ intrinsic Order( gens::SeqEnum[AlgEtQElt] : Check:=100 , CheckIsKnownOrder:=true
         end if;
     else
     //we assume that gens is a ZBasis of a multiplicativly closed lattice
+        require #gens eq AbsoluteDimension(A) : "with Check:=0 at least as many elements as the dimension are needed";
         zb:=gens;
     end if;
 
@@ -985,6 +986,10 @@ end intrinsic;
     assert Order([PrimitiveElement(A)] : Check:=1) eq EquationOrder(A);
     _<y>:=PolynomialRing(Rationals());
     failed:=false; try _:=EquationOrder(EtaleAlgebra(y^2-1/2)); catch e failed:=true; end try; assert failed;
+    printf ".";
+    // with Check:=0, fewer elements than the dimension are refused
+    A:=EtaleAlgebra(x^3-2);
+    failed:=false; try _:=Order([One(A)] : Check:=0); catch e failed:=true; end try; assert failed;
     printf ".";
     SetAssertions(1);
     printf "all good!";

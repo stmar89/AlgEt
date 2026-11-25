@@ -170,7 +170,10 @@ intrinsic QuotientVS(I::AlgEtQOrd, J::AlgEtQOrd, P::AlgEtQIdl) -> ModRng, Map
  - J subset I and I/J is a vector space V over K, say of dimension d.
  The function returns the KModule K^d=V and the natural surjection I->V (with preimages).}
     S := Order(P);
-    return QuotientVS(S!!OneIdeal(I),S!!OneIdeal(J),P);
+    IS:=S!!OneIdeal(I); JS:=S!!OneIdeal(J); // S*I and S*J: equal to I and J if and only if they are S-modules
+    require Index(IS) eq Index(I) : "the first argument must be an S-module, where S is the order of P";
+    require Index(JS) eq Index(J) : "the second argument must be an S-module, where S is the order of P";
+    return QuotientVS(IS,JS,P);
 end intrinsic;
 
 ///ditto
@@ -180,7 +183,10 @@ intrinsic QuotientVS(I::AlgEtQOrd, J::AlgEtQIdl, P::AlgEtQIdl) -> ModRng, Map
  - J in I and I/J is a vector space V over K, say of dimension d.
  The function returns the KModule K^d=V and the natural surjection I->V (with preimages).}
     S := Order(P);
-    return QuotientVS(S!!OneIdeal(I),S!!J,P);
+    IS:=S!!OneIdeal(I); JS:=S!!J; // S*I and S*J: equal to I and J if and only if they are S-modules
+    require Index(IS) eq Index(I) : "the first argument must be an S-module, where S is the order of P";
+    require Index(JS) eq Index(J) : "the second argument must be an S-module, where S is the order of P";
+    return QuotientVS(IS,JS,P);
 end intrinsic;
 
 ///ditto
@@ -190,7 +196,10 @@ intrinsic QuotientVS(I::AlgEtQIdl, J::AlgEtQOrd, P::AlgEtQIdl) -> ModRng, Map
  - J in I and I/J is a vector space V over K, say of dimension d.
  The function returns the KModule K^d=V and the natural surjection I->V (with preimages).}
     S := Order(P);
-    return QuotientVS(S!!I,S!!OneIdeal(J),P);
+    IS:=S!!I; JS:=S!!OneIdeal(J); // S*I and S*J: equal to I and J if and only if they are S-modules
+    require Index(IS) eq Index(I) : "the first argument must be an S-module, where S is the order of P";
+    require Index(JS) eq Index(J) : "the second argument must be an S-module, where S is the order of P";
+    return QuotientVS(IS,JS,P);
 end intrinsic;
 
 ///ditto
@@ -206,6 +215,8 @@ intrinsic QuotientVS(I::AlgEtQIdl, J::AlgEtQIdl, P::AlgEtQIdl) -> ModRng, Map
     K,k:=ResidueField(P);
     A := Algebra(S);
     d := Ilog(#K,Integers() ! (Index(J)/Index(I))); // d = dim(I/J) over (S/P)
+    // a necessary condition for P*I c J (which is checked only with assert2 above)
+    require (#K)^d eq Integers()!(Index(J)/Index(I)) : "I/J is not a vector space over the residue field of P";
     V := KModule(K,d);
     //need to find a basis of I/J over R/P.
     Minv,zbI := inclusion_matrix(I); // see coords_wrt
@@ -339,6 +350,12 @@ end intrinsic;
     assert forall{ y : y in V | v(y@@v) eq y } and forall{ z : z in ZBasis(J) | v(z) eq Zero(V) };
     printf ".";
 
+    // the arguments must be modules over the order of P, and I/J a vector space over its residue field
+    _<x>:=PolynomialRing(Integers());
+    A:=EtaleAlgebra(x^2+1); O:=MaximalOrder(A); i:=PrimitiveElement(A); R:=Order([3*i]);
+    failed:=false; try _:=QuotientVS(O,R,PrimesAbove(3*OneIdeal(O))[1]); catch e failed:=true; end try; assert failed;
+    failed:=false; try _:=QuotientVS(OneIdeal(O),6*OneIdeal(O),PrimesAbove(5*OneIdeal(O))[1]); catch e failed:=true; end try; assert failed;
+    printf ".";
     SetAssertions(1);
     printf " all good!";
 */

@@ -107,6 +107,8 @@ intrinsic Ideal(S::AlgEtQOrd, gens::SeqEnum) -> AlgEtQIdl
         require bool : "generators not in the algebra";
         Append(~gensA,gA);
     end for;
+    // S*gens has full rank if and only if in every component some generator is not zero
+    require forall{ i : i in [1..#Components(A)] | exists{ g : g in gensA | not IsZero(Components(g)[i]) } } : "the generators do not span a lattice of full rank";
     id:=CreateAlgEtQIdl(S,gensA); // it removes the repeated generators
     if #id`Generators eq 1 then
         // a fractional ideal has full rank: this fails for a single zero-divisor, which
@@ -1381,9 +1383,11 @@ end intrinsic;
                 end for;
                 Append(~gs,DotProduct(cs,AbsoluteBasis(A)));
             end for;
-            I:=Ideal(E,gs);
-            if not IsZeroDivisor(gs[1]) and IsInvertible(I) then
-                Append(~ids,I);
+            if not IsZeroDivisor(gs[1]) then // then gs spans a lattice of full rank
+                I:=Ideal(E,gs);
+                if IsInvertible(I) then
+                    Append(~ids,I);
+                end if;
             end if;
         end while;
         for I in ids do
@@ -1520,6 +1524,10 @@ end intrinsic;
     A:=EtaleAlgebra((x^2+5)*(x^2+7)); E:=EquationOrder(A); pi:=PrimitiveElement(A);
     I:=Ideal(E,[A!2,pi]); _:=ZBasis(I); e1:=OrthogonalIdempotents(A)[1];
     failed:=false; try _:=e1*I; catch e failed:=true; end try; assert failed;
+    printf ".";
+    // generators which do not span a lattice of full rank
+    A:=EtaleAlgebra((x^2+5)*(x^2+7)); E:=EquationOrder(A); e1:=OrthogonalIdempotents(A)[1];
+    failed:=false; try _:=Ideal(E,[e1,2*e1]); catch e failed:=true; end try; assert failed;
     printf ".";
     SetAssertions(1);
     printf " all good!";

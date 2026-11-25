@@ -134,7 +134,8 @@ intrinsic ModuleFromDirectSum(R::AlgEtQOrd,m::Map,seq::SeqEnum[Tup])->AlgEtQMod
             gens cat:=[ mI(z) : z in ZBasis(I[1]) ];
         end for;
     end if;
-    require Dimension(UA) eq Rank(MatrixAtoQ(gens)) : "gens do not generater a Z-module of full rank";
+    // the sum is direct and of full rank if and only if there are dim(UA) generators of full rank
+    require #gens eq Dimension(UA) and Dimension(UA) eq Rank(MatrixAtoQ(gens)) : "the sum is not direct, or not of full rank";
     M:=Module(R,m,gens);
     assert forall{d:d in dsr|Type(d[1]) eq AlgEtQIdl};
     M`DirectSumRep:=dsr;
@@ -280,10 +281,13 @@ end intrinsic;
 
 intrinsic 'subset'(I1 :: AlgEtQMod, I2 :: AlgEtQMod) -> BoolElt
 {Checks if the first argument is inside the second.}
+  require UniverseAlgebra(I1) cmpeq UniverseAlgebra(I2) : "the modules must be in the same universe algebra";
   if not Index(I2, I1) in Integers() then
     return false;
   end if;
-  return forall{ x : x in Generators(I1) | x in I2};
+  // the generators of I1 generate it over Order(I1): if the orders differ, a Z-basis is needed
+  gens:=Order(I1) eq Order(I2) select Generators(I1) else ZBasis(I1);
+  return forall{ x : x in gens | x in I2};
 end intrinsic;
 
 //----------
@@ -430,6 +434,14 @@ end intrinsic;
     S:=Order([2*r]); T:=Order([3*r]); m:=NaturalAction(A,A);
     M:=Module(S,m,[One(A)]);
     assert T!!M eq Module(T,m,ZBasis(O));
+    printf ".";
+    // ModuleFromDirectSum refuses a sum which is not direct; subset of modules over different orders
+    _<x>:=PolynomialRing(Integers());
+    K:=EtaleAlgebra(x^2+20); R:=EquationOrder(K); O:=MaximalOrder(K); m:=NaturalAction(K,K);
+    failed:=false; try _:=ModuleFromDirectSum(R,m,[<OneIdeal(R),m>,<Ideal(R,ZBasis(O)),m>]); catch e failed:=true; end try; assert failed;
+    K:=EtaleAlgebra(x^2+1); O:=MaximalOrder(K); i:=PrimitiveElement(K); R:=Order([9*i]); m:=NaturalAction(K,K);
+    assert not Module(O,m,[K!3]) subset Module(R,m,[One(K)]); // 3O is not contained in Z[9i]
+    assert Module(R,m,[K!9]) subset Module(O,m,[One(K)]);
     printf ".";
     SetAssertions(1);
     printf " all good!";

@@ -207,9 +207,11 @@ end function;
 /// Returns whether the order $R$ is maximal at the prime $P$, that is, if $(R:O)$ is not contained in $P$, where $O$ is the maximal order.
 intrinsic IsMaximalAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> BoolElt
 {Returns whether the order R is maximal at the prime P, that is, if (R:O) is not contained in P, where O is the maximal order.}
+    require Order(P) eq R : "P must be an ideal of R";
     if IsMaximal(R) then
         return true;
     end if;
+    require IsPrime(P) : "P must be a prime of R"; // free for the primes computed by the package
     if assigned R`SingularPrimes then
         return not P in SingularPrimes(R);
     end if;

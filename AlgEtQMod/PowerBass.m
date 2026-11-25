@@ -392,7 +392,14 @@ intrinsic DirectSumRepresentation(M::AlgEtQMod)->SeqEnum[Tup]
             assert forall{bc:bc in BC|Type(bc[1]) eq AlgEtQIdl};
             M`DirectSumRep:=BC;
         elif n eq Dimension(UA) then //squarefree case
-            M`DirectSumRep:=[<Ideal(Rg,ZBasis(M)),mR>];
+            // UA can be a copy of Ag (for example the one made by IsomorphismClassesOverBassOrder): the
+            // Z-basis of M is pulled back to Ag through the isomorphism Ag -> UA
+            if UA cmpeq Ag then
+                zbM:=ZBasis(M);
+            else
+                zbM:=[ projs[1](Inverse(AgstoUA)(z)) : z in ZBasis(M) ];
+            end if;
+            M`DirectSumRep:=[<Ideal(Rg,zbM),mR>];
         else
             error "implemented only for the squarefree or power-of-bass case";
         end if;
@@ -662,6 +669,14 @@ end intrinsic;
     K:=EtaleAlgebra([K1,K2]); V:=EtaleAlgebra([K1,K1,K2]); m:=NaturalAction(K,V);
     M:=Module(EquationOrder(K),m,AbsoluteBasis(V));
     failed:=false; try _:=DirectSumRepresentation(M); catch e failed:=Position(e`Object,"not of the form") gt 0; end try; assert failed;
+    printf ".";
+    // DirectSumRepresentation of a module rebuilt in a universe algebra which is a copy of Algebra(R)
+    _<x>:=PolynomialRing(Integers());
+    K:=EtaleAlgebra(x^2+20); R:=EquationOrder(K);
+    cl:=IsomorphismClassesOverBassOrder(R,1);
+    V,m:=UniverseAlgebra(cl[1]);
+    N:=Module(R,m,ZBasis(cl[1]));
+    assert #DirectSumRepresentation(N) eq 1 and IsIsomorphic(N,cl[1]);
     printf ".";
     SetAssertions(1);
     printf " all good!";

@@ -38,6 +38,7 @@ import "Ord.m" : all_but_one;
 /// Given an order $S$ and a prime $P$, returns the Cohen-Macaulay type of $S$ at $P$.
 intrinsic CohenMacaulayTypeAtPrime(S::AlgEtQOrd,P::AlgEtQIdl)->RngIntElt
 {Given an order S and a prime P, returns the Cohen-Macaulay type of S at P. This integer equals the dimension of S^t/P*S^t where S^t is the trace dual of S.}
+    require Order(P) eq S and IsPrime(P) : "P must be a prime of S"; // free for the primes computed by the package
     if IsGorenstein(S) then
         return 1;
     end if;
@@ -80,6 +81,7 @@ end intrinsic;
 intrinsic IsGorensteinAtPrime(S::AlgEtQOrd,P::AlgEtQIdl) -> BoolElt
 {Given an order S and a prime P, returns whether S is Gorenstein at P, that is, if every fractional ideal I with (I:I)=S is locally principal at P.}
 // Let St be the trace dual ideal of S. We check if St/PSt is one dimensional over S/P
+    require Order(P) eq S and IsPrime(P) : "P must be a prime of S"; // free for the primes computed by the package
     if assigned S`IsGorenstein and S`IsGorenstein then
         return true;
     end if;
@@ -121,6 +123,7 @@ intrinsic IsBassAtPrime(S::AlgEtQOrd,P::AlgEtQIdl) -> BoolElt
 {Check if the order S is Bass at the prime ideal P, that is, if every overorder of S is Gorenstein at the primes above P.}
 // we compute the maximal order O and check if O/PO is at most 2-dimensional over S/P
 // see Hofman,Sircana, On the computations of over-orders, Definition 5.23
+    require Order(P) eq S and IsPrime(P) : "P must be a prime of S"; // free for the primes computed by the package
     if assigned S`IsBass and S`IsBass then
         return true;
     end if;
@@ -266,6 +269,16 @@ end function;
         _:=CohenMacaulayType(S);
         printf ".";
     end for;
+    // the ...AtPrime intrinsics need a prime of the order
+    _<x>:=PolynomialRing(Integers());
+    E:=EquationOrder(EtaleAlgebra((x^2+5)*(x^2+7)));
+    P:=SingularPrimes(E)[1]; P2:=P*P;
+    failed:=false; try _:=IsMaximalAtPrime(E,P2); catch e failed:=true; end try; assert failed;
+    failed:=false; try _:=CohenMacaulayTypeAtPrime(E,P2); catch e failed:=true; end try; assert failed;
+    failed:=false; try _:=IsGorensteinAtPrime(E,P2); catch e failed:=true; end try; assert failed;
+    failed:=false; try _:=IsBassAtPrime(E,P2); catch e failed:=true; end try; assert failed;
+    assert not IsMaximalAtPrime(E,P);
+    printf ".";
     SetAssertions(1);
     printf " all good!";
 */

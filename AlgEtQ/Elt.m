@@ -164,6 +164,7 @@ end intrinsic;
 intrinsic AbsoluteCoordinates(seq::SeqEnum[AlgEtQElt] , basis::SeqEnum[AlgEtQElt]) -> SeqEnum
 {Given a sequence of elements and a basis over the prime field, returns a sequence whose entries are the coordinates with respect to the given basis.}
     A:=Algebra(seq[1]);
+    require forall{ b : b in basis | Algebra(b) cmpeq A } : "the basis must be in the algebra of the elements";
     Mbasis:=Matrix([ AbsoluteCoordinates(b) : b in basis ]);
     require #basis eq AbsoluteDimension(A) and Determinant(Mbasis) ne 0: "the elements given do not form a basis";
     Mseq:=[ Matrix([AbsoluteCoordinates(b)]) : b in seq ];
@@ -237,7 +238,8 @@ intrinsic PrimitiveElement(A::AlgEtQ) -> AlgEtQElt
 {Returns a primitive element of the étale algebra A, that is, an element of A whose minimal polynomial over Q has degree equal to the dimension of A over Q. The output is deterministically computed using the following procedure. Let N be the number of components of A, each one having primitive element a_i. Set b_1 = a_1. For i=2,..,N, set b_i = a_i+j where j is the smallest non-negative integer such that the minimal polynomial of a_i+j is not in the set of minimal polynomials of the elements b_1,...,b_(i-1). The output is the element of A whose components are b_1,...,b_N. In particular, if A is a product of number fields with different defining polynomials, then the output is the element of A whose components are the primitive elements of the components.}
     if not assigned A`PrimitiveElement then
         nf:=Components(A);
-        ms:={DefiningPolynomial(nf[1])};
+        // the minimal polynomials over Q, monic: DefiningPolynomial(nf[1]) need not be monic
+        ms:={AbsoluteMinimalPolynomial(PrimitiveElement(nf[1]))};
         bs:=<PrimitiveElement(nf[1])>;
         for i in [2..#nf] do
             ai:=PrimitiveElement(nf[i]);
@@ -254,7 +256,7 @@ intrinsic PrimitiveElement(A::AlgEtQ) -> AlgEtQElt
         end for;
         prim_elt:=CreateAlgEtQElt(A,bs);
         A`PrimitiveElement:=prim_elt;
-        assert2 Degree(MinimalPolynomial(prim_elt)) eq AbsoluteDimension(A);
+        assert Degree(MinimalPolynomial(prim_elt)) eq AbsoluteDimension(A); // once per algebra
     end if;
     return A`PrimitiveElement;
 end intrinsic;
@@ -972,6 +974,13 @@ end intrinsic;
     assert Evaluate(MinimalPolynomial(a),a) eq Zero(A);
     printf ".";
 
+    // PrimitiveElement with a non-monic defining polynomial, repeated
+    _<x>:=PolynomialRing(Integers());
+    K:=NumberField(2*x^2+1); A:=EtaleAlgebra([K,K]);
+    assert Degree(MinimalPolynomial(PrimitiveElement(A))) eq 4;
+    // AbsoluteCoordinates with a basis of another algebra
+    failed:=false; try _:=AbsoluteCoordinates([PrimitiveElement(EtaleAlgebra(x^2+1))],AbsoluteBasis(EtaleAlgebra(x^2+2))); catch e failed:=true; end try; assert failed;
+    printf ".";
     SetAssertions(1);
     printf " all good!";
 

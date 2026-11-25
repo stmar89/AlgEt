@@ -307,8 +307,9 @@ end intrinsic;
 /// Returns the sequence of classes in $W$.
 intrinsic Classes(W::AlgEtQWECM)->SeqEnum[AlgEtQWECMElt]
 {Returns the sequence of classes in W.}
+    // in the order of OverOrders(R), which is reproducible (the keys of the array are not)
     arr:=Array(W);
-    return &cat[ arr[T] : T in Keys(arr)];
+    return &cat[ arr[T] : T in OverOrders(Order(W)) ];
 end intrinsic;
 
 /// Returns the sequence of representatives of the classes in $W$.
@@ -564,6 +565,13 @@ end intrinsic;
     end for;
     printf ".";
 
+    // the classes come in the order of OverOrders
+    _<x>:=PolynomialRing(Integers());
+    E:=EquationOrder(EtaleAlgebra(x^4+16)); oo:=OverOrders(E);
+    W,w:=WeakEquivalenceClassMonoidAbstract(E);
+    pos:=[ Index(oo,MultiplicatorRing(w(c))) : c in Classes(W) ];
+    assert pos eq Sort(pos);
+    printf ".";
     SetAssertions(1);
     printf " all good!";
 */

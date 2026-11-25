@@ -279,7 +279,10 @@ intrinsic Classes(icm::AlgEtQICM)->SeqEnum[AlgEtQICMElt]
 {Returns the sequence of the classes in the given ideal class monoid.}
     W:=WeakEquivalenceClassMonoidAbstract(Order(icm));
     output:=[];
-    for T->WT in Array(W) do
+    arr:=Array(W);
+    // in the order of OverOrders(R), which is reproducible (the keys of the array are not)
+    for T in OverOrders(Order(icm)) do
+        WT:=arr[T];
         PT,pT:=PicardGroup(T : GRH:=icm`GRH);
         output cat:=[CreateAlgEtQICMElt(icm,w,z,pT):w in WT, z in PT];
     end for;
@@ -426,6 +429,13 @@ end intrinsic;
     A:=EtaleAlgebra(x^2+1); O:=MaximalOrder(A); i:=PrimitiveElement(A); E:=Order([3*i]);
     icmE:=IdealClassMonoidAbstract(E); icmO:=IdealClassMonoidAbstract(O);
     assert IsCoercible(icmE,One(icmO)) and icmE!One(icmO) eq icmE!OneIdeal(O);
+    printf ".";
+    // the classes come in the order of OverOrders
+    _<x>:=PolynomialRing(Integers());
+    E:=EquationOrder(EtaleAlgebra(x^4+16)); oo:=OverOrders(E);
+    icm,m:=IdealClassMonoidAbstract(E);
+    pos:=[ Index(oo,MultiplicatorRing(m(c))) : c in Classes(icm) ];
+    assert pos eq Sort(pos);
     printf ".";
     SetAssertions(1);
     printf " all good!";

@@ -53,13 +53,13 @@ declare attributes AlgEtQIdl: residue_class_ring_unit_subgroup_generators,
 /// where $\mathfrak{f}$ is the conductor of $R$, the first, second and third map are the natural maps, the fourth is induced by $a \mapsto (a\mathcal{O}_A \cap R)$ and the last one is induced by the extension map $I \mapsto I\mathcal{O}_A$.
 ///
 /// The following intrinsics allow to compute all the elements of the sequence.
-/// If one wants to perform the computation under the GRH bound one can either use the appropriate parameters or use `SetClassGroupBounds("GRH")` as for number fields.
+/// If one wants to perform the computation under the GRH bound one has to use the parameter `GRH`: the class groups of the number fields are otherwise computed unconditionally (`Proof:="Full"`), also after `SetClassGroupBounds("GRH")`.
 
 
 
-/// Given an order $S$ and a fractional $S$-ideal $I$, returns the group $(S/I)^\times$ and a map $(S/I)^\times \to  S$ giving representatives. This is implemented only when $S$ is the maximal order.
+/// Given an order $S$ and a proper integral $S$-ideal $I$ whose multiplicator ring is the maximal order, returns the group $(S/I)^\times$ and a map $(S/I)^\times \to  S$ giving representatives.
 intrinsic ResidueRingUnits(S::AlgEtQOrd,I::AlgEtQIdl) -> GrpAb,Map
-{Given an order S and a fractional S-ideal, returns the group (S/I)^* and a map (S/I)^* -> S giving representatives. This is implemented only when S is the maximal order.}
+{Given an order S and a proper integral S-ideal I whose multiplicator ring is the maximal order, returns the group (S/I)^* and a map (S/I)^* -> S giving representatives.}
     // the attribute is stored in I, hence for Order(I) only: the order is checked also on cached calls
     require Order(I) eq S : "I is not an S-ideal.";
     if not assigned I`ResidueRingUnits then

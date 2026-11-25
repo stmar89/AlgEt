@@ -16,7 +16,7 @@ declare verbose AlgEtQElt, 3;
 declare attributes AlgEtQElt : Algebra, // AlgEtQ
                               AbsoluteCoordinates,
                               Components, // Tup
-                              Hash; // RngIntElt, see the intrinsic Hash
+                              HashValue; // RngIntElt, the integer returned by Hash (as for orders and ideals)
 
 declare attributes AlgEtQ : Basis,
                            AbsoluteBasis,
@@ -357,15 +357,15 @@ intrinsic 'eq'(x1::AlgEtQElt,x2::FldRatElt) -> BoolElt
     return x1 eq (Algebra(x1)!x2);
 end intrinsic;
 
-/// Returns a hash value of the element, computed from its absolute coordinates, so that equal elements have the same hash value. The value is stored in the attribute `Hash`. Magma uses it to build sets, indexed sets and associative arrays of elements: only elements with the same hash value are compared with `eq`. Different elements might have the same hash value: this only costs an extra comparison.
+/// Returns a hash value of the element, computed from its absolute coordinates, so that equal elements have the same hash value. The value is stored in the attribute `HashValue`. Magma uses it to build sets, indexed sets and associative arrays of elements: only elements with the same hash value are compared with `eq`. Different elements might have the same hash value: this only costs an extra comparison.
 intrinsic Hash(x::AlgEtQElt) -> RngIntElt
-{Returns a hash value of the element, computed from its absolute coordinates, so that equal elements have the same hash value. The value is stored in the attribute Hash. Magma uses it to build sets, indexed sets and associative arrays of elements: only elements with the same hash value are compared with eq. Different elements might have the same hash value: this only costs an extra comparison.}
-    if not assigned x`Hash then
+{Returns a hash value of the element, computed from its absolute coordinates, so that equal elements have the same hash value. The value is stored in the attribute HashValue. Magma uses it to build sets, indexed sets and associative arrays of elements: only elements with the same hash value are compared with eq. Different elements might have the same hash value: this only costs an extra comparison.}
+    if not assigned x`HashValue then
         // The universe matters, e.g. Hash([1,2]) ne Hash([1/1,2/1]), so we make sure it is
         // Rationals().
-        x`Hash:=Hash(ChangeUniverse(AbsoluteCoordinates(x),Rationals()));
+        x`HashValue:=Hash(ChangeUniverse(AbsoluteCoordinates(x),Rationals()));
     end if;
-    return x`Hash;
+    return x`HashValue;
 end intrinsic;
 
 /// Returns the sum of the two elements.
@@ -909,10 +909,10 @@ end intrinsic;
     assert #Keys(AA) eq #elts;
     assert forall{ i : i in [1..#elts] | AA[copies[i]] eq i };
     printf ".";
-    // 2. Forced collisions: all the elements get the same hash value, stored in the attribute Hash.
+    // 2. Forced collisions: all the elements get the same hash value, stored in the attribute HashValue.
     elts:=[ elt_from_coords(s) : s in seqs[1..60] ]; // distinct elements
     copies:=[ A!Components(e) : e in elts ];
-    for e in elts cat copies do y:=e; y`Hash:=0; end for; // y and e are the same object
+    for e in elts cat copies do y:=e; y`HashValue:=0; end for; // y and e are the same object
     assert #{ Hash(e) : e in elts } eq 1;
     assert #Setseq(Seqset(elts)) eq #elts;
     assert #Seqset(elts cat copies) eq #elts;

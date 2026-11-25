@@ -173,20 +173,24 @@ wkicm_bar_with_P_P:=function(I,P,gensU)
     // Magma's sets of subspaces of a KModule (type ModFld, as Q) are slow: a membership compares the
     // subspaces one by one (about 1.5 ms each for subspaces of GF(11)^4). We keep sets of keys
     // instead: the entries of the reduced echelon form of a basis matrix of the subspace, which
-    // determines it. The coordinates are taken in Q: Basis(W) is in the coordinates of W.
-    key:=func< W | Eltseq(EchelonForm(Matrix(k,[ Eltseq(Q!b) : b in Basis(W) ]))) >;
+    // determines it (the reduced echelon form is unique). The coordinates are taken in Q: Basis(W) is
+    // in the coordinates of W.
+    ech:=func< W | EchelonForm(Matrix(k,[ Eltseq(Q!b) : b in Basis(W) ])) >;
+    key:=func< W | Eltseq(ech(W)) >;
 
     orbit:=function(W)
     // the keys of the orbit of the subspace W under A^*. The group is finite, so the closure under
-    // the generators suffices.
-        orb:={ key(W) };
-        frontier:=[ W ];
+    // the generators suffices. The subspaces of the orbit are kept as echelon matrices only: the
+    // image of the row space of X under g is the row space of X*g, and no KModule subspace is built.
+        X0:=ech(W);
+        orb:={ Eltseq(X0) };
+        frontier:=[ X0 ];
         repeat
             new:=[];
             for X in frontier, g in U_gens do
-                Y:=sub<Q|[ (Q!X.i)*g : i in [1..Ngens(X)] ]>;
+                Y:=EchelonForm(X*g);
                 n:=#orb;
-                Include(~orb,key(Y));
+                Include(~orb,Eltseq(Y));
                 if #orb gt n then // Y is new
                     Append(~new,Y);
                 end if;

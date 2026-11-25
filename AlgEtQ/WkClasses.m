@@ -170,14 +170,27 @@ wkicm_bar_with_P_P:=function(I,P,gensU)
     // subspaces.
     U_gens:=[ g : g in Seqset([ mat(g) : g in gensU ]) | not IsScalar(g) ];
 
+    // Magma's sets of subspaces of a KModule (type ModFld, as Q) are slow: a membership compares the
+    // subspaces one by one (about 1.5 ms each for subspaces of GF(11)^4). We keep sets of keys
+    // instead: the entries of the reduced echelon form of a basis matrix of the subspace, which
+    // determines it. The coordinates are taken in Q: Basis(W) is in the coordinates of W.
+    key:=func< W | Eltseq(EchelonForm(Matrix(k,[ Eltseq(Q!b) : b in Basis(W) ]))) >;
+
     orbit:=function(W)
-    // the orbit of the subspace W under A^*. The group is finite, so the closure under the
-    // generators suffices.
-        orb:={W};
-        frontier:={W};
+    // the keys of the orbit of the subspace W under A^*. The group is finite, so the closure under
+    // the generators suffices.
+        orb:={ key(W) };
+        frontier:=[ W ];
         repeat
-            new:={ sub<Q|[ (Q!X.i)*g : i in [1..Ngens(X)] ]> : X in frontier, g in U_gens } diff orb;
-            orb join:=new;
+            new:=[];
+            for X in frontier, g in U_gens do
+                Y:=sub<Q|[ (Q!X.i)*g : i in [1..Ngens(X)] ]>;
+                n:=#orb;
+                Include(~orb,key(Y));
+                if #orb gt n then // Y is new
+                    Append(~new,Y);
+                end if;
+            end for;
             frontier:=new;
         until IsEmpty(new);
         return orb;
@@ -196,15 +209,16 @@ wkicm_bar_with_P_P:=function(I,P,gensU)
     dim:=dimQ;
     min_dim:=stop_at_dim_2 select 2 else 1;
     while dim gt min_dim and #reps gt 0 do
-        seen:={}; // subspaces of dimension dim-1 already considered: whole orbits for those with
-                  // trivial extension
+        seen:={}; // keys of the subspaces of dimension dim-1 already considered: whole orbits for
+                  // those with trivial extension
         new_reps:=[];
         for W in reps do
             for M in MaximalSubmodules(W) do
-                if M in seen then
+                n:=#seen;
+                Include(~seen,key(M));
+                if #seen eq n then // M was already considered
                     continue;
                 end if;
-                Include(~seen,M);
                 if not has_trivial_extension(M) then
                     continue;
                 end if;

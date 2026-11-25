@@ -146,20 +146,36 @@ intrinsic ResidueRingUnitsSubgroupGenerators(F::AlgEtQIdl) -> SeqEnum[AlgEtQElt]
         primes:={x[1]:x in l2};
         primes:=[<x, Maximum([y[2]: y in l2 |y[1] eq x])>:x in primes];
         primes_powers:=[ p[1]^p[2] : p in primes ];
+        // rests[i] is the intersection of the prime powers other than the i-th (they are coprime,
+        // so meet is the product, and it is faster): pre[i] is the intersection of the first i,
+        // suf[i] of the ones from the i-th on, and rests[i] = pre[i-1] meet suf[i+1]: 3n-6
+        // intersections for n primes, instead of n(n-2) when each rests[i] is computed from
+        // scratch.
+        n:=#primes;
+        if n eq 1 then
+            rests:=[ OneIdeal(S) ];
+        else
+            pre:=[ primes_powers[1] ];
+            for i in [2..n-1] do
+                Append(~pre,pre[i-1] meet primes_powers[i]);
+            end for;
+            suf:=[ OneIdeal(S) : i in [1..n] ];
+            suf[n]:=primes_powers[n];
+            for i in [n-1..2 by -1] do
+                suf[i]:=primes_powers[i] meet suf[i+1];
+            end for;
+            rests:=[ i eq 1 select suf[2] else i eq n select pre[n-1] else pre[i-1] meet suf[i+1] : i in [1..n] ];
+        end if;
         elts:={};
         for i->a in primes do
             a1a2:=primes_powers[i];
             idp:=a[1];
-            if #primes gt 1 then
-                // coprime ideals, so we can use meet instead of *, which is faster
-                rest:=&meet[ primes_powers[j] : j in [1..#primes] | j ne i];
-            else
-                rest:=OneIdeal(S);
-            end if;
+            rest:=rests[i];
             //Compute primitive elt for residue field
             c:=PrimitiveElementResidueField(idp);
             e1:=ChineseRemainderTheorem(a1a2,rest,One(A),Zero(A));
-            e2:=ChineseRemainderTheorem(a1a2,rest,Zero(A),One(A));
+            // e2 = 1-e1 is 0 modulo a1a2 and 1 modulo rest: no second CRT is needed
+            e2:=One(A)-e1;
             c:=c*e1+e2;
             // the previous is equivalent to the following, but faster since we can 'reuse' e1 and
             // e2 later.

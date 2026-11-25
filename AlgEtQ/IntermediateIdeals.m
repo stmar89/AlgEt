@@ -16,9 +16,9 @@ declare verbose IntermediateIdeals, 2;
 intrinsic _MinimalIntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]
 {Given fractional S-ideals I and J such that J subseteq I, returns the minimal (with respect to inclusion) fractional S-ideals K such that J subsetneq K subseteq I.
  Note that J is never in the output.}
-    assert2 J subset I; // "the ideal J needs to be inside I";
+    assert2 J subset I; // not a require: it costs an inclusion test, and these are called recursively
     S:=Order(I);
-    assert2 S eq Order(J); // "The ideals must be over the same order";
+    require S eq Order(J) : "The ideals must be over the same order";
     if J eq I then
         return {@ @};
     else
@@ -100,9 +100,9 @@ intrinsic _MaximalIntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQI
 {Given fractional S-ideals I and J such that J subseteq I, returns the maximal (with respect to inclusion) fractional S-ideals K such that J subseteq K subsetneq I.
  Note I is never in the output, while J is in the output if and only if the S-module I/J is simple, in which case the output consists only of J.
  }
-    assert2 J subset I; // "the ideal J needs to be inside I";
+    assert2 J subset I; // not a require: it costs an inclusion test, and these are called recursively
     S:=Order(I);
-    assert2 S eq Order(J); // "The ideals must be over the same order";
+    require S eq Order(J) : "The ideals must be over the same order";
     if J eq I then
         return {@ @};
     else

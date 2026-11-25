@@ -265,7 +265,7 @@ intrinsic 'eq'(icm1::AlgEtQICM,icm2::AlgEtQICM)->BoolElt
     return Order(icm1) eq Order(icm2);
 end intrinsic;
 
-intrinsic '#'(icm::AlgEtQICM)->RngInt
+intrinsic '#'(icm::AlgEtQICM)->RngIntElt
 {Returns the size of the given ideal class monoid.}
     size:=0;
     W:=WeakEquivalenceClassMonoidAbstract(Order(icm));

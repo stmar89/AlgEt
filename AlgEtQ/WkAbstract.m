@@ -295,7 +295,7 @@ intrinsic 'eq'(W::AlgEtQWECM,WW::AlgEtQWECM)->BoolElt
 end intrinsic;
 
 /// Returns the size of $W$.
-intrinsic '#'(W::AlgEtQWECM)->RngInt
+intrinsic '#'(W::AlgEtQWECM)->RngIntElt
 {Returns the size of W.}
     size:=0;
     for k->v in Array(W) do

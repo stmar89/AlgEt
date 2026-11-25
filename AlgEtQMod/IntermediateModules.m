@@ -30,9 +30,9 @@ declare verbose IntermediateModules, 2;
 
 intrinsic MinimalIntermediateModules(I::AlgEtQMod,J::AlgEtQMod)->SetIndx[AlgEtQMod]
 {Given S-modules J subset I, returns the minimal (with respect to inclusion) S-modules M such that J subsetneq M subset I. Note that J is never in the output.}
-    assert2 J subset I; // "the ideal J needs to be inside I";
+    assert2 J subset I; // not a require: it costs an inclusion test, and these are called recursively
     S:=Order(I);
-    assert2 S eq Order(J); // "The ideals must be over the same order";
+    require S eq Order(J) : "The ideals must be over the same order";
     if J eq I then 
         return {@ @};
     else
@@ -91,9 +91,9 @@ end intrinsic;
 
 intrinsic MaximalIntermediateModules(I::AlgEtQMod,J::AlgEtQMod)->SetIndx[AlgEtQMod]
 {Given S-modules J subset I, returns the maximal (with respect to inclusion) S-modules K such that J subset K subsetneq I. Note I is never in the output, while J is in the output if and only if the S-module I/J is simple, in which case the output consists only of J.}
-    assert2 J subset I; // "the ideal J needs to be inside I";
+    assert2 J subset I; // not a require: it costs an inclusion test, and these are called recursively
     S:=Order(I);
-    assert2 S eq Order(J); // "The ideals must be over the same order";
+    require S eq Order(J) : "The ideals must be over the same order";
     if J eq I then
         return {@ @}; // as for the ideals: I is never in the output
     else

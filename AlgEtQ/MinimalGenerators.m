@@ -18,9 +18,9 @@ import "ShortEltSmallRep.m" : short_non_zero_divisors;
 
 ///## Two-generating set
 
-/// A procedure that given an invertible fractional ideal $I$, stores in the attribute `Generators` of $I$ one or two non-zerodivisors in $I$ generating $I$. The first one is `ShortElement(I)`, and the second one is chosen by a deterministic process: the output does not depend on the random state.
+/// A procedure that given an invertible fractional ideal $I$, stores in the attribute `Generators` of $I$ one or two elements of $I$ generating $I$. If $I$ has at most two generators, they are kept as they are (they might be zero-divisors). Otherwise, the first one is `ShortElement(I)`, a non-zerodivisor, and the second one is chosen by a deterministic process: the output does not depend on the random state.
 intrinsic TwoGeneratingSet(I::AlgEtQIdl)
-{A procedure that given an invertible fractional ideal I, stores in the attribute Generators of I one or two non-zerodivisors in I generating I. The first one is ShortElement(I), and the second one is chosen by a deterministic process: the output does not depend on the random state.}
+{A procedure that given an invertible fractional ideal I, stores in the attribute Generators of I one or two elements of I generating I. If I has at most two generators, they are kept as they are (they might be zero-divisors). Otherwise, the first one is ShortElement(I), a non-zerodivisor, and the second one is chosen by a deterministic process: the output does not depend on the random state.}
     require IsInvertible(I) : "the ideal must be invertible";
     if #Generators(I) gt 2 then
         a:=ShortElement(I);

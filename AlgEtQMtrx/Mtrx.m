@@ -112,7 +112,7 @@ intrinsic Components(x::AlgEtQMtrx) -> Tup
     return x`Components;
 end intrinsic;
 
-intrinsic Entries(x::AlgEtQMtrx) -> SeqEnum[SeqEnum[AlgEtElt]]
+intrinsic Entries(x::AlgEtQMtrx) -> SeqEnum[SeqEnum[AlgEtQElt]]
 {Returns a sequence of sequences containing the entries of the matrix.}
     if not assigned x`Entries then
         assert assigned x`Components and assigned x`Universe;

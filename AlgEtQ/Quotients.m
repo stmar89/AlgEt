@@ -85,7 +85,7 @@ end intrinsic;
 intrinsic ResidueField(P::AlgEtQIdl) -> FldFin, Map
 {Given a prime P of S, returns a finite field F isomorphic to S/P and a surjection (with inverse) S->F.}
     if not assigned P`ResidueField then
-        assert IsPrime(P);
+        require IsPrime(P) : "the ideal must be prime";
         S := Order(P);
         A := Algebra(S);
         Q,q := ResidueRing(S,P); // q:A->Q, where Q=S/P is an abelian group isomorphic to GF(p)^d

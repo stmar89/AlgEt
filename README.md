@@ -21,7 +21,7 @@ To use them, use the magma command `AttachSpec("spec")`, after opening magma in 
 
 We also introduce the type `AlgEtQMod`, for modules over `AlgEtQ`.
 For complete descriptions and more details we refer to the [`List of commands for AlgEtQMod`](https://github.com/stmar89/AlgEt/blob/main/doc/ListOfCommandsAlgEtQMod.md)
-To use them, use the magma command `AttachSpec("specMod")`, after opening magma in the folder where you have downloaded the repo.
+To use them, use the magma command `AttachSpec("specMod")`, after opening magma in the folder where you have downloaded the repo. AlgEtQMod uses AlgEtQ and AlgEtQMtrx, so attach `spec` and `specMtrx` as well: `AttachSpec("spec"); AttachSpec("specMtrx"); AttachSpec("specMod");`.
 
 We also introduce the type `AlgEtQMtrx`, for matrices over `AlgEtQ`.
 For complete descriptions and more details we refer to the [`List of commands for AlgEtQMtrx`](https://github.com/stmar89/AlgEt/blob/main/doc/ListOfCommandsAlgEtQMtrx.md)

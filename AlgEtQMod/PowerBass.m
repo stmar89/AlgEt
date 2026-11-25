@@ -474,7 +474,7 @@ end intrinsic;
 // SteinitzClass
 // ------------------- //
 
-intrinsic SteinitzClass(M::AlgEtQMod)->AlgEtQOrdIdl
+intrinsic SteinitzClass(M::AlgEtQMod)->AlgEtQIdl
 {returns the product of the fractional ideals in the input}
     if not assigned M`SteinitzClass then
 	    M`SteinitzClass:=&*[ D[1] : D in DirectSumRepresentation(M) ];

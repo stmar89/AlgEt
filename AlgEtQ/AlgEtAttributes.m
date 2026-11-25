@@ -92,7 +92,7 @@ intrinsic BaseField(A::AlgEtQ) -> FldNum,Map
     return Explode(A`BaseField);
 end intrinsic;
 
-intrinsic PrimeField(A::AlgEtQ) -> FldNum
+intrinsic PrimeField(A::AlgEtQ) -> FldRat
 {Returns the prime field of the étale algebra.}
     if not assigned A`PrimeField then
         nf:=Components(A);
@@ -105,7 +105,7 @@ end intrinsic;
 ///### Dimension
 
 /// Returns the dimension of A over the base field, which in this case is $\mathbb{Q}$.
-intrinsic Dimension(A::AlgEtQ)->RngInt
+intrinsic Dimension(A::AlgEtQ)->RngIntElt
 {Returns the dimension of A over the base field, which in this case is the rational field.}
     if not assigned A`Dimension then
         nf:=Components(A);
@@ -116,7 +116,7 @@ intrinsic Dimension(A::AlgEtQ)->RngInt
 end intrinsic;
 
 /// Returns the dimension of $A$ over the prime field.
-intrinsic AbsoluteDimension(A::AlgEtQ)->RngInt
+intrinsic AbsoluteDimension(A::AlgEtQ)->RngIntElt
 {Returns the dimension of A over the prime field, which in this case is the rational field.}
     if not assigned A`AbsoluteDimension then
         A`AbsoluteDimension:=&+[AbsoluteDegree(E) : E in Components(A)];

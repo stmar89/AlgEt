@@ -17,9 +17,9 @@ freeze;
 
 ///## Direct products
 
-/// Given a sequence of étale algebras over $\mathbb{Q}$, returns the direct product, together with sequences of inclusions and projections.
-intrinsic DirectProduct(seq::SeqEnum[AlgEtQ]) -> AlgEtQ,SeqEnum[Map],SeqEnum[Map]
-{Given a sequence of étale algebras over the rational field, returns the direct product, together with sequences of inclusions and projections.}
+/// Given a sequence of étale algebras over $\mathbb{Q}$, returns the direct product, together with lists of inclusions and projections.
+intrinsic DirectProduct(seq::SeqEnum[AlgEtQ]) -> AlgEtQ,List,List
+{Given a sequence of étale algebras over the rational field, returns the direct product, together with lists of inclusions and projections.}
     all_comps:=[ Components(K) : K in seq ];
     tot_num_comps:=&+[#c : c in all_comps];
     D:=EtaleAlgebra(&cat(all_comps));

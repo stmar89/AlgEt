@@ -42,13 +42,13 @@ _Precision := Precision; // so we can use it when there is a optional parameter 
 intrinsic CMType(seq::SeqEnum[Map]) -> AlgEtQCMType
 {Given a sequence of homomorphisms from a CM-algebra to CC, one per conjugate pair, it returns the corresponding CMType.}
     A:=Domain(seq[1]);
-    assert &and[Domain(s) eq A : s in seq[2..#seq]];
+    require &and[Domain(s) eq A : s in seq[2..#seq]] : "the maps must have the same domain";
     require HasComplexConjugate(A) : "the algebra must be a CM-algebra";
     g:=Dimension(A) div 2;
-    assert #seq eq g;
+    require #seq eq g : "there must be one homomorphism per pair of complex conjugate ones";
     F:=PrimitiveElement(A);
     CC_vals:=[ h(F) : h in seq ];
-    assert forall{ c : c in CC_vals | not exists{ d : d in CC_vals | Abs( ComplexConjugate(c)-d) lt 10^(2-Precision(d)) }  };
+    require forall{ c : c in CC_vals | not exists{ d : d in CC_vals | Abs( ComplexConjugate(c)-d) lt 10^(2-Precision(d)) }  } : "two of the homomorphisms are complex conjugate";
     PHI:=New(AlgEtQCMType);
     PHI`Homs:=seq;
     return PHI;
@@ -63,7 +63,7 @@ end intrinsic;
 /// Given a totally imaginary element $b$ in an CM-étale algebra $A$ such that $b\in A^\times$, returns the CM-type $\Phi$ for which $b$ is $\Phi$-positive.
 intrinsic CMType( b::AlgEtQElt  ) -> AlgEtQCMType
 {Given a totally imginary element b, it returns the CMType PHI for which b is PHI-positive, that is, Im(phi(b))>0 for every phi in PHI.}
-    assert not IsZeroDivisor(b) and (b eq -ComplexConjugate(b));
+    require not IsZeroDivisor(b) and (b eq -ComplexConjugate(b)) : "the element must be a non-zero-divisor b with conj(b) = -b";
     PHI:=New(AlgEtQCMType);
     PHI`CMPositiveElement:=b;
     return PHI;
@@ -133,47 +133,6 @@ intrinsic CMPosElt( PHI::AlgEtQCMType )->AlgEtQElt
     return CMPositiveElement(PHI);
 end intrinsic;
 
-/// Given a CM-type $\Phi$, returns the sequence of homomorphisms to complex field. The vararg `Precision` determines the precision of the complex field.
-intrinsic Homs( PHI::AlgEtQCMType : Precision := _Precision(GetDefaultRealField()) )->SeqEnum[Map]
-{Given a CM-type PHI, returns the sequence of maps to the complex field. The vararg Precision (default real field precision) determines the precision of the codomains of the maps.}
-    if not assigned PHI`Homs then
-        b:=CMPositiveElement(PHI);
-        A:=Parent(b);
-        homs:=HomsToC(A : Precision := Precision);
-        phi:=[ ff : ff in homs | Im(ff( b )) gt 0 ];
-        assert #phi eq #homs div 2;
-        PHI`Homs:=phi;
-    end if;
-    return PHI`Homs;
-end intrinsic;
-
-/// Equality testing for CM-types.
-intrinsic 'eq'(PHI1 :: AlgEtQCMType, PHI2::AlgEtQCMType : Precision := _Precision(GetDefaultRealField()))->BoolElt
-{Returns whether two cm types are equal. This happens if and only if the quotient of (any) two CMPositiveElements is totally real and totally positive.}
-    A:=Domain(Homs(PHI1)[1]);
-    assert forall{ phi : phi in Homs(PHI1) cat Homs(PHI2) | Domain(phi) eq A };
-    b1:=CMPositiveElement(PHI1);
-    b2:=CMPositiveElement(PHI2);
-    if b1 eq b2 then
-        return true;
-    else
-        b:=b1/b2;
-        homs:=HomsToC(A : Precision := Precision);
-        return forall{ h : h in homs | Re(h(b)) gt 0 };
-    end if;
-end intrinsic;
-
-/// Returns the precision of the codomain of the homomorphisms defining the given CM-type.
-intrinsic Precision(PHI :: AlgEtQCMType)->RngIntElt
-{Returns the precision of the given CM-type, that is, the codomain of each homomorphism will be ComplexField(Precision).}
-    if assigned PHI`Homs then
-        phi0:=Homs(PHI);
-        return Precision(Codomain(phi0[1]));
-    else
-        return Precision(GetDefaultRealField()); //the default precision
-    end if;
-end intrinsic;
-
 change_precision_homs:=function(PHI, prec)
 // Returns the homomorphisms of the CM-type PHI with codomain ComplexField(prec). PHI is not
 // modified.
@@ -205,6 +164,51 @@ change_precision_homs:=function(PHI, prec)
     return phi;
 end function;
 
+/// Given a CM-type $\Phi$, returns the sequence of homomorphisms to complex field. The vararg `Precision` determines the precision of the complex field: by default (`0`) it is the precision of the stored homomorphisms, or the default real field precision if none is stored. With a different precision, the homomorphisms with that precision are returned and $\Phi$ is not changed (use `ChangePrecision` for that).
+intrinsic Homs( PHI::AlgEtQCMType : Precision := 0 )->SeqEnum[Map]
+{Given a CM-type PHI, returns the sequence of maps to the complex field. The vararg Precision determines the precision of the codomains of the maps: by default (0) it is the precision of the stored maps, or the default real field precision if none is stored. With a different precision, the maps with that precision are returned and PHI is not changed (use ChangePrecision for that).}
+    require Precision ge 0 : "Precision must be a non-negative integer";
+    if not assigned PHI`Homs then
+        prec:=Precision gt 0 select Precision else _Precision(GetDefaultRealField());
+        b:=CMPositiveElement(PHI);
+        A:=Parent(b);
+        homs:=HomsToC(A : Precision := prec);
+        phi:=[ ff : ff in homs | Im(ff( b )) gt 0 ];
+        assert #phi eq #homs div 2;
+        PHI`Homs:=phi;
+    elif Precision gt 0 and Precision ne _Precision(Codomain(PHI`Homs[1])) then
+        return change_precision_homs(PHI,Precision);
+    end if;
+    return PHI`Homs;
+end intrinsic;
+
+/// Equality testing for CM-types.
+intrinsic 'eq'(PHI1 :: AlgEtQCMType, PHI2::AlgEtQCMType : Precision := _Precision(GetDefaultRealField()))->BoolElt
+{Returns whether two cm types are equal. This happens if and only if the quotient of (any) two CMPositiveElements is totally real and totally positive.}
+    A:=Domain(Homs(PHI1)[1]);
+    assert forall{ phi : phi in Homs(PHI1) cat Homs(PHI2) | Domain(phi) eq A };
+    b1:=CMPositiveElement(PHI1);
+    b2:=CMPositiveElement(PHI2);
+    if b1 eq b2 then
+        return true;
+    else
+        b:=b1/b2;
+        homs:=HomsToC(A : Precision := Precision);
+        return forall{ h : h in homs | Re(h(b)) gt 0 };
+    end if;
+end intrinsic;
+
+/// Returns the precision of the codomain of the homomorphisms defining the given CM-type.
+intrinsic Precision(PHI :: AlgEtQCMType)->RngIntElt
+{Returns the precision of the given CM-type, that is, the codomain of each homomorphism will be ComplexField(Precision).}
+    if assigned PHI`Homs then
+        phi0:=Homs(PHI);
+        return Precision(Codomain(phi0[1]));
+    else
+        return Precision(GetDefaultRealField()); //the default precision
+    end if;
+end intrinsic;
+
 /// Given a CM-type and a positive integer, returns a new CM-type, equal to the given one, whose homomorphisms have codomain the complex field with the given precision. The given CM-type is not modified: use `ChangePrecision(~PHI,prec)` for that.
 intrinsic ChangePrecision(PHI0 :: AlgEtQCMType, prec::RngIntElt )->AlgEtQCMType
 {Given a CM-type and a positive integer, returns a new CM-type, equal to the given one, whose homomorphisms have codomain the complex field with the given precision. The given CM-type is not modified: use ChangePrecision(~PHI,prec) for that.}
@@ -228,14 +232,18 @@ end intrinsic;
 // AllCMTypes
 /////////////////////////////////////////////////////
 
-intrinsic AllCMTypes(A::AlgEtQ : Precision := _Precision(GetDefaultRealField()) ) -> SeqEnum[AlgEtQCMType]
-{Returns all the CM-types of the given étale algebra. The parameter Precision determines the precision of the output.}
+intrinsic AllCMTypes(A::AlgEtQ : Precision := 0 ) -> SeqEnum[AlgEtQCMType]
+{Returns all the CM-types of the given étale algebra. The parameter Precision determines the precision of the output: by default (0) it is the precision of the stored CM-types, or the default real field precision if none are stored. With a different precision, copies of the stored CM-types with that precision are returned (see ChangePrecision).}
+    require Precision ge 0 : "Precision must be a non-negative integer";
     if not assigned A`AllCMTypes then
         require HasComplexConjugate(A) : "the algebra must be a CM-algebra";
+        prec:=Precision gt 0 select Precision else _Precision(GetDefaultRealField());
         // this uses the fact that if A HasComplexConjugation then HomsToC come in conjugate pairs
-        cc:=CartesianProduct(Partition([ h: h in HomsToC(A : Precision := Precision )],2));
+        cc:=CartesianProduct(Partition([ h: h in HomsToC(A : Precision := prec )],2));
         cc:=[ [ci : ci in c] : c in cc ]; //from tuple to seq
         A`AllCMTypes:=[ CMType(c) : c in cc ];
+    elif Precision gt 0 and Precision ne _Precision(Codomain(Homs(A`AllCMTypes[1])[1])) then
+        return [ ChangePrecision(PHI,Precision) : PHI in A`AllCMTypes ];
     end if;
     return A`AllCMTypes;
 end intrinsic;
@@ -295,6 +303,16 @@ end intrinsic;
     // CM-types only for CM-algebras
     _<x>:=PolynomialRing(Integers());
     failed:=false; try _:=AllCMTypes(EtaleAlgebra(x^4+2)); catch e failed:=true; end try; assert failed;
+    printf ".";
+    // the vararg Precision is used also when the homomorphisms are already stored, without changing them
+    _<x>:=PolynomialRing(Integers());
+    A:=EtaleAlgebra(x^4+x^2+529);
+    PHI:=AllCMTypes(A)[1];
+    p0:=Precision(PHI);
+    assert Precision(Codomain(Homs(PHI : Precision:=60)[1])) eq 60 and Precision(PHI) eq p0;
+    assert Precision(AllCMTypes(A : Precision:=60)[1]) eq 60 and Precision(AllCMTypes(A)[1]) eq p0;
+    ChangePrecision(~PHI,80);
+    assert Precision(Codomain(Homs(PHI)[1])) eq 80; // the default keeps the stored precision
     printf ".";
     SetAssertions(1);
     printf " all good!";

@@ -456,7 +456,7 @@ end intrinsic;
 /// We observed that applying the in-built Hash function to the sequence defined above, while giving a smaller hash, it often lead to collisions. For this reason, equality is tested using the whole sequence.
 /// The intrinsic `Hash` returns an integer computed from this sequence, which is used by Magma to build sets, indexed sets and associative arrays of orders: only orders with the same hash value are compared with `eq`, so collisions only cost an extra comparison.
 
-intrinsic myHash(S::AlgEtQOrd)->SeqEnum[RngInt]
+intrinsic myHash(S::AlgEtQOrd)->SeqEnum[RngIntElt]
 {Hash function for AlgEtQOrd.}
 // two orders have the hash iff they are equal
     if not assigned S`Hash then
@@ -616,7 +616,7 @@ end intrinsic;
 /// Given two orders $S$ and $T$ returns the ratio of their indices. If $T subset S$ the outputs is the index of the inclusion, that is, it equals $[S:T] = \#S/T$.
 intrinsic Index(S::AlgEtQOrd, T::AlgEtQOrd) -> FldRatElt
 {Given two orders S and T returns the ratio of their indices. If T subset S the outputs is the index of the inclusion, that is, it equals [S:T] = \#S/T.}
-  assert Algebra(T) cmpeq Algebra(S);
+  require Algebra(T) cmpeq Algebra(S) : "the orders must be in the same algebra";
   elt := Index(T)/Index(S);
   if IsCoercible(Integers(), elt) then
     elt := Integers() ! elt;

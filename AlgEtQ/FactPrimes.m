@@ -158,7 +158,7 @@ intrinsic SingularPrimes(R::AlgEtQOrd) -> SeqEnum[AlgEtQIdl]
 end intrinsic;
 
 ///ditto
-intrinsic NonInvertiblePrimes(R::AlgEtQOrd) -> SetIndx
+intrinsic NonInvertiblePrimes(R::AlgEtQOrd) -> SeqEnum[AlgEtQIdl]
 { " } // "
     return SingularPrimes(R);
 end intrinsic;

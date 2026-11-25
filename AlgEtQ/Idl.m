@@ -104,9 +104,7 @@ intrinsic Ideal(S::AlgEtQOrd, gens::SeqEnum) -> AlgEtQIdl
     gensA:=[];
     for g in gens do
         bool,gA:=IsCoercible(A,g);
-        if not bool then
-            error "generators not in the algebra";
-        end if;
+        require bool : "generators not in the algebra";
         Append(~gensA,gA);
     end for;
     id:=CreateAlgEtQIdl(S,gensA); // it removes the repeated generators
@@ -296,7 +294,7 @@ end intrinsic;
 /// We observed that applying the in-built Hash function to the sequence defined above, while giving a smaller hash, it often leads to collisions. For this reason, equality is tested using the whole sequence.
 /// The intrinsic `Hash` returns an integer computed from this sequence, which is used by Magma to build sets, indexed sets and associative arrays of fractional ideals: only ideals with the same hash value are compared with `eq`, so collisions only cost an extra comparison.
 
-intrinsic myHash(I::AlgEtQIdl)->SeqEnum[RngInt]
+intrinsic myHash(I::AlgEtQIdl)->SeqEnum[RngIntElt]
 {Hash function.}
     if not assigned I`Hash then
         H,d:=lattice_hnf(ZBasis(I));
@@ -588,24 +586,21 @@ end intrinsic;
 intrinsic '*'(I::AlgEtQIdl , x::AlgEtQElt ) -> AlgEtQIdl
 {Returns the fractional ideal x*I.}
     bool,x:=IsCoercible(Algebra(I),x);
-    if not bool then
-        error "the element must be in the same algebra of I";
-    else
-        require not IsZeroDivisor(x) : "the element must not be a zero-divisor";
-        S:=Order(I);
-        gens:=[i*x : i in Generators(I) ];
-        id:=Ideal(S,gens);
-        if assigned I`ZBasis and not assigned id`ZBasis then
-            id`ZBasis:=[x*z : z in ZBasis(I)];
-        end if;
-        if assigned I`MultiplicatorRing then
-            id`MultiplicatorRing:=MultiplicatorRing(I);
-        end if;
-        if assigned I`IsInvertible then
-            id`IsInvertible:=IsInvertible(I);
-        end if;
-        return id;
+    require bool : "the element must be in the same algebra of I";
+    require not IsZeroDivisor(x) : "the element must not be a zero-divisor";
+    S:=Order(I);
+    gens:=[i*x : i in Generators(I) ];
+    id:=Ideal(S,gens);
+    if assigned I`ZBasis and not assigned id`ZBasis then
+        id`ZBasis:=[x*z : z in ZBasis(I)];
     end if;
+    if assigned I`MultiplicatorRing then
+        id`MultiplicatorRing:=MultiplicatorRing(I);
+    end if;
+    if assigned I`IsInvertible then
+        id`IsInvertible:=IsInvertible(I);
+    end if;
+    return id;
 end intrinsic;
 
 ///ditto

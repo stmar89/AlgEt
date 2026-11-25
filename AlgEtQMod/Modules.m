@@ -88,9 +88,7 @@ intrinsic Module(S::AlgEtQOrd, m::Map, gens::SeqEnum) -> AlgEtQMod
     gensV:=[];
     for g in gens do
         bool,gV:=IsCoercible(V,g);
-        if not bool then
-            error "generators not in the algebra";
-        end if;
+        require bool : "generators not in the algebra";
         Append(~gensV,gV);
     end for;
     return CreateAlgEtQMod(S,m,gensV);
@@ -114,15 +112,17 @@ intrinsic ModuleFromDirectSum(R::AlgEtQOrd,m::Map,seq::SeqEnum[Tup])->AlgEtQMod
     require is_pure_power : "The universe algebra is not of the form K^r";
     AR:=Algebra(R);
     UA:=Codomain(m);
-    assert m(One(AR)) eq One(UA);
     require AR eq Domain(m) : "the map does not have Algebra(R) as domain";
+    require m(One(AR)) eq One(UA) : "the map must be unital";
     require forall{I : I in seq | Order(I[1]) eq R } : "the fractional ideals are not R ideals";
-    if forall{I : I in seq | Type(I[2]) eq Map } then
+    with_maps:=forall{I : I in seq | Type(I[2]) eq Map };
+    require with_maps or forall{I : I in seq | Type(I[2]) eq AlgEtQElt } : "the sequence is not valid for this constructor";
+    if with_maps then
         require forall{I : I in seq | Domain(I[2]) eq AR and Codomain(I[2]) eq UA } : "the sequence is not valid for this constructor";
         //in this case the given seq is the DirectSumRep of the module
         gens:=&cat[ [ I[2](z) : z in ZBasis(I[1]) ] : I in seq ];
         dsr:=seq;
-    elif forall{I : I in seq | Type(I[2]) eq AlgEtQElt } then 
+    else // the second entries are elements
         require forall{I : I in seq | Parent(I[2]) eq UA } : "the sequence is not valid for this constructor";
         dsr:=[];
         gens:=[];
@@ -133,8 +133,6 @@ intrinsic ModuleFromDirectSum(R::AlgEtQOrd,m::Map,seq::SeqEnum[Tup])->AlgEtQMod
             Append(~dsr,<I[1],mI>);
             gens cat:=[ mI(z) : z in ZBasis(I[1]) ];
         end for;
-    else
-        error "the sequence is not valid for this constructor";
     end if;
     require Dimension(UA) eq Rank(MatrixAtoQ(gens)) : "gens do not generater a Z-module of full rank";
     M:=Module(R,m,gens);
@@ -189,7 +187,7 @@ intrinsic ZBasis(I::AlgEtQMod)->SeqEnum[AlgEtQElt]
     return I`ZBasis;
 end intrinsic;
 
-intrinsic myHash(I::AlgEtQMod)->RngInt
+intrinsic myHash(I::AlgEtQMod)->SeqEnum[RngIntElt]
 {Hash function.}
     if not assigned I`Hash then
         H,d:=lattice_hnf(ZBasis(I));

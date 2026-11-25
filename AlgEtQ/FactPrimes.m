@@ -14,10 +14,13 @@ freeze;
 declare verbose FactPrimes, 3;
 
 declare attributes AlgEtQOrd : SingularPrimes,
-                               PrimesBelow; // The cache of PrimeBelow: an AssociativeArray keyed by the orders T
-                                            // containing S, whose value at T is an AssociativeArray keyed by the
-                                            // primes P of T, with value PrimeBelow(S,P). The primes are grouped by
-                                            // their order because ideals over different orders cannot be compared.
+                               PrimesBelow; // The cache of PrimeBelow: an AssociativeArray keyed by
+                                            // the orders T
+                                            // containing S, whose value at T is an AssociativeArray
+                                            // keyed by the primes P of T, with value
+                                            // PrimeBelow(S,P). The primes are grouped by their
+                                            // order because ideals over different orders cannot be
+                                            // compared.
 
 declare attributes AlgEtQ : PlacesAboveRationalPrime;
 
@@ -66,13 +69,26 @@ intrinsic PrimeBelow(S::AlgEtQOrd, P::AlgEtQIdl) -> AlgEtQIdl
         return S`PrimesBelow[T][P];
     end if;
     require IsPrime(P) : "the ideal must be prime";
-    // The inclusion test is skipped when T is the maximal order, which contains every order: this is the main use,
-    // and with many orders S the test would cost more than the intersection itself.
+    // The inclusion test is skipped when T is the maximal order, which contains every order: this
+    // is the main use, and with many orders S the test would cost more than the intersection
+    // itself.
     require (assigned T`IsMaximal and T`IsMaximal) or S subset T : "the order must be contained in the order of the prime";
-    // S/(S meet P) embeds in the finite field T/P, so it is a finite domain, hence a field: S meet P is a prime of S.
+    // S/(S meet P) embeds in the finite field T/P, so it is a finite domain, hence a field: S meet
+    // P is a prime of S.
     Q:=OneIdeal(S) meet S!!P;
     Q`IsPrime:=true;
     cache:=assigned S`PrimesBelow select S`PrimesBelow else AssociativeArray();
+    // Distinct primes, also of different orders, can be above the same prime of S: if it is already
+    // stored, we return it, so that each prime of S is one ideal, whose attributes (residue field,
+    // ...) are computed once.
+    for T2 in Keys(cache) do
+        for P2 in Keys(cache[T2]) do
+            if cache[T2][P2] eq Q then
+                Q:=cache[T2][P2];
+                break T2;
+            end if;
+        end for;
+    end for;
     below:=IsDefined(cache,T) select cache[T] else AssociativeArray();
     below[P]:=Q;
     cache[T]:=below;
@@ -154,7 +170,8 @@ end intrinsic;
 /// We deal the case of non-maximal orders by taking intersections.
 
 function factorizationMaximalOrder(I)
-//given an ideal of the maximal order of an étale algebra, returns the factorization into a product of prime ideals
+//given an ideal of the maximal order of an étale algebra, returns the factorization into a product
+//of prime ideals
     O:=Order(I);
     assert IsMaximal(O);
     test,OasProd:=IsProductOfOrders(O);
@@ -201,9 +218,10 @@ intrinsic Factorization(I::AlgEtQIdl) -> Tup
             O:=MaximalOrder(Algebra(I));
             IO:=O !! I;
             facO:=factorizationMaximalOrder(IO);
-            // I is coprime with the conductor of S. So every prime P of S containing I is below exactly
-            // one prime PO of O containing IO, and the valuations of I at P and of IO at PO are equal,
-            // since S and O are equal locally at P. Hence we only need to intersect each PO with S.
+            // I is coprime with the conductor of S. So every prime P of S containing I is below
+            // exactly one prime PO of O containing IO, and the valuations of I at P and of IO at PO
+            // are equal, since S and O are equal locally at P. Hence we only need to intersect each
+            // PO with S.
             facS:=<>;
             for pO in facO do
                 P:=PrimeBelow(S,pO[1]);
@@ -263,7 +281,8 @@ end intrinsic;
             Append(~ids,J);
         end if;
     end for;
-    facs:=[* Factorization(I) : I in ids *]; // a list: tuples of different lengths are not in the same universe
+    facs:=[* Factorization(I) : I in ids *]; // a list: tuples of different lengths are not in the
+                                             // same universe
     // an ideal with many prime factors, coprime with the conductor.
     // We compare its primes with PrimesAbove of a copy without the attribute Factorization.
     ps:=[ p : p in PrimesUpTo(20) | IsCoprime(p*OneIdeal(E1),Conductor(E1)) ];
@@ -273,7 +292,8 @@ end intrinsic;
     assert Seqset(PrimesAbove(J)) eq { p[1] : p in fac };
     printf ".";
 
-    // testing PlacesAboveRationalPrime: the primes above different rational primes are stored separately
+    // testing PlacesAboveRationalPrime: the primes above different rational primes are stored
+    // separately
     _<x>:=PolynomialRing(Integers());
     A:=EtaleAlgebra((x^2+5)*(x^2+7));
     O:=MaximalOrder(A);
@@ -286,9 +306,10 @@ end intrinsic;
     assert Keys(A`PlacesAboveRationalPrime) eq {2,3};
     printf ".";
 
-    // PrimeBelow: the prime S meet P of S below a prime P of an order T containing S. It is stored: the same ideal
-    // object is returned again, also for an equal prime which is a different object. Primes of the maximal order and
-    // of an intermediate order T, in an algebra with two components.
+    // PrimeBelow: the prime S meet P of S below a prime P of an order T containing S. It is stored:
+    // the same ideal object is returned again, also for an equal prime which is a different object.
+    // Primes of the maximal order and of an intermediate order T, in an algebra with two
+    // components.
     A:=EtaleAlgebra((x^2+5)*(x^3-2000));
     E:=EquationOrder(A);
     O:=MaximalOrder(A);
@@ -305,7 +326,15 @@ end intrinsic;
             end for;
         end for;
     end for;
-    assert IsIdentical(PrimeBelow(T,PrimesAbove(Conductor(T))[1]),PrimesAbove(Conductor(T))[1]); // P of T itself
+    // one ideal for each prime of E: the primes of E below the different primes of O and of T above
+    // the same prime P of E are all the same object, which is P itself (PrimesAbove uses
+    // PrimeBelow)
+    for P in PrimesAbove(Conductor(E)) do
+        below:=[ PrimeBelow(E,Q) : Q in PrimesAbove(O!!P) cat PrimesAbove(T!!P) ];
+        assert forall{ Q2 : Q2 in below | IsIdentical(Q2,P) };
+    end for;
+    // P of T itself
+    assert IsIdentical(PrimeBelow(T,PrimesAbove(Conductor(T))[1]),PrimesAbove(Conductor(T))[1]);
     try
         _:=PrimeBelow(O,PrimesAbove(Conductor(E))[1]); // O is not contained in E
         ok:=false;

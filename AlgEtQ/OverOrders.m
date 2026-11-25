@@ -309,7 +309,8 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl : CheckIsKnownOrde
                     for t in tail_tuples do
                         w := V!E!([F!0 : j in [1..pivot-1]] cat [F!1] cat [F!x : x in t]);
                         if q eq 2 then
-                            // for q eq 2 being a subspace of the eigenspace guarantees that it is mult closed
+                            // for q eq 2 being a subspace of the eigenspace guarantees that it
+                            // is mult closed
                             S:=Order([w@@mTV] cat zbR : CheckIsKnownOrder:=CheckIsKnownOrder);
                             Include(~output,S);// necessarily minimal, because it has dim 1
                             Append(~type1_ws,w);

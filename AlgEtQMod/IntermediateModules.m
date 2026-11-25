@@ -56,9 +56,9 @@ intrinsic MinimalIntermediateModules(I::AlgEtQMod,J::AlgEtQMod)->SetIndx[AlgEtQM
             Fp:=FiniteField(p);
             // Note: Qp = Fp^rk as a vector space
             // So its S-module structure can be realized over Fp.
-            // More precisely, given generators ai of S over Z, 
-            // to find the (minimal) sub-S-modules, it is enough to look at Qp as module over Fp[ai]
-            // In matrices we store the matrix representations of the action of the ZBasis of S on Qp
+            // More precisely, given generators ai of S over Z, to find the (minimal) sub-S-modules,
+            // it is enough to look at Qp as module over Fp[ai]. In matrices we store the matrix
+            // representations of the action of the ZBasis of S on Qp.
             matrices:=[Matrix(Fp,[ Eltseq(Qp!(q(m(zS)*(Qp.j@@q)))) : j in [1..Ngens(Qp)]]) : zS in ZBasis(S) ];
             matrices:=Setseq(Seqset(matrices)); //possibly there are repetiions.
             Qp_Rmod:=RModule(matrices);
@@ -97,8 +97,8 @@ intrinsic MaximalIntermediateModules(I::AlgEtQMod,J::AlgEtQMod)->SetIndx[AlgEtQM
     if J eq I then 
         return {@ J @};
     else
-        // If I c K c I is maximal then I/K is a simple module, that is, isomorphic to S/P for some prime P of S.
-        // In particular, if p is the characteristic of S/P, then p*I c K c I.
+        // If I c K c I is maximal then I/K is a simple module, that is, isomorphic to S/P for some
+        // prime P of S. In particular, if p is the characteristic of S/P, then p*I c K c I.
         // Note that I/pI is an Fp-vector space.
         _,m:=UniverseAlgebra(I);
         gens_J_over_S:=Generators(J);
@@ -113,9 +113,9 @@ intrinsic MaximalIntermediateModules(I::AlgEtQMod,J::AlgEtQMod)->SetIndx[AlgEtQM
             Fp:=FiniteField(p);
             // Note: Qp = Fp^rk as a vector space
             // So its S-module structure can be realized over Fp.
-            // More precisely, given generators ai of S over Z, 
-            // to find the (minimal) sub-S-modules, it is enough to look at Qp as module over Fp[ai]
-            // In matrices we store the matrix representations of the action of the ZBasis of S on Qp
+            // More precisely, given generators ai of S over Z, to find the (minimal) sub-S-modules,
+            // it is enough to look at Qp as module over Fp[ai]. In matrices we store the matrix
+            // representations of the action of the ZBasis of S on Qp.
             matrices:=[Matrix(Fp,[ Eltseq(qp(q(m(zS)*(Qp.j@@qp@@q)))) : j in [1..Ngens(Qp)]]) : zS in ZBasis(S) ];
             matrices:=Setseq(Seqset(matrices)); //possibly there are repetiions.
             Qp_Rmod:=RModule(matrices);
@@ -146,7 +146,8 @@ intrinsic IntermediateModulesWithTrivialExtension(I::AlgEtQMod,J::AlgEtQMod,O::A
         pot_new:={@ K : K in pot_new | O!!K eq IO @}; // only the ones with trivial extension.
         output join:=pot_new;
         done join:=queue;
-        // Note: if O!!K is not IO then every submodule of K will also not have trivial extension. Hence such K's can be excluded from the recursion.
+        // Note: if O!!K is not IO then every submodule of K will also not have trivial extension.
+        // Hence such K's can be excluded from the recursion.
         queue := pot_new diff done;
     end while;
     return output;

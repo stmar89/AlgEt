@@ -18,7 +18,8 @@ declare type AlgEtQ[AlgEtQElt];
 declare attributes AlgEtQ : DefiningPolynomial,
                            Dimension,
                            AbsoluteDimension,
-                           BaseField, //a tup : <F,m> where F is the Base field and m is the diagonal embedding into A
+                           BaseField, // a tup : <F,m> where F is the Base field and m is the
+                                      // diagonal embedding into A
                            HasBaseField, //a boolean
                            PrimeField,
                            Components; //a tup of 3 sequences: the first are the NF,
@@ -41,7 +42,8 @@ declare attributes AlgEtQ : DefiningPolynomial,
 
 intrinsic EtaleAlgebra(seq::SeqEnum[FldNum]) -> AlgEtQ
 {Given a sequence of number fields which are absolute extensions of the rational field, returns the étale algebra corresponding to the direct product. The number fields with DefiningPolynomial of degree one need to created with DoLinearExtension set to true.}
-// funny stuff: ExtendedType([NumberField(g[1]) : g in Factorization(f)]); for f:=(x^8+16)*(x^8+81); returns SeqEnum[FldNum] and not SeqEnum[FldNum[FldRat]]
+// funny stuff: ExtendedType([NumberField(g[1]) : g in Factorization(f)]); for
+// f:=(x^8+16)*(x^8+81); returns SeqEnum[FldNum] and not SeqEnum[FldNum[FldRat]]
     require #seq gt 0 : "at least one number field is needed";
     require forall{ K : K in seq | ISA(ExtendedType(K),FldNum[FldRat])} : "The given number fields are not absolute extensions of Q.";
     A:=New(AlgEtQ);

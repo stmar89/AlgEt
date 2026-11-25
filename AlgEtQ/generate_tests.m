@@ -7,7 +7,8 @@
 // https://creativecommons.org/licenses/by/4.0/
 /////////////////////////////////////////////////////
 
-// Based on https://github.com/stmar89/AlgEt/blob/0e293da57edfd90f57380ac9d684b7a1d4a7090a/dev/fast_tests_AlgEtQ_make/magma_make_fast_tests_AlgEtQ.txt
+// Based on
+// https://github.com/stmar89/AlgEt/blob/0e293da57edfd90f57380ac9d684b7a1d4a7090a/dev/fast_tests_AlgEtQ_make/magma_make_fast_tests_AlgEtQ.txt
 /*
     This script collects all the fast tests from the various .m files in AlgEtQ/ and puts them in a file (or files) which can then be run.
 
@@ -33,7 +34,8 @@ SetColumns(0);
 SetAutoColumns(false);
 
 find_next:=function(inp,pos,str);
-    //find the next occurrence in inp of str starting from the character inp[pos]. returns the position of the character right after str.
+    //find the next occurrence in inp of str starting from the character inp[pos]. returns the
+    //position of the character right after str.
     // if Eof is reached returns 0;
     assert pos gt 0;
     if pos eq #inp then

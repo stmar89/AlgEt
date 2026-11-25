@@ -83,7 +83,8 @@ intrinsic LoadWKICM(str::MonStgElt) -> AlgEtQOrd
     data:=eval(str);
     PP:=PolynomialRing(Rationals());
     ff:=[ PP!f : f in data[1]];
-    A:=EtaleAlgebra([NumberField(f : DoLinearExtension) : f in ff ]); // DoLinearExtension: for the Q components, as in EtaleAlgebra(f)
+    // DoLinearExtension: for the Q components, as in EtaleAlgebra(f)
+    A:=EtaleAlgebra([NumberField(f : DoLinearExtension) : f in ff ]);
     wk:=data[2];
 
     ooR:=[ Order([ A ! s : s in wk[j][1]]) : j in [1..#wk] ];

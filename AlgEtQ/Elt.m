@@ -71,7 +71,6 @@ intrinsic IsCoercible(A::AlgEtQ, x::.) -> BoolElt, .
         x1:=CreateAlgEtQElt(A,comp);
         return true,x1;
     elif Type(x) eq RngIntElt or Type(x) eq FldRatElt then
-        coordinates:=<>;
         nf:=Components(A);
         comp:=<nf[i]!x : i in [1..#nf]>; //diagonal embedding
         x1:=CreateAlgEtQElt(A,comp);
@@ -237,7 +236,7 @@ end intrinsic;
 intrinsic PrimitiveElement(A::AlgEtQ) -> AlgEtQElt
 {Returns a primitive element of the étale algebra A, that is, an element of A whose minimal polynomial over Q has degree equal to the dimension of A over Q. The output is deterministically computed using the following procedure. Let N be the number of components of A, each one having primitive element a_i. Set b_1 = a_1. For i=2,..,N, set b_i = a_i+j where j is the smallest non-negative integer such that the minimal polynomial of a_i+j is not in the set of minimal polynomials of the elements b_1,...,b_(i-1). The output is the element of A whose components are b_1,...,b_N. In particular, if A is a product of number fields with different defining polynomials, then the output is the element of A whose components are the primitive elements of the components.}
     if not assigned A`PrimitiveElement then
-        nf,embs:=Components(A);
+        nf:=Components(A);
         ms:={DefiningPolynomial(nf[1])};
         bs:=<PrimitiveElement(nf[1])>;
         for i in [2..#nf] do
@@ -293,7 +292,6 @@ intrinsic Random(A::AlgEtQ , bd::RngIntElt) -> AlgEtQElt
     coeff:=[ Random(-bd,bd) : i in [1..#abs] ];
     num:=&+[abs[i]*coeff[i] : i in [1..#abs]];
     repeat
-        abs:=AbsoluteBasis(A);
         coeff:=[ Random(-bd,bd) : i in [1..#abs] ];
         den:=&+[abs[i]*coeff[i] : i in [1..#abs]];
     until IsUnit(den);
@@ -703,7 +701,6 @@ end intrinsic;
 
 intrinsic MinimalPolynomial(x::AlgEtQElt, F::Fld) -> RngUPolElt
 {Returns the minimal polynomial of the element over the field F.}
-    A:=Algebra(x);
     m:=LCM( [ MinimalPolynomial(c, F) : c in Components(x) ] );
     assert2 (0 eq Evaluate(m,x));
     return m;

@@ -16,7 +16,7 @@ declare verbose CRT, 2;
 declare attributes AlgEtQOrd : CRT_data;
 declare attributes AlgEtQIdl : CRT_data;
 
-import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQtoA , meet_zbasis , all_but_one;
+import "Ord.m" : crQZ , crZQ , MatrixAtoQ , all_but_one;
 
 ///## Chinese remainder theorem
 /// Let $I$ and $J$ be integral fractional ideals over the same order $S$ in an étale algebra.
@@ -48,8 +48,6 @@ CRT_data_order:=function(S)
         zS:=ZBasis(S);
         M:=MatrixAtoQ(zS);
         d:=Denominator(M);
-        //_,V:=HermiteForm(crQZ(d*M)); // V*d*M eq H
-        //cc:=Matrix([AbsoluteCoordinates([One(Algebra(S))],S)[1]])*crZQ(V^-1);
         M:=VerticalJoin(crQZ(d*M),ZeroMatrix(Integers(),#zS));
         H,V:=HermiteForm(M); // V*M eq H
         cc:=AbsoluteCoordinates([One(Algebra(S))],S)[1];
@@ -90,7 +88,7 @@ intrinsic ChineseRemainderTheorem(I::AlgEtQIdl,J::AlgEtQIdl,a::AlgEtQElt,b::AlgE
     if g ne 1 then
         K:=Algebra(S);
         n:=AbsoluteDimension(K);
-        cc,d:=CRT_data_order(S);
+        cc:=CRT_data_order(S);
         CI,zI:=CRT_data_ideal(I);
         CJ,zJ:=CRT_data_ideal(J);
         zIs:=[zI,zJ];
@@ -143,12 +141,12 @@ intrinsic ChineseRemainderTheoremFunctions(Is::SeqEnum[AlgEtQIdl])-> Map,Map
     S:=Order(Is[1]);
     N:=#Is;
     require forall{i : i in [2..N] | Order(Is[i]) eq S}:"the ideals must be of the same order";
-    S:=OneIdeal(S);
-    Q,q:=Quotient(S,&meet(Is));
+    OS:=OneIdeal(S);
+    Q,q:=Quotient(OS,&meet(Is));
     quots:=[];
     maps:=<>;
     for I in Is do
-        QI,qI:=Quotient(S,I);
+        QI,qI:=Quotient(OS,I);
         Append(~quots,QI);
         Append(~maps,qI);
     end for;
@@ -166,7 +164,7 @@ intrinsic ChineseRemainderTheoremFunctions(Is::SeqEnum[AlgEtQIdl])-> Map,Map
         return (&+[embs[j](maps[j](as[j])) : j in [1..N] ])@@isom@@q;
     end function;
     II:=&meet(Is);
-    assert forall{s : s in ZBasis(S) | func2(func1(s)) -s in II};
+    assert forall{s : s in ZBasis(OS) | func2(func1(s)) -s in II};
     return func1,func2;
 end intrinsic;
 

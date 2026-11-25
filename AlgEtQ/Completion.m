@@ -26,8 +26,8 @@ intrinsic Completion(P::AlgEtQIdl : MinPrecision:=20) -> FldPad,Map
     mK:=embs[ind]; // mK:=K->L
     PK:=PKs[ind];
     LP,mLP:=Completion(K,PK : Precision:=MinPrecision); // mLP:K->LP
-    // it seems that Magma Ignore the Parameter Precision and returns always a ring with Infinity precition.
-    // workaround
+    // it seems that Magma Ignore the Parameter Precision and returns always a ring with Infinity
+    // precition. Workaround:
     LP1:=ChangePrecision(LP,MinPrecision);
     map:=hom< L->LP1 | x:->LP1!mLP(Components(x)[ind]) ,
                       y:->mK((LP!y)@@mLP) >;
@@ -81,7 +81,8 @@ end intrinsic;
     // Consider a bunch of prime of O and their uniformizers in O.
     pp:=PrimesAbove(2*3*5*7*O);
     unifs:=Uniformizers(pp);
-    // We now verify that each element is a uniformizer at the correct prime and a unit everywhere else
+    // We now verify that each element is a uniformizer at the correct prime and a unit everywhere
+    // else
     for iP->P in pp do
         AP,mP:=Completion(P);
         for it->t in unifs do

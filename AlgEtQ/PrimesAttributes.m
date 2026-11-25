@@ -150,8 +150,8 @@ end intrinsic;
                 assert forall{ y : y in elts | Valuation(y*OneIdeal(O),P) eq Valuation(y,P) };
             end for;
             ts:=Uniformizers(pp);
-            // short: the reduction modulo L, the product of the P^2, plus k times the smallest integer
-            // of L, with k at most the number of components
+            // short: the reduction modulo L, the product of the P^2, plus k times the smallest
+            // integer of L, with k at most the number of components
             L:=&meet[ P^2 : P in pp ];
             ZBasisLLL(L : FromHNF:=true); // the basis used by Uniformizers
             assert forall{ t : t in ts | exists{ k : k in [0..#Components(A)] |

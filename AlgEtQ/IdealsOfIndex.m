@@ -47,8 +47,9 @@ intrinsic IdealsOfIndex(I::RngOrdIdl, N::RngIntElt) -> SeqEnum[RngOrdIdl]
     assert forall{J : J in Js | J+ff eq 1*OK};
     result := [];
     for J in Js do
-            K := (O meet J) * I; // OK/J=O/(J meet O)=I/K, where the second isomorphism holds because
-                                 // (J meet O) is invertible in O, since it is coprime with ff.
+            // OK/J=O/(J meet O)=I/K, where the second isomorphism holds because (J meet O) is
+            // invertible in O, since it is coprime with ff.
+            K := (O meet J) * I;
             Append(~result, K);
     end for;
     return result;
@@ -80,7 +81,7 @@ ideals_of_index_product:=function(Is, N)
     for d in Divisors(N) do
         J1 := IdealsOfIndex(Is[1], N div d);
         Jk := $$(<Is[i] : i in [2..#Is]>, d);
-        if #J1 ge 0 and #Jk ge 0 then
+        if #J1 gt 0 and #Jk gt 0 then
             for c in CartesianProduct(J1, Jk) do
                 Append(~result, <c[1]> cat c[2]);
             end for;

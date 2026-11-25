@@ -26,8 +26,8 @@ intrinsic _MinimalIntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQI
         Q,q:=Quotient(I,J);
         min_ideals:={@ @};
         // Following code is based on the following Lemma.
-        // LEMMA: Let M be a finite non-zero S-module (eg I/J). Let N be a minimal submodule of M (non-zero, possibly N=M).
-        // Then there exists a prime number p dividing #M such that pN=0.
+        // LEMMA: Let M be a finite non-zero S-module (eg I/J). Let N be a minimal submodule of M
+        // (non-zero, possibly N=M). Then there exists a prime number p dividing #M such that pN=0.
         // In particular, N is a submodule of the kernel Mp of the multiplication-by-p map on M.
         // PROOF: pN is a submodule of N. Since N is minimal pN=N or pN=0.
         // The first case occurs if p does not divide the order of N.
@@ -41,9 +41,9 @@ intrinsic _MinimalIntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQI
             Fp:=FiniteField(p);
             // Note: Qp = Fp^rk as a vector space
             // So its S-module structure can be realized over Fp.
-            // More precisely, given generators ai of S over Z,
-            // to find the (minimal) sub-S-modules, it is enough to look at Qp as module over Fp[ai]
-            // In matrices we store the matrix representations of the action of the ZBasis of S on Qp
+            // More precisely, given generators ai of S over Z, to find the (minimal) sub-S-modules,
+            // it is enough to look at Qp as module over Fp[ai]. In matrices we store the matrix
+            // representations of the action of the ZBasis of S on Qp.
             matrices:=[Matrix(Fp,[ Eltseq(Qp!(q(zS*(Qp.j@@q)))) : j in [1..Ngens(Qp)]]) : zS in ZBasis(S) ];
             matrices:=Setseq(Seqset(matrices)); //possibly there are repetiions.
             Qp_Rmod:=RModule(matrices);
@@ -106,8 +106,8 @@ intrinsic _MaximalIntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQI
     if J eq I then
         return {@ @};
     else
-        // If J c K c I is maximal then I/K is a simple module, that is, isomorphic to S/P for some prime P of S.
-        // In particular, if p is the characteristic of S/P, then p*I c K c I.
+        // If J c K c I is maximal then I/K is a simple module, that is, isomorphic to S/P for some
+        // prime P of S. In particular, if p is the characteristic of S/P, then p*I c K c I.
         // Note that I/pI is an Fp-vector space.
         Q,q:=Quotient(I,J);
         gens_J_over_S:=Generators(J);
@@ -121,9 +121,9 @@ intrinsic _MaximalIntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQI
             Fp:=FiniteField(p);
             // Note: Qp = Fp^rk as a vector space
             // So its S-module structure can be realized over Fp.
-            // More precisely, given generators ai of S over Z,
-            // to find the (minimal) sub-S-modules, it is enough to look at Qp as module over Fp[ai]
-            // In matrices we store the matrix representations of the action of the ZBasis of S on Qp
+            // More precisely, given generators ai of S over Z, to find the (minimal) sub-S-modules,
+            // it is enough to look at Qp as module over Fp[ai]. In matrices we store the matrix
+            // representations of the action of the ZBasis of S on Qp.
             matrices:=[Matrix(Fp,[ Eltseq(qp(q(zS*(Qp.j@@qp@@q)))) : j in [1..Ngens(Qp)]]) : zS in ZBasis(S) ];
             matrices:=Setseq(Seqset(matrices)); //possibly there are repetiions.
             Qp_Rmod:=RModule(matrices);
@@ -191,8 +191,8 @@ Note that the output always contains I. The output is produced by recursively co
         pot_new:={@ K : K in pot_new | O!!K eq IO @}; //we keep only the ones with trivial extension
         output join:={@ K : K in pot_new | not K in done @};
         done join:=queue;
-        // Note: if O!!K is not IO, then all the submodules of K will also not have trivial extension IO.
-        // Hence we don't need to continue the recursion on K.
+        // Note: if O!!K is not IO, then all the submodules of K will also not have trivial
+        // extension IO. Hence we don't need to continue the recursion on K.
         queue := pot_new diff done;
     end while;
     return output;
@@ -234,8 +234,8 @@ In particular, the output contains I if and only if O = (I:I) = S. The output is
         pot_new:={@ K : K in pot_new | O!!K eq IO @}; //we keep only the ones with trivial extension
         output join:={@ K : K in pot_new | not K in done and MultiplicatorRing(K) eq S @};
         done join:=queue;
-        // Note: if O!!K is not IO, then all the submodules of K will also not have trivial extension IO.
-        // Hence we don't need to continue the recursion on K.
+        // Note: if O!!K is not IO, then all the submodules of K will also not have trivial
+        // extension IO. Hence we don't need to continue the recursion on K.
         queue := pot_new diff done;
     end while;
     return output;
@@ -299,9 +299,9 @@ The output is produced by recursively computing the maximal ones.}
         pot_new:=&join[_MaximalIntermediateIdeals(elt,J) : elt in queue ];
         output join:={@ K : K in pot_new | Index(I,K) eq N @};
         done join:=queue;
-        queue := {@ M : M in pot_new diff done | Index(I,M) lt N @}; // If [I:M] ge N then for all K c M we have
-                                                                     // that [I:K]>N. Hence we don't want such M's
-                                                                     // in the queue.
+        // If [I:M] ge N then for all K c M we have that [I:K]>N. Hence we don't want such M's in
+        // the queue.
+        queue := {@ M : M in pot_new diff done | Index(I,M) lt N @};
     end while;
     return output;
 end intrinsic;

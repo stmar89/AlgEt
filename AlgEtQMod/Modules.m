@@ -47,8 +47,7 @@ declare attributes AlgEtQMod : Index, //stores the index
                                                   // for ideals
                               IsZBasisLLLFromHNF;
 
-import "../AlgEtQ/Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQtoA , meet_zbasis , inclusion_matrix ,
-                           lattice_hnf , hash_from_hnf;
+import "../AlgEtQ/Ord.m" : crZQ , MatrixAtoQ , MatrixQtoA , inclusion_matrix , lattice_hnf , hash_from_hnf;
 import "../AlgEtQ/ZBasisLLL.m" : lll_zbasis;
 import "PowerBass.m" : is_pure_power_internal;
 
@@ -69,7 +68,6 @@ CreateAlgEtQMod:=function(S,m,gens)
     I`Order:=S;
     gens:=Setseq(Seqset(gens));
     if #gens gt AbsoluteDimension(V) then
-        ZZ:=Integers();
         vprintf AlgEtQIdl,3: "too many gens";
         gens:=[g*m(s) : g in gens, s in ZBasis(S) ];
         H,d:=lattice_hnf(gens);
@@ -111,7 +109,7 @@ end intrinsic;
 
 intrinsic ModuleFromDirectSum(R::AlgEtQOrd,m::Map,seq::SeqEnum[Tup])->AlgEtQMod
 {Let R be an order and a map m:Algebra(R)->A, where A is an algebra isomorphic to Algebra(R)^s. Let seq be a sequence of pairs <J,v> where J is a fractional R ideal and v is either an element of A or a map v:Algebra(J)->A. It returns the AlgEtQMod M=J1v1+J2v2+...Jsvs (in the first case) or J1v1(1)+...+Jsvs(1) (in the second case).}
-    is_pure_power,ones:=is_pure_power_internal(m);
+    is_pure_power:=is_pure_power_internal(m);
     require is_pure_power : "The universe algebra is not of the form K^r";
     AR:=Algebra(R);
     UA:=Codomain(m);
@@ -228,21 +226,12 @@ end intrinsic;
 
 intrinsic 'eq'(I::AlgEtQMod,J::AlgEtQMod) -> BoolElt
 {Equality testing.}
-    V,m:=UniverseAlgebra(I);
-    VJ,mJ:=UniverseAlgebra(J); 
+    V:=UniverseAlgebra(I);
+    VJ:=UniverseAlgebra(J);
     require V cmpeq VJ : "The modules are not in the same algebra.";
     // one should check that the action is the same, maybe with an assert2
     require Order(I) cmpeq Order(J) : "The modules are not over the same order.";
     out:=myHash(I) eq myHash(J);
-    // if out then //we copy the attributes
-    //     for att in GetAttributes(AlgEtQIdl) do
-    //         if assigned I``att and not assigned J``att then
-    //             J``att:=I``att;
-    //         elif assigned J``att and not assigned I``att then
-    //             I``att:=J``att;
-    //         end if;
-    //     end for;
-    // end if;
     return out;
 end intrinsic;
 
@@ -274,14 +263,6 @@ end intrinsic;
 intrinsic 'in'(x::AlgEtQElt , I::AlgEtQMod ) -> BoolElt
 {Returns if x is in I.}
     require Algebra(x) eq UniverseAlgebra(I) : "the elements must lie in the same algebra of definition";
-    // if assigned I`Generators and x in I`Generators then 
-    //     return true;
-    // end if;
-    // if assigned I`ZBasis and x in I`ZBasis then 
-    //     return true;
-    // end if;
-    // mat := AbsoluteCoordinates([x], ZBasis(I))[1];
-    // return &and[IsCoercible(Integers(), elt) : elt in Eltseq(mat)];
     ZZ:=Integers();
     coord:=AbsoluteCoordinates([x],I)[1];
     is_in:=forall{m : m in coord | IsCoercible(ZZ,m)};

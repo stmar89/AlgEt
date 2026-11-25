@@ -141,7 +141,7 @@ ext_map_Pic:=function(icm,S)
     if not assigned icm`ExtensionMapsPics then
         icm`ExtensionMapsPics:=AssociativeArray();
     end if;
-    test,map:=IsDefined(icm`ExtensionMapsPics,S);
+    test:=IsDefined(icm`ExtensionMapsPics,S);
     if not test then
         icm`ExtensionMapsPics[S]:=ExtensionHomPicardGroups(Order(icm),S : GRH:=icm`GRH);
     end if;
@@ -327,7 +327,6 @@ end intrinsic;
     assert #[c:c in cs|c*one ne c] eq 0;
     assert #[<a,b>:a,b in cs[1..5]|a*b ne (w(a)*w(b))@@w] eq 0;
     assert forall{c:c in cs|c^2 eq (w(c)^2)@@w};
-    // test-alarm-limit 150
     // x^n must not form the ideal power of the representative, whose size grows with n.
     assert one^(2^64+1) eq one;
     _:=Random(icm)*Random(icm);

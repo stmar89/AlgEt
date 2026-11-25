@@ -81,7 +81,6 @@ Method should be of the form "julia -J /tmp/Hecke.so ~/path/to/AlgEt/" (the ".so
         end if;
     end if;
 
-    //require EquationOrder(Algebra(S)) subset S : "Implemented only for modules over orders containing the equation order";
     pi:=PrimitiveElement(Algebra(S));
     if not pi in S then
         pi:=pi*Exponent(Quotient(pi*S + OneIdeal(S),OneIdeal(S)));

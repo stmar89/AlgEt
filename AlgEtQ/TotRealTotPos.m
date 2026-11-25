@@ -100,7 +100,6 @@ debug_test:=function(S,S_tot_pos_in_US)
 // this test is quite costly!
 // it loops over the subgroups of S*/<v*bar(v) : v in S^*> meet S^* to find the totally positive
 // units
-    K:=Algebra(S);
     zbS:=ZBasis(S);
     T:=Order(zbS cat [ ComplexConjugate(z) : z in zbS ]); // T=S*bar(S)
     UT,uT:=UnitGroup(T); //uT:UT->T
@@ -111,7 +110,6 @@ debug_test:=function(S,S_tot_pos_in_US)
     USinUT:=sub<UT | [ g@@uT : g in gensUinS ]>;
     Q,q:=quo< USinUT | USinUT meet USUSb >; // q:=USinUT->Q
                                             // Q = S*/<v bar(v) : v in S*> meet S* in UT
-    ker_q:=Kernel(q);
     subs:=Subgroups(Q);
     subs_tp:=[]; // subs of tot pos elements
     for H0 in subs do
@@ -138,7 +136,6 @@ intrinsic TotallyRealPositiveUnitGroup(S::AlgEtQOrd) -> Grp
                                 // on the other hand, to compute US, one needs OK
         UF,uF:=UnitGroup(OF); // uF:UF->F
         US,uS,UK,uK:=units_of_S_in_units_of_O(S); // US is a subgroup of UK
-        UFtoUK:=hom< UF->UK | [ (FtoK(uF(UF.i))@@uK) : i in [1..Ngens(UF)]]>;
 
         FF2:=FiniteField(2);
         signs:=Matrix([[ Re(h(uF(UF.i))) gt 0 select (FF2!0) else (FF2!1) : h in HomsToC(F) ] : i in [1..Ngens(UF)]]);

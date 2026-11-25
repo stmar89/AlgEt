@@ -67,7 +67,7 @@ end intrinsic;
 intrinsic HasBaseField(A::AlgEtQ) -> BoolElt
 {Returns whether the components of A all have the same base field.}
     if not assigned A`HasBaseField then
-        nf,embs:=Components(A);
+        nf:=Components(A);
         F:=BaseRing(nf[1]);
         A`HasBaseField:=forall{ E : E in nf[2..#nf] | BaseRing(E) eq F };
         if A`HasBaseField then

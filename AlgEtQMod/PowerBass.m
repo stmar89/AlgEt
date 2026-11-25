@@ -28,7 +28,7 @@ freeze;
 
 declare verbose PowerBass, 1;
 
-import "../AlgEtQ/Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQtoA , meet_zbasis , inclusion_matrix;
+import "../AlgEtQ/Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixQtoA;
 
 /* 
     Let M be an S-module in the K-algebra V.
@@ -57,14 +57,27 @@ import "../AlgEtQ/Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ
 // ------------------- //
 
 declare attributes AlgEtQMod :
-                             DirectSumRep, // a sequence of pairs <J,m> where J is a practional R ideal and m:Algebra(R)->UniverseAlgebra, such that the module equals J1*m1(One(R))+...+Js*ms(One(R)) where the sum is direct. Also (Ji:Ji) subseteq (Ji+1:Ji+1)  
+                             DirectSumRep, // a sequence of pairs <J,m> where J is a practional R
+                                           // ideal and m:Algebra(R)->UniverseAlgebra, such that the
+                                           // module equals J1*m1(One(R))+...+Js*ms(One(R)) where
+                                           // the sum is direct. Also (Ji:Ji) subseteq (Ji+1:Ji+1)
                              SteinitzClass, // the ideal J1*J2*...*Js of the above decomposition
-                             StandardDirectSumRep, // < seq,map >, where seq is a sequence of pairs <Si,ei> with ei an orthogonal idempotent of the UniverseAlgebra UA and Si is the multiplicator ring of Ji (from the direct sum decomposition) for i = 1,...,s-1 and Ss is the SteinitzClass. map:UA->UA sends the DirectSumRep into seq.
-                             multiplicator_overorder; // the multiplicator ring of the module, that is, the biggest over-order S of R for which M is an S-module
+                             StandardDirectSumRep, // < seq,map >, where seq is a sequence of pairs
+                                                   // <Si,ei> with ei an orthogonal idempotent of
+                                                   // the UniverseAlgebra UA and Si is the
+                                                   // multiplicator ring of Ji (from the direct sum
+                                                   // decomposition) for i = 1,...,s-1 and Ss is the
+                                                   // SteinitzClass. map:UA->UA sends the
+                                                   // DirectSumRep into seq.
+                             multiplicator_overorder; // the multiplicator ring of the module, that
+                                                      // is, the biggest over-order S of R for which
+                                                      // M is an S-module
 
 
 is_pure_power_internal:=function(m)
-//Given a m:K->V module returns whether V is isomorphic to K^r, for some r, and, if so, also a sequence of elements of V which are the r distinct copies if 1_K in V and an isomorphism K^r->V, together with embeddings K->Kr and projections Kr->K.
+//Given a m:K->V module returns whether V is isomorphic to K^r, for some r, and, if so, also a
+//sequence of elements of V which are the r distinct copies if 1_K in V and an isomorphism K^r->V,
+//together with embeddings K->Kr and projections Kr->K.
     K:=Domain(m);
     V:=Codomain(m);
     dimK:=AbsoluteDimension(K);
@@ -142,7 +155,8 @@ intrinsic compute_multiplicator_overorder(M::AlgEtQMod)->AlgEtQOrd
     if not assigned M`multiplicator_overorder then
         if assigned M`DirectSumRep then
             mult_rings:=[ MultiplicatorRing(J[1]) : J in M`DirectSumRep ];
-            assert exists(mr){ T : T in mult_rings | forall{ S : S in mult_rings | T subset S }  }; //is the smallest of the multiplicator rings
+            // is the smallest of the multiplicator rings
+            assert exists(mr){ T : T in mult_rings | forall{ S : S in mult_rings | T subset S }  };
             assert mr in mult_rings;
             M`multiplicator_overorder:=mr;
         else
@@ -165,7 +179,8 @@ end intrinsic;
 
 bass_factor:=function(gens_input,Rg,mAgs,embs,projs)
 // Input: 
-// - gens_input is a sequence of vectors in mAgs:Ag->Ag^s whose Zspan is an Rg-module M, where Ag is the fraction field of Rg.
+// - gens_input is a sequence of vectors in mAgs:Ag->Ag^s whose Zspan is an Rg-module M, where Ag is
+//   the fraction field of Rg.
 // - Rg : see above
 // - mAgs: see above
 // - embs,projs are the embeddings Ag->Ags and projections Ags->Ag
@@ -189,9 +204,9 @@ bass_factor:=function(gens_input,Rg,mAgs,embs,projs)
     // Let u be a unit of Ags. Write Ags = Ag*u + B where B is isomorphic to Ag^(s-1).
     // Let p_u be the projection along u defined by sending x*u+b (with x in Ag and b in B) to x.
     //
-    // We need a generators u from gens such that th fractional Rg-ideal J:=p_u(M) satisfies (J:J)=T.
-    // If no u in gens satisfies this property, we act with a matrix rU in GL_ns(Z) on gens, 
-    // so that the obtained set also has Zspan M, until we find one.
+    // We need a generators u from gens such that th fractional Rg-ideal J:=p_u(M) satisfies
+    // (J:J)=T. If no u in gens satisfies this property, we act with a matrix rU in GL_ns(Z) on
+    // gens, so that the obtained set also has Zspan M, until we find one.
     // An element u with the property above exists in M, by a Theorem of Bass.
     //
     // TODO It would be nice to find a deterministic method.
@@ -210,7 +225,8 @@ bass_factor:=function(gens_input,Rg,mAgs,embs,projs)
                 if not IsZeroDivisor(u) then
                     vprintf PowerBass,2: ".";
                     // We define the 'projection along u', as described above.
-                    p_u:=[ projs[j](u) : j in [1..s] ]; // the projections of u onto the s Ag-components of Ags 
+                    p_u:=[ projs[j](u) : j in [1..s] ]; // the projections of u onto the s
+                                                        // Ag-components of Ags
                     n_u:=&+[ (p_u[j])^2 : j in [1..s] ]; // the 'Ag-norm', squared, of u
                     p_u:=Hom(Ags,Ag,[(&+[ projs[j](g)*p_u[j]:j in [1..s]])/n_u:g in abs_Ags]);
                     J:=Ideal(Rg,[ p_u(g) : g in gens ]); // J=p_u(M)
@@ -230,20 +246,21 @@ bass_factor:=function(gens_input,Rg,mAgs,embs,projs)
     
     // We got our factor J. Need to find v and M0
     Jinv:=ColonIdeal(S,S!!J);
-    gens_JinvM:=&cat[[ mAgs(j)*g :g in gens] : j in ZBasis(Jinv)]; // generators of J^-1*M (not a ZBasis)
+    // generators of J^-1*M (not a ZBasis)
+    gens_JinvM:=&cat[[ mAgs(j)*g :g in gens] : j in ZBasis(Jinv)];
     coeffsu_JinvM:=[ p_u(g) : g in gens_JinvM ]; // p_u(J^-1*M)
     assert Ideal(Rg,coeffsu_JinvM) eq Ideal(Rg,ZBasis(S));
     A:=MatrixAtoQ(coeffsu_JinvM);
     d_A:=Denominator(A);
     AZ:=crQZ(d_A*A); 
     assert #Rows(AZ) eq #gens_JinvM;
-    // d_A*1 in the absolute basis of Ag: it is (d_A,0,...,0) only when Ag is a field, since AbsoluteBasis(Ag) is the
-    // concatenation of the bases of the components
+    // d_A*1 in the absolute basis of Ag: it is (d_A,0,...,0) only when Ag is a field, since
+    // AbsoluteBasis(Ag) is the concatenation of the bases of the components
     vect:=Vector(Integers(),[ d_A*c : c in AbsoluteCoordinates(One(Ag)) ]);
     v:=DotProduct(Eltseq(Solution(AZ,vect)),gens_JinvM);
 
-    // Define M0=J^-1*N0, where N0 is the set of elements of J^-1*M such that the projection onto u is 0, 
-    // that is, N0=ker(J^-1*M ->> Ag*u)    
+    // Define M0=J^-1*N0, where N0 is the set of elements of J^-1*M such that the projection onto u
+    // is 0, that is, N0=ker(J^-1*M ->> Ag*u)
     
     mat:=MatrixAtoQ([p_u(g)*n_u : g in gens_JinvM]);
     den:=Denominator(mat);
@@ -287,7 +304,8 @@ intrinsic DirectSumRepresentation(M::AlgEtQMod)->SeqEnum[Tup]
     if not assigned M`DirectSumRep then    
         UA,mR:=UniverseAlgebra(M);
         Rg:=Order(M);
-        is_pure_power,ones,AgstoUA,embs,projs:=is_pure_power_internal(mR); //AGstoUA:Ags^s->UA isomorphism
+        // AGstoUA:Ags^s->UA isomorphism
+        is_pure_power,ones,AgstoUA,embs,projs:=is_pure_power_internal(mR);
         Ags:=Domain(AgstoUA);
         require is_pure_power : "The universe algebra is not of the form K^r.";
         Ag:=Algebra(Rg);
@@ -318,8 +336,8 @@ intrinsic DirectSumRepresentation(M::AlgEtQMod)->SeqEnum[Tup]
                 assert #gens_I0 eq rank*n;
                 // Assume that rk_Rg(<gens_loop>_Z) = r.
                 // Then rk_Rg(<gens_I0>_Z) = r-1.
-                // he next run of bass_factor should happen in Ag^(r-1), appropriately embedded is Ag^s,
-                // where s=rk_Rg(M).
+                // he next run of bass_factor should happen in Ag^(r-1), appropriately embedded is
+                // Ag^s, where s=rk_Rg(M).
                 if rank ge 1 then  
                     mI0:=Matrix([[p(g):p in projs_loop]:g in gens_I0]);
                     rkI0:=Rank(mI0);
@@ -328,18 +346,20 @@ intrinsic DirectSumRepresentation(M::AlgEtQMod)->SeqEnum[Tup]
                         m1_mat:=Matrix( [Random(rowsI0) : i in [1..rkI0]] );
                     until Rank(m1_mat) eq rkI0;
                     assert #Columns(m1_mat) eq #embs_loop;
-                    m1:=[ &+[embs_loop[i](g[i]) : i in [1..#embs_loop]] : g in Rows(m1_mat) ]; // as elts of Aloop
+                    // as elts of Aloop
+                    m1:=[ &+[embs_loop[i](g[i]) : i in [1..#embs_loop]] : g in Rows(m1_mat) ];
                     Aold:=Aloop;
                     Aloop,embs_loop,projs_loop:=DirectProduct([Ag : i in [1..rank]]);
                     mAloop_Aold:=Hom(Aloop,Aold, 
                         [ &+[ mAg_Aloop(projs_loop[i](b))*m1[i] : i in [1..rank] ] : b in AbsoluteBasis(Aloop) ]);
-                    // mAloop_Aold needs to send the i-th copy of 1_Ag to m1[i]. These copies are the orthogonal
-                    // idempotents of Aloop only when Ag is a field.
+                    // mAloop_Aold needs to send the i-th copy of 1_Ag to m1[i]. These copies are
+                    // the orthogonal idempotents of Aloop only when Ag is a field.
                     assert forall{ i : i in [1..rank] | mAloop_Aold(embs_loop[i](One(Ag))) eq m1[i] };
                     mAloop_Ags:=mAloop_Aold*mAloop_Ags;
                     mAg_Aloop:=NaturalAction(Ag,Aloop);
                     gens_loop:=Rows(Solution(m1_mat,mI0)); //gens_loop*m1 eq mI0, as matrix
-                    gens_loop:=[&+[embs_loop[i](g[i]):i in [1..rank]]:g in gens_loop]; // as elts of Aloop
+                    // as elts of Aloop
+                    gens_loop:=[&+[embs_loop[i](g[i]):i in [1..rank]]:g in gens_loop];
                 end if;
             until rank eq 0;
             assert #gens_I0 eq 0;
@@ -440,11 +460,9 @@ intrinsic IsomorphismClassesOverBassOrder(R::AlgEtQOrd, map::Map )->SeqEnum[AlgE
         assert #seq eq #ones;
         seqid:=[ Ideal(R,ZBasis(seq[i])) : i in [1..#seq] ];
         assert2 forall{ i : i in [2..#seqid] | MultiplicatorRing(seqid[i-1]) subset MultiplicatorRing(seqid[i])};
-        // the conditions asserted in the previous condition is assumed by the DirectSumRep attribute
+        // the conditions asserted in the previous condition is assumed by the DirectSumRep
+        // attribute
         M:=ModuleFromDirectSum(R,map,[<seqid[i],ones[i]> : i in [1..#seq]]);
-        // moved the next two lines into ModuleFromDirectSum
-        //maps_ones:=[ Hom(AR,UA,[map(a)*ones[i] : a in AbsoluteBasis(AR)]) : i in [1..#ones] ];
-        //M`DirectSumRep:=[ <seqid[i],maps_ones[i]> : i in [1..#ones] ]; 
         Append(~output,M);
     end for;
     return output;
@@ -509,7 +527,6 @@ intrinsic StandardDirectSumRepresentation(M::AlgEtQMod)->SeqEnum[Tup],Map
         require is_pure_power : "The universe algebra is not of the form K^r.";
         AR:=Algebra(R);
         oneAR:=One(AR);
-        dr:=Dimension(AR);
         DRS:=DirectSumRepresentation(M);
         assert forall{d:d in DRS | Type(d[1]) eq AlgEtQIdl};
         s:=#DRS;
@@ -519,13 +536,15 @@ intrinsic StandardDirectSumRepresentation(M::AlgEtQMod)->SeqEnum[Tup],Map
         seq:=[ < Si_s[j],ei_s[j] > : j in [1..s ]];
         //now we build map:
         hom_id:=std_Bass_map([D[1] : D in DRS],UA,isom,embs,projs);
-        // hom_vs sends mR(a)*D[2](oneAR) to mR(a)*oid[i], for a in Basis(AR) and D the i-th pair of DRS. Hom takes the
-        // images of AbsoluteBasis(UA), which is not ordered copy by copy in general (EtaleAlgebra sorts the components
-        // of UA): we write AbsoluteBasis(UA) in the basis dom of the mR(a)*oid[i].
+        // hom_vs sends mR(a)*D[2](oneAR) to mR(a)*oid[i], for a in Basis(AR) and D the i-th pair of
+        // DRS. Hom takes the images of AbsoluteBasis(UA), which is not ordered copy by copy in
+        // general (EtaleAlgebra sorts the components of UA): we write AbsoluteBasis(UA) in the
+        // basis dom of the mR(a)*oid[i].
         dom:=&cat[ [ mR(a)*oid[i] : a in Basis(AR) ] : i in [1..s] ];
         img:=&cat[ [ mR(a)*D[2](oneAR) : a in Basis(AR) ] : D in DRS ];
         hom_vs:=Inverse(Hom(UA,UA,MatrixQtoA(UA,MatrixAtoQ(dom)^-1*MatrixAtoQ(img)) : ComputeInverse:=true));
-        map:=Hom(UA,UA,[hom_id(hom_vs(b)):b in Basis(UA)]:ComputeInverse:=true); // not as a composition to make it cleaner.
+        // not as a composition to make it cleaner.
+        map:=Hom(UA,UA,[hom_id(hom_vs(b)):b in Basis(UA)]:ComputeInverse:=true);
         M`StandardDirectSumRep:=<seq,map>;
         // TEST 
         if GetAssertions() gt 1 then
@@ -593,10 +612,11 @@ end intrinsic;
     //AttachSpec("../specMod");
     //AttachSpec("../specMtrx");
     SetAssertions(2);
-    // Modules over a Bass order in an algebra with several components, built from generators, so that
-    // DirectSumRepresentation has to compute the decomposition. Before the fix, bass_factor took (1,0,...,0) for the
-    // coordinates of 1 (they are those of the idempotent of the first component) and IsIsomorphic(M,u*M) failed with
-    // "No solution exists"; StandardDirectSumRepresentation assumed that AbsoluteBasis(UA) is ordered copy by copy.
+    // Modules over a Bass order in an algebra with several components, built from generators, so
+    // that DirectSumRepresentation has to compute the decomposition. Before the fix, bass_factor
+    // took (1,0,...,0) for the coordinates of 1 (they are those of the idempotent of the first
+    // component) and IsIsomorphic(M,u*M) failed with "No solution exists";
+    // StandardDirectSumRepresentation assumed that AbsoluteBasis(UA) is ordered copy by copy.
     _<x>:=PolynomialRing(Integers());
     A:=EtaleAlgebra((x^2+5)*(x^2+20));
     E:=EquationOrder(A);

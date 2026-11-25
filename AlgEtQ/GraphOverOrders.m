@@ -30,28 +30,33 @@ intrinsic GraphOverOrders(R::AlgEtQOrd) -> GrphDir
         if IsMaximal(R) then
             G:=Digraph< 1 | : SparseRep:=true >; // sparse, as below
         else
-            // Let P_1,...,P_n be the singular primes of R. For each k, let L_k be the set consisting of R and of
-            // the P_k-overorders of R, that is, the overorders S of R such that S/R is supported only at P_k.
-            // By Hofmann-Sircana "On the computation of overorders", the map
+            // Let P_1,...,P_n be the singular primes of R. For each k, let L_k be the set
+            // consisting of R and of the P_k-overorders of R, that is, the overorders S of R such
+            // that S/R is supported only at P_k. By Hofmann-Sircana "On the computation of
+            // overorders", the map
             //      L_1 x ... x L_n -> { overorders of R }       (S_1,...,S_n) :-> S_1+...+S_n
-            // is a bijection which respects inclusions in both directions: S_1+...+S_n is the unique overorder
-            // of R which is equal to S_k locally at P_k, for each k. It follows that T_1+...+T_n is a minimal
-            // overorder of S_1+...+S_n if and only if
+            // is a bijection which respects inclusions in both directions: S_1+...+S_n is the
+            // unique overorder of R which is equal to S_k locally at P_k, for each k. It follows
+            // that T_1+...+T_n is a minimal overorder of S_1+...+S_n if and only if
             //  - S_k eq T_k for all indices k but one, say k0, and
             //  - T_k0 is a minimal overorder of S_k0.
-            // Hence we get the graph of R from the graphs of the L_k's, which are much smaller. We proceed in 3 steps:
-            //  1) we get the L_k's, and the position in OverOrders(R) of the overorder corresponding to each tuple;
+            // Hence we get the graph of R from the graphs of the L_k's, which are much smaller. We
+            // proceed in 3 steps:
+            //  1) we get the L_k's, and the position in OverOrders(R) of the overorder corresponding
+            //     to each tuple;
             //  2) we compute the minimal inclusions in each L_k;
-            //  3) we combine the minimal inclusions of the L_k's into the minimal inclusions of the overorders of R.
+            //  3) we combine the minimal inclusions of the L_k's into the minimal inclusions of the
+            //     overorders of R.
             O:=MaximalOrder(Algebra(R));
             pp:=SingularPrimes(R);
             n:=#pp;
 
-            // Step 1: oo_at_Ps[k] is L_k, as a sequence, with R as first entry. An overorder is encoded by a sequence of
-            // positions c=[c_1,...,c_n], which stands for the sum of the orders oo_at_Ps[k][c_k], and pos[c] is its
-            // position in OverOrders(R). See local_overorders_fmt and positions_of_overorders in OverOrders.m: pos is
-            // computed by OverOrders(R), or when it is needed for the first time if the overorders were found in
-            // another way, for example by WKICM or LoadWKICM.
+            // Step 1: oo_at_Ps[k] is L_k, as a sequence, with R as first entry. An overorder is
+            // encoded by a sequence of positions c=[c_1,...,c_n], which stands for the sum of the
+            // orders oo_at_Ps[k][c_k], and pos[c] is its position in OverOrders(R). See
+            // local_overorders_fmt and positions_of_overorders in OverOrders.m: pos is computed by
+            // OverOrders(R), or when it is needed for the first time if the overorders were found
+            // in another way, for example by WKICM or LoadWKICM.
             vprintf GraphOverOrders,1 : "Computing the overorders at each singular prime, as sums...";
             t0:=Cputime();
             output:=OverOrders(R);
@@ -60,29 +65,33 @@ intrinsic GraphOverOrders(R::AlgEtQOrd) -> GrphDir
             vprintf GraphOverOrders,1 : "Done in %o secs.\n",Cputime(t0);
             vprintf GraphOverOrders,1 : "Number of P-overorders for each singular prime P: %o\n",[ #x : x in oo_at_Ps ];
 
-            // Step 2: min_at_Ps[k][i] is the sequence of the positions j such that oo_at_Ps[k][j] is a minimal
-            // overorder of oo_at_Ps[k][i].
-            // Let S be in L_k, with P=P_k. If T is a minimal overorder of S then the conductor (S:T) is a prime Q
-            // of S, and T is in L_k if and only if Q contains P. So the minimal overorders of S in L_k are the
-            // output of MinimalOverOrdersAtPrime(S,Q), where Q runs over the primes of S above P.
-            // We do not read them from the attribute S`MinimalOverOrders, because it cannot be trusted to
-            // be complete: it is filled as a side effect of OverOrdersAtPrime(R,P) only when this intrinsic
-            // computes the P-overorders from scratch, and this does not happen if R`OverOrders is already assigned,
-            // for example by WKICM or by LoadWKICM. MinimalOverOrdersAtPrime returns the stored minimal overorders
-            // if they are known, and computes (and stores) them otherwise.
+            // Step 2: min_at_Ps[k][i] is the sequence of the positions j such that oo_at_Ps[k][j]
+            // is a minimal overorder of oo_at_Ps[k][i].
+            // Let S be in L_k, with P=P_k. If T is a minimal overorder of S then the conductor
+            // (S:T) is a prime Q of S, and T is in L_k if and only if Q contains P. So the minimal
+            // overorders of S in L_k are the output of MinimalOverOrdersAtPrime(S,Q), where Q runs
+            // over the primes of S above P.
+            // We do not read them from the attribute S`MinimalOverOrders, because it cannot be
+            // trusted to be complete: it is filled as a side effect of OverOrdersAtPrime(R,P) only
+            // when this intrinsic computes the P-overorders from scratch, and this does not happen
+            // if R`OverOrders is already assigned, for example by WKICM or by LoadWKICM.
+            // MinimalOverOrdersAtPrime returns the stored minimal overorders if they are known, and
+            // computes (and stores) them otherwise.
             vprintf GraphOverOrders,1 : "Computing the minimal inclusions at each singular prime...";
             t0:=Cputime();
             min_at_Ps:=[];
             for k->P in pp do
                 oo_P:=oo_at_Ps[k];
-                oo_P_set:={@ S : S in oo_P @}; // an indexed set, to find the position of an order using its Hash
+                oo_P_set:={@ S : S in oo_P @}; // an indexed set, to find the position of an order
+                                               // using its Hash
                 ppO:=PrimesAbove(O!!P); // the primes of O above P
                 min_P:=[];
                 for S in oo_P do
-                    // The primes of S above P are the primes of S below the primes of O above P. Distinct primes
-                    // of O might be above the same prime of S: the indexed set removes the repetitions. PrimeBelow
-                    // returns the primes stored in S by OverOrdersAtPrime, so the minimal overorders stored in S
-                    // under them are found at once.
+                    // The primes of S above P are the primes of S below the primes of O above P.
+                    // Distinct primes of O might be above the same prime of S: the indexed set
+                    // removes the repetitions. PrimeBelow returns the primes stored in S by
+                    // OverOrdersAtPrime, so the minimal overorders stored in S under them are found
+                    // at once.
                     qq:={@ PrimeBelow(S,QO) : QO in ppO @};
                     min_S:=[];
                     for Q in qq do
@@ -108,8 +117,9 @@ intrinsic GraphOverOrders(R::AlgEtQOrd) -> GrphDir
             vprintf GraphOverOrders,1 : "Number of minimal inclusions for each singular prime: %o\n",
                                         [ &+[ #x : x in min_P ] : min_P in min_at_Ps ];
 
-            // Step 3: the minimal overorders of the overorder corresponding to the tuple c correspond to the tuples
-            // obtained from c by replacing exactly one entry c[k] with an element of min_at_Ps[k][c[k]].
+            // Step 3: the minimal overorders of the overorder corresponding to the tuple c
+            // correspond to the tuples obtained from c by replacing exactly one entry c[k] with an
+            // element of min_at_Ps[k][c[k]].
             vprintf GraphOverOrders,1 : "Computing the minimal inclusions of the overorders...";
             t0:=Cputime();
             min_inclusions:=[];
@@ -125,13 +135,15 @@ intrinsic GraphOverOrders(R::AlgEtQOrd) -> GrphDir
             end for;
             vprintf GraphOverOrders,1 : "Done in %o secs.\n",Cputime(t0);
             // tests
-            assert2 forall{ incl : incl in min_inclusions | output[incl[1]] subset output[incl[2]] }; // inclusions
-            // the next test is very time consuming: cubic in #output
+            // inclusions
+            assert2 forall{ incl : incl in min_inclusions | output[incl[1]] subset output[incl[2]] };
+            // minimal inclusions; the next test is very time consuming: cubic in #output
             assert3 forall{ incl : incl in min_inclusions | [ S : S in output |
                             S ne output[incl[1]] and output[incl[1]] subset S
-                                and S subset output[incl[2]] ] eq [ output[incl[2]] ] }; // minimal inclusions
-            // The sparse representation: the dense one (an adjacency matrix) is refused by Magma for 100000 vertices
-            // or more ("Dimension too big to create graph"), and these graphs have only a few edges per vertex.
+                                and S subset output[incl[2]] ] eq [ output[incl[2]] ] };
+            // The sparse representation: the dense one (an adjacency matrix) is refused by Magma
+            // for 100000 vertices or more ("Dimension too big to create graph"), and these graphs
+            // have only a few edges per vertex.
             G:=Digraph< #output | min_inclusions : SparseRep:=true >;
         end if;
         R`GraphOverOrders:=G;
@@ -150,8 +162,9 @@ end intrinsic;
     edges:=func< G | { [Index(InitialVertex(e)),Index(TerminalVertex(e))] : e in Edges(G) } >;
 
     min_inclusions_naive:=function(oo)
-    // Given a sequence oo of orders, returns the set of pairs [i,j] such that oo[i] is strictly contained in oo[j]
-    // and no other order of oo lies in between. It tests all inclusions: quadratic in #oo.
+    // Given a sequence oo of orders, returns the set of pairs [i,j] such that oo[i] is strictly
+    // contained in oo[j] and no other order of oo lies in between. It tests all inclusions:
+    // quadratic in #oo.
         above:=[ { j : j in [1..#oo] | j ne i and oo[i] subset oo[j] } : i in [1..#oo] ];
         output:={};
         for i in [1..#oo] do
@@ -179,19 +192,22 @@ end intrinsic;
         tG := GraphOverOrders(R);
         assert #tO eq #Vertices(tG);
         assert <#Edges(tM), #Vertices(tM), #Vertices(tG), #Edges(tG)> eq data[i];
-        // we compare with the minimal inclusions found by testing all inclusions among the overorders
+        // we compare with the minimal inclusions found by testing all inclusions among the
+        // overorders
         assert edges(tG) eq min_inclusions_naive(tO);
     end for;
 
-    // The graph must not depend on what was computed before. If the overorders of R are already known when
-    // GraphOverOrders is called, for example after WKICM or LoadWKICM, then the minimal overorders of the
-    // overorders are not stored, or only some of them are: GraphOverOrders has to compute them.
+    // The graph must not depend on what was computed before. If the overorders of R are already
+    // known when GraphOverOrders is called, for example after WKICM or LoadWKICM, then the minimal
+    // overorders of the overorders are not stored, or only some of them are: GraphOverOrders has to
+    // compute them.
     fs:=[
           x^6+3*x^5+99*x^2+2997, //1 sing prime
           x^4+4*x^3+6*x^2+44*x+121, //2 sing primes
           (x^2+5)*(x^2+20), //4 sing primes, in a product of two number fields
         ];
-    data := [<1, 33, 65>, <2, 16, 26>, <4, 24, 52>]; // number of singular primes, of overorders, of minimal inclusions
+    data := [<1, 33, 65>, <2, 16, 26>, <4, 24, 52>]; // number of singular primes, of overorders, of
+                                                     // minimal inclusions
     for i->f in fs do
         printf ".";
         // GraphOverOrders is the first computation

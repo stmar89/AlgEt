@@ -12,7 +12,6 @@
 freeze;
 
 declare verbose ShortEltSmallRep, 2;
-import "Ord.m" : MatrixQtoA,MatrixAtoQ,MatrixAtoZ;
 
 declare attributes AlgEtQIdl : ShortElement, SmallRepresentative;
 
@@ -64,27 +63,6 @@ intrinsic ShortElement(I::AlgEtQIdl) ->AlgEtQElt
         end while;
         _,i:=Min([Abs(Norm(x)) : x in elts]);
         elt:=elts[i];
-
-        // // The following is deterministic, but does not always work. Also, enumerating all short
-        // vectors is too much, and too memory extensive. L:=Lattice(MatrixAtoQ(ZBasis(I))); //
-        // b:=Basis(LLL(L)); //we reduce above, so it is cached.
-        // b:=Basis(L);
-        // b:=[ Norm(c) : c in b ];
-        // k:=0;
-        // stop:=false;
-        // min:=Min(b);
-        // repeat
-        //     k,Round(2^(-k)*min),Round((min+1)*2^k);
-        //     p:=ShortVectors(L,2^(-k)*min,(min+1)*2^k);
-        //     for i in [1..#p] do
-        //         elt:=MatrixQtoA(Algebra(I),Matrix([Eltseq(p[i][1])]))[1];
-        //         if not IsZeroDivisor(elt) then
-        //             stop:=true;
-        //             break i;
-        //         end if;
-        //     end for;
-        //     k+:=1;
-        // until stop;
         I`ShortElement:= elt;
     end if;
     return I`ShortElement;

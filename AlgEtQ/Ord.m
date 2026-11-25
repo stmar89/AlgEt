@@ -339,7 +339,7 @@ end intrinsic;
 
 intrinsic Order(A::AlgEtQ , orders::Tup) -> AlgEtQOrd
 {Given an étale algebra and a tuple of orders in the components of the étale algebra, it generates the direct sum order.}
-    nf,embs,projs:=Components(A);
+    nf,embs:=Components(A);
     // ISA, not Type(S) in {...}: the orders of cyclotomic and quadratic fields have the types
     // RngCyc and RngQuad, which are subtypes of RngOrd.
     require #nf eq #orders and forall{ i : i in [1..#orders] | NumberField(orders[i]) eq nf[i]} and
@@ -579,10 +579,10 @@ intrinsic Random(O::AlgEtQOrd , bd::RngIntElt : ZeroDivisorsAllowed:=false ) -> 
     require bd gt 0 : "The bound needs to be a positive integer.";
     B := ZBasis(O);
     if ZeroDivisorsAllowed then
-       elt:=&+[ Random([-bd..bd])*b : b in B];
+       elt:=DotProduct([ Random([-bd..bd]) : b in B ],B);
     else
         repeat
-            elt:=&+[ Random([-bd..bd])*b : b in B];
+            elt:=DotProduct([ Random([-bd..bd]) : b in B ],B);
         until not IsZeroDivisor(elt);
     end if;
     return elt;
@@ -753,7 +753,6 @@ This is equivalent for the given order to contain some idempotents of the algebr
                 end if;
                 Append(~arr[n],j);
             end for;
-            max:=Max(Keys(arr));
             W:=sub<V|>;
             n:=1;
             while Dimension(W) lt D do

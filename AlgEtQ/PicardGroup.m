@@ -480,7 +480,6 @@ unit_group_maximal:=function(O, GRH)
     assert test; //the order must be a product
     A:=Algebra(O);
     nf,embs:=Components(A);
-    idemA:=OrthogonalIdempotents(A);
     U_asProd:=[];
     u_asProd:=[**];
     for OL in O_asProd do

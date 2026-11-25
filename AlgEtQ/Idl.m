@@ -41,7 +41,7 @@ declare attributes AlgEtQIdl : Index, //stores the index
                                                             // MultiplicatorRing(I): see '!!'
                               inclusion_matrix;
 
-import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQtoA , meet_zbasis , inclusion_matrix ,
+import "Ord.m" : crQZ , crZQ , hnf , MatrixAtoQ , MatrixQtoA , meet_zbasis , inclusion_matrix ,
                  lattice_hnf , hash_from_hnf , hnf_from_hash;
 import "ShortEltSmallRep.m" : short_non_zero_divisors;
 
@@ -75,7 +75,6 @@ CreateAlgEtQIdl:=function(S,gens : ZSpan:=false)
     // later slower.
     gens:=IndexedSetToSequence({@ g : g in gens @});
     if ZSpan or #gens gt AbsoluteDimension(A) then
-        ZZ:=Integers();
         if not ZSpan then
             vprint AlgEtQIdl,3: "CreateAlgEtQIdl: too many gens";
             gens:=[g*s : g in gens, s in ZBasis(S) ];
@@ -728,7 +727,6 @@ intrinsic 'meet'(I::AlgEtQIdl, J::AlgEtQIdl) -> AlgEtQIdl
 // Note that the hnf in Magma is not the same as in the book. This is why the matrix M and P are
 // taken in a slightly different way compared to the reference.
     require Order(I) eq Order(J): "the ideals must be defined over the same order";
-    A:=Algebra(I);
     if I subset J then
         return I;
     end if;
@@ -815,7 +813,6 @@ intrinsic IsInvertible(I::AlgEtQIdl) ->BoolElt
         test:=One(O) in I*COI;
         I`IsInvertible:=test;
         if test then
-            I`Inverse:=COI;
             I`MultiplicatorRing:=O;
             COI`IsInvertible:=true;
             COI`MultiplicatorRing:=O;
@@ -851,7 +848,6 @@ intrinsic MultiplicatorRing(I::AlgEtQIdl) -> AlgEtQOrd
         elif assigned I`IsInvertible and I`IsInvertible then
             I`MultiplicatorRing:=R;
         else
-            A:=Algebra(I);
             zbS:=ZBasis(ColonIdeal(I,I));
             S:=Order(zbS : Check:=0 );
             I`MultiplicatorRing:=S;
@@ -900,10 +896,10 @@ intrinsic Random(I::AlgEtQIdl , bd::RngIntElt : ZeroDivisorsAllowed:=false ) -> 
     require bd gt 0 : "The bound needs to be a positive integer.";
     B := ZBasis(I);
     if ZeroDivisorsAllowed then
-       elt:=&+[ Random([-bd..bd])*b : b in B];
+       elt:=DotProduct([ Random([-bd..bd]) : b in B ],B);
     else
         repeat
-            elt:=&+[ Random([-bd..bd])*b : b in B];
+            elt:=DotProduct([ Random([-bd..bd]) : b in B ],B);
         until not IsZeroDivisor(elt);
     end if;
     return elt;
@@ -984,7 +980,6 @@ intrinsic MinimalInteger(I::AlgEtQIdl) -> RngIntElt
 {Returns the smallest integer contained in the given fractional ideal, which must be integral.}
     if not assigned I`MinimalInteger then
         require IsIntegral(I): "the ideal must be integral";
-        ZZ:=Integers();
         coord:=AbsoluteCoordinates([One(Algebra(I))],I)[1];
         min:=LCM([ Denominator(c) : c in Eltseq(coord)]);
         assert2 min in I;

@@ -39,9 +39,10 @@ intrinsic IsWeakEquivalent(I::AlgEtQIdl,J::AlgEtQIdl)->BoolElt,AlgEtQIdl,AlgEtQI
         JS:=S!!J;
         CIJ:=ColonIdeal(IS,JS);
         CJI:=ColonIdeal(JS,IS);
-        //test := OneIdeal(S) eq (CIJ*CJI); //note that this test does not depend on the order of definition of the ideals.
         id:=(CIJ*CJI);
-        test:=One(Algebra(I)) in id; //faster!
+        // faster than OneIdeal(S) eq CIJ*CJI. The test does not depend on the order of
+        // definition of the ideals.
+        test:=One(Algebra(I)) in id;
         if not test then
             return false,_,_;
         else

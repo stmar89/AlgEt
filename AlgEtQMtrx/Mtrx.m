@@ -48,7 +48,8 @@ declare attributes AlgEtQMtrx :
                                Determinant,
                                HashValue; // the integer returned by Hash
                                // MinimalPolynomial does not work well if there are zerodivisors.
-                               // CharacteristicPolynomial require Polynomials over AlgEtQ, not implemented.
+                               // CharacteristicPolynomial require Polynomials over AlgEtQ, not
+                               // implemented.
 
 //------------
 // Printing 
@@ -133,7 +134,7 @@ intrinsic Matrix(entries::SeqEnum[SeqEnum[AlgEtQElt]]) -> AlgEtQMtrx
     A:=Algebra(entries[1,1]);
     x:=New(AlgEtQMtrx);
     x`Universe:=A;
-    x`NumberOfRows:=#entries;;
+    x`NumberOfRows:=#entries;
     x`NumberOfColumns:=#entries[1];
     x`Entries:=entries;
     return x;
@@ -288,8 +289,8 @@ intrinsic 'eq'(x1::AlgEtQMtrx,x2::AlgEtQMtrx) -> BoolElt
 {Is x1=x2 ?}
     A:=Universe(x1);
     require A cmpeq Universe(x2): "The matrices are not defined over the same algebra.";
-    if assigned x1`Components and assigned x2`Components then // matrix operations are only on components.
-                                                              // it is more likely that entries are not assigned.
+    // matrix operations are only on components: it is more likely that entries are not assigned.
+    if assigned x1`Components and assigned x2`Components then
         return Components(x1) eq Components(x2);
     else
         return Entries(x1) eq Entries(x2);
@@ -300,7 +301,8 @@ end intrinsic;
 intrinsic Hash(x::AlgEtQMtrx) -> RngIntElt
 {Returns a hash value of the matrix, computed from the rational coordinates of its components, so that equal matrices have the same hash value. The value is stored in the attribute HashValue. Magma uses it to build sets, indexed sets and associative arrays of matrices: only matrices with the same hash value are compared with eq. Different matrices might have the same hash value: this only costs an extra comparison.}
     if not assigned x`HashValue then
-        // Components(x) is computed from the entries if needed: the value does not depend on how x was created.
+        // Components(x) is computed from the entries if needed: the value does not depend on how x
+        // was created.
         coords:=[ Rationals() | NumberOfRows(x), NumberOfColumns(x) ];
         for M in Components(x) do
             for e in Eltseq(M) do
@@ -311,64 +313,6 @@ intrinsic Hash(x::AlgEtQMtrx) -> RngIntElt
     end if;
     return x`HashValue;
 end intrinsic;
-
-// // +
-// // using the components, as below, is faster!
-// intrinsic '+'(x1::AlgEtQMtrx,x2::AlgEtQMtrx) -> AlgEtQMtrx
-// {x1+x2.}
-//     A:=Universe(x1);
-//     require A cmpeq Universe(x2): "The matrices are not defined over the same algebra.";
-//     s:=NumberOfRows(x1);
-//     r:=NumberOfColumns(x1);
-//     sr:=s*r;
-//     require NumberOfRows(x2) eq s and NumberOfColumns(x2) eq r : "The matrices cannot be added.";
-//     x1:=Flat(Entries(x1));
-//     x2:=Flat(Entries(x2));
-//     x3:=[ x1[k]+x2[k] : k in [1..sr] ]; 
-//     return Matrix(s,r,x3);
-// end intrinsic;
-// 
-// // -
-// intrinsic '-'(x1::AlgEtQMtrx) -> AlgEtQMtrx
-// {-x1.}
-//     A:=Universe(x1);
-//     s:=NumberOfRows(x1);
-//     r:=NumberOfColumns(x1);
-//     sr:=s*r;
-//     x1:=Flat(Entries(x1));
-//     x3:=[ -x1[k] : k in [1..sr] ]; 
-//     return Matrix(s,r,x3);
-// end intrinsic;
-// 
-// intrinsic '-'(x1::AlgEtQMtrx,x2::AlgEtQMtrx) -> AlgEtQMtrx
-// {x1-x2.}
-//     A:=Universe(x1);
-//     require A cmpeq Universe(x2): "The matrices are not defined over the same algebra.";
-//     s:=NumberOfRows(x1);
-//     r:=NumberOfColumns(x1);
-//     sr:=s*r;
-//     require NumberOfRows(x2) eq s and NumberOfColumns(x2) eq r : "The matrices cannot be added.";
-//     x1:=Flat(Entries(x1));
-//     x2:=Flat(Entries(x2));
-//     x3:=[ x1[k]-x2[k] : k in [1..sr] ]; 
-//     return Matrix(s,r,x3);
-// end intrinsic;
-// 
-// // *
-// intrinsic '*'(x1::AlgEtQMtrx,x2::AlgEtQMtrx) -> AlgEtQMtrx
-// {x1*x2.}
-//     A:=Universe(x1);
-//     require A cmpeq Universe(x2): "The elements must belong to the same algebra.";
-//     require NumberOfColumns(x1) eq NumberOfRows(x2) : "The matrices have the wrong sizes.";
-//     s:=NumberOfRows(x1);
-//     r:=NumberOfColumns(x2);
-//     rows1:=Rows(x1);
-//     cols2:=Columns(x2);
-//     x3:=[ [ DotProduct(rows1[i],cols2[j]) : j in [1..r] ] : i in [1..s] ];
-//     x3:=Matrix(x3);
-//     assert2 NumberOfRows(x3) eq s and NumberOfColumns(x3) eq r;
-//     return x3;
-// end intrinsic;
 
 // +
 intrinsic '+'(x1::AlgEtQMtrx,x2::AlgEtQMtrx) -> AlgEtQMtrx
@@ -424,8 +368,9 @@ intrinsic '*'(x1::AlgEtQMtrx,x2::.) -> AlgEtQMtrx
     return CreateMtrxFromComponents(Universe(x1),<comp1[i]*comp2[i] : i in [1..#comp1]> );
 end intrinsic;
 
-// The next two are needed: without them, a*M and M*a with a::AlgEtQElt are dispatched to the intrinsics
-// '*'(x1::AlgEtQElt,x2::.) and '*'(x1::.,x2::AlgEtQElt) of Elt.m, which try to coerce the matrix into the algebra.
+// The next two are needed: without them, a*M and M*a with a::AlgEtQElt are dispatched to the
+// intrinsics '*'(x1::AlgEtQElt,x2::.) and '*'(x1::.,x2::AlgEtQElt) of Elt.m, which try to coerce
+// the matrix into the algebra.
 intrinsic '*'(x1::AlgEtQElt,x2::AlgEtQMtrx) -> AlgEtQMtrx
 {x1*x2.}
     bool,x1:=IsCoercible(Universe(x2),x1);
@@ -612,7 +557,8 @@ end intrinsic;
     assert &+[ i*R : i in [1..4] ] eq &+[1..4]*R;
     assert &*[ i*R : i in [1..4] ] eq &*[1..4]*R^4;
 
-    // testing Hash: sets, indexed sets and associative arrays of matrices, also when the hash values collide
+    // testing Hash: sets, indexed sets and associative arrays of matrices, also when the hash
+    // values collide
     mats:=[]; // distinct matrices
     while #mats lt 30 do
         M:=RandomMatrix(A,3,2);

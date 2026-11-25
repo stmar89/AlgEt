@@ -149,7 +149,6 @@ intrinsic IsBass(S::AlgEtQOrd) -> BoolElt
         if IsMaximal(S) then
             S`IsBass:=true;
         else
-            O:=MaximalOrder(Algebra(S));
             sing:=SingularPrimes(S);
             S`IsBass:=forall{P:P in sing | IsBassAtPrime(S,P)};
         end if;

@@ -14,7 +14,6 @@ freeze;
 //------------
 // TwoGeneratingSet
 //------------
-import "Ord.m" : MatrixAtoQ,MatrixAtoZ;
 import "ShortEltSmallRep.m" : short_non_zero_divisors;
 
 ///## Two-generating set
@@ -24,11 +23,6 @@ intrinsic TwoGeneratingSet(I::AlgEtQIdl)
 {A procedure that given an invertible fractional ideal I, stores in the attribute Generators of I one or two non-zerodivisors in I generating I. The first one is ShortElement(I), and the second one is chosen by a deterministic process: the output does not depend on the random state.}
     require IsInvertible(I) : "the ideal must be invertible";
     if #Generators(I) gt 2 then
-        // if assigned I`IsIntegral and IsIntegral(I) then
-        //     a:=MinimalInteger(I);
-        // else
-        //     a:=Random(I : ZeroDivisorsAllowed:=false );
-        // end if;
         a:=ShortElement(I);
         S:=Order(I);
         zbaS:=[a*z : z in ZBasis(S)];

@@ -44,7 +44,6 @@ end intrinsic;
 intrinsic IsConjugateStable(O::AlgEtQOrd) -> BoolElt,AlgEtQOrd
 {Given an order O in a CM-étale algebra, returns whether O is conjugate stable and the complex conjugate.}
     if not assigned O`IsConjugateStable then
-        A:=Algebra(O);
         Ob:=Order([ ComplexConjugate(x) : x in ZBasis(O) ] : CheckIsKnownOrder:=false);
         is_stable:=Ob eq O;
         if is_stable then
@@ -61,7 +60,6 @@ end intrinsic;
 /// Given an order $O$ in a CM-étale algebra, returns the complex conjugate of $O$.
 intrinsic ComplexConjugate(O::AlgEtQOrd) -> AlgEtQOrd
 {Given an order O in a CM-étale algebra, returns the complex conjugate of O.}
-    A:=Algebra(O);
     _,Ob:=IsConjugateStable(O); //if stable Ob = O, to preserve attributes!
     return Ob;
 end intrinsic;
@@ -71,7 +69,6 @@ intrinsic IsConjugateStable(I::AlgEtQIdl) -> BoolElt,AlgEtQIdl
 {Given a fractional ideal I in a CM-étale algebra, returns whether I is conjugate stable and the complex conjugate. If the order of I is not conjugate stable, then the second output will be defined over the complex conjugate of the order.}
     if not assigned I`IsConjugateStable then
         O:=Order(I);
-        A:=Algebra(O);
         is_stableO,Ob:=IsConjugateStable(O);
         Ib:=Ideal(Ob,[ ComplexConjugate(x) : x in ZBasis(I)]);
         if not is_stableO then
@@ -109,7 +106,8 @@ end intrinsic;
     R:=Order([pi,pib]);
     oo:=FindOverOrders(R);
     O:=MaximalOrder(K);
-    S:=[ S : S in oo | Index(O,S) eq 8 ][1]; //there is only one order of index 8, so conjugate stable
+    S:=[ S : S in oo | Index(O,S) eq 8 ][1]; // there is only one order of index 8, so conjugate
+                                             // stable
     assert IsConjugateStable(R);
     assert IsConjugateStable(TraceDualIdeal(R));
     assert IsConjugateStable(O);

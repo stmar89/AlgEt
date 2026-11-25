@@ -41,8 +41,8 @@ declare attributes AlgEtQWECMElt : Parent,
 ///////////////////
 
 function CreateAlgEtQWECMElt(W,I)
-// a the weak equiv class monoid of an order R, of type AlgEtQWECM and a fractional R-ideal, it creates an element of the monoid
-// to be used only when creating the weak equivalence class monoid
+// a the weak equiv class monoid of an order R, of type AlgEtQWECM and a fractional R-ideal, it
+// creates an element of the monoid to be used only when creating the weak equivalence class monoid
     x:=New(AlgEtQWECMElt);
     x`Parent:=W;
     x`Ideal:=I;
@@ -116,9 +116,10 @@ end intrinsic;
 /// Returns a hash value of the class, computed from the stored representative, so that equal classes have the same hash value. The value is stored in the attribute `HashValue`, and it does not change if the representative is changed with `SetRepresentative`. Magma uses it to build sets, indexed sets and associative arrays of classes, like the multiplication table of the monoid: only classes with the same hash value are compared with `eq`. Different classes might have the same hash value: this only costs an extra comparison.
 intrinsic Hash(x::AlgEtQWECMElt) -> RngIntElt
 {Returns a hash value of the class, computed from the stored representative, so that equal classes have the same hash value. The value is stored in the attribute HashValue, and it does not change if the representative is changed with SetRepresentative. Magma uses it to build sets, indexed sets and associative arrays of classes, like the multiplication table of the monoid: only classes with the same hash value are compared with eq. Different classes might have the same hash value: this only costs an extra comparison.}
-    // Each class is created only once, together with the monoid (see WeakEquivalenceClassMonoidAbstract), and
-    // coercions and products return these objects: equal classes are the same object. Hence the stored value stays
-    // valid when SetRepresentative changes the representative, e.g. for the keys of the multiplication table.
+    // Each class is created only once, together with the monoid (see
+    // WeakEquivalenceClassMonoidAbstract), and coercions and products return these objects: equal
+    // classes are the same object. Hence the stored value stays valid when SetRepresentative
+    // changes the representative, e.g. for the keys of the multiplication table.
     if not assigned x`HashValue then
         x`HashValue:=Hash(Ideal(x));
     end if;
@@ -223,7 +224,8 @@ intrinsic WeakEquivalenceClassMonoidAbstract(R::AlgEtQOrd) -> AlgEtQWECM,Map
 {Given an order R, returns the weak equivalence class monoid W of R together with a map (with preimages) sending each class of W to a representative (determined by WeakEquivalenceClassMonoid).}
     if not assigned R`WKICMAbstractRep then
         if (not assigned R`OverOrders) or exists{T:T in R`OverOrders|not assigned T`WKICM_bar} then
-            // this populates everything faster than computing separately the overorders and the wk_icm_bar's
+            // this populates everything faster than computing separately the overorders and the
+            // wk_icm_bar's
             _:=WeakEquivalenceClassMonoid(R);
         end if;
         oo:=OverOrders(R);
@@ -404,7 +406,8 @@ end intrinsic;
     assert Random(W) in W;
     assert Seqset(Idempotents(W)) eq {W!T:T in OverOrders(E)};
     assert #W eq &*[#Localization(W,P) : P in SingularPrimes(E)];
-    assert WeakEquivalenceClassMonoidAbstract(MaximalOrder(K)) eq Localization(W,PrimesAbove(11*E)[1]); // 11 is regular
+    // 11 is regular
+    assert WeakEquivalenceClassMonoidAbstract(MaximalOrder(K)) eq Localization(W,PrimesAbove(11*E)[1]);
     _:=Random(W)*Random(W);
     assert assigned W`MultiplicationTable;
     assert not IsGeneratingSet(W,Idempotents(W));
@@ -432,7 +435,8 @@ end intrinsic;
     assert Random(W) in W;
     assert Seqset(Idempotents(W)) eq {W!T:T in OverOrders(E)};
     assert #W eq &*[#Localization(W,P) : P in SingularPrimes(E)];
-    assert WeakEquivalenceClassMonoidAbstract(MaximalOrder(K)) eq Localization(W,PrimesAbove(11*E)[1]); // 11 is regular
+    // 11 is regular
+    assert WeakEquivalenceClassMonoidAbstract(MaximalOrder(K)) eq Localization(W,PrimesAbove(11*E)[1]);
     _:=Random(W)*Random(W);
     assert assigned W`MultiplicationTable;
     assert not IsGeneratingSet(W,Idempotents(W));
@@ -460,7 +464,8 @@ end intrinsic;
     assert Random(W) in W;
     assert Seqset(Idempotents(W)) eq {W!T:T in OverOrders(E)};
     assert #W eq &*[#Localization(W,P) : P in SingularPrimes(E)];
-    assert WeakEquivalenceClassMonoidAbstract(MaximalOrder(K)) eq Localization(W,PrimesAbove(11*E)[1]); // 11 is regular
+    // 11 is regular
+    assert WeakEquivalenceClassMonoidAbstract(MaximalOrder(K)) eq Localization(W,PrimesAbove(11*E)[1]);
     _:=Random(W)*Random(W);
     assert assigned W`MultiplicationTable;
     assert not IsGeneratingSet(W,Idempotents(W));
@@ -485,14 +490,16 @@ end intrinsic;
     assert Random(W) in W;
     assert Seqset(Idempotents(W)) eq {W!T:T in OverOrders(E)};
     assert #W eq &*[#Localization(W,P) : P in SingularPrimes(E)];
-    assert WeakEquivalenceClassMonoidAbstract(MaximalOrder(K)) eq Localization(W,PrimesAbove(11*E)[1]); // 11 is regular
+    // 11 is regular
+    assert WeakEquivalenceClassMonoidAbstract(MaximalOrder(K)) eq Localization(W,PrimesAbove(11*E)[1]);
     _:=Random(W)*Random(W);
     assert assigned W`MultiplicationTable;
     assert IsBass(E);
     assert IsGeneratingSet(W,Idempotents(W));
     _:=MultiplicationTable(W);
 
-    // testing Hash: sets, indexed sets and associative arrays of classes, also when the hash values collide
+    // testing Hash: sets, indexed sets and associative arrays of classes, also when the hash values
+    // collide
     _<x>:=PolynomialRing(Integers());
     A:=EtaleAlgebra(x^4+16);
     E:=EquationOrder(A);

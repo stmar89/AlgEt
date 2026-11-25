@@ -28,6 +28,17 @@ freeze;
 
 declare verbose IntermediateModules, 2;
 
+import "../AlgEtQ/Ord.m" : MatrixAtoQ, MatrixQtoA;
+import "Modules.m" : CreateAlgEtQMod;
+
+lift_map:=function(V,Q,q)
+// Given the quotient q:I->Q=I/J of modules in V, returns a function sending a sequence of elements of
+// Q to a sequence of elements of I mapping onto them: the integer combinations of fixed lifts of the
+// generators of Q, computed with one matrix product (as in IntermediateIdeals.m).
+    L:=MatrixAtoQ([ Q.j@@q : j in [1..Ngens(Q)] ]);
+    return func< ys | #ys eq 0 select [V|] else MatrixQtoA(V,Matrix(Rationals(),[ Eltseq(y) : y in ys ])*L) >;
+end function;
+
 intrinsic MinimalIntermediateModules(I::AlgEtQMod,J::AlgEtQMod)->SetIndx[AlgEtQMod]
 {Given S-modules J subset I, returns the minimal (with respect to inclusion) S-modules M such that J subsetneq M subset I. Note that J is never in the output.}
     assert2 J subset I; // not a require: it costs an inclusion test, and these are called recursively
@@ -37,8 +48,9 @@ intrinsic MinimalIntermediateModules(I::AlgEtQMod,J::AlgEtQMod)->SetIndx[AlgEtQM
         return {@ @};
     else
         _,m:=UniverseAlgebra(I);
-        gens_J_over_S:=Generators(J);
         Q,q:=Quotient(I,J);
+        lift:=lift_map(Codomain(m),Q,q);
+        zbJ:=ZBasis(J);
         min_mods:={@ @};
         // Following code is based on the following Lemma.
         // LEMMA: Let M be a finite S-module (eg I/J). Let N be a minimal submodule of M. 
@@ -63,8 +75,10 @@ intrinsic MinimalIntermediateModules(I::AlgEtQMod,J::AlgEtQMod)->SetIndx[AlgEtQM
             matrices:=Setseq(Seqset(matrices)); //possibly there are repetiions.
             Qp_Rmod:=RModule(matrices);
             min_Rmod:=MinimalSubmodules(Qp_Rmod);
-            min_mods join:={@ Module(S,m, gens_J_over_S cat 
-                                    [(Q!(Qp!Eltseq(Qp_Rmod!b)))@@q : b in Basis(min)]) : min in min_Rmod @};
+            // K/J = min, so K is the Z-span of ZBasis(J) and lifts of a basis of min: no products with
+            // ZBasis(S) are needed
+            min_mods join:={@ CreateAlgEtQMod(S,m, zbJ cat lift([ Q!(Qp!Eltseq(Qp_Rmod!b)) : b in Basis(min) ]) : ZSpan:=true)
+                                    : min in min_Rmod @};
         end for;
         return min_mods;
     end if;
@@ -101,12 +115,13 @@ intrinsic MaximalIntermediateModules(I::AlgEtQMod,J::AlgEtQMod)->SetIndx[AlgEtQM
         // prime P of S. In particular, if p is the characteristic of S/P, then p*I c K c I.
         // Note that I/pI is an Fp-vector space.
         _,m:=UniverseAlgebra(I);
-        gens_J_over_S:=Generators(J);
         Q,q:=Quotient(I,J);
+        lift:=lift_map(Codomain(m),Q,q);
+        zbJ:=ZBasis(J);
         max_submod:={@ @};
         for p in PrimeDivisors(#Q) do
             mp:=[ p*(Q.j) : j in [1..Ngens(Q)] ];
-            mp_in_I:=[ x@@q : x in mp  ] cat gens_J_over_S;
+            mp_in_I:=lift(mp) cat zbJ; // Z-spans p*I+J
             Qp,qp:=quo<Q|mp>;
             rk:=Ngens(Qp);
             assert #Qp eq p^rk;
@@ -120,8 +135,10 @@ intrinsic MaximalIntermediateModules(I::AlgEtQMod,J::AlgEtQMod)->SetIndx[AlgEtQM
             matrices:=Setseq(Seqset(matrices)); //possibly there are repetiions.
             Qp_Rmod:=RModule(matrices);
             max_Rmod:=MaximalSubmodules(Qp_Rmod);
-            max_submod join:={@ Module(S,m, mp_in_I cat 
-                                    [(Qp!Eltseq(Qp_Rmod!b))@@qp@@q : b in Basis(max)]) : max in max_Rmod @};
+            // K/(p*I+J) = max, so K is the Z-span of mp_in_I and lifts of a basis of max: no products
+            // with ZBasis(S) are needed
+            max_submod join:={@ CreateAlgEtQMod(S,m, mp_in_I cat lift([ (Qp!Eltseq(Qp_Rmod!b))@@qp : b in Basis(max) ]) : ZSpan:=true)
+                                    : max in max_Rmod @};
         end for;
         return max_submod;
     end if;

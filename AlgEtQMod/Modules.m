@@ -59,18 +59,22 @@ import "../AlgEtQ/Quotients.m" : quotient_from_zbases;
 // Creation functions
 //----------
 
-CreateAlgEtQMod:=function(S,m,gens)
+CreateAlgEtQMod:=function(S,m,gens : ZSpan:=false)
 // Given S::AlgEtQOrd and some generators creates the new object 
 // m:Algebra(S)->Parent(gens[1]) determine the action
 // Here we just assign the generators. we do not compute the Zbasis unless necessary!
+// If ZSpan is true, then gens are assumed to generate the module also over Z: the ZBasis is computed
+// from them, without multiplying them by ZBasis(S) (as for ideals, see CreateAlgEtQIdl).
     I:=New(AlgEtQMod);
     V:=Codomain(m);
     I`UniverseAlgebra:=<V,m>;
     I`Order:=S;
     gens:=Setseq(Seqset(gens));
-    if #gens gt AbsoluteDimension(V) then
+    if ZSpan or #gens gt AbsoluteDimension(V) then
         vprintf AlgEtQMod,3: "too many gens";
-        gens:=[g*m(s) : g in gens, s in ZBasis(S) ];
+        if not ZSpan then
+            gens:=[g*m(s) : g in gens, s in ZBasis(S) ];
+        end if;
         H,d:=lattice_hnf(gens);
         zb:=MatrixQtoA(V,(1/d)*crZQ(H));
         assert #zb eq AbsoluteDimension(V);

@@ -106,47 +106,6 @@ intrinsic PrimeBelow(S::AlgEtQOrd, P::AlgEtQIdl) -> AlgEtQIdl
     return Q;
 end intrinsic;
 
-/// Given an integral fractional $S$-ideal $I$, returns the sequence of primes of $S$ containing $I$.
-intrinsic PrimesAbove(I::AlgEtQIdl) -> SeqEnum[AlgEtQIdl]
-{Given an integral fractional S-ideal I, returns the sequence of primes of S containing I.}
-    if not assigned I`PrimesAbove then
-        require IsIntegral(I): "the ideal must be integral";
-        S:=Order(I);
-        if assigned I`Factorization then
-            primes:=[P[1] : P in I`Factorization];
-        elif I eq OneIdeal(S) then
-            primes:=[];
-        else
-            if IsMaximal(S) then
-                O:=S;
-                IO:=I;
-                fac:=Factorization(IO);
-                primes:=[P[1] : P in fac]; //they are all distinct
-            else
-                O:=MaximalOrder(Algebra(I));
-                IO:=O!!I;
-                fac:=Factorization(IO);
-                // The set removes the repetitions (several primes of O can be above the same prime
-                // of S). Its order depends on the hash values of the primes, so the order of the
-                // output of PrimesAbove is not otherwise meaningful.
-                primes:= Setseq({ PrimeBelow(S,PO[1]) : PO in fac });
-                for i in [1..#primes] do
-                    P:=primes[i];
-                    P`IsPrime:=true;
-                end for;
-            end if;
-            assert2 forall{P : P in primes | IsIntegral(P)};
-            assert2 forall{P : P in primes | I subset P};
-            assert2 forall{P : P in primes | IsPrimePower(Integers() ! Index(S,P))};
-        end if;
-        for P in primes do
-            ZBasisLLL(P);
-        end for;
-        I`PrimesAbove:=primes;
-    end if;
-    return I`PrimesAbove;
-end intrinsic;
-
 primes_above_rational_prime:=function(O, q)
 // Given the maximal order O and a rational prime q, returns the list of the triples <i,P_L,P> of
 // the primes of O above q (see the attribute PrimesAboveRationalPrime), computing and storing it
@@ -176,6 +135,49 @@ primes_above_rational_prime:=function(O, q)
     end if;
     return O`PrimesAboveRationalPrime[q];
 end function;
+
+/// Given an integral fractional $S$-ideal $I$, returns the sequence of primes of $S$ containing $I$.
+intrinsic PrimesAbove(I::AlgEtQIdl) -> SeqEnum[AlgEtQIdl]
+{Given an integral fractional S-ideal I, returns the sequence of primes of S containing I.}
+    if not assigned I`PrimesAbove then
+        require IsIntegral(I): "the ideal must be integral";
+        S:=Order(I);
+        if assigned I`Factorization then
+            primes:=[P[1] : P in I`Factorization];
+        elif I eq OneIdeal(S) then
+            primes:=[];
+        else
+            // The primes of S containing I contain N:=MinimalInteger(I), so they are above the
+            // rational primes q dividing N. Each of them is PrimeBelow(S,PO) for a prime PO of the
+            // maximal order O above q, and I c PO meet S if and only if I c PO. The primes of O above
+            // q are built once (primes_above_rational_prime) and I c PO is tested with a few
+            // memberships: neither I*O nor its factorization are needed. The output is in a fixed
+            // order: by q, then by component; repetitions (several primes of O above the same prime
+            // of S) are removed.
+            maxS:=IsMaximal(S);
+            O:=maxS select S else MaximalOrder(Algebra(I));
+            gI:=Generators(I);
+            primes:={@ @};
+            for q in PrimeDivisors(MinimalInteger(I)) do
+                for t in primes_above_rational_prime(O,q) do
+                    PO:=t[3];
+                    if forall{ g : g in gI | g in PO } then
+                        Include(~primes, maxS select PO else PrimeBelow(S,PO));
+                    end if;
+                end for;
+            end for;
+            primes:=IndexedSetToSequence(primes);
+            assert2 forall{P : P in primes | IsIntegral(P)};
+            assert2 forall{P : P in primes | I subset P};
+            assert2 forall{P : P in primes | IsPrimePower(Integers() ! Index(S,P))};
+        end if;
+        for P in primes do
+            ZBasisLLL(P);
+        end for;
+        I`PrimesAbove:=primes;
+    end if;
+    return I`PrimesAbove;
+end intrinsic;
 
 intrinsic PlacesAboveRationalPrime(E::AlgEtQ,p::RngIntElt)->SeqEnum[AlgEtQIdl]
 {Given an étale algebra and a rational prime, returns the primes of maximal order of the algebra containing the rational prime.}

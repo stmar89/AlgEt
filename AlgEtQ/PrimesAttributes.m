@@ -9,10 +9,12 @@
 
 
 
+freeze;
+
 declare attributes AlgEtQIdl : InertiaDegree,
                                RamificationIndex;
 
-declare verbose nice_unif,3;
+declare verbose Uniformizers, 3;
 
 // we continue the doc of FactPrimes.m
 
@@ -76,7 +78,7 @@ intrinsic Uniformizers(PPs::SeqEnum[AlgEtQIdl]) -> SeqEnum
 {Given a sequence of primes P of the maximal order, it returns a sequence of elements t_P such that t_P is a uniformizer at P and a unit at every other prime in the sequence. The output does not depend on the random state.}
     OO:=Order(PPs[1]);
     require IsMaximal(OO) and forall{P : P in PPs | IsPrime(P)} : "The input needs to be a sequence of primes of the maximal order.";
-    vprintf nice_unif,2 : "nice_uniformizers: %o primes\n",#PPs;
+    vprintf Uniformizers,2 : "nice_uniformizers: %o primes\n",#PPs;
     one:=One(Algebra(PPs[1]));
     nice_unifs:=[];
     PPs2:=[ P^2 : P in PPs];
@@ -87,14 +89,14 @@ intrinsic Uniformizers(PPs::SeqEnum[AlgEtQIdl]) -> SeqEnum
     ZBasisLLL(L : FromHNF:=true);
     mL:=MinimalInteger(L);
     for iP->P in PPs do
-        vprintf nice_unif,2 : "nice_uniformizers: %o-th prime...",iP;
+        vprintf Uniformizers,2 : "nice_uniformizers: %o-th prime...",iP;
         P2:=PPs2[iP];
         // An element of P not in P^2 has valuation 1 at P. We take the first one in the LLL-reduced
         // Z-basis of P obtained from its HNF, which depends only on P: some element of a Z-basis of
         // P is not in P^2, since P ne P^2.
         ZBasisLLL(P : FromHNF:=true);
         tP:=[ z : z in ZBasis(P) | not z in P2 ][1];
-        vprintf nice_unif,2 : "got an element of valuation 1...";
+        vprintf Uniformizers,2 : "got an element of valuation 1...";
         assert2 tP in P and not tP in P2;
         elts:=[ i eq iP select tP else one : i in [1..#PPs] ];
         tP:=CRT(PPs2,elts);
@@ -106,19 +108,19 @@ intrinsic Uniformizers(PPs::SeqEnum[AlgEtQIdl]) -> SeqEnum
             k+:=1;
         end while;
         tP:=tP+k*mL;
-        vprintf nice_unif,2 : "got a short non-zerodivisor...";
-        vprintf nice_unif,2 : "asserts";
+        vprintf Uniformizers,2 : "got a short non-zerodivisor...";
+        vprintf Uniformizers,2 : "asserts";
         assert2 tP in P and not tP in P2;
-        vprintf nice_unif,2 : ".";
+        vprintf Uniformizers,2 : ".";
         assert2 tP in MaximalOrder(Algebra(tP));
-        vprintf nice_unif,2 : ".";
+        vprintf Uniformizers,2 : ".";
         assert2 forall{ Q : Q in [ Q : Q in PPs | Q ne P ] | not tP in Q };
-        vprintf nice_unif,2 : ".";
+        vprintf Uniformizers,2 : ".";
         // for some reason this is very time consuming
         assert3 Seqset(PrimesAbove(tP*MaximalOrder(Algebra(tP)))) meet Seqset(PPs) eq {P};
-        vprintf nice_unif,2 : ".";
+        vprintf Uniformizers,2 : ".";
         assert not IsZeroDivisor(tP);
-        vprintf nice_unif,2 : "all passed\n";
+        vprintf Uniformizers,2 : "all passed\n";
         Append(~nice_unifs,tP);
     end for;
     return nice_unifs;

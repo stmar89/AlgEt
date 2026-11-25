@@ -11,8 +11,6 @@
 
 freeze;
 
-declare verbose AlgEtQ, 1;
-
 //------------
 // DirectProduct of AlgEtQ
 //------------

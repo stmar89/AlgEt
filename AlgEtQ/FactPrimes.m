@@ -22,7 +22,15 @@ declare attributes AlgEtQOrd : SingularPrimes,
                                             // order because ideals over different orders cannot be
                                             // compared.
 
-declare attributes AlgEtQ : PlacesAboveRationalPrime;
+// The primes of the maximal order O, built once: an AssociativeArray keyed by the rational primes q,
+// whose value is the list of the triples <i, P_L, P>, one for each prime P of O above q: P is
+// P_L, a prime of the maximal order of the i-th component, at the i-th component, and the unit ideal
+// at the other components. The list has the components in order, and for each of them the
+// primes in the order of Factorization(q*O_i). Each P is marked prime, with its ramification index
+// and its inertia degree. Written only by primes_above_rational_prime; read by
+// factorizationMaximalOrder and PlacesAboveRationalPrime. A prime of O is always the same object, so
+// what is stored on it (ZBasis, Hash, residue field, PrimeBelow, minimal overorders) is computed once.
+declare attributes AlgEtQOrd : PrimesAboveRationalPrime;
 
 ///# Primes, factorization and completions
 
@@ -77,22 +85,24 @@ intrinsic PrimeBelow(S::AlgEtQOrd, P::AlgEtQIdl) -> AlgEtQIdl
     // P is a prime of S.
     Q:=OneIdeal(S) meet S!!P;
     Q`IsPrime:=true;
-    cache:=assigned S`PrimesBelow select S`PrimesBelow else AssociativeArray();
+    if not assigned S`PrimesBelow then
+        S`PrimesBelow:=AssociativeArray();
+    end if;
     // Distinct primes, also of different orders, can be above the same prime of S: if it is already
     // stored, we return it, so that each prime of S is one ideal, whose attributes (residue field,
     // ...) are computed once.
-    for T2 in Keys(cache) do
-        for P2 in Keys(cache[T2]) do
-            if cache[T2][P2] eq Q then
-                Q:=cache[T2][P2];
+    for T2 in Keys(S`PrimesBelow) do
+        for P2 in Keys(S`PrimesBelow[T2]) do
+            if S`PrimesBelow[T2][P2] eq Q then
+                Q:=S`PrimesBelow[T2][P2];
                 break T2;
             end if;
         end for;
     end for;
-    below:=IsDefined(cache,T) select cache[T] else AssociativeArray();
-    below[P]:=Q;
-    cache[T]:=below;
-    S`PrimesBelow:=cache;
+    if not IsDefined(S`PrimesBelow,T) then
+        S`PrimesBelow[T]:=AssociativeArray();
+    end if;
+    S`PrimesBelow[T][P]:=Q;
     return Q;
 end intrinsic;
 
@@ -137,16 +147,41 @@ intrinsic PrimesAbove(I::AlgEtQIdl) -> SeqEnum[AlgEtQIdl]
     return I`PrimesAbove;
 end intrinsic;
 
+primes_above_rational_prime:=function(O, q)
+// Given the maximal order O and a rational prime q, returns the list of the triples <i,P_L,P> of
+// the primes of O above q (see the attribute PrimesAboveRationalPrime), computing and storing it
+// the first time.
+    if not assigned O`PrimesAboveRationalPrime then
+        O`PrimesAboveRationalPrime:=AssociativeArray();
+    end if;
+    if not IsDefined(O`PrimesAboveRationalPrime,q) then
+        test,OasProd:=IsProductOfOrders(O);
+        assert test; // since O is maximal
+        tup_one_ideals:=< 1*OL : OL in OasProd >;
+        out:=[* *]; // a list: the primes P_L of different components are in different universes
+        for i in [1..#OasProd] do
+            for pe in Factorization(q*OasProd[i]) do
+                tup_p:=tup_one_ideals;
+                tup_p[i]:=pe[1]; // we replace the i-th ideal with the prime
+                P:=Ideal(O,tup_p);
+                ZBasisLLL(P);
+                P`IsPrime:=true;
+                P`RamificationIndex:=pe[2]; // the exponent of the prime in q*O_i
+                P`InertiaDegree:=Ilog(q,Integers()!Index(O,P)); // [O:P] = q^f
+                assert2 q^P`InertiaDegree eq Index(O,P);
+                Append(~out,<i,pe[1],P>);
+            end for;
+        end for;
+        O`PrimesAboveRationalPrime[q]:=out;
+    end if;
+    return O`PrimesAboveRationalPrime[q];
+end function;
+
 intrinsic PlacesAboveRationalPrime(E::AlgEtQ,p::RngIntElt)->SeqEnum[AlgEtQIdl]
 {Given an étale algebra and a rational prime, returns the primes of maximal order of the algebra containing the rational prime.}
-    if not assigned E`PlacesAboveRationalPrime then
-        E`PlacesAboveRationalPrime:=AssociativeArray();
-    end if;
-    if not IsDefined(E`PlacesAboveRationalPrime,p) then
-        require IsPrime(p) : "The integer p needs to be a prime number";
-        E`PlacesAboveRationalPrime[p]:=PrimesAbove(p*MaximalOrder(E));
-    end if;
-    return E`PlacesAboveRationalPrime[p];
+    require IsPrime(p) : "The integer p needs to be a prime number";
+    // stored in the maximal order, see the attribute PrimesAboveRationalPrime
+    return [ t[3] : t in primes_above_rational_prime(MaximalOrder(E),p) ];
 end intrinsic;
 
 intrinsic SingularPrimes(R::AlgEtQOrd) -> SeqEnum[AlgEtQIdl]
@@ -177,29 +212,20 @@ function factorizationMaximalOrder(I)
 //of prime ideals
     O:=Order(I);
     assert IsMaximal(O);
-    test,OasProd:=IsProductOfOrders(O);
-    assert test; //since we assume that O is maximal
-    A:=Algebra(O);
     test,IasProd:=IsProductOfIdeals(I);
     assert test;
     fac:=[]; //this will be the factorization of I
-    nf,embs:=Components(A);
-    tup_one_ideals:=< 1*O : O in OasProd >;
-    for i in [1..#nf] do
+    for i in [1..#IasProd] do
         IL:=IasProd[i];
         if not One(Order(IL)) in IL then
             facL:=Factorization(IL); // < <P,e> : ... >;
             assert #facL gt 0;
             for p in facL do
-                tup_p:=tup_one_ideals;
-                tup_p[i]:=p[1]; // we replace the i-th ideal with P
-                assert2 tup_p ne tup_one_ideals;
-                P:=Ideal(O,tup_p);
-                ZBasisLLL(P);
-                assert2 P ne OneIdeal(O);
-                P`IsPrime:=true; //we know P is prime
-                assert2 IsPrimePower(Integers() ! Index(O,P));
-                Append(~fac,<P,p[2]>);
+                // the prime of O which is p[1] at the i-th component, built once (see
+                // primes_above_rational_prime)
+                Ps:=[ t[3] : t in primes_above_rational_prime(O,Minimum(p[1])) | t[1] eq i and t[2] eq p[1] ];
+                assert #Ps eq 1;
+                Append(~fac,<Ps[1],p[2]>);
             end for;
          end if;
     end for;
@@ -309,7 +335,17 @@ end intrinsic;
     assert Seqset(P3) eq Seqset(PrimesAbove(3*O));
     assert Seqset(P2) ne Seqset(P3);
     assert PlacesAboveRationalPrime(A,2) eq P2; // the stored value
-    assert Keys(A`PlacesAboveRationalPrime) eq {2,3};
+    assert Keys(O`PrimesAboveRationalPrime) eq {2,3};
+    // the primes of O are built once: the same objects in PlacesAboveRationalPrime, PrimesAbove and
+    // Factorization, marked prime, with their ramification indices and inertia degrees
+    assert forall{ P : P in PrimesAbove(2*O) cat [ f[1] : f in Factorization(6*O) ] |
+                        exists{ Q : Q in P2 cat P3 | IsIdentical(P,Q) } };
+    for pP in [ <2,P2>, <3,P3> ] do
+        p,Ps:=Explode(pP);
+        assert forall{ P : P in Ps | assigned P`IsPrime and assigned P`RamificationIndex and assigned P`InertiaDegree };
+        assert forall{ P : P in Ps | P`RamificationIndex eq Valuation(A!p,P) and p^P`InertiaDegree eq Index(O,P) };
+        assert &+[ RamificationIndex(P)*InertiaDegree(P) : P in Ps ] eq AbsoluteDimension(A);
+    end for;
     printf ".";
 
     // PrimeBelow: the prime S meet P of S below a prime P of an order T containing S. It is stored:

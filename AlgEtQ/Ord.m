@@ -189,6 +189,42 @@ all_but_one:=function(seq, op, one)
     return rests,suf;
 end function;
 
+op_over_product:=function(lists, op)
+// Given non-empty sequences lists[1..n] and a function op of two arguments, returns the sequence of
+// op(...op(op(x_1,x_2),x_3)...,x_n) for all the tuples (x_1,...,x_n) in CartesianProduct(lists), in
+// the same order (the last entry changes fastest). The result for a prefix (x_1,...,x_k) is
+// computed once, and used by all the tuples starting with it: m_1*m_2 + m_1*m_2*m_3 + ... +
+// m_1*...*m_n operations, for lists of sizes m_i, instead of (n-1)*m_1*...*m_n.
+    n:=#lists;
+    if n eq 1 then
+        return lists[1];
+    end if;
+    out:=[];
+    idx:=[ 1 : k in [1..n] ]; // the current tuple
+    pre:=[ lists[1][1] ]; // pre[k] is the result for the first k entries, for k in [1..n-1]
+    for k in [2..n-1] do
+        Append(~pre,op(pre[k-1],lists[k][1]));
+    end for;
+    repeat
+        Append(~out,op(pre[n-1],lists[n][idx[n]]));
+        // the next tuple: the last index changes fastest
+        k:=n;
+        while k ge 1 and idx[k] eq #lists[k] do
+            idx[k]:=1;
+            k-:=1;
+        end while;
+        if k eq 0 then
+            break;
+        end if;
+        idx[k]+:=1;
+        // the results for the prefixes of length k, ..., n-1 change
+        for j in [k..n-1] do
+            pre[j]:=j eq 1 select lists[1][idx[1]] else op(pre[j-1],lists[j][idx[j]]);
+        end for;
+    until false;
+    return out;
+end function;
+
 ///hide-none
 
 ///# Orders in étale algebras over $\mathbb{Q}$
@@ -227,8 +263,15 @@ end function;
 intrinsic Order( gens::SeqEnum[AlgEtQElt] : Check:=100 , CheckIsKnownOrder:=true ) -> AlgEtQOrd
 {Returns the order generated as an algebra over ZZ by a given sequence of elements. The parameter Check (default 100) determines how many times the program tries to obtain a multiplicatively closed lattice by adding the product of the given generators. If Check is 0 then this step is skipped: the ZZ-span of the given elements is assumed to be closed under multiplication, which is not verified, and it is returned as an order. The vararg CheckIsKnownOrder determines whether the program checks if the order is already known, i.e. in the attribute KnownOrders of the algebra. The default value is true. The stored ZBasis is LLL-reduced.}
     A:=Universe(gens);
-    gens:=Setseq(Seqset(gens));// we remove duplicates
     dim:=AbsoluteDimension(A);
+    // We remove duplicates, which matter when the generators are used as they are: in the closure
+    // loop, and when they are taken as a Z-basis. With Check eq 0 and more than dim generators only
+    // their Z-span (an HNF) is used, so the duplicates do not matter, and removing them costs a
+    // comparison of elements per pair with the same hash (about 25% of OverOrders for many
+    // overorders).
+    if Check gt 0 or #gens le dim then
+        gens:=Setseq(Seqset(gens));
+    end if;
     hash:=[]; // the hash of the order, when its HNF is computed below
     if Check gt 0 then
         require forall{g : g in gens | IsIntegral(g) } : "The elements are not all integral, hence do not generate an order.";

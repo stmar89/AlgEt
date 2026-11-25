@@ -19,6 +19,8 @@ declare verbose ResidueRingUnits, 3;
 //    says whether GRH was assumed (see valid_for). The helpers that compute them return values and
 //    store nothing.
 //  - conductor_sequence: the function conductor_sequence (see conductor_sequence_fmt).
+import "Ord.m" : all_but_one;
+
 declare attributes AlgEtQOrd: PicardGroup,
                               UnitGroup,
                               conductor_sequence;
@@ -149,25 +151,9 @@ intrinsic ResidueRingUnitsSubgroupGenerators(F::AlgEtQIdl) -> SeqEnum[AlgEtQElt]
         primes:=[<x, Maximum([y[2]: y in l2 |y[1] eq x])>:x in primes];
         primes_powers:=[ p[1]^p[2] : p in primes ];
         // rests[i] is the intersection of the prime powers other than the i-th (they are coprime,
-        // so meet is the product, and it is faster): pre[i] is the intersection of the first i,
-        // suf[i] of the ones from the i-th on, and rests[i] = pre[i-1] meet suf[i+1]: 3n-6
-        // intersections for n primes, instead of n(n-2) when each rests[i] is computed from
-        // scratch.
-        n:=#primes;
-        if n eq 1 then
-            rests:=[ OneIdeal(S) ];
-        else
-            pre:=[ primes_powers[1] ];
-            for i in [2..n-1] do
-                Append(~pre,pre[i-1] meet primes_powers[i]);
-            end for;
-            suf:=[ OneIdeal(S) : i in [1..n] ];
-            suf[n]:=primes_powers[n];
-            for i in [n-1..2 by -1] do
-                suf[i]:=primes_powers[i] meet suf[i+1];
-            end for;
-            rests:=[ i eq 1 select suf[2] else i eq n select pre[n-1] else pre[i-1] meet suf[i+1] : i in [1..n] ];
-        end if;
+        // so meet is the product, and it is faster), from the prefixes and the suffixes: see
+        // all_but_one
+        rests:=all_but_one(primes_powers,func< I,J | I meet J >,OneIdeal(S));
         elts:={};
         for i->a in primes do
             a1a2:=primes_powers[i];

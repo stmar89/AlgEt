@@ -20,11 +20,13 @@ import "Elt.m" : CreateAlgEtQElt;
 declare attributes AlgEtQ : MaximalOrder,
                            ProductOfEquationOrders,
                            EquationOrder,
-                           KnownOrders; // An indexed set containing all the orders in the algebra constructed so far.
-                                        // We store them, because to avoid creating multiple copies of the same order.
-                                        // In particular, this is more efficient for the attributes.
-                                        // Looking up an order in it uses the intrinsic Hash for orders.
-                                        // The attribute is populated at creation of the order.
+                           KnownOrders; // An indexed set containing all the orders in the algebra
+                                        // constructed so far.
+                                        // We store them, because to avoid creating multiple copies
+                                        // of the same order. In particular, this is more efficient
+                                        // for the attributes. Looking up an order in it uses the
+                                        // intrinsic Hash for orders. The attribute is populated at
+                                        // creation of the order.
 
 declare attributes AlgEtQOrd : IsMaximal,
                               IsProductOfOrders,
@@ -79,7 +81,8 @@ end function;
 hnf:=function(M)
 //input: a matrix over the Integers()
 //output: the matrix in HNF, without the zero rows
-// HermiteForm puts the zero rows at the bottom: we count them, instead of computing the rank (a second echelon form).
+// HermiteForm puts the zero rows at the bottom: we count them, instead of computing the rank (a
+// second echelon form).
     H:=HermiteForm(M);
     r:=Nrows(H);
     while r gt 0 and IsZero(H[r]) do
@@ -103,10 +106,11 @@ MatrixAtoZ:=function(gens)
 end function;
 
 MatrixQtoA:=function(A,P)
-//given a matrix with Integer or Rational entries, returns a sequence of elements of A, corresponding to the rows.
-// The absolute basis of A is the concatenation of the bases of the components of A (see AbsoluteBasis).
-// So the j-th component of the element with absolute coordinates s is the element of the j-th number field
-// whose coordinates are the j-th block of s: no arithmetic is needed.
+//given a matrix with Integer or Rational entries, returns a sequence of elements of A,
+//corresponding to the rows.
+// The absolute basis of A is the concatenation of the bases of the components of A (see
+// AbsoluteBasis). So the j-th component of the element with absolute coordinates s is the element
+// of the j-th number field whose coordinates are the j-th block of s: no arithmetic is needed.
     nf:=Components(A);
     assert Ncols(P) eq AbsoluteDimension(A);
     P:=ChangeRing(P,Rationals());
@@ -123,23 +127,25 @@ MatrixQtoA:=function(A,P)
 end function;
 
 // The Hermite normal form of a full Z-lattice L in an étale algebra, and its hash.
-// Let M be the matrix of the coordinates of a Z-basis of L, d a positive integer such that d*M is integral, and H the
-// (upper triangular) Hermite normal form of d*M. The rational matrix (1/d)*H depends only on L: not on the Z-basis, nor
-// on d, since the HNF of c*X is c times the HNF of X for c>0. Orders, fractional ideals and modules are hashed with
-// hash_from_hnf(H,d), see myHash: so the hash can be stored for free wherever H is computed anyway, and conversely H can
-// be read from the hash with hnf_from_hash. Both use only integer operations done by Magma's built-in functions.
+// Let M be the matrix of the coordinates of a Z-basis of L, d a positive integer such that d*M is
+// integral, and H the (upper triangular) Hermite normal form of d*M. The rational matrix (1/d)*H
+// depends only on L: not on the Z-basis, nor on d, since the HNF of c*X is c times the HNF of X for
+// c>0. Orders, fractional ideals and modules are hashed with hash_from_hnf(H,d), see myHash: so the
+// hash can be stored for free wherever H is computed anyway, and conversely H can be read from the
+// hash with hnf_from_hash. Both use only integer operations done by Magma's built-in functions.
 
 lattice_hnf:=function(gens)
-// Given elements of an étale algebra spanning a full Z-lattice L (possibly more than a Z-basis), returns H and d as
-// above, where M is the matrix of the coordinates of gens and d its denominator.
+// Given elements of an étale algebra spanning a full Z-lattice L (possibly more than a Z-basis),
+// returns H and d as above, where M is the matrix of the coordinates of gens and d its denominator.
     M:=MatrixAtoQ(gens);
     d:=Integers()!Denominator(M);
     return hnf(crQZ(d*M)),d;
 end function;
 
 hash_from_hnf:=function(H,d)
-// Given H and d as above, returns the hash of L: the denominator e of (1/d)*H followed by the entries of the upper
-// triangular part of (e/d)*H, row by row. With g the gcd of d and of the entries of H, e = d/g and (e/d)*H = H/g.
+// Given H and d as above, returns the hash of L: the denominator e of (1/d)*H followed by the
+// entries of the upper triangular part of (e/d)*H, row by row. With g the gcd of d and of the
+// entries of H, e = d/g and (e/d)*H = H/g.
     dim:=Nrows(H);
     g:=GCD(d,GCD(Eltseq(H)));
     entries:=&cat[ Eltseq(H[i])[i..dim] : i in [1..dim] ];
@@ -150,12 +156,37 @@ hash_from_hnf:=function(H,d)
 end function;
 
 hnf_from_hash:=function(hash,d)
-// The inverse of hash_from_hnf: given the hash of L and an integer d>0 such that d*M is integral for the matrix M of a
-// Z-basis of L, returns the HNF H of d*M. Since d*M is integral, d is a multiple of the denominator e=hash[1].
+// The inverse of hash_from_hnf: given the hash of L and an integer d>0 such that d*M is integral
+// for the matrix M of a Z-basis of L, returns the HNF H of d*M. Since d*M is integral, d is a
+// multiple of the denominator e=hash[1].
     e:=hash[1];
     assert d mod e eq 0;
-    T:=UpperTriangularMatrix(hash[2..#hash]); // the entries are filled row by row, as in hash_from_hnf
+    T:=UpperTriangularMatrix(hash[2..#hash]); // the entries are filled row by row, as in
+                                              // hash_from_hnf
     return (d div e)*Matrix(Integers(),Nrows(T),Ncols(T),Eltseq(T));
+end function;
+
+all_but_one:=function(seq, op, one)
+// Given a sequence seq of n elements, an associative and commutative operation op (a function of
+// two arguments, e.g. func< I,J | I meet J >) and its neutral element one, returns rests and suf,
+// where rests[i] is op of all the seq[j] with j ne i, and suf[i] is op of seq[i..n] for i >= 2
+// (suf[1] is not computed and is one, as suf[n+1]). They come from the prefixes and the suffixes:
+// 3n-6 operations for n >= 2, instead of n(n-2) when each rests[i] is computed from scratch, and
+// never more.
+    n:=#seq;
+    suf:=[ one : i in [1..n+1] ];
+    for i in [n..2 by -1] do
+        suf[i]:=i eq n select seq[n] else op(seq[i],suf[i+1]);
+    end for;
+    if n eq 1 then
+        return [ one ],suf;
+    end if;
+    pre:=[ seq[1] ]; // pre[i] is op of seq[1..i], needed up to n-1
+    for i in [2..n-1] do
+        Append(~pre,op(pre[i-1],seq[i]));
+    end for;
+    rests:=[ i eq 1 select suf[2] else i eq n select pre[n-1] else op(pre[i-1],suf[i+1]) : i in [1..n] ];
+    return rests,suf;
 end function;
 
 ///hide-none
@@ -170,9 +201,10 @@ end function;
 /// The `ZBasis` is put in a canonical form (we use the Hermite normal form of the numerators and divide by the denominators), unless the parameter `Check` is set to $0$ and the given elements are as many as the dimension of the algebra: then they are taken as the `ZBasis`. The entries of the corresponding upper triangular matrix uniquely determine the order and are used for hashing it.
 
 create_order:=function(A,gens,zb,hash,CheckIsKnownOrder)
-// Creates the order of A with Z-basis zb, generated by gens (zb is used as generators when gens has more than dim
-// elements), with the given hash if hash is not empty (see hash_from_hnf). If CheckIsKnownOrder is true and the order
-// is already known, returns the known one. The stored Z-basis is LLL-reduced.
+// Creates the order of A with Z-basis zb, generated by gens (zb is used as generators when gens has
+// more than dim elements), with the given hash if hash is not empty (see hash_from_hnf). If
+// CheckIsKnownOrder is true and the order is already known, returns the known one. The stored
+// Z-basis is LLL-reduced.
     dim:=AbsoluteDimension(A);
     assert #zb eq dim;
     R:=New(AlgEtQOrd);
@@ -186,7 +218,8 @@ create_order:=function(A,gens,zb,hash,CheckIsKnownOrder)
     if CheckIsKnownOrder then
         IsKnownOrder(~R);
     end if;
-    ZBasisLLL(R); // for better coefficients: it uses the HNF stored in the hash, computed by IsKnownOrder
+    ZBasisLLL(R); // for better coefficients: it uses the HNF stored in the hash, computed by
+                  // IsKnownOrder
     return R;
 end function;
 
@@ -238,15 +271,17 @@ intrinsic Order( gens::SeqEnum[AlgEtQElt] : Check:=100 , CheckIsKnownOrder:=true
         hash:=hash_from_hnf(crQZ(e*P),e);
         zb:=MatrixQtoA(A,P);
     elif #gens gt dim then
-    // We assume that gens generates over Z a multiplicatively closed lattice: we only need its Z-basis (one HNF).
-    // Examples:
-    // - S_1+...+S_n, for overorders S_i of an order S which differ from S at pairwise distinct primes of S: at each
-    //   prime of S the sum is locally equal to one of the S_i, hence it is closed under multiplication;
+    // We assume that gens generates over Z a multiplicatively closed lattice: we only need its
+    // Z-basis (one HNF). Examples:
+    // - S_1+...+S_n, for overorders S_i of an order S which differ from S at pairwise distinct
+    //   primes of S: at each prime of S the sum is locally equal to one of the S_i, hence it is
+    //   closed under multiplication;
     // - S+I, for an order S and an integral ideal I of an overorder of S.
         H,d:=lattice_hnf(gens);
         hash:=hash_from_hnf(H,d);
         zb:=MatrixQtoA(A,(1/d)*crZQ(H));
-        // the lattice is closed under multiplication: it has the same hash as the lattice spanned with the products
+        // the lattice is closed under multiplication: it has the same hash as the lattice spanned
+        // with the products
         if GetAssertions() ge 2 then
             H2,d2:=lattice_hnf(zb cat [ z1*z2 : z1,z2 in zb ]);
             assert hash_from_hnf(H2,d2) eq hash;
@@ -262,8 +297,8 @@ end intrinsic;
 intrinsic Order(A::AlgEtQ , orders::Tup) -> AlgEtQOrd
 {Given an étale algebra and a tuple of orders in the components of the étale algebra, it generates the direct sum order.}
     nf,embs,projs:=Components(A);
-    // ISA, not Type(S) in {...}: the orders of cyclotomic and quadratic fields have the types RngCyc and RngQuad,
-    // which are subtypes of RngOrd.
+    // ISA, not Type(S) in {...}: the orders of cyclotomic and quadratic fields have the types
+    // RngCyc and RngQuad, which are subtypes of RngOrd.
     require #nf eq #orders and forall{ i : i in [1..#orders] | NumberField(orders[i]) eq nf[i]} and
 forall{ S : S in orders | ISA(Type(S),RngOrd) } : "The second input should be a sequence of orders in the number fields defining A";
     gens:=&cat[ [ embs[i](z) : z in AbsoluteBasis(orders[i]) ] : i in [1..#nf] ];
@@ -283,7 +318,8 @@ intrinsic EquationOrder(A::AlgEtQ) -> AlgEtQOrd
         pow:=PowerBasis(A);
         E:=Order(pow : Check:=0); //the PowerBasis generates a multiplicatively closed lattice
         assert2 E eq Order([pow[2]]);
-        E`Generators:=[pow[2]]; // I want the generator set to be small, so I put only the primitive element
+        E`Generators:=[pow[2]]; // I want the generator set to be small, so I put only the primitive
+                                // element
         A`EquationOrder:=E;
     end if;
     return A`EquationOrder;
@@ -336,7 +372,8 @@ intrinsic IsKnownOrder(~R::AlgEtQOrd)
             R:=A`KnownOrders[i];
         else
             // We take the indexed set out of the attribute, so that Include modifies it in place:
-            // otherwise the whole set is copied, and every order in it hashed again, at every new order.
+            // otherwise the whole set is copied, and every order in it hashed again, at every new
+            // order.
             K:=A`KnownOrders;
             delete A`KnownOrders;
             Include(~K,R);
@@ -390,7 +427,8 @@ end intrinsic;
 intrinsic Hash(S::AlgEtQOrd) -> RngIntElt
 {Returns a hash value of the order, so that equal orders have the same hash value. It is computed from the sequence returned by myHash and it is stored in the attribute HashValue. Magma uses it to build sets, indexed sets and associative arrays of orders: only orders with the same hash value are compared with eq. Different orders might have the same hash value: this only costs an extra comparison.}
     if not assigned S`HashValue then
-        // The universe matters, e.g. Hash([1,2]) ne Hash([1/1,2/1]), so we make sure it is Integers().
+        // The universe matters, e.g. Hash([1,2]) ne Hash([1/1,2/1]), so we make sure it is
+        // Integers().
         S`HashValue:=Hash(ChangeUniverse(myHash(S),Integers()));
     end if;
     return S`HashValue;
@@ -416,14 +454,15 @@ end intrinsic;
 
 inclusion_matrix:=function(O)
 // the inclusion matrix is simply the inverse of the matrix MatrixAtoQ(ZBasis(O)).
-// This allows to check if an element is in O by simply making one matrix multiplication, rather then
-// solving a system (as in AbsoluteCoordinates). It is much faster.
+// This allows to check if an element is in O by simply making one matrix multiplication, rather
+// then solving a system (as in AbsoluteCoordinates). It is much faster.
 // O can also be an ideal.
     if not assigned O`inclusion_matrix then
         zO:=ZBasis(O);
         O`inclusion_matrix:=<MatrixAtoQ(zO)^-1,zO>;
     end if;
-    assert2 ZBasis(O) eq O`inclusion_matrix[2]; // if the ZBasis(O) is changed and inclusion_matrix is not deleted
+    assert2 ZBasis(O) eq O`inclusion_matrix[2]; // if the ZBasis(O) is changed and inclusion_matrix
+                                                // is not deleted
                                                 // the assert will fail.
     return Explode(O`inclusion_matrix);
 end function;
@@ -547,7 +586,8 @@ intrinsic '*'(O1::AlgEtQOrd,O2::AlgEtQOrd)->AlgEtQOrd
         return O1;
     end if;
     if assigned O1`IsMaximal and O1`IsMaximal then
-    //calling IsMaximal(O1) would trigger the computation of the maximal order, which might be expensive
+    //calling IsMaximal(O1) would trigger the computation of the maximal order, which might be
+    //expensive
         return O1;
     end if;
     if assigned O2`IsMaximal and O2`IsMaximal then
@@ -579,8 +619,8 @@ meet_zbasis:=function(zb1,zb2)
     M:=hnf(M);
     //the hnf of zb1 meet zb2 is the lower-right quadrant of M
     P:=Matrix(N,N,[M[i,j] : i,j in [N+1..2*N]]);
-    // A block of a matrix in HNF is in HNF: P is the HNF of d times the matrix of a Z-basis of the intersection, so its
-    // hash is free (see lattice_hnf).
+    // A block of a matrix in HNF is in HNF: P is the HNF of d times the matrix of a Z-basis of the
+    // intersection, so its hash is free (see lattice_hnf).
     zb:=MatrixQtoA(A,(1/d)*crZQ(P));
     return zb,hash_from_hnf(P,d);
 end function;
@@ -589,7 +629,8 @@ intrinsic 'meet'(O1::AlgEtQOrd,O2::AlgEtQOrd)->AlgEtQOrd
 {Returns the order given by the intersection of two given orders.}
     require Algebra(O1) cmpeq Algebra(O2) : "the orders must be defined in the same algebra";
     if assigned O1`IsMaximal and O1`IsMaximal then
-    //calling IsMaximal(O1) would trigger the computation of the maximal order, which might be expensive
+    //calling IsMaximal(O1) would trigger the computation of the maximal order, which might be
+    //expensive
         return O2;
     end if;
     if assigned O2`IsMaximal and O2`IsMaximal then
@@ -605,8 +646,8 @@ intrinsic 'meet'(O1::AlgEtQOrd,O2::AlgEtQOrd)->AlgEtQOrd
         return O2;
     end if;
     zb,hash:=meet_zbasis(ZBasis(O1),ZBasis(O2));
-    // The intersection of two orders is multiplicatively closed. Its hash is known: we store it before the known
-    // orders are looked up, which would compute it again.
+    // The intersection of two orders is multiplicatively closed. Its hash is known: we store it
+    // before the known orders are looked up, which would compute it again.
     O:=create_order(Algebra(O1),zb,zb,hash,true);
     assert2 O eq Order(zb);
     return O;
@@ -751,8 +792,10 @@ end intrinsic;
     ff:=Conductor(EquationOrder(A));
     T:=MultiplicatorRing(ff);
     assert T in A`KnownOrders;
-    assert assigned T`IsMaximal and assigned T`IsProductOfOrders; //these two attributes are assigned when we created OA above.
-                                                                  // hence T points to the same memory spot of OA
+    // these two attributes are assigned when we created OA above.
+    assert assigned T`IsMaximal and assigned T`IsProductOfOrders;
+                                                                  // hence T points to the same
+                                                                  // memory spot of OA
     printf ".";
 
     O:=Order(ZBasis(OA));
@@ -806,7 +849,8 @@ end intrinsic;
     assert not E2 meet E1 eq E2;
     printf ".";
 
-    // testing Hash: sets, indexed sets and associative arrays of orders, also when the hash values collide
+    // testing Hash: sets, indexed sets and associative arrays of orders, also when the hash values
+    // collide
     _<x>:=PolynomialRing(Integers());
     A:=EtaleAlgebra((x^2+3)*(x^2+27));
     oo:=FindOverOrders(EquationOrder(A)); // distinct orders
@@ -838,7 +882,8 @@ end intrinsic;
     assert forall{ i : i in [1..#oo] | AA[copies2[i]] eq i };
     printf ".";
 
-    // components given by QuadraticField and CyclotomicField: their maximal orders have types RngQuad and RngCyc
+    // components given by QuadraticField and CyclotomicField: their maximal orders have types
+    // RngQuad and RngCyc
     A:=EtaleAlgebra([QuadraticField(-5),CyclotomicField(5)]);
     O:=MaximalOrder(A);
     assert IsMaximal(O);
@@ -848,16 +893,18 @@ end intrinsic;
     assert #P eq 2; // the class numbers of Q(sqrt(-5)) and Q(zeta_5) are 2 and 1
     printf ".";
 
-    // The hashes stored without computing them (from an HNF computed anyway, or copied from an object with the same
-    // lattice) must be the ones computed from scratch: we compare with fresh copies, built from the Z-bases, which
-    // compute their hash. Intersections of orders and of ideals, ZBasisLLL, restriction of ideals, OneIdeal.
+    // The hashes stored without computing them (from an HNF computed anyway, or copied from an
+    // object with the same lattice) must be the ones computed from scratch: we compare with fresh
+    // copies, built from the Z-bases, which compute their hash. Intersections of orders and of
+    // ideals, ZBasisLLL, restriction of ideals, OneIdeal.
     _<x>:=PolynomialRing(Integers());
     A:=EtaleAlgebra((x^2+5)*(x^4+16));
     E:=EquationOrder(A);
     oo:=OverOrders(E);
     fresh_order:=function(S)
         F:=Order(ZBasis(S) : Check:=0, CheckIsKnownOrder:=false);
-        delete F`Hash; // stored by ZBasisLLL at creation: we want it computed from scratch by myHash
+        delete F`Hash; // stored by ZBasisLLL at creation: we want it computed from scratch by
+                       // myHash
         return F;
     end function;
     fresh_ideal:=func< I | Ideal(Order(I),ZBasis(I)) >; // its hash is computed by ZBasis or myHash

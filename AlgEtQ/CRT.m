@@ -16,7 +16,7 @@ declare verbose CRT, 2;
 declare attributes AlgEtQOrd : CRT_data;
 declare attributes AlgEtQIdl : CRT_data;
 
-import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQtoA , meet_zbasis ;
+import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQtoA , meet_zbasis , all_but_one;
 
 ///## Chinese remainder theorem
 /// Let $I$ and $J$ be integral fractional ideals over the same order $S$ in an étale algebra.
@@ -34,7 +34,8 @@ import "Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixAtoZ , MatrixQ
 //
 // Let I1+I2=S be ideals.
 // Let zI1 and zI2 be the matrices whose rows are given by ZBasis(I1) and ZBasis(I2).
-// Let U be such that U*VerticalJoin(d*zI1,d*zI2) = H, where H is in HNF, hence equal to the H above.
+// Let U be such that U*VerticalJoin(d*zI1,d*zI2) = H, where H is in HNF, hence equal to the H
+// above.
 //
 // Then cc*VerticalJoin(d*zS , 0n) = cc * V^-1 * U * VerticalJoin(d*zI1,d*zI2).
 // This implies that (a1,...,an,b1,...,bn) = cc*V^-1*U satisfies
@@ -67,7 +68,8 @@ CRT_data_ideal:=function(I)
          _,d:=CRT_data_order(Order(I));
          zI:=ZBasis(I);
          I`CRT_data:=<crQZ(d*MatrixAtoQ(zI)),zI>;
-         // 20240426 : we now store also the ZBasis, since the attribute might change (eg. when using LLL)
+         // 20240426 : we now store also the ZBasis, since the attribute might change (eg. when
+         // using LLL)
      end if;
      return Explode(I`CRT_data);
 end function;
@@ -124,12 +126,15 @@ intrinsic ChineseRemainderTheorem(Is::SeqEnum[AlgEtQIdl],as::SeqEnum[AlgEtQElt])
     require #Is eq N: "The number of ideals is not the same as the number of elements";
     require forall{i : i in [1..N] | as[i] in S}:"the elements must lie in order of definition of the ideals";
     require forall{i : i in [2..N] | Order(Is[i]) eq S}:"the ideals must be of the same order";
-    if N eq 1 then
-        return as[1];
-    else
-        b:=$$(Is[2..N],as[2..N]);
-        return ChineseRemainderTheorem(Is[1],&meet(Is[2..N]),as[1],b);
-    end if;
+    // From the last ideal to the first: e = as[i] modulo Is[i], and e is the element of the
+    // previous step modulo suf[i+1], the intersection of Is[i+1..N]. The intersections of the
+    // suffixes are computed once (see all_but_one), instead of again at every step.
+    _,suf:=all_but_one(Is,func< I,J | I meet J >,OneIdeal(S));
+    e:=as[N];
+    for i in [N-1..1 by -1] do
+        e:=ChineseRemainderTheorem(Is[i],suf[i+1],as[i],e);
+    end for;
+    return e;
 end intrinsic;
 
 /// Given a sequence `Is` of $N$ integral fractional $S$-ideals $I_1,\ldots,I_N$, pairwise coprime, returns a map $S \to S^N$ representing the natural isomorphism $S/I \to \frac{S}{I_1}\times \cdots \times \frac{S}{I_N}$, where $I=\prod_i I_i$, and a map $S^N \to S$ representing the inverse.

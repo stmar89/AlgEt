@@ -1064,9 +1064,9 @@ coprime_rep_from_primes:=function(I,Iinv,zb,pp)
     return x;
 end function;
 
-/// Given an invertible fractional ideal $I$ and an integral ideal $J$, defined over the same order, returns a unit $x$ of the parent algebra such that $x\cdot I$ is an integral fractional ideal coprime with $J$, together with the product $x\cdot I$. The output depends only on $I$ and $J$ (it is not random), and $x$ is a short element of $I^{-1}$, so $x\cdot I$ is small.
-intrinsic CoprimeRepresentative(I::AlgEtQIdl,J::AlgEtQIdl) -> AlgEtQElt,AlgEtQIdl
-{Given an invertible fractional ideal I and an integral ideal J, defined over the same order, returns a unit x of the parent algebra such that x*I is an integral fractional ideal coprime with J, together with the product x*I. The output depends only on I and J (it is not random), and x is a short element of I^-1, so x*I is small.}
+/// Given an invertible fractional ideal $I$ and an integral ideal $J$, defined over the same order, returns a unit $x$ of the parent algebra such that $x\cdot I$ is an integral fractional ideal coprime with $J$, together with the product $x\cdot I$. The output depends only on $I$ and $J$ (it is not random), and $x$ is a short element of $I^{-1}$, so $x\cdot I$ is small. If $I$ is already integral and coprime with $J$, then $x=1$, unless the vararg `MakeSmall` is set to true: then $x$ is always a short element of $I^{-1}$, so that $x\cdot I$ is small also in this case.
+intrinsic CoprimeRepresentative(I::AlgEtQIdl,J::AlgEtQIdl : MakeSmall:=false) -> AlgEtQElt,AlgEtQIdl
+{Given an invertible fractional ideal I and an integral ideal J, defined over the same order, returns a unit x of the parent algebra such that x*I is an integral fractional ideal coprime with J, together with the product x*I. The output depends only on I and J (it is not random), and x is a short element of I^-1, so x*I is small. If I is already integral and coprime with J, then x=1, unless the vararg MakeSmall is set to true: then x is always a short element of I^-1, so that x*I is small also in this case.}
     require IsIntegral(J) : "the second ideal must be integral";
     S:=Order(I);
     require S eq Order(J): "the ideals must be defined over the same order";
@@ -1089,7 +1089,7 @@ intrinsic CoprimeRepresentative(I::AlgEtQIdl,J::AlgEtQIdl) -> AlgEtQElt,AlgEtQId
     else
         is_good:=func< x | IsCoprime(x eq One(A) select I else x*I,J) >;
     end if;
-    if IsIntegral(I) and is_good(One(A)) then
+    if not MakeSmall and IsIntegral(I) and is_good(One(A)) then
         x:=One(A);
     else
         Iinv:=Inverse(I); // cached
@@ -1400,6 +1400,25 @@ end intrinsic;
     for I in [ J6, np[2], np[2]*PrimesAbove(3*O)[1] ] do
         check_coprime_rep(I,J6);
     end for;
+    printf ".";
+
+    // MakeSmall: for an integral ideal coprime to J, x = 1 by default, and a short element of I^-1
+    // with MakeSmall; the postconditions hold in both cases, and the output does not depend on the
+    // seed.
+    E:=EquationOrder(EtaleAlgebra(x^4-1000*x^3-1000*x^2-1000*x-1000));
+    F:=Conductor(E);
+    _:=SingularPrimes(E);
+    I:=Ideal(E,[ (ZBasis(E)[2]+3)^4, ZBasis(E)[3]+7 ])^3;
+    if IsCoprime(I,F) then
+        x1,xI1:=CoprimeRepresentative(I,F);
+        assert x1 eq One(Algebra(E)) and IsIdentical(xI1,I);
+    end if;
+    xs,xIs:=CoprimeRepresentative(I,F : MakeSmall:=true);
+    assert xIs eq xs*I and IsIntegral(xIs) and IsCoprime(xIs,F) and not IsZeroDivisor(xs);
+    SetSeed(7);
+    I2:=Ideal(E,ZBasis(I));
+    assert CoprimeRepresentative(I2,F : MakeSmall:=true) eq xs;
+    SetSeed(1);
     printf ".";
 
     // ColonIdeal: the same Z-basis as with the rational computation used until 2026-11 (the

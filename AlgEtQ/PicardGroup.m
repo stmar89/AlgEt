@@ -26,11 +26,13 @@ declare attributes AlgEtQOrd: PicardGroup,
 // Who writes what:
 //  - residue_class_ring_unit_subgroup_generators: ResidueRingUnitsSubgroupGenerators;
 //  - ResidueRingUnits: the intrinsic ResidueRingUnits, as <group, map>;
-//  - SmallPowers: small_power; small_prod_cache: small_prod_of_powers.
+//  - SmallPowers: small_power; small_prod_cache: small_prod_of_powers; compact_powers:
+//    compact_power.
 declare attributes AlgEtQIdl: residue_class_ring_unit_subgroup_generators,
                               ResidueRingUnits,
                               SmallPowers,
-                              small_prod_cache;
+                              small_prod_cache,
+                              compact_powers;
 
 ///# Picard group and unit group
 /// Let $R$ be an order in an étale algebra $A$ over $\mathbb{Q}$ with maximal order $\mathcal{O}_A$.
@@ -756,14 +758,60 @@ picard_representative:=function(data, rep)
     return small_prod_of_powers(data`S, data`generators_ideals, Eltseq(rep));
 end function;
 
-power_product_in_O:=function(data, coeff)
-// The ideal &*[ gens_GO_in_O[i]^coeff[i] ] of O, computed exactly: it is coprime to FO when the
-// exponents are not negative.
-    if #data`gens_GO_in_O eq 0 then
-        return OneIdeal(data`O);
+compact_rep:=function(X, FO, r)
+// Given an invertible ideal X of the maximal order O, coprime to FO, returns K = a*X, small,
+// integral and coprime to FO, and the class of a in R = (O/FO)^* (the map r). Since X and K are
+// coprime to FO, a is a unit at the primes above FO, so its class is defined. With MakeSmall, a is
+// a short element of X^-1 also when X is already integral and coprime to FO, as the products in
+// compact_power are.
+    a,K:=CoprimeRepresentative(X,FO : MakeSmall:=true);
+    return K,a@@r;
+end function;
+
+compact_power:=function(g, e, FO, r)
+// Given an invertible ideal g of O coprime to FO and an integer e > 0, returns K and rho with g^e =
+// mu^-1*K, K small, integral and coprime to FO, and rho the class of mu in R = (O/FO)^*. The power
+// is never formed: repeated squaring, with every intermediate ideal replaced by compact_rep. The
+// powers met along the way are stored in g`compact_powers, for the next calls (the discrete
+// logarithms use the same powers again and again), together with FO.
+    if not assigned g`compact_powers or not IsIdentical(g`compact_powers[1],FO) then
+        g`compact_powers:=<FO,AssociativeArray()>;
     end if;
-    assert #coeff eq #data`gens_GO_in_O;
-    return &*[ (data`gens_GO_in_O[i])^coeff[i] : i in [1..#coeff] ];
+    is_def,Kr:=IsDefined(g`compact_powers[2],e);
+    if is_def then
+        return Explode(Kr);
+    end if;
+    if e eq 1 then
+        K,rho:=compact_rep(g,FO,r);
+    elif IsEven(e) then
+        K1,r1:=$$(g,e div 2,FO,r);
+        K,ra:=compact_rep(K1*K1,FO,r); // K = a*K1^2 = a*mu1^2*g^e
+        rho:=2*r1+ra;
+    else
+        K1,r1:=$$(g,e-1,FO,r);
+        K2,r2:=$$(g,1,FO,r);
+        K,ra:=compact_rep(K1*K2,FO,r); // K = a*K1*K2 = a*mu1*mu2*g^e
+        rho:=r1+r2+ra;
+    end if;
+    cache:=g`compact_powers[2];
+    cache[e]:=<K,rho>;
+    g`compact_powers:=<FO,cache>;
+    return K,rho;
+end function;
+
+compact_power_product:=function(start, gens, exps, FO, r)
+// Given invertible ideals start and gens[i] of O, coprime to FO, and integers exps[i] >= 0, returns
+// K and rho with start*&*[gens[i]^exps[i]] = mu^-1*K, K small, integral and coprime to FO, and rho
+// the class of mu in R = (O/FO)^*: see compact_power.
+    K,rho:=compact_rep(start,FO,r);
+    for i in [1..#gens] do
+        if exps[i] ne 0 then
+            Ki,ri:=compact_power(gens[i],exps[i],FO,r);
+            K,ra:=compact_rep(K*Ki,FO,r);
+            rho:=rho+ri+ra;
+        end if;
+    end for;
+    return K,rho;
 end function;
 
 picard_discrete_log:=function(data, id)
@@ -779,15 +827,14 @@ picard_discrete_log:=function(data, id)
                                               // coprime with F
     idO:=O!!(crep*id); //idO is coprime with FO
     GOrep:=idO@@data`gO;
-    // no minus signs, so J is coprime with FO
-    J:=power_product_in_O(data,Eltseq(data`H!Eltseq(GOrep)));
-    assert2 IsCoprime(J,FO);
-    prod:=(idO^-1)*J; //prod is coprime with FO...
-    isprinc,elt:=is_principal_maximal(prod,data`GRH);
-    // as IsPrincipal does: prod can be a stored power of a generator of GO (when idO^-1 is O)
-    prod`Generators:=[elt];
-    assert2 IsCoprime(elt*O,FO); //..hence elt is in the image r:R->Pic(S)
-    Rrep:=elt@@r;
+    // prod = idO^-1 * &*[ gens_GO_in_O[i]^GOrep[i] ] is principal and coprime to FO (no negative
+    // exponents): its generator elt gives the class of idO in Pic(S). The product is never formed:
+    // prod = mu^-1*K with K small (see compact_power_product), and elt = gK/mu with gK a generator
+    // of K, so the class of elt in R = (O/FO)^* is the one of gK minus rho, the class of mu.
+    K,rho:=compact_power_product(idO^-1,data`gens_GO_in_O,Eltseq(data`H!Eltseq(GOrep)),FO,r);
+    isprinc,gK:=is_principal_maximal(K,data`GRH);
+    assert isprinc;
+    Rrep:=gK@@r-rho;
     return data`mDP(-data`mRD(Rrep)+data`mHD(data`H!Eltseq(GOrep))); //[I]=-[xO meet S]+GOrep
 end function;
 
@@ -830,13 +877,13 @@ picard_group_non_maximal:=function(S, GRH)
     assert #gens_GO_in_S eq #InvariantFactors(GO);
     for i in [1..#gens_GO_in_S] do
         n:=InvariantFactors(GO)[i];
-        Ipow:=gens_GO_in_O[i]^n; // stored in gens_GO_in_O[i]`KnownPowers
-        is_princ, gen := is_principal_maximal(Ipow,GRH);
+        // g^n is principal, for g = gens_GO_in_O[i]: g^n = mu^-1*K with K small (see compact_power,
+        // the power is never formed), and a generator of g^n is gK/mu with gK a generator of K,
+        // whose class in R is the one of gK minus rho, the class of mu.
+        K,rho:=compact_power(gens_GO_in_O[i],n,FO,r);
+        is_princ, gK := is_principal_maximal(K,GRH);
         assert is_princ;
-        // the generator replaces the generators of the power, as IsPrincipal does: the power is
-        // stored and used again, and this fixes the generators of P below
-        Ipow`Generators:=[gen];
-        Append(~relDglue,-mRD(gen@@r)+mHD(H.i*n));
+        Append(~relDglue,-mRD(gK@@r-rho)+mHD(H.i*n));
     end for;
     P, mDP := quo<D|relDresidue cat relDunits cat relDglue>;
     vprintf AlgEtQPicardGroup, 2: "PicardGroup: D = %o\n",D;

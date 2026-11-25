@@ -1192,6 +1192,7 @@ end intrinsic;
     // with r directly, which accepts only elements of O: PicardGroup of this overorder (from
     // PicardGroup_1.8) failed with "Element is not in the codomain of the map".
     SetAssertions(2);
+    _<x>:=PolynomialRing(Integers());
     A:=EtaleAlgebra(x^6-3*x^5-3*x^4+65*x^3-48*x^2-768*x+4096);
     assert [ DefiningPolynomial(K) : K in Components(A) ] eq [ x^2-7*x+16, x^4+4*x^3+9*x^2+64*x+256 ];
     zb:=[ <[ 0, 0 ], [ -2/9, -1/6, 0, -1/18 ]>, <[ 0, 0 ], [ -1/9, 1/6, 0, -5/18 ]>,

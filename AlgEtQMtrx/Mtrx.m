@@ -217,25 +217,25 @@ intrinsic ScalarMatrix(n::RngIntElt,s::AlgEtQElt) -> AlgEtQMtrx
 end intrinsic;
 
 intrinsic IdentityMatrix(A::AlgEtQ, n::RngIntElt) -> AlgEtQMtrx
-{Returns the nxn identity matrix over the étale algebra A.}   
+{Returns the nxn identity matrix over the étale algebra A.}
     u:=One(A);
     return ScalarMatrix(n,u);
 end intrinsic;
 
 intrinsic ZeroMatrix(A::AlgEtQ, n::RngIntElt) -> AlgEtQMtrx
-{Returns the nxn identity matrix over the étale algebra A.}   
+{Returns the nxn zero matrix over the étale algebra A.}
     u:=Zero(A);
     return ScalarMatrix(n,u);
 end intrinsic;
 
 intrinsic RandomMatrix(A::AlgEtQ, s::RngIntElt, r::RngIntElt : bd:=3) -> AlgEtQMtrx
-{Returns a random sxr identity matrix over the étale algebra A, with coefficients bounded by the VarArg bd.}   
+{Returns a random sxr matrix over the étale algebra A, with coefficients bounded by the VarArg bd.}
     Q:=[ [ Random(A,bd) : j in [1..r] ] : i in [1..s] ];
     return Matrix(Q);
 end intrinsic;
 
 intrinsic RandomMatrix(A::AlgEtQ, n::RngIntElt : bd:=3) -> AlgEtQMtrx
-{Returns a random square nxn identity matrix over the étale algebra A, with coefficients bounded by the VarArg bd.}   
+{Returns a random square nxn matrix over the étale algebra A, with coefficients bounded by the VarArg bd.}
     return RandomMatrix(A,n,n : bd:=bd);
 end intrinsic;
 
@@ -269,7 +269,7 @@ intrinsic Rank(x::AlgEtQMtrx) -> RngIntElt
 end intrinsic;
 
 intrinsic Trace(x::AlgEtQMtrx) -> AlgEtQElt
-{Determinant.}
+{Trace.}
     A:=Universe(x);
     return A!<Trace(c) : c in Components(x)>;
 end intrinsic;

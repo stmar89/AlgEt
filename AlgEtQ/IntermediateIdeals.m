@@ -9,7 +9,7 @@
 freeze;
 declare verbose IntermediateIdeals, 2;
 ///# Intermediate fractional ideals
-/// Let $I$ and $J$ be orders or fractional ideals in an étale algebra over $\mathbb{Q}$ satisfying $J subseteq I$.
+/// Let $I$ and $J$ be orders or fractional ideals in an étale algebra over $\mathbb{Q}$ satisfying $J \subseteq I$.
 /// Since the quotient $I/J$ is finite, there are finitely many fractional ideals $K$ (over a fixed order) such that $J \subseteq K \subseteq I$.
 /// The following intrinsic allow to compute them.
 /// Given fractional $S$-ideals $I$ and $J$ such that $J \subseteq I$, returns the minimal (with respect to inclusion) fractional $S$-ideals $K$ such that $J \subsetneq K \subseteq I$. Note that $J$ is never in the output.
@@ -54,7 +54,7 @@ intrinsic _MinimalIntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQI
         return min_ideals;
     end if;
 end intrinsic;
-/// Given fractional $S$-ideals $I$ and $J$ such that $J$ \subseteq $I$, returns all the fractional $S$-ideals $K$ such that $J \subseteq K \subseteq I$. They are produced recursively from the minimal ones. The output includes $I$ and $J$.
+/// Given fractional $S$-ideals $I$ and $J$ such that $J \subseteq I$, returns all the fractional $S$-ideals $K$ such that $J \subseteq K \subseteq I$. They are produced recursively from the minimal ones. The output includes $I$ and $J$.
 intrinsic _IntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQIdl]
 {Given fractional S-ideals I and J such that J subseteq I, returns all the fractional S-ideals K such that J subseteq K subseteq I.
  They are produced recursively from the minimal ones.
@@ -135,7 +135,7 @@ intrinsic _MaximalIntermediateIdeals(I::AlgEtQIdl,J::AlgEtQIdl)->SetIndx[AlgEtQI
     end if;
 end intrinsic;
 // This combines the four intrinsics above
-/// Given fractional $S$-ideals $I$ and $J$ such that $J$ \subseteq $I$, returns all the fractional $S$-ideals $K$ such that $J \subseteq K \subseteq I$. There are 3 boolean parameters, and no more than one can be turned to `true`. If the parameter `Maximal` is `true` then the only the maximal intermediate ideals are returned. In particular, the output will not contain $I$. If the parameter `Minimal` is set to `true` then only the minimal intermediate ideals are returned. In particular the output will not contain $J$. If the parameter `PrescribedMultiplicatorRing` is set to `true` then the output will contain only the intermediate ideal $K$ satisfying $(K:K)=S$.
+/// Given fractional $S$-ideals $I$ and $J$ such that $J \subseteq I$, returns all the fractional $S$-ideals $K$ such that $J \subseteq K \subseteq I$. There are 3 boolean parameters, and no more than one can be turned to `true`. If the parameter `Maximal` is `true` then the only the maximal intermediate ideals are returned. In particular, the output will not contain $I$. If the parameter `Minimal` is set to `true` then only the minimal intermediate ideals are returned. In particular the output will not contain $J$. If the parameter `PrescribedMultiplicatorRing` is set to `true` then the output will contain only the intermediate ideal $K$ satisfying $(K:K)=S$.
 intrinsic IntermediateIdeals(I::AlgEtQIdl, J::AlgEtQIdl :
     Maximal := false,
     Minimal := false,
@@ -377,7 +377,7 @@ end intrinsic;
     printf ".";
     assert forall{I:I in mm | {@ I @} eq IntermediateIdeals(I,ff : Minimal:=true)};
     printf ".";
-    nn:=IntermediateIdeals(EO,ff); //2 minutess
+    nn:=IntermediateIdeals(EO,ff);
     printf ".";
     assert mm subset nn;
     assert EO in nn;

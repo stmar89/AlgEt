@@ -71,7 +71,7 @@ intrinsic MinimalIntermediateModules(I::AlgEtQMod,J::AlgEtQMod)->SetIndx[AlgEtQM
 end intrinsic;
 
 intrinsic IntermediateModules(I::AlgEtQMod,J::AlgEtQMod)->SetIndx[AlgEtQMod]
-{Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that J subset K subset I. They are produced recursively using from the minimal ones.}
+{Given fractional S-ideals J subset I, returns all the fractional S-ideals K such that J subset K subset I. They are produced recursively starting from the minimal ones.}
     V,m:=UniverseAlgebra(I);
     VJ,mJ:=UniverseAlgebra(J);
     require Order(I) eq Order(J) : "The modules must be over the same order";
@@ -97,7 +97,7 @@ intrinsic MaximalIntermediateModules(I::AlgEtQMod,J::AlgEtQMod)->SetIndx[AlgEtQM
     if J eq I then 
         return {@ J @};
     else
-        // If I c K c I is maximal then I/K is a simple module, that is, isomorphic to S/P for some
+        // If J c K c I is maximal then I/K is a simple module, that is, isomorphic to S/P for some
         // prime P of S. In particular, if p is the characteristic of S/P, then p*I c K c I.
         // Note that I/pI is an Fp-vector space.
         _,m:=UniverseAlgebra(I);

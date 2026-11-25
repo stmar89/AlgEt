@@ -308,7 +308,7 @@ intrinsic RandomUnit(A::AlgEtQ , bd::RngIntElt) -> AlgEtQElt
 {Returns a random unit of the étale algebra with coefficients are bounded by the positive integer bd.}
     require bd gt 0 : "The bound needs to be a positive integer.";
     nf:=Components(A);
-    require BaseField(A) eq Rationals() : "The function works only for product of absolute number fiedls'" ;
+    require BaseField(A) eq Rationals() : "The function works only for product of absolute number fields" ;
     repeat
         num:=A!< E!Random(EquationOrder(E),bd) : E in nf>;
         den:=A!< E!Random(EquationOrder(E),bd) : E in nf>;
@@ -644,7 +644,7 @@ end intrinsic;
 
 /// Given two sequences of $n$ elements $[a_1,\ldots,a_n]$ and $[b_1,\ldots,b_n]$ returns $\sum_{i=1}^n a_i\cdot b_i$.
 intrinsic _DotProduct(a::SeqEnum[AlgEtQElt], b::SeqEnum[AlgEtQElt]) -> AlgEtQElt
-{Given sequences a and b, such that #a eq #b, returns &+[a[i]*b[i] : i in [1..#a]]. .}
+{Given sequences a and b, such that #a eq #b, returns &+[a[i]*b[i] : i in [1..#a]].}
     A := Universe(a);
     require A eq Universe(b) : "The sequences don't have the same universe";
     require #a eq #b : "The sequences don't have the same size";

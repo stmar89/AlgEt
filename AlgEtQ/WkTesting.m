@@ -69,7 +69,7 @@ end intrinsic;
 
 ///ditto
 intrinsic IsWeakEquivalent(J::AlgEtQIdl,O::AlgEtQOrd)->BoolElt,AlgEtQIdl,AlgEtQIdl
-{Checks if the ideal J is weakly equivalent to order O, that is, if J is invertible in O. If so, J and its the inverse (O:J) are also returned.}
+{Checks if the ideal J is weakly equivalent to order O, that is, if J is invertible in O. If so, J and its inverse (O:J) are also returned.}
     return IsWeakEquivalent(J,OneIdeal(O));
 end intrinsic;
 
@@ -81,7 +81,7 @@ end intrinsic;
 
 ///ditto
 intrinsic IsWeaklyEquivalent(O1::AlgEtQOrd,O2::AlgEtQOrd)->BoolElt,AlgEtQIdl,AlgEtQIdl
-{Check if the two orders are weakly equivalent, that is equal. If so, O1 and O2 are also returned.}
+{Checks if the two orders are weakly equivalent, that is, equal. If so, the unit ideal of O1 is also returned, twice.}
     if O1 eq O2 then 
         return true,OneIdeal(O1),OneIdeal(O1);
     else
@@ -97,7 +97,7 @@ end intrinsic;
 
 ///ditto
 intrinsic IsWeaklyEquivalent(J::AlgEtQIdl,O::AlgEtQOrd)->BoolElt,AlgEtQIdl,AlgEtQIdl
-{Checks if the ideal J is weakly equivalent to order O, that is, if J is invertible in O. If so, J and its the inverse (O:J) are also returned.}
+{Checks if the ideal J is weakly equivalent to order O, that is, if J is invertible in O. If so, J and its inverse (O:J) are also returned.}
     return IsWeakEquivalent(J,OneIdeal(O));
 end intrinsic;
 

@@ -439,7 +439,7 @@ intrinsic ZBasis(S::AlgEtQOrd)->SeqEnum[AlgEtQElt]
     return S`ZBasis;
 end intrinsic;
 
-/// Return a set of generators as a \mathbb{Z}}-algebra of the order.
+/// Return a set of generators as a $\mathbb{Z}$-algebra of the order.
 intrinsic Generators(S::AlgEtQOrd)->SeqEnum[AlgEtQElt]
 {Return a set of generators (as a Z-algebra) of the order.}
     // assigned at creation
@@ -451,7 +451,7 @@ end intrinsic;
 /// Let $S$ be an order.
 /// Let $P$ be the upper triangular Hermite normal form of the integer square matrix $d\cdot M$ where $M$ is the matrix whose rows are the coefficients of a $\mathbb{Z}$-basis of $S$ and $d$ is the least common denominator of its entries.
 /// The `Hash` of $S$ is defined to be the sequence consisting of the least common denominator of $\frac{1}{d}\cdot P$ and the entries of the upper triangular part of $\frac{1}{d}\cdot P$.
-/// This hashing method has no collisions and it is independent of the choice of $\mathbb{Z}-basis$ from which we start the procedure.
+/// This hashing method has no collisions and it is independent of the choice of $\mathbb{Z}$-basis from which we start the procedure.
 /// We observed that applying the in-built Hash function to the sequence defined above, while giving a smaller hash, it often lead to collisions. For this reason, equality is tested using the whole sequence.
 /// The intrinsic `Hash` returns an integer computed from this sequence, which is used by Magma to build sets, indexed sets and associative arrays of orders: only orders with the same hash value are compared with `eq`, so collisions only cost an extra comparison.
 
@@ -602,7 +602,7 @@ end intrinsic;
 // Index
 //----------
 
-/// Given an order $T$ returns the determinant of the change of basis from a $\mathbb{Z}-basis of $T$ to the basis of the parent algebra.
+/// Given an order $T$ returns the determinant of the change of basis from a $\mathbb{Z}$-basis of $T$ to the basis of the parent algebra.
 intrinsic Index(T::AlgEtQOrd) -> FldRatElt
 {Given an order T returns the determinant of the change of basis from a Z-basis of T to the basis of the parent algebra.}
   if not assigned T`Index then

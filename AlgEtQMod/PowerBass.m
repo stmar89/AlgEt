@@ -43,7 +43,7 @@ import "../AlgEtQ/Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixQtoA
     the isomorphism class of the 'Steinitz class' I1*...*Is, which is an Ss-ideal.
     This a theorem of Bass.
 
-    In this package, we inlcude functionalities to determine
+    In this package, we include functionalities to determine
     - if an S-module M has a 'Bass decomposition'
     - the Bass decomposition
     - the Steinitz class
@@ -57,7 +57,7 @@ import "../AlgEtQ/Ord.m" : crQZ , crZQ , Columns , hnf , MatrixAtoQ , MatrixQtoA
 // ------------------- //
 
 declare attributes AlgEtQMod :
-                             DirectSumRep, // a sequence of pairs <J,m> where J is a practional R
+                             DirectSumRep, // a sequence of pairs <J,m> where J is a fractional R
                                            // ideal and m:Algebra(R)->UniverseAlgebra, such that the
                                            // module equals J1*m1(One(R))+...+Js*ms(One(R)) where
                                            // the sum is direct. Also (Ji:Ji) subseteq (Ji+1:Ji+1)
@@ -302,7 +302,7 @@ bass_factor:=function(gens_input,Rg,mAgs,embs,projs)
 end function;
 
 intrinsic DirectSumRepresentation(M::AlgEtQMod)->SeqEnum[Tup]
-{Given an R-module M in V=K^s, with R Bass, it returns a sequence of pairs <J,m> where J is a practional R ideal and m:Algebra(R)->UniverseAlgebra, such that M =  J1*m1(One(R))+...+Js*ms(One(R)) where the sum is direct. Also (Ji:Ji) subseteq (Ji+1:Ji+1).}
+{Given an R-module M in V=K^s, with R Bass, it returns a sequence of pairs <J,m> where J is a fractional R ideal and m:Algebra(R)->UniverseAlgebra, such that M =  J1*m1(One(R))+...+Js*ms(One(R)) where the sum is direct. Also (Ji:Ji) subseteq (Ji+1:Ji+1).}
     if not assigned M`DirectSumRep then    
         UA,mR:=UniverseAlgebra(M);
         Rg:=Order(M);
@@ -429,7 +429,7 @@ direct_sums_overorders:=function(R,r)
 end function;
 
 intrinsic IsomorphismClassesOverBassOrder(R::AlgEtQOrd, r::RngIntElt)->SeqEnum[AlgEtQMod]
-{Given a Bass order R and a rank r, it returns representatives of all the isormorphism classes of torsion-free R modules of rank r.}
+{Given a Bass order R and a rank r, it returns representatives of all the isomorphism classes of torsion-free R modules of rank r.}
 	require r gt 0 : "the second input must be a positive integer";  
     Kis:=Components(Algebra(R));
     V:=EtaleAlgebra([Kis[j] : i in [1..r] , j in [1..#Kis]]); // V=K^r
@@ -438,7 +438,7 @@ intrinsic IsomorphismClassesOverBassOrder(R::AlgEtQOrd, r::RngIntElt)->SeqEnum[A
 end intrinsic;
 
 intrinsic IsomorphismClassesOverBassOrder(R::AlgEtQOrd, map::Map )->SeqEnum[AlgEtQMod]
-{Given a Bass order R and a map:Algebra(R)->UA, it returns representatives of all the isormorphism classes of torsion-free R modules inside R. We need UA to be isomorphic to a power of Algebra(R).}
+{Given a Bass order R and a map:Algebra(R)->UA, it returns representatives of all the isomorphism classes of torsion-free R modules inside R. We need UA to be isomorphic to a power of Algebra(R).}
     is_pure_power,ones:=is_pure_power_internal(map);
     require is_pure_power : "The universe algebra is not of the form K^r.";
     require IsBass(R) : "the first input must be a Bass order";
@@ -570,7 +570,7 @@ intrinsic IsIsomorphicOverBassOrder( M1::AlgEtQMod, M2::AlgEtQMod )->BoolElt,Map
     R:=Order(M1);
     AR:=Algebra(R);
     require UniverseAlgebra(M2) eq UA : "the modules don't live in the same algebra";
-    require R eq Order(M2) : "the modules are not defiend over the same order";
+    require R eq Order(M2) : "the modules are not defined over the same order";
     require IsBass(R) : "the order is not Bass";
     is_pure_power,ones,isom,embs,projs:=is_pure_power_internal(mR);
     require is_pure_power : "The universe algebra is not of the form K^r.";

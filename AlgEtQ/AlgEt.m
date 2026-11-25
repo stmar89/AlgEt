@@ -33,7 +33,7 @@ declare attributes AlgEtQ : DefiningPolynomial,
 /// - $A = \dfrac{K[x]}{f(x)}$ where $f(x)$ is a polynomial with in $K[x]$ and no repeated roots over $\overline{K}$.
 /// We will refer to the field $K$ as the `prime field` of $A$ and to the fields $K_1,\ldots,K_n$  as the `components` of $A$.
 /// If $F$ is a finite extension of $K$ such that $K_1,\ldots,K_n$ are all defined as relative extensions of $F$, we call $F$ the `base field` of $A$.
-/// If the components $K_1,\ldots,K_n$ of $A$ have distinct defining polynomials, say $f_1(x),\ldots,f_n(x) \in F[x]$ then $A$ is isomorphic to the étale algebra $F[x]/(f(x)$ where $f(x) = f_1(x)\cdot \cdots \cdot f_n(x)$. The polynomial $f(x)$ is then referred to as the `defining polynomial` of $A$.
+/// If the components $K_1,\ldots,K_n$ of $A$ have distinct defining polynomials, say $f_1(x),\ldots,f_n(x) \in F[x]$ then $A$ is isomorphic to the étale algebra $F[x]/(f(x))$ where $f(x) = f_1(x)\cdot \cdots \cdot f_n(x)$. The polynomial $f(x)$ is then referred to as the `defining polynomial` of $A$.
 
 ///# Étale algebras over $\mathbb{Q}$
 /// Currently we have implemented in MAGMA the type `AlgEtQ` which corresponds to étale algebras over the rational field $\mathbb{Q}$.
@@ -41,7 +41,7 @@ declare attributes AlgEtQ : DefiningPolynomial,
 /// For such an algebra, the base field coincides with the prime field $\mathbb{Q}$.
 
 intrinsic EtaleAlgebra(seq::SeqEnum[FldNum]) -> AlgEtQ
-{Given a sequence of number fields which are absolute extensions of the rational field, returns the étale algebra corresponding to the direct product. The number fields with DefiningPolynomial of degree one need to created with DoLinearExtension set to true.}
+{Given a sequence of number fields which are absolute extensions of the rational field, returns the étale algebra corresponding to the direct product. The number fields with DefiningPolynomial of degree one need to be created with DoLinearExtension set to true.}
 // funny stuff: ExtendedType([NumberField(g[1]) : g in Factorization(f)]); for
 // f:=(x^8+16)*(x^8+81); returns SeqEnum[FldNum] and not SeqEnum[FldNum[FldRat]]
     require #seq gt 0 : "at least one number field is needed";
@@ -54,9 +54,9 @@ intrinsic EtaleAlgebra(seq::SeqEnum[FldNum]) -> AlgEtQ
 end intrinsic;
 
 
-/// Given a polynomial with integer of rational coefficients, which is squarefree, that is, with no repeated complex roots, returns the étale algebra which is the product of the number fields defined by the irreducible factors of the polynomial.
+/// Given a polynomial with integer or rational coefficients, which is squarefree, that is, with no repeated complex roots, returns the étale algebra which is the product of the number fields defined by the irreducible factors of the polynomial.
 intrinsic EtaleAlgebra(f::RngUPolElt[RngQZ]) -> AlgEtQ
-{Given a squarefree polynomial with integer of rational coefficients returns the product of the number fields defined by the irreducible factors.}
+{Given a squarefree polynomial with integer or rational coefficients returns the product of the number fields defined by the irreducible factors.}
     require IsSquarefree(f) : "The polynomial must be squarefree.";
     A:=EtaleAlgebra([NumberField(g[1]: DoLinearExtension) : g in Factorization(f)]);
     // DoLinearExtension is to avoid issues with g's of degree 1.

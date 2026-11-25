@@ -28,8 +28,8 @@ declare attributes AlgEtQ : PlacesAboveRationalPrime;
 
 ///## Primes
 /// Let $S$ be an order in an étale algebra $A$. A `prime` of $S$ is a maximal ideal of $S$, that is, an integral fractional ideal $\mathfrak{p}$ such that $S/\mathfrak{p}$ is a field.
-/// It is well-known that a prime $\mathfrak{p}$ of $S$ is invertible if and only if $\mathfrak{p}$ does not contain the conductor of $S$. Such primes are also called `regular`. A prime which in non-invertible is also called `singular`.
-/// In particular, there is only finitely many singular primes.
+/// It is well-known that a prime $\mathfrak{p}$ of $S$ is invertible if and only if $\mathfrak{p}$ does not contain the conductor of $S$. Such primes are also called `regular`. A prime which is non-invertible is also called `singular`.
+/// In particular, there are only finitely many singular primes.
 
 intrinsic IsPrime(I::AlgEtQIdl) -> BoolElt
 {Returns whether the given integral fractional ideal is a prime of its order of definition.}
@@ -116,7 +116,10 @@ intrinsic PrimesAbove(I::AlgEtQIdl) -> SeqEnum[AlgEtQIdl]
                 O:=MaximalOrder(Algebra(I));
                 IO:=O!!I;
                 fac:=Factorization(IO);
-                primes:= Setseq({ PrimeBelow(S,PO[1]) : PO in fac }); //remove doubles
+                // The set removes the repetitions (several primes of O can be above the same prime
+                // of S). Its order depends on the hash values of the primes, so the order of the
+                // output of PrimesAbove is not otherwise meaningful.
+                primes:= Setseq({ PrimeBelow(S,PO[1]) : PO in fac });
                 for i in [1..#primes] do
                     P:=primes[i];
                     P`IsPrime:=true;

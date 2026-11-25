@@ -205,7 +205,6 @@ end intrinsic;
         Append(~out1,e);
     end for;
     printf ".";
-    // old code ~14 secs. new code ~7 secs. w/o profiler
 
     // test 2
     out2:=[];

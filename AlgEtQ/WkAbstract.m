@@ -30,7 +30,7 @@ declare attributes AlgEtQWECMElt : Parent,
                                    HashValue; // the integer returned by Hash
 
 ///## Abstract representation of the weak equivalence class monoid.
-/// The second method to compute $\mathcal{W}(R)$ returns an abstract representation of the monoid together with a map giving representatives. The monoid is of type `AlgEtQWECM` and each class is of type `AlgEtQWECMElt`. Classes can be created by feeding to the operator `!` a fractional $S$-ideal, when $S$ is an overorder of $R$ or an overorder of $R$.
+/// The second method to compute $\mathcal{W}(R)$ returns an abstract representation of the monoid together with a map giving representatives. The monoid is of type `AlgEtQWECM` and each class is of type `AlgEtQWECMElt`. Classes can be created by feeding to the operator `!` an overorder $S$ of $R$, or a fractional $S$-ideal for an overorder $S$ of $R$.
 /// Whenever a class is created a representative is stored in an attribute.
 /// This representative can be changed using the intrinsic `SetRepresentative`.
 /// Classes can be multiplied using the operator `*`. Whenever two classes are multiplied, the result is stored in the attribute `MultiplicationTable` of the monoid.
@@ -219,7 +219,7 @@ end intrinsic;
 // AlgEtQWECM : computation/creation //
 ///////////////////////////////////////
 
-/// Given an order $R$, returns the weak equivalence class monoid $W$ of $R$ together with a map (with preimages) sending each class of $W$ to a representative (determined by WeakEquivalenceClassMonoid).}
+/// Given an order $R$, returns the weak equivalence class monoid $W$ of $R$ together with a map (with preimages) sending each class of $W$ to a representative (determined by WeakEquivalenceClassMonoid).
 intrinsic WeakEquivalenceClassMonoidAbstract(R::AlgEtQOrd) -> AlgEtQWECM,Map
 {Given an order R, returns the weak equivalence class monoid W of R together with a map (with preimages) sending each class of W to a representative (determined by WeakEquivalenceClassMonoid).}
     if not assigned R`WKICMAbstractRep then

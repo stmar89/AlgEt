@@ -40,7 +40,7 @@ import "PowerBass.m" : is_pure_power_internal;
 //------------
 
 intrinsic IsIsomorphic(I::AlgEtQMod,J::AlgEtQMod : Method:="Magma",UseSpecializedMethod:=true) -> BoolElt
-{Given two modules I and J returns wheater they are isomorphic.
+{Given two modules I and J returns whether they are isomorphic.
 The vararg UseSpecializedMethod (default true) triggers the use of specialized code in the following two special cases: when I and J are fractional ideals, or when they are modules in V over a Bass order S in K with V = K^s for some s.
 The vararg Method allows to choose if the isomorphism testing is done with "Magma", very slow, or with the Hecke/Nemo package for julia, which is much faster.
 To use the latter option, install julia, add the package Hecke and build the package.

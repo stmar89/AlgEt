@@ -121,7 +121,7 @@ intrinsic LoadWKICM(str::MonStgElt) -> AlgEtQOrd
             IS`IsInvertible:=iI eq 1; //only the first is invertible
             Append(~wkS,IS);
             IR:=R!!IS;
-            Append(~wkR,IR); //attributes are already moved
+            Append(~wkR,IR); // R!!IS keeps the Z-basis, the multiplicator ring and the hash of IS
         end for;
         S`WKICM_bar:=wkS;
     end for;

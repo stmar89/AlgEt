@@ -92,7 +92,7 @@ end function;
 
 /// Given a fractional $O$-ideal $I$ and a positive integer $N$, returns all the fractional $O$-ideals $J$ satisfying $J \subseteq I$ and $[I:J]=N$. The intrinsic is very fast if $N$ is coprime to the conductor of $O$. If this condition is not satisfied, a slower algorithm is used. One can force the slow algorithm by setting the parameter `Method:="Slow"`.
 intrinsic IdealsOfIndex(I::AlgEtQIdl, N::RngIntElt : Method := "Default") -> SeqEnum[AlgEtQIdl]
-{Given a fractional O-ideal I and a positive integer N, returns all the fractional O-ideals J satisfying  J subseteq I and [I:J]=N. The intrinsic is very fast if N is coprime to the conductor of O. If this condition is not satisfied a slower algorithm. One can force the slow algorithm by setting the parameter Method:="Slow".}
+{Given a fractional O-ideal I and a positive integer N, returns all the fractional O-ideals J satisfying J subseteq I and [I:J]=N. The intrinsic is very fast if N is coprime to the conductor of O. If this condition is not satisfied a slower algorithm. One can force the slow algorithm by setting the parameter Method:="Slow".}
     require Method in {"Default","Slow"} : "The method is not recognized. It should be either Default or Slow";
     require N gt 0 : "N must be a strictly positive integer";
     if N eq 1 then

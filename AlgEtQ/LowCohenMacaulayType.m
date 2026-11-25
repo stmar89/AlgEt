@@ -27,7 +27,7 @@ import "Ord.m" : all_but_one;
 /// This is equivalent to every fractional $R$-ideal $I$ with $(I:I)=R$ being invertible.
 ///
 /// The order $R$ is `Bass at the prime` $\mathfrak{p}$ if every overorder $S$ of $R$ is Gorenstein at the finitely many primes above $\mathfrak{p}$. The order $R$ is `Bass` if it is so at all (singular) primes.
-/// One can show that $R$ is Bass at $\mathfrak{p}$ if and only if $\dim_{R/\mathfrak{p}}(\mathcal{O_A}/\mathfrak{p}\mathcal{O}_A)\leq 2$, where $\mathcal{O}_A$ is the maximal order of $A$.
+/// One can show that $R$ is Bass at $\mathfrak{p}$ if and only if $\dim_{R/\mathfrak{p}}(\mathcal{O}_A/\mathfrak{p}\mathcal{O}_A)\leq 2$, where $\mathcal{O}_A$ is the maximal order of $A$.
 ///
 /// Reference: Stefano Marseglia, "Cohen-Macaulay type of orders, generators and ideal classes", Journal of Algebra 658 (2024), 247-276.
 
@@ -225,11 +225,11 @@ wkicm_bar_CM_type2:=function(S,pp)
         pows:=[];
         for P in pp do
             _,p,e:=IsPrimePower(Integers()!Index(S,P)); // e=Valuation(p,Index(S,P));
-            m:=Valuation(Index(S,I),p) div e; // Here we are using Proposition 4.2 of Klueners and
-                                              // Pauli
-                                              // "Computing residue class rings ...".
-                                              // With such an m we have:
-                                              //   pp[i]^m \subseteq I_pp[i]
+            // By Proposition 4.2 of Klueners and Pauli "Computing residue class rings ...", with
+            // this m we have P^m \subseteq I locally at P. The exponent uses the valuation at p of
+            // the global index [S:I], which is at least the local one at P: m may be larger than
+            // needed, which is harmless.
+            m:=Valuation(Index(S,I),p) div e;
             Append(~pows,P^m);
         end for;
         // pows_hat[i] is the intersection of the pows[j] with j ne i (coprime ideals, so we can use
@@ -254,7 +254,7 @@ end function;
     f:=x^4-10000*x^3-10000*x^2-10000*x-10000;
     A:=EtaleAlgebra(f);
     E:=EquationOrder(A);
-    oo:=FindOverOrders(E); // ~13 secs
+    oo:=FindOverOrders(E);
     assert #oo eq 297;
     for S in oo do
         pp:=SingularPrimes(S);

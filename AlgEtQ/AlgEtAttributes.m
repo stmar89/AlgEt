@@ -83,7 +83,7 @@ intrinsic HasBaseField(A::AlgEtQ) -> BoolElt
     return A`HasBaseField;
 end intrinsic;
 
-/// Returns whether the common base field of the components of $A$ if it exists, together with the diagonal embedding.
+/// Returns the common base field of the components of $A$, if it exists, together with the diagonal embedding.
 intrinsic BaseField(A::AlgEtQ) -> FldNum,Map
 {Returns the common base field of the components of the étale algebra, if it exists, together with the diagonal embedding.}
     if not assigned A`BaseField then

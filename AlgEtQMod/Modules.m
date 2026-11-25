@@ -60,7 +60,7 @@ import "../AlgEtQ/Quotients.m" : quotient_from_zbases;
 //----------
 
 CreateAlgEtQMod:=function(S,m,gens)
-// Given S::AlgEtQOrd and some generateors creates the new object 
+// Given S::AlgEtQOrd and some generators creates the new object 
 // m:Algebra(S)->Parent(gens[1]) determine the action
 // Here we just assign the generators. we do not compute the Zbasis unless necessary!
     I:=New(AlgEtQMod);
@@ -69,7 +69,7 @@ CreateAlgEtQMod:=function(S,m,gens)
     I`Order:=S;
     gens:=Setseq(Seqset(gens));
     if #gens gt AbsoluteDimension(V) then
-        vprintf AlgEtQIdl,3: "too many gens";
+        vprintf AlgEtQMod,3: "too many gens";
         gens:=[g*m(s) : g in gens, s in ZBasis(S) ];
         H,d:=lattice_hnf(gens);
         zb:=MatrixQtoA(V,(1/d)*crZQ(H));
@@ -115,7 +115,7 @@ intrinsic ModuleFromDirectSum(R::AlgEtQOrd,m::Map,seq::SeqEnum[Tup])->AlgEtQMod
     AR:=Algebra(R);
     UA:=Codomain(m);
     assert m(One(AR)) eq One(UA);
-    require AR eq Domain(m) : "the map does not have Algebra(R) as codomain";
+    require AR eq Domain(m) : "the map does not have Algebra(R) as domain";
     require forall{I : I in seq | Order(I[1]) eq R } : "the fractional ideals are not R ideals";
     if forall{I : I in seq | Type(I[2]) eq Map } then
         require forall{I : I in seq | Domain(I[2]) eq AR and Codomain(I[2]) eq UA } : "the sequence is not valid for this constructor";

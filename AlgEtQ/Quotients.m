@@ -165,7 +165,7 @@ end intrinsic;
 /// - $J \subseteq I$ and $I/J$ is a vector space $V$ over $K$, say of dimension $d$.
 /// The intrinsic returns the $K$-vector space $K^d=V$ and the natural surjection $I \to V$ (with preimages).
 intrinsic QuotientVS(I::AlgEtQOrd, J::AlgEtQOrd, P::AlgEtQIdl) -> ModRng, Map
-{Let I, J be orders, P a fractional R-ideals such that:
+{Let I, J be orders, P a fractional R-ideal such that:
  - P is prime of some order R, with residue field K;
  - J subset I and I/J is a vector space V over K, say of dimension d.
  The function returns the KModule K^d=V and the natural surjection I->V (with preimages).}

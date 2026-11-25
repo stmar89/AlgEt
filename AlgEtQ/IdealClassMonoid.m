@@ -26,7 +26,7 @@ declare attributes AlgEtQOrd:   ICM,
 /// We have a partitioning $\mathcal{I}(R) = \bigsqcup_S \mathcal{I}_S(R)$ where the disjoint union is taken over the overorders $S$ of $R$ and $\mathcal{I}_S(R)$ is the subset of $\mathcal{I}(R)$ consisting of ideal classes with multiplicator ring $S$.
 /// The computation is then performed by first computing $\mathcal{W}(R)$ and then observing that for each overorder $S$ of $R$, the Picard group $\mathrm{Pic}(S)$ acts freely on $\mathcal{I}_S(R)$ with quotient space $\mathcal{W}_S(R)$.
 
-/// Given an order $S$, returns a sequence of fractional $S$-ideals representing the ideal classes. The parameter `GRH`  determines whether the computation of the Picard groups of the overorders of $S$ is done using the GRH bound.
+/// Given an order $S$, returns a sequence of fractional $S$-ideals representing the ideal classes. The parameter `GRH` determines whether the computation of the Picard groups of the overorders of $S$ is done using the GRH bound.
 intrinsic IdealClassMonoid(S::AlgEtQOrd : GRH:=false ) -> SeqEnum
 {Given an order S, returns a sequence of fractional S-ideals representing the ideal classes. The parameter GRH  determines whether the computation of the Picard groups of the overorders of S is done using the GRH bound.}
     return ICM(S : GRH:=GRH);

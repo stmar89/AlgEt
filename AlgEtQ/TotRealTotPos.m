@@ -57,11 +57,16 @@ end function;
 // IsTotallyReal, IsTotallyRealPositive
 //////////////////////////
 
+///## Totally real and totally positive elements and units
+/// Let $K$ be a CM-étale algebra, and $F$ its totally real subalgebra (see `TotallyRealSubAlgebra`). The totally real and the totally positive elements are defined in the section on complex conjugation above. For an order $S$ in $K$, the totally real units of $S$ and the totally positive ones are returned as subgroups of the group $S^*$ given by `UnitGroup(S)`. They are computed without writing down the units of $S$, so they work also when $S^*$ has a huge index in the unit group of the maximal order.
+
+/// Returns whether $a$ is totally real.
 intrinsic IsTotallyReal(a::AlgEtQElt) -> BoolElt
 {Returns whether a is totally real.}
     return a eq ComplexConjugate(a);
 end intrinsic;
 
+/// Returns whether $a$ is totally positive, that is, totally real and with positive image under every homomorphism $\varphi:A\to\mathbb{C}$.
 intrinsic IsTotallyRealPositive(a::AlgEtQElt) -> BoolElt
 {Returns whether a is totally positive, that is, totally real and with positive image in CC.}
     return IsTotallyReal(a) and forall{ h : h in HomsToC(Parent(a)) | Re(h(a)) gt 0 };
@@ -71,6 +76,7 @@ end intrinsic;
 // Totally Real SubAlgebra
 //////////////////////////
 
+/// Given a CM-étale algebra $K$, returns its unique totally real subalgebra $F$, together with an embedding $F\to K$.
 intrinsic TotallyRealSubAlgebra(K::AlgEtQ) -> AlgEtQ,Map
 {Given a CM algebra K, returns the unique totally real subalgebra, with an embedding.}
     if not assigned K`TotallyRealSubAlgebra then
@@ -95,8 +101,9 @@ end intrinsic;
 // Totally Real Units
 //////////////////////////
 
+/// Given an order $S$ in a CM-étale algebra, returns the group of totally real units of $S$, as a subgroup of $S^*$.
 intrinsic TotallyRealUnitGroup(S::AlgEtQOrd) -> Grp
-{Given an order S in a CM étale algebra A returns the group of totally real units of S, as a subgroup of S^*.}
+{Given an order S in a CM étale algebra, returns the group of totally real units of S, as a subgroup of S^*.}
     if not assigned S`TotallyRealUnitGroup then
         F,FtoK,UF,uF,US,UK,uK:=totally_real_units_data(S);
         UFtoUK:=hom< UF->UK | [ (FtoK(uF(UF.i))@@uK) : i in [1..Ngens(UF)]]>;
@@ -140,8 +147,9 @@ debug_test:=function(S,S_tot_pos_in_US)
     return Htp eq S_tot_pos_in_US;
 end function;
 
+/// Given an order $S$ in a CM-étale algebra, returns the group of totally positive units of $S$, as a subgroup of $S^*$.
 intrinsic TotallyRealPositiveUnitGroup(S::AlgEtQOrd) -> Grp
-{Given an order S in a CM étale algebra. Returns the group of totally positive totally real units of S, as a subgroup of S^*.}
+{Given an order S in a CM étale algebra, returns the group of totally positive totally real units of S, as a subgroup of S^*.}
     if not assigned S`TotallyRealPositiveUnitGroup then
         F,FtoK,UF,uF,US,UK,uK:=totally_real_units_data(S);
         FF2:=FiniteField(2);

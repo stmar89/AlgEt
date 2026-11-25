@@ -62,7 +62,7 @@ intrinsic IsCoercible(icm::AlgEtQICM, x::.) -> BoolElt, .
     if Parent(x) cmpeq icm then
         return true,x;
     elif Type(x) eq AlgEtQICMElt and Order(icm) subset Order(Parent(x)) then
-        return true,(RepresentativeMap(Parent(x))(x))@@RepresentativeMap(icm);
+        return true,(Order(icm)!!RepresentativeMap(Parent(x))(x))@@RepresentativeMap(icm);
     elif Type(x) eq AlgEtQIdl and Order(icm) subset Order(x) then
         return true,(Order(icm)!!x)@@RepresentativeMap(icm);
     elif Type(x) eq AlgEtQOrd and Order(icm) subset x then
@@ -421,6 +421,12 @@ end intrinsic;
     assert not IsIdentical(icm1,icm2) and IsIdentical(icm2,icm3) and #icm2 eq #icm1;
     printf ".";
 
+    // classes of the monoid of an overorder are coerced
+    _<x>:=PolynomialRing(Integers());
+    A:=EtaleAlgebra(x^2+1); O:=MaximalOrder(A); i:=PrimitiveElement(A); E:=Order([3*i]);
+    icmE:=IdealClassMonoidAbstract(E); icmO:=IdealClassMonoidAbstract(O);
+    assert IsCoercible(icmE,One(icmO)) and icmE!One(icmO) eq icmE!OneIdeal(O);
+    printf ".";
     SetAssertions(1);
     printf " all good!";
 */

@@ -102,7 +102,8 @@ intrinsic ChineseRemainderTheorem(I::AlgEtQIdl,J::AlgEtQIdl,a::AlgEtQElt,b::AlgE
         cc:=Partition(Eltseq(cc),n);
         cs:=[ DotProduct(cc[i],zIs[i]) : i in [1..N] ];
         vprintf CRT,2 : "c1,c2=\n%o\n",cs;
-        // cs[i] in Is[i] and \sum_i cs[i] = 1
+        // cs[i] in Is[i] by construction, and \sum_i cs[i] = 1 if and only if I and J are coprime
+        require &+cs eq One(K) : "the ideals must be coprime";
     else
         //1 = g = \sum_i c1s[i]*Is_min[i]
         cs:=[c1s[i]*Is_min[i] : i in [1..N]];// only integers here. very fast
@@ -150,6 +151,7 @@ intrinsic ChineseRemainderTheoremFunctions(Is::SeqEnum[AlgEtQIdl])-> Map,Map
         Append(~quots,QI);
         Append(~maps,qI);
     end for;
+    require #Q eq &*[ #QI : QI in quots ] : "the ideals must be pairwise coprime";
     D,embs,projs:=DirectSum(quots);
     assert2 IsIsomorphic(D,Q);
     isom:=iso<Q->D | [ &+[embs[j](maps[j](Q.i@@q)) : j in [1..#Is]] : i in [1..Ngens(Q)] ]>;
@@ -267,6 +269,13 @@ end intrinsic;
     assert #PicardGroup(T) eq 192;
     printf ".";
 
+    // ideals that are not coprime are refused
+    _<x>:=PolynomialRing(Integers());
+    A:=EtaleAlgebra(x^2+1); O:=MaximalOrder(A);
+    P:=PrimesAbove(2*OneIdeal(O))[1];
+    failed:=false; try _:=ChineseRemainderTheorem(P,P,One(A),Zero(A)); catch e failed:=true; end try; assert failed;
+    failed:=false; try _:=ChineseRemainderTheoremFunctions([P,P]); catch e failed:=true; end try; assert failed;
+    printf ".";
     SetAssertions(1);
     printf " all good!";
 

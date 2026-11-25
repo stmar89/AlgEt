@@ -82,7 +82,22 @@ intrinsic TotallyRealSubAlgebra(K::AlgEtQ) -> AlgEtQ,Map
     if not assigned K`TotallyRealSubAlgebra then
         require HasComplexConjugate(K) : "the algebra does not have CM ";
         a:=PrimitiveElement(K);
-        b:=a+ComplexConjugate(a);
+        ac:=ComplexConjugate(a);
+        // b must generate the totally real subalgebra K^+: since b is in K^+, this holds if and only
+        // if its minimal polynomial has degree dim(K)/2. a+conj(a) is tried first, but it can fail,
+        // e.g. it is 0 when a has trace 0 in every component (as for x^2+d): then other elements of
+        // K^+ are tried, in a fixed order.
+        half:=Dimension(K) div 2;
+        ts:=[ a^k+ac^k : k in [1..Dimension(K)-1] ];
+        cands:=[ ts[1], a*ac ] cat ts[2..#ts] cat [ ts[1]+j*t : t in ts[2..#ts] cat [a*ac], j in [1..10] ];
+        found:=false;
+        for c in cands do
+            if Degree(MinimalPolynomial(c)) eq half then
+                b:=c; found:=true;
+                break;
+            end if;
+        end for;
+        require found : "no generator of the totally real subalgebra found";
         F:=EtaleAlgebra(MinimalPolynomial(b));
         dim:=Dimension(F);
         bF:=PrimitiveElement(F);
@@ -228,6 +243,13 @@ end intrinsic;
     E:=EquationOrder(A);
     assert Invariants(TotallyRealUnitGroup(E)) eq [2,0,0,0,0];
     assert Invariants(TotallyRealPositiveUnitGroup(E)) eq [0,0,0,0];
+    // a+conj(a) does not always generate the totally real subalgebra (it is 0 for these)
+    _<x>:=PolynomialRing(Integers());
+    for f in [ (x^2+1)*(x^2+2), x^4+6*x^2+1 ] do
+        F,FtoK:=TotallyRealSubAlgebra(EtaleAlgebra(f));
+        assert Dimension(F) eq 2;
+    end for;
+    printf ".";
     SetAssertions(1);
     printf " all good!";
 */

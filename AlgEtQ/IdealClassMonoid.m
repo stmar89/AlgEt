@@ -11,8 +11,12 @@
 
 freeze;
 
+// Both are stored as <list, GRH>, where GRH says whether some Picard group was computed under GRH:
+// see valid_for in PicardGroup.m.
 declare attributes AlgEtQOrd:   ICM,
                                 ICM_bar;
+
+import "PicardGroup.m" : valid_for;
 
 ///# Ideal class monoid
 /// Let $R$ be an order in an étale algebra $A$ over $\mathbb{Q}$. Ideal multiplication induces the structure of commutative monoid on the set of ideal classes of $R$, which we then call `ideal class monoid` of $R$.
@@ -35,21 +39,23 @@ end intrinsic;
 ///ditto
 intrinsic ICM(S::AlgEtQOrd : GRH:=false ) -> SeqEnum
 { " } // "
-    if not assigned S`ICM then
+    if not assigned S`ICM or not valid_for(S`ICM[2],GRH) then
         _:=WKICM(S); //to populate all attributes T`WKICM_bar
         seqOO:=OverOrders(S);
         seqICM:=[];
+        used_GRH:=false; // whether some Picard group was computed under GRH
         for T in seqOO do
             ICM_barT := [(S!!I) : I in ICM_bar(T: GRH:=GRH )];
+            used_GRH:=used_GRH or T`ICM_bar[2];
             seqICM:=seqICM cat ICM_barT;
         end for;
         assert forall{I: I in seqICM | Order(I) eq S};
         for I in seqICM do
             ZBasisLLL(I);
         end for;
-        S`ICM:=seqICM;
+        S`ICM:=<seqICM,used_GRH>;
     end if;
-    return S`ICM;
+    return S`ICM[1];
 end intrinsic;
 
 /// Given an order $S$, returns a sequence containing all representatives of the ideal classes of fractional $S$-ideals with multiplicator ring $S$.
@@ -61,9 +67,10 @@ end intrinsic;
 ///ditto
 intrinsic ICM_bar(S::AlgEtQOrd : GRH:=false ) -> SeqEnum
 { " } // "
-    if not assigned S`ICM_bar then
+    if not assigned S`ICM_bar or not valid_for(S`ICM_bar[2],GRH) then
         seqWKS_bar:=WKICM_bar(S);
         GS,gS:=PicardGroup(S : GRH:=GRH );
+        used_GRH:=S`PicardGroup[3]; // the stored Picard group can be one computed without GRH
         repS:=[gS(x) : x in GS];
         ICM_barS := &cat[[I*J : I in seqWKS_bar] : J in repS];
         for iI in [1..#ICM_barS] do
@@ -73,9 +80,9 @@ intrinsic ICM_bar(S::AlgEtQOrd : GRH:=false ) -> SeqEnum
         end for;
         assert2 forall{J : J in ICM_barS | MultiplicatorRing(J) eq S};
         assert forall{J : J in ICM_barS | Order(J) eq S};
-        S`ICM_bar:=ICM_barS;
+        S`ICM_bar:=<ICM_barS,used_GRH>;
     end if;
-    return S`ICM_bar;
+    return S`ICM_bar[1];
 end intrinsic;
 
 /* TESTS
@@ -96,6 +103,13 @@ end intrinsic;
         _:=ICM(E);
         printf ".";
     end for;
+    // a result computed under GRH is not returned when it is asked without GRH
+    _<x>:=PolynomialRing(Integers());
+    A:=EtaleAlgebra((x^2+5)*(x^2+7)); E:=EquationOrder(A);
+    L1:=ICM_bar(E : GRH:=true); assert E`ICM_bar[2];
+    L2:=ICM_bar(E); assert not E`ICM_bar[2] and not E`PicardGroup[3] and #L1 eq #L2;
+    L3:=ICM_bar(E : GRH:=true); assert IsIdentical(L2,L3); // an unconditional result is valid under GRH
+    printf ".";
     SetAssertions(1);
     printf " all good!";
 

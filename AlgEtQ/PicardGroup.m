@@ -60,8 +60,10 @@ declare attributes AlgEtQIdl: residue_class_ring_unit_subgroup_generators,
 /// Given an order $S$ and a fractional $S$-ideal $I$, returns the group $(S/I)^\times$ and a map $(S/I)^\times \to  S$ giving representatives. This is implemented only when $S$ is the maximal order.
 intrinsic ResidueRingUnits(S::AlgEtQOrd,I::AlgEtQIdl) -> GrpAb,Map
 {Given an order S and a fractional S-ideal, returns the group (S/I)^* and a map (S/I)^* -> S giving representatives. This is implemented only when S is the maximal order.}
+    // the attribute is stored in I, hence for Order(I) only: the order is checked also on cached calls
+    require Order(I) eq S : "I is not an S-ideal.";
     if not assigned I`ResidueRingUnits then
-        require Order(I) eq S and I subset OneIdeal(S) : "I is not a proper S-ideal.";
+        require I subset OneIdeal(S) : "I is not a proper S-ideal.";
         require IsMaximal(MultiplicatorRing(I)) : "the ideal needs to have maximal multiplicator ring.";
         maximal_order_case:=function(S,I)
         // if S is maximal
@@ -1201,6 +1203,12 @@ end intrinsic;
     S:=Order([ A!t : t in zb ]);
     P,p:=PicardGroup(S : GRH:=true);
     assert Invariants(P) eq [ 2, 8 ] and forall{ g : g in P | p(g)@@p eq g };
+    printf ".";
+    // ResidueRingUnits checks the order also when the result is cached
+    A:=EtaleAlgebra(x^2+1); O:=MaximalOrder(A); i:=PrimitiveElement(A); S:=Order([3*i]);
+    F:=Conductor(S); _:=ResidueRingUnits(S,F);
+    failed:=false; try _:=ResidueRingUnits(O,F); catch e failed:=true; end try; assert failed;
+    assert #ResidueRingUnits(O,O!!F) eq 8;
     printf ".";
     SetAssertions(1);
     printf " all good!";

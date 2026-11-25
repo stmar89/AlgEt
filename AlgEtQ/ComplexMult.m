@@ -43,6 +43,7 @@ intrinsic CMType(seq::SeqEnum[Map]) -> AlgEtQCMType
 {Given a sequence of homomorphisms from a CM-algebra to CC, one per conjugate pair, it returns the corresponding CMType.}
     A:=Domain(seq[1]);
     assert &and[Domain(s) eq A : s in seq[2..#seq]];
+    require HasComplexConjugate(A) : "the algebra must be a CM-algebra";
     g:=Dimension(A) div 2;
     assert #seq eq g;
     F:=PrimitiveElement(A);
@@ -230,6 +231,7 @@ end intrinsic;
 intrinsic AllCMTypes(A::AlgEtQ : Precision := _Precision(GetDefaultRealField()) ) -> SeqEnum[AlgEtQCMType]
 {Returns all the CM-types of the given étale algebra. The parameter Precision determines the precision of the output.}
     if not assigned A`AllCMTypes then
+        require HasComplexConjugate(A) : "the algebra must be a CM-algebra";
         // this uses the fact that if A HasComplexConjugation then HomsToC come in conjugate pairs
         cc:=CartesianProduct(Partition([ h: h in HomsToC(A : Precision := Precision )],2));
         cc:=[ [ci : ci in c] : c in cc ]; //from tuple to seq
@@ -289,6 +291,10 @@ end intrinsic;
         ChangePrecision(~PHI,20);
         assert Precision(PHI) eq 20 and PHI eq PHI0;
     end for;
+    printf ".";
+    // CM-types only for CM-algebras
+    _<x>:=PolynomialRing(Integers());
+    failed:=false; try _:=AllCMTypes(EtaleAlgebra(x^4+2)); catch e failed:=true; end try; assert failed;
     printf ".";
     SetAssertions(1);
     printf " all good!";

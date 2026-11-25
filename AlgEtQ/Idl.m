@@ -225,6 +225,12 @@ intrinsic '!!'(T::AlgEtQOrd,I::AlgEtQIdl) -> AlgEtQIdl
         elif to_mr and assigned I`ExtensionToMultiplicatorRing and IsIdentical(Order(I`ExtensionToMultiplicatorRing),T) then
             return I`ExtensionToMultiplicatorRing;
         end if;
+        if not (to_max or to_mr or Order(I) subset T) then
+            // Order(I) and T are not contained in each other: the generators of I over Order(I) do not
+            // generate I*T over T, while a Z-basis of I does. I*T is an Order(I)*T-module, so it is
+            // not invertible over T: no attributes are set.
+            return Ideal(T,ZBasis(I));
+        end if;
         out:=Ideal(T,Generators(I));
         if (assigned T`IsMaximal and IsMaximal(T)) or (assigned I`IsInvertible and IsInvertible(I)) then
             out`IsInvertible:=true;
@@ -585,6 +591,7 @@ intrinsic '*'(I::AlgEtQIdl , x::AlgEtQElt ) -> AlgEtQIdl
     if not bool then
         error "the element must be in the same algebra of I";
     else
+        require not IsZeroDivisor(x) : "the element must not be a zero-divisor";
         S:=Order(I);
         gens:=[i*x : i in Generators(I) ];
         id:=Ideal(S,gens);
@@ -1507,6 +1514,18 @@ end intrinsic;
     assert J2 eq Ideal(E,ZBasis(J)) and AbsoluteCoordinates([One(A)],J2) eq AbsoluteCoordinates([One(A)],J);
     printf ".";
 
+    // T!!I for orders T and Order(I) not contained in each other: the result is I*T
+    A:=EtaleAlgebra(x^2-2); O:=MaximalOrder(A); r:=PrimitiveElement(A);
+    S:=Order([2*r]); T:=Order([3*r]); // S*T = O
+    assert not S subset T and not T subset S;
+    assert T!!OneIdeal(S) eq Ideal(T,ZBasis(O));
+    I:=Ideal(S,[One(A),2*r]); _:=IsInvertible(I);
+    assert MultiplicatorRing(T!!I) eq O;
+    // x*I is refused for a zero-divisor x
+    A:=EtaleAlgebra((x^2+5)*(x^2+7)); E:=EquationOrder(A); pi:=PrimitiveElement(A);
+    I:=Ideal(E,[A!2,pi]); _:=ZBasis(I); e1:=OrthogonalIdempotents(A)[1];
+    failed:=false; try _:=e1*I; catch e failed:=true; end try; assert failed;
+    printf ".";
     SetAssertions(1);
     printf " all good!";
 */

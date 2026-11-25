@@ -325,9 +325,12 @@ intrinsic '!!'(T::AlgEtQOrd,I::AlgEtQMod) -> AlgEtQMod
         id:=Module(T,m,ZBasis(I));
         id`ZBasis:=ZBasis(I); //the ZBasis stays the same..
         return id;
-    else //in this case Order(I) is strictly contained in T
+    else
         _,m:=UniverseAlgebra(I);
-        out:=Module(T,m,Generators(I));
+        // If Order(I) is contained in T, the generators of I generate IT over T. Otherwise (the two
+        // orders are not contained in each other) a Z-basis of I does.
+        gens:=Order(I) subset T select Generators(I) else ZBasis(I);
+        out:=Module(T,m,gens);
         return out;
     end if;
 end intrinsic;
@@ -422,6 +425,13 @@ end intrinsic;
         assert forall{ z : z in zb | z in N2 }; // the inclusion matrix is the one of the new ZBasis
         assert forall{ z : z in ZBasis(N2) | q(z)@@q - z in J } and forall{ z : z in ZBasis(J) | q(z) eq Zero(Q) };
     end for;
+    printf ".";
+    // T!!M for orders T and Order(M) not contained in each other: the result is M*T
+    _<x>:=PolynomialRing(Integers());
+    A:=EtaleAlgebra(x^2-2); O:=MaximalOrder(A); r:=PrimitiveElement(A);
+    S:=Order([2*r]); T:=Order([3*r]); m:=NaturalAction(A,A);
+    M:=Module(S,m,[One(A)]);
+    assert T!!M eq Module(T,m,ZBasis(O));
     printf ".";
     SetAssertions(1);
     printf " all good!";

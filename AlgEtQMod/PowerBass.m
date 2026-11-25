@@ -308,8 +308,8 @@ intrinsic DirectSumRepresentation(M::AlgEtQMod)->SeqEnum[Tup]
         Rg:=Order(M);
         // AGstoUA:Ags^s->UA isomorphism
         is_pure_power,ones,AgstoUA,embs,projs:=is_pure_power_internal(mR);
-        Ags:=Domain(AgstoUA);
         require is_pure_power : "The universe algebra is not of the form K^r.";
+        Ags:=Domain(AgstoUA);
         Ag:=Algebra(Rg);
         n:=Dimension(Ag);
         s:=Dimension(Ags) div n;
@@ -655,6 +655,13 @@ end intrinsic;
     cl:=IsomorphismClassesOverBassOrder(R,2);
     assert #cl eq 3 and
            [ Index(MaximalOrder(A),compute_multiplicator_overorder(M)) : M in cl ] eq [ 2, 2, 1 ];
+    printf ".";
+    // a universe algebra which is not a power: the error of the require
+    _<x>:=PolynomialRing(Integers());
+    K1:=NumberField(x^2+5); K2:=NumberField(x^2+7);
+    K:=EtaleAlgebra([K1,K2]); V:=EtaleAlgebra([K1,K1,K2]); m:=NaturalAction(K,V);
+    M:=Module(EquationOrder(K),m,AbsoluteBasis(V));
+    failed:=false; try _:=DirectSumRepresentation(M); catch e failed:=Position(e`Object,"not of the form") gt 0; end try; assert failed;
     printf ".";
     SetAssertions(1);
     printf " all good!";

@@ -101,8 +101,17 @@ intrinsic IdealsOfIndex(I::AlgEtQIdl, N::RngIntElt : Method := "Default") -> Seq
     if Method eq "Slow" then
         test := false;
     else
-        test, dec := IsProductOfIdeals(MultiplicatorRing(I)!!I);
+        // The ideals are computed over T:=MultiplicatorRing(I): they are all the S-ideals of index N in I
+        // only if N is coprime to [T:S] too, besides the conductor of T.
+        T:=MultiplicatorRing(I);
+        test, dec := IsProductOfIdeals(T!!I);
+        if GCD(Integers()!Index(T,Order(I)), N) ne 1 then
+            test:=false;
+        end if;
         for J in dec do
+            if not test then
+                break;
+            end if;
             O := Order(J);
             OK := MaximalOrder(NumberField(O));
             index_OK_O := Index(OK, O);
@@ -162,6 +171,12 @@ end intrinsic;
             _:=IdealsOfIndex(E,N);
         end if;
     end for;
+    // the fast method is valid only if N is coprime also to [(I:I):Order(I)]
+    _<x>:=PolynomialRing(Integers());
+    A:=EtaleAlgebra(x^2+1); O:=MaximalOrder(A); i:=PrimitiveElement(A); E:=Order([2*i]);
+    I:=E!!OneIdeal(O);
+    assert #IdealsOfIndex(I,2) eq 3 and #IdealsOfIndex(I,2 : Method:="Slow") eq 3;
+    printf ".";
     SetAssertions(1);
     printf " all good!";
 */

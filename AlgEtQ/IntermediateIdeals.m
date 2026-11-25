@@ -221,7 +221,7 @@ In particular, the output contains I if and only if O = (I:I) = S. The output is
     require S eq Order(J) : "The ideals must be over the same order";
     require S subset O : "O is not an overorder of Order(I)";
     IO:=O!!I;
-    require MultiplicatorRing(I) subset O : "I is not an O-ideal";
+    require O subset MultiplicatorRing(I) : "I is not an O-ideal";
     queue:={@ I @};
     if MultiplicatorRing(I) eq S then
         output:={@ I @};
@@ -411,6 +411,13 @@ end intrinsic;
     printf ".";
     nn:=IntermediateIdeals(OneIdeal(O),O!!ff,O : PrescribedMultiplicatorRing:=true);
     assert OneIdeal(O) in nn;
+    printf ".";
+    // the order O must be contained in (I:I) (the check was the other way round)
+    _<x>:=PolynomialRing(Integers());
+    A:=EtaleAlgebra(x^2+1); O:=MaximalOrder(A); i:=PrimitiveElement(A); E:=Order([3*i]);
+    I:=E!!OneIdeal(O);
+    _:=IntermediateIdeals(I,3*I,E : PrescribedMultiplicatorRing:=true); // E c (I:I) = O: valid
+    failed:=false; try _:=IntermediateIdeals(OneIdeal(E),Conductor(E),O : PrescribedMultiplicatorRing:=true); catch e failed:=true; end try; assert failed;
     printf ".";
     SetAssertions(1);
     printf " all good!";

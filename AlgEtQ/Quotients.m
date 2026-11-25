@@ -34,22 +34,29 @@ coords_wrt:=function(seq, Minv)
     return [ Eltseq(r) : r in Rows(MatrixAtoQ(seq)*Minv) ];
 end function;
 
-/// Given a fractional ideal $I$ and the $\mathbb{Z}$-basis of an ideal or order $J$ such that $J \subseteq I$, returns the abelian group $Q=I/J$ together with the quotient map $q:I\to Q$.
-intrinsic Quotient(I::AlgEtQIdl, zbJ::SeqEnum[AlgEtQElt]) -> GrpAb, Map
-{Given a fractional ideal I and the ZBasis of an ideal or order J such that  J subset I, returns the abelian group Q=I/J together with the quotient map q:I->Q.}
-    // if J is not inside I, an error occurs while forming Q. so no need to check in advance
-    A:=Algebra(I);
-    require forall{ z : z in zbJ | Algebra(z) cmpeq A } : "the algebra is not the same";
-    Minv,zbI:=inclusion_matrix(I);
+quotient_from_zbases:=function(A, Minv, zbI, zbJ)
+// Given the Z-basis zbI of a lattice I in the algebra A (of an ideal, an order or a module), the
+// inverse Minv of its matrix (its inclusion matrix), and the Z-basis zbJ of a lattice J contained
+// in I, returns the abelian group Q=I/J and the quotient map q:A->Q, with preimages. It is shared
+// by Quotient for ideals and orders, and for modules (Modules.m). If J is not inside I, an error
+// occurs while forming Q, so there is no need to check in advance.
     N := #zbI;
     F := FreeAbelianGroup(N);
     rel := [F ! cc : cc in coords_wrt(zbJ,Minv)];
-    //mFI := map<F->A| x:->&+[Eltseq(x)[i]*zbI[i] : i in [1..N]]>;
     mFI := map<F->A| x:->DotProduct(Eltseq(x),zbI)>;
     mIF := map<A->F| x:-> F ! coords_wrt([x],Minv)[1]>;
     Q,qFQ := quo<F|rel>; //q:F->Q. Q is an "abstract" abelian group isomorphic to I/J.
     q:=map< A->Q | x:->qFQ(mIF(x)) , y:-> mFI(y@@qFQ) >;
     return Q,q;
+end function;
+
+/// Given a fractional ideal $I$ and the $\mathbb{Z}$-basis of an ideal or order $J$ such that $J \subseteq I$, returns the abelian group $Q=I/J$ together with the quotient map $q:I\to Q$.
+intrinsic Quotient(I::AlgEtQIdl, zbJ::SeqEnum[AlgEtQElt]) -> GrpAb, Map
+{Given a fractional ideal I and the ZBasis of an ideal or order J such that  J subset I, returns the abelian group Q=I/J together with the quotient map q:I->Q.}
+    A:=Algebra(I);
+    require forall{ z : z in zbJ | Algebra(z) cmpeq A } : "the algebra is not the same";
+    Minv,zbI:=inclusion_matrix(I);
+    return quotient_from_zbases(A,Minv,zbI,zbJ);
 end intrinsic;
 
 /// Given fractional ideals $I$ and $J$ such that $J \subseteq I$, returns the abelian group $Q=I/J$ together with the quotient map $q:I \to Q$.
@@ -61,19 +68,10 @@ end intrinsic;
 /// Given an order $S$ and the $\mathbb{Z}$-basis of an ideal or order $J$ such that $J \subseteq S$, returns the abelian group $Q=S/J$ together with the quotient map $q:S\to Q$.
 intrinsic Quotient(S::AlgEtQOrd, zbJ::SeqEnum[AlgEtQElt]) -> GrpAb, Map
 {Given an order S and the ZBasis of an ideal or order J such that J subset S, returns the abelian group Q=S/J together with the quotient map q:S->Q.}
-    // if J is not inside S, an error occurs while forming Q. so no need to check in advance
     A:=Algebra(S);
     require forall{ z : z in zbJ | Algebra(z) cmpeq A } : "the algebra is not the same";
     Minv,zbS:=inclusion_matrix(S);
-    N := #zbS;
-    F := FreeAbelianGroup(N);
-    rel := [F ! cc : cc in coords_wrt(zbJ,Minv)];
-    //mFS := map<F->A| x:->&+[Eltseq(x)[i]*zbS[i] : i in [1..N]]>;
-    mFS := map<F->A| x:->DotProduct(Eltseq(x),zbS)>;
-    mSF := map<A->F| x:-> F ! coords_wrt([x],Minv)[1]>;
-    Q,qFQ := quo<F|rel>; //q:F->Q. Q is an "abstract" abelian group isomorphic to S/J.
-    q:=map< A->Q | x:->qFQ(mSF(x)) , y:-> mFS(y@@qFQ) >;
-    return Q,q;
+    return quotient_from_zbases(A,Minv,zbS,zbJ);
 end intrinsic;
 
 /// Given an order $S$ and integral fractional $S$-ideal $I$, returns the abelian group $S/I$ and the quotient map $q:S \to S/I$ (with preimages). Important: the domain of $q$ is the parent algebra of $S$, since the elements of $S$ are expressed as elements of $A$. We stress that the output is a group and does not have a multiplication. This can be obtained by first taking preimages, doing the multiplication, and then applying the projection.

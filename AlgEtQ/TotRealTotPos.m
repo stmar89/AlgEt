@@ -32,6 +32,27 @@ units_of_S_in_units_of_O:=function(S)
     return US,uS,data`UO,data`uO;
 end function;
 
+totally_real_units_data:=function(S)
+// Given an order S in a CM algebra K, returns the totally real subalgebra F of K with its embedding
+// FtoK, the unit group UF,uF of the maximal order of F, US:=UnitGroup(S), and the unit group UK,uK
+// of the maximal order of K, of which US is a subgroup (see units_of_S_in_units_of_O). Shared by
+// TotallyRealUnitGroup and TotallyRealPositiveUnitGroup.
+    K:=Algebra(S);
+    F,FtoK:=TotallyRealSubAlgebra(K);
+    OF:=MaximalOrder(F); // computing OF is not optimal, and possibly avoidable
+                         // on the other hand, to compute US, one needs OK
+    UF,uF:=UnitGroup(OF); // uF:UF->F
+    US,_,UK,uK:=units_of_S_in_units_of_O(S); // US is a subgroup of UK
+    return F,FtoK,UF,uF,US,UK,uK;
+end function;
+
+meet_in_US:=function(H, US, UK)
+// Given subgroups H and US of UK, returns H meet US as a subgroup of US. The intersection is taken
+// in UK, and written in US by coercion: no unit of S is computed.
+    H_meet_US:=H meet US;
+    return sub<US| [ US!(UK!H_meet_US.i) : i in [1..Ngens(H_meet_US)] ]>;
+end function;
+
 //////////////////////////
 // IsTotallyReal, IsTotallyRealPositive
 //////////////////////////
@@ -77,17 +98,9 @@ end intrinsic;
 intrinsic TotallyRealUnitGroup(S::AlgEtQOrd) -> Grp
 {Given an order S in a CM étale algebra A returns the group of totally real units of S, as a subgroup of S^*.}
     if not assigned S`TotallyRealUnitGroup then
-        K:=Algebra(S);
-        F,FtoK:=TotallyRealSubAlgebra(K);
-        OF:=MaximalOrder(F); // computing OF is not optimal, and possibly avoidable
-                                // on the other hand, to compute US, one needs OK
-        UF,uF:=UnitGroup(OF); // uF:UF->F
-        US,uS,UK,uK:=units_of_S_in_units_of_O(S); // US is a subgroup of UK
+        F,FtoK,UF,uF,US,UK,uK:=totally_real_units_data(S);
         UFtoUK:=hom< UF->UK | [ (FtoK(uF(UF.i))@@uK) : i in [1..Ngens(UF)]]>;
-        // The intersection is taken in UK, and written in US by coercion: no unit of S is computed.
-        S_tot_real_in_UK:=Image(UFtoUK) meet US;
-        S_tot_real_in_US:=sub<US| [ US!(UK!S_tot_real_in_UK.i) : i in [1..Ngens(S_tot_real_in_UK)] ]>;
-        S`TotallyRealUnitGroup:=S_tot_real_in_US;
+        S`TotallyRealUnitGroup:=meet_in_US(Image(UFtoUK),US,UK);
     end if;
     return S`TotallyRealUnitGroup;
 end intrinsic;
@@ -130,22 +143,14 @@ end function;
 intrinsic TotallyRealPositiveUnitGroup(S::AlgEtQOrd) -> Grp
 {Given an order S in a CM étale algebra. Returns the group of totally positive totally real units of S, as a subgroup of S^*.}
     if not assigned S`TotallyRealPositiveUnitGroup then
-        K:=Algebra(S);
-        F,FtoK:=TotallyRealSubAlgebra(K);
-        OF:=MaximalOrder(F); // computing OF is not optimal, and possibly avoidable
-                                // on the other hand, to compute US, one needs OK
-        UF,uF:=UnitGroup(OF); // uF:UF->F
-        US,uS,UK,uK:=units_of_S_in_units_of_O(S); // US is a subgroup of UK
-
+        F,FtoK,UF,uF,US,UK,uK:=totally_real_units_data(S);
         FF2:=FiniteField(2);
         signs:=Matrix([[ Re(h(uF(UF.i))) gt 0 select (FF2!0) else (FF2!1) : h in HomsToC(F) ] : i in [1..Ngens(UF)]]);
         sol,ker:=Solution( signs , Vector([FF2!0 : i in [1..Dimension(F)]]));
         UF_tot_pos_gens:=   [ 2*UF.i : i in [1..Ngens(UF)] ] cat
                             [ &+[ sol[i]+k[i] eq 1 select UF.i else 0*UF.i : i in [1..Ngens(UF)] ] : k in Basis(ker)] ;
-        assert2 debug_test(OF,sub<UF|UF_tot_pos_gens>);
-        // The intersection is taken in UK, and written in US by coercion: no unit of S is computed.
-        S_tot_pos_in_UK:=sub<UK| [ g@uF@FtoK@@uK : g in UF_tot_pos_gens ]> meet US;
-        S_tot_pos_in_US:=sub<US| [ US!(UK!S_tot_pos_in_UK.i) : i in [1..Ngens(S_tot_pos_in_UK)] ]>;
+        assert2 debug_test(MaximalOrder(F),sub<UF|UF_tot_pos_gens>);
+        S_tot_pos_in_US:=meet_in_US(sub<UK| [ g@uF@FtoK@@uK : g in UF_tot_pos_gens ]>,US,UK);
         assert2 debug_test(S,S_tot_pos_in_US);
         S`TotallyRealPositiveUnitGroup:=S_tot_pos_in_US;
     end if;

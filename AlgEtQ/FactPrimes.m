@@ -203,7 +203,10 @@ function factorizationMaximalOrder(I)
             end for;
          end if;
     end for;
-    assert2 I eq &*[p[1]^p[2] : p in fac];
+    // The powers are formed by repeated products, not with '^': for an invertible ideal '^' calls
+    // TwoGeneratingSet, which can call CoprimeRepresentative, PrimesAbove and Factorization of an
+    // equal ideal again, an infinite recursion at assertion level 2 (Magma then crashes).
+    assert2 I eq &*[ &*[ p[1] : i in [1..p[2]] ] : p in fac ];
     return fac;
 end function;
 
@@ -233,7 +236,7 @@ intrinsic Factorization(I::AlgEtQIdl) -> Tup
                 Append(~facS, <P,pO[2]>);
             end for;
             assert2 #{ p[1] : p in facS } eq #facS; // the primes of S are distinct
-            assert2 I eq &*([ p[1]^p[2] : p in facS ]);
+            assert2 I eq &*[ &*[ p[1] : i in [1..p[2]] ] : p in facS ]; // no '^': see factorizationMaximalOrder
             I`Factorization:=facS;
         end if;
      end if;
@@ -345,6 +348,22 @@ end intrinsic;
         ok:=true;
     end try;
     assert ok;
+    printf ".";
+    // at assertion level 2, the check of a factorization formed the prime powers with '^', which for
+    // this ideal led to an infinite recursion (TwoGeneratingSet, CoprimeRepresentative, PrimesAbove,
+    // Factorization) and a crash of Magma; found by the timing test PicardGroup_1.8 at level 2
+    SetAssertions(2);
+    _<x>:=PolynomialRing(Integers());
+    A:=EtaleAlgebra(x^6-3*x^5-3*x^4+65*x^3-48*x^2-768*x+4096);
+    assert [ DefiningPolynomial(K) : K in Components(A) ] eq [ x^2-7*x+16, x^4+4*x^3+9*x^2+64*x+256 ];
+    zbS:=[ <[ 0, 0 ], [ -1/9, 1/48, 1/12, 11/144 ]>, <[ 0, 0 ], [ 0, -1/24, 1/6, -1/24 ]>,
+           <[ 0, 0 ], [ 1/9, 3/16, 1/12, 19/144 ]>, <[ 0, 0 ], [ 1/9, -1/6, 0, 5/18 ]>,
+           <[ 1, 0 ], [ 0, 0, 0, 0 ]>, <[ 0, 1 ], [ 0, 0, 0, 0 ]> ];
+    gI:=[ <[ 2, 0 ], [ 0, 0, 0, 0 ]>, <[ 3, 1 ], [ 0, 0, 0, 0 ]>, <[ 0, 0 ], [ 1, 0, 0, 0 ]> ];
+    S:=Order([ A!t : t in zbS ]);
+    I:=Ideal(S,[ A!t : t in gI ]);
+    TwoGeneratingSet(I);
+    assert #Generators(I) le 2 and I eq Ideal(S,Generators(I));
     printf ".";
     SetAssertions(1);
     printf " all good!";

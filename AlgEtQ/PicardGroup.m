@@ -139,7 +139,10 @@ intrinsic ResidueRingUnitsSubgroupGenerators(F::AlgEtQIdl) -> SeqEnum[AlgEtQElt]
         O:=MaximalOrder(A);
         Fm:=O!!F;
         l:=Factorization(Fm);
-        l2:=[ <(S!!x[1]) meet S,x[2]>: x in l];
+        // the primes of S below the primes of O in the factorization: PrimeBelow returns the stored
+        // primes of S, already marked as prime, so their residue fields are computed once (and
+        // IsPrime is not needed)
+        l2:=[ <PrimeBelow(S,x[1]),x[2]>: x in l];
         primes:={x[1]:x in l2};
         primes:=[<x, Maximum([y[2]: y in l2 |y[1] eq x])>:x in primes];
         primes_powers:=[ p[1]^p[2] : p in primes ];

@@ -66,12 +66,12 @@ Method should be of the form "julia -J /tmp/Hecke.so ~/path/to/AlgEt/" (the ".so
             if not test then
                 return false,_;
             else
-                assert Iid eq x*Jid;
+                assert2 Iid eq x*Jid;
                 m1:=dsr1[2](One(V));
                 m2:=dsr2[2](One(V));
                 isom:=Hom(V,V,[(b/m1)*(1/x)*m2 : b in AbsoluteBasis(V)]);
-                assert Module(S,m,[isom(z):z in ZBasis(I)]) eq J;
-                assert Module(S,m,[z@@isom:z in ZBasis(J)]) eq I;
+                assert2 Module(S,m,[isom(z):z in ZBasis(I)]) eq J;
+                assert2 Module(S,m,[z@@isom:z in ZBasis(J)]) eq I;
                 return true,isom;
             end if;
         end if;
@@ -207,8 +207,8 @@ Method should be of the form "julia -J /tmp/Hecke.so ~/path/to/AlgEt/" (the ".so
         str:="[\n";
         for i->I in candidates do
             mat:=Matrix(AbsoluteCoordinates([pi*z : z in ZBasis(I)],ZBasis(I)));
-            assert MinimalPolynomial(mat) eq min_poly;
-            assert CharacteristicPolynomial(mat) eq char_poly;
+            assert2 MinimalPolynomial(mat) eq min_poly;
+            assert2 CharacteristicPolynomial(mat) eq char_poly;
             str cat:=Sprintf("%o,\n", Eltseq(mat));
         end for;
         str:=Prune(Prune(str)) cat "\n]\n";
@@ -227,7 +227,7 @@ Method should be of the form "julia -J /tmp/Hecke.so ~/path/to/AlgEt/" (the ".so
             classes_k:=classes_O; 
         else
             _,Ik:=CoprimeRepresentative(pO(g),ff); // Ik+ff=O, Ik cap ff = Ik*ff
-            assert not IsPrincipal(Ik);
+            assert2 not IsPrincipal(Ik);
             test,Ik_prod:=IsProductOfIdeals(Ik);
             assert test;
             // MffIk = f1^(s1-1)+f1I1 + ... + fn^(sn-1)+fnIn

@@ -111,7 +111,7 @@ is_pure_power_internal:=function(m)
     Kr,embs,projs:=DirectProduct([K:i in [1..r]]);
     imgs:=[ &+[m(projs[i](b))*oneKs[i] : i in [1..r]] : b in AbsoluteBasis(Kr) ];
     isom:=Hom(Kr,V, imgs : ComputeInverse:=true);
-    assert forall{ b : b in AbsoluteBasis(Kr) | Inverse(isom)(isom(b)) eq b } and isom(One(Kr)) eq &+(oneKs);
+    assert2 forall{ b : b in AbsoluteBasis(Kr) | Inverse(isom)(isom(b)) eq b } and isom(One(Kr)) eq &+(oneKs);
     if not forall{z:z in AbsoluteBasis(K)|forall{p:p in projs|p(Inverse(isom)(m(z))) eq z}} then 
         // we test if m is the diag embedding
         return false,_,_,_,_;
@@ -156,7 +156,9 @@ intrinsic compute_multiplicator_overorder(M::AlgEtQMod)->AlgEtQOrd
         if assigned M`DirectSumRep then
             mult_rings:=[ MultiplicatorRing(J[1]) : J in M`DirectSumRep ];
             // is the smallest of the multiplicator rings
-            assert exists(mr){ T : T in mult_rings | forall{ S : S in mult_rings | T subset S }  };
+            // not an assert: the exists assigns mr, which would be skipped with SetAssertions(0)
+            found:=exists(mr){ T : T in mult_rings | forall{ S : S in mult_rings | T subset S }  };
+            assert found;
             assert mr in mult_rings;
             M`multiplicator_overorder:=mr;
         else
@@ -219,7 +221,7 @@ bass_factor:=function(gens_input,Rg,mAgs,embs,projs)
     repeat
         for k2 in [1..100] do
             gens:=MatrixQtoA(Ags,rU*gens_input_matrix);
-            assert has_same_Zspan_AlgEtQ(gens,gens_input);
+            assert2 has_same_Zspan_AlgEtQ(gens,gens_input);
             for ui in [1..#gens] do
                 u:=gens[ui];
                 if not IsZeroDivisor(u) then
@@ -249,7 +251,7 @@ bass_factor:=function(gens_input,Rg,mAgs,embs,projs)
     // generators of J^-1*M (not a ZBasis)
     gens_JinvM:=&cat[[ mAgs(j)*g :g in gens] : j in ZBasis(Jinv)];
     coeffsu_JinvM:=[ p_u(g) : g in gens_JinvM ]; // p_u(J^-1*M)
-    assert Ideal(Rg,coeffsu_JinvM) eq Ideal(Rg,ZBasis(S));
+    assert2 Ideal(Rg,coeffsu_JinvM) eq Ideal(Rg,ZBasis(S));
     A:=MatrixAtoQ(coeffsu_JinvM);
     d_A:=Denominator(A);
     AZ:=crQZ(d_A*A); 
@@ -284,18 +286,18 @@ bass_factor:=function(gens_input,Rg,mAgs,embs,projs)
     // We make J smaller, and modify v accordingly.
     J,sm:=SmallRepresentative(J);
     v:=v/mAgs(sm);
-    //TEST//
+    if GetAssertions() ge 2 then // only checks
         gens_Jv:=[ mAgs(j)*v : j in ZBasis(J)];
-        assert has_same_Zspan_AlgEtQ(gens_M0 cat gens_Jv,gens_input);
+        assert2 has_same_Zspan_AlgEtQ(gens_M0 cat gens_Jv,gens_input);
         assert #gens_M0 eq #gens - n;
         if not IsEmpty(gens_M0) then
-            assert Rank(MatrixAtoQ(gens_M0)) eq Rank(MatrixAtoQ(gens_input))-n;
-            assert Rank(Matrix([[p(g):p in projs]: g in gens_M0])) eq Rank(Matrix([[p(g):p in projs]: g in gens_input]))-1;
+            assert2 Rank(MatrixAtoQ(gens_M0)) eq Rank(MatrixAtoQ(gens_input))-n;
+            assert2 Rank(Matrix([[p(g):p in projs]: g in gens_M0])) eq Rank(Matrix([[p(g):p in projs]: g in gens_input]))-1;
         else
-            assert n eq Rank(MatrixAtoQ(gens_input));
-            assert 1 eq Rank(Matrix([[p(g):p in projs]: g in gens_input]));
+            assert2 n eq Rank(MatrixAtoQ(gens_input));
+            assert2 1 eq Rank(Matrix([[p(g):p in projs]: g in gens_input]));
         end if;
-    //END TEST//    
+    end if;    
     return J,v,gens_M0;
 end function;
 
@@ -354,7 +356,7 @@ intrinsic DirectSumRepresentation(M::AlgEtQMod)->SeqEnum[Tup]
                         [ &+[ mAg_Aloop(projs_loop[i](b))*m1[i] : i in [1..rank] ] : b in AbsoluteBasis(Aloop) ]);
                     // mAloop_Aold needs to send the i-th copy of 1_Ag to m1[i]. These copies are
                     // the orthogonal idempotents of Aloop only when Ag is a field.
-                    assert forall{ i : i in [1..rank] | mAloop_Aold(embs_loop[i](One(Ag))) eq m1[i] };
+                    assert2 forall{ i : i in [1..rank] | mAloop_Aold(embs_loop[i](One(Ag))) eq m1[i] };
                     mAloop_Ags:=mAloop_Aold*mAloop_Ags;
                     mAg_Aloop:=NaturalAction(Ag,Aloop);
                     gens_loop:=Rows(Solution(m1_mat,mI0)); //gens_loop*m1 eq mI0, as matrix
@@ -367,9 +369,9 @@ intrinsic DirectSumRepresentation(M::AlgEtQMod)->SeqEnum[Tup]
             // We need to push back all the v's from Ags to UA
             basisAg:=AbsoluteBasis(Ag);
             BC:= [ <bc[1],Hom(Ag,UA,[mR(basisAg[i])*AgstoUA(bc[2]): i in [1..Dimension(Ag)]]: ComputeInverse:=false)> : bc in bass_decompI ];
-            // TESTS //////////////////////////////////
+            if GetAssertions() ge 2 then // only checks: the sum is direct
                 BC_test:=[[ bc[2](z) : z in ZBasis(bc[1]) ] : bc in BC ];
-                assert has_same_Zspan_AlgEtQ( ZBasis(M) , &cat(BC_test)); // the sum is ok
+                assert2 has_same_Zspan_AlgEtQ( ZBasis(M) , &cat(BC_test)); // the sum is ok
                 assert forall{bc : bc in BC | Codomain(bc[2]) eq UA};
                 // test using abelian groups. I will test also the intersections
                 mat_gens:=MatrixAtoQ(ZBasis(M));
@@ -383,10 +385,10 @@ intrinsic DirectSumRepresentation(M::AlgEtQMod)->SeqEnum[Tup]
                     subF_Jv:=sub<F|gensF_Jv>;
                     Append(~subs,subF_Jv);
                 end for;
-                assert &+subs eq F; //the sum is ok
-                assert forall{H : H in subs | not exists{G : G in subs | G ne H and not IsTrivial(G meet H)}}; 
+                assert2 &+subs eq F; //the sum is ok
+                assert2 forall{H : H in subs | not exists{G : G in subs | G ne H and not IsTrivial(G meet H)}}; 
                     //the intersections are trivial, that is the sum is direct
-            // END TESTS //////////////////////////////////////
+            end if;
             assert forall{bc:bc in BC|Type(bc[1]) eq AlgEtQIdl};
             M`DirectSumRep:=BC;
         elif n eq Dimension(UA) then //squarefree case
@@ -550,8 +552,8 @@ intrinsic StandardDirectSumRepresentation(M::AlgEtQMod)->SeqEnum[Tup],Map
         if GetAssertions() gt 1 then
             gens_in:=&cat[[ mR(z)*D[2](oneAR) : z in ZBasis(D[1])] : D in DRS];
             gens_std:=&cat[[ mR(z)*D[2](oneAR) : z in ZBasis(D[1])] : D in M`StandardDirectSumRep[1]];
-            assert has_same_Zspan_AlgEtQ(ZBasis(M),gens_in);
-            assert has_same_Zspan_AlgEtQ([ map(g) : g in gens_in],gens_std);
+            assert2 has_same_Zspan_AlgEtQ(ZBasis(M),gens_in);
+            assert2 has_same_Zspan_AlgEtQ([ map(g) : g in gens_in],gens_std);
         end if;
         // end test
     end if;
@@ -588,12 +590,12 @@ intrinsic IsIsomorphicOverBassOrder( M1::AlgEtQMod, M2::AlgEtQMod )->BoolElt,Map
                 oneAR:=AR!1;
                 gens1:=&cat[[ mR(z)*D[2](oneAR) : z in ZBasis(D[1])] : D in Std1 ];
                 gens2:=&cat[[ mR(z)*D[2](oneAR) : z in ZBasis(D[1])] : D in Std2 ];
-                assert has_same_Zspan_AlgEtQ([map_x(g) : g in gens1] , gens2);
+                assert2 has_same_Zspan_AlgEtQ([map_x(g) : g in gens1] , gens2);
             end if;
             // end test
             map:=Hom(UA,UA,[ Inverse(mStd2)(map_x(mStd1(g))) : g in Basis(UA) ]);
             // TEST
-            assert has_same_Zspan_AlgEtQ([map(g) : g in ZBasis(M1)] , ZBasis(M2));
+            assert2 has_same_Zspan_AlgEtQ([map(g) : g in ZBasis(M1)] , ZBasis(M2));
             // end test
             return true,map;
          else
@@ -643,6 +645,16 @@ end intrinsic;
         printf ".";
     end for;
     assert not IsIsomorphic(M1,M2);
+    printf ".";
+
+    // compute_multiplicator_overorder from the DirectSumRep also with assertions off: the
+    // multiplicator ring was found inside an assert
+    SetAssertions(0);
+    A:=EtaleAlgebra(x^2+x+2);
+    R:=Order([2*PrimitiveElement(A)]);
+    cl:=IsomorphismClassesOverBassOrder(R,2);
+    assert #cl eq 3 and
+           [ Index(MaximalOrder(A),compute_multiplicator_overorder(M)) : M in cl ] eq [ 2, 2, 1 ];
     printf ".";
     SetAssertions(1);
     printf " all good!";

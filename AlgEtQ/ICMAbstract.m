@@ -259,6 +259,9 @@ end intrinsic;
 
 intrinsic 'eq'(icm1::AlgEtQICM,icm2::AlgEtQICM)->BoolElt
 {Returns whether the two ideal class monoid are the same, that is, if the underlying orders are so.}
+    if IsIdentical(icm1,icm2) then
+        return true;
+    end if;
     return Order(icm1) eq Order(icm2);
 end intrinsic;
 

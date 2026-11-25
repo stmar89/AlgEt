@@ -111,7 +111,7 @@ intrinsic ChineseRemainderTheorem(I::AlgEtQIdl,J::AlgEtQIdl,a::AlgEtQElt,b::AlgE
     e:=DotProduct(cs,ashat);
     assert2 forall{ cs : i in [1..N] | cs[i] in Is[i] };
     assert2 &+cs eq One(Algebra(S));
-    assert forall{ i : i in [1..N] | e-as[i] in Is[i]};
+    assert2 forall{ i : i in [1..N] | e-as[i] in Is[i]};
     vprintf CRT,2 : "all good!\n";
     return e;
 end intrinsic;
@@ -151,7 +151,7 @@ intrinsic ChineseRemainderTheoremFunctions(Is::SeqEnum[AlgEtQIdl])-> Map,Map
         Append(~maps,qI);
     end for;
     D,embs,projs:=DirectSum(quots);
-    assert IsIsomorphic(D,Q);
+    assert2 IsIsomorphic(D,Q);
     isom:=iso<Q->D | [ &+[embs[j](maps[j](Q.i@@q)) : j in [1..#Is]] : i in [1..Ngens(Q)] ]>;
     // isom : E1/&meet(Is) -> \prod_{I in Is} E1/I
     // is the natural isomorphism of E1 modules.
@@ -164,7 +164,7 @@ intrinsic ChineseRemainderTheoremFunctions(Is::SeqEnum[AlgEtQIdl])-> Map,Map
         return (&+[embs[j](maps[j](as[j])) : j in [1..N] ])@@isom@@q;
     end function;
     II:=&meet(Is);
-    assert forall{s : s in ZBasis(OS) | func2(func1(s)) -s in II};
+    assert2 forall{s : s in ZBasis(OS) | func2(func1(s)) -s in II};
     return func1,func2;
 end intrinsic;
 

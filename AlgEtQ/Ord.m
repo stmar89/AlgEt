@@ -479,6 +479,9 @@ end intrinsic;
 
 intrinsic 'eq'(O1::AlgEtQOrd,O2::AlgEtQOrd)->BoolElt
 {Checks equality of orders.}
+    if IsIdentical(O1,O2) then
+        return true;
+    end if;
     require Algebra(O1) cmpeq Algebra(O2) : "the orders must be defined in the same etale algebra";
     if
     //O1`Generators eq O2`Generators or O1`ZBasis eq O2`ZBasis or //this seems to be slowe
@@ -771,7 +774,7 @@ This is equivalent for the given order to contain some idempotents of the algebr
                 n+:=1;
             end while;
             assert #output eq D;
-            assert OneIdeal(S) eq Ideal(S , [ z*g : z in ZBasis(S) , g in output ]);
+            assert2 OneIdeal(S) eq Ideal(S , [ z*g : z in ZBasis(S) , g in output ]);
 
             S`IsProductOfOrdersInFactorAlgebras:=<true, output>;
         end if;

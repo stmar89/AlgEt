@@ -305,6 +305,9 @@ end intrinsic;
 
 intrinsic 'eq'(I::AlgEtQIdl , J::AlgEtQIdl ) -> BoolElt
 {Equality testing.}
+    if IsIdentical(I,J) then
+        return true;
+    end if;
     require Algebra(I) cmpeq Algebra(J) : "The ideals are not in the same algebra.";
     require Order(I) cmpeq Order(J) : "The ideals are not over the same order.";
     if  (not (assigned I`Hash and assigned J`Hash)) and
@@ -825,8 +828,8 @@ end intrinsic;
 
 intrinsic Inverse(I::AlgEtQIdl) ->AlgEtQIdl
 {Computes the inverse of a given invertible ideal.}
-    require IsInvertible(I) : "The ideal is not invertible in the order of definition";
     if not assigned I`Inverse then
+        require IsInvertible(I) : "The ideal is not invertible in the order of definition";
         O:=Order(I);
         COI:=ColonIdeal(O,I);
         COI`IsInvertible:=true;

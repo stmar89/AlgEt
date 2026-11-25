@@ -44,7 +44,7 @@ intrinsic IdealsOfIndex(I::RngOrdIdl, N::RngIntElt) -> SeqEnum[RngOrdIdl]
     require N gt 0 and GCD(index_OK_O, N) eq 1 : "N is not coprime with the conductor of Order(I)";
     Js := IdealsOfIndex(OK, N);
     ff:=OK !! Conductor(O);
-    assert forall{J : J in Js | J+ff eq 1*OK};
+    assert2 forall{J : J in Js | J+ff eq 1*OK};
     result := [];
     for J in Js do
             // OK/J=O/(J meet O)=I/K, where the second isomorphism holds because (J meet O) is

@@ -149,9 +149,9 @@ intrinsic TotallyRealPositiveUnitGroup(S::AlgEtQOrd) -> Grp
         sol,ker:=Solution( signs , Vector([FF2!0 : i in [1..Dimension(F)]]));
         UF_tot_pos_gens:=   [ 2*UF.i : i in [1..Ngens(UF)] ] cat
                             [ &+[ sol[i]+k[i] eq 1 select UF.i else 0*UF.i : i in [1..Ngens(UF)] ] : k in Basis(ker)] ;
-        assert2 debug_test(MaximalOrder(F),sub<UF|UF_tot_pos_gens>);
+        assert3 debug_test(MaximalOrder(F),sub<UF|UF_tot_pos_gens>);
         S_tot_pos_in_US:=meet_in_US(sub<UK| [ g@uF@FtoK@@uK : g in UF_tot_pos_gens ]>,US,UK);
-        assert2 debug_test(S,S_tot_pos_in_US);
+        assert3 debug_test(S,S_tot_pos_in_US);
         S`TotallyRealPositiveUnitGroup:=S_tot_pos_in_US;
     end if;
     return S`TotallyRealPositiveUnitGroup;

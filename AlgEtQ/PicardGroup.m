@@ -457,7 +457,7 @@ picard_group_maximal:=function(O, GRH)
     end function;
     inverse_map:=function(id)
         vprint AlgEtQPicardGroup, 2: "picard_group_maximal: inverse_map\n";
-        assert IsInvertible(id);
+        assert2 IsInvertible(id);
         // same ideal class, but integral and with a small Z-basis
         id:=SmallRepresentative(id);
         test,id_asprod:=IsProductOfIdeals(id);

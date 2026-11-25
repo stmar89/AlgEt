@@ -219,12 +219,13 @@ end intrinsic;
 /// Given an order $R$ and prime $P$ of $R$, returns the minimal overorders $S$ of R whose conductor $(R:S)$ is a $P$-primary ideal of $R$. The minimality assumption forces the conductor $(R:S)$ to be exactly $P$. The vararg `CheckIsKnownOrder` (default `true`) determines whether the output is checked against the global database of known orders. If it is set to `false`, the output is not stored in the attribute `MinimalOverOrders` of $R$. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.
 intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl : CheckIsKnownOrder:=true) -> SetIndx[AlgEtQOrd]
 {Given an order R and prime P of R, returns the minimal overorders S of R whose conductor (R:S) is a P-primary ideal of R. The minimality assumption forces the conductor (R:S) to be exactly P. The vararg CheckIsKnownOrder (default true) determines whether the output is checked against the global database of known orders. If it is set to false, the output is not stored in the attribute MinimalOverOrders of R. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.}
-    require IsPrime(P) : "The ideal P must be prime.";
+    // The order is checked before the lookup, which is keyed only by the prime. P is prime if it
+    // is found: the primality test is needed only when the minimal overorders are computed.
     require Order(P) eq R : "P must be an ideal of R";
-
     if assigned R`MinimalOverOrders and IsDefined(R`MinimalOverOrders,P) then
         return R`MinimalOverOrders[P]; // already computed
     end if;
+    require IsPrime(P) : "The ideal P must be prime.";
 
     output:={@ Universe({@ R @}) | @}; //empty set
     if not IsMaximalAtPrime(R,P) then
@@ -378,10 +379,12 @@ end intrinsic;
 /// Given an order $R$ and prime $P$ of $R$, returns $R$ and the overorders $S$ of $R$ with conductor $(R:S)$ which is $P$-primary. We recursively produce the minimal $Q$-overorders where $Q$ are primes above $P$. The output is sorted by decreasing `Index(S)`, which is the same as increasing index $[S:R]$, with ties broken using `myHash(S)`. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.
 intrinsic OverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> SeqEnum[AlgEtQOrd]
 {Given an order R and prime P of R, returns R and the overorders S of R with conductor (R:S) which is P-primary. We recursively produce the minimal PP-overorders where PP are primes above P. The output is sorted by decreasing Index(S), which is the same as increasing index [S:R], with ties broken using myHash(S). Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.}
-    require IsPrime(P) : "The ideal P must be prime.";
     require Order(P) eq R : "P must be an ideal of R";
     k:=Index(SingularPrimes(R),P);
     if k eq 0 then
+        // P is not a singular prime: R is maximal at P, if P is prime. A singular prime is prime,
+        // so the primality test is needed only here.
+        require IsPrime(P) : "The ideal P must be prime.";
         return [ R ]; // R is maximal at P
     end if;
     data:=local_overorders(R);

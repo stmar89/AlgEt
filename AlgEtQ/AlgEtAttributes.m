@@ -45,6 +45,11 @@ end intrinsic;
 
 intrinsic 'eq'(A1::AlgEtQ,A2::AlgEtQ) -> BoolElt
 {Two étale algebras are defined to be equal if they have the same components.}
+   // The same object: this is the common case (every equality of elements, orders and ideals starts
+   // by comparing their algebras), and comparing the components costs much more.
+   if IsIdentical(A1,A2) then
+       return true;
+   end if;
    c1,e1,p1:=Components(A1);
    c2,e2,p2:=Components(A2);
    return <c1,e1,p1> eq <c2,e2,p2>;

@@ -241,7 +241,9 @@ intrinsic WeakEquivalenceClassMonoidAbstract(R::AlgEtQOrd) -> AlgEtQWECM,Map
         preimg:=function(y)
             assert Order(y) eq R ;
             T:=MultiplicatorRing(y);
-            assert exists(I){w:w in arr[T]|IsWeaklyEquivalent(Ideal(w),y)};
+            // not an assert: the exists assigns I, which would be skipped with SetAssertions(0)
+            found:=exists(I){w:w in arr[T]|IsWeaklyEquivalent(Ideal(w),y)};
+            assert found;
             return I;
         end function;
 
@@ -284,6 +286,9 @@ end intrinsic;
 
 intrinsic 'eq'(W::AlgEtQWECM,WW::AlgEtQWECM)->BoolElt
 {Equality testing for weak equivalence class monoids, that is, if the underlying orders are equal.}
+    if IsIdentical(W,WW) then
+        return true;
+    end if;
     return Order(W) eq Order(WW);
 end intrinsic;
 
@@ -538,6 +543,14 @@ end intrinsic;
     T:=MultiplicationTable(W);
     assert #Keys(T) eq #W*(#W+1) div 2;
     assert forall{ a : a,b in cl | a*b eq (w(a)*w(b))@@w };
+    printf ".";
+
+    // the preimages of the map also with assertions off: they were found inside an assert
+    SetAssertions(0);
+    A:=EtaleAlgebra(x^4+16);
+    E:=EquationOrder(A);
+    W,w:=WeakEquivalenceClassMonoidAbstract(E);
+    assert forall{ I : I in WKICM(E) | IsWeakEquivalent(w(I@@w),I) };
     printf ".";
 
     SetAssertions(1);

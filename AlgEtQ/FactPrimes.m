@@ -99,8 +99,8 @@ end intrinsic;
 /// Given an integral fractional $S$-ideal $I$, returns the sequence of primes of $S$ containing $I$.
 intrinsic PrimesAbove(I::AlgEtQIdl) -> SeqEnum[AlgEtQIdl]
 {Given an integral fractional S-ideal I, returns the sequence of primes of S containing I.}
-    require IsIntegral(I): "the ideal must be integral";
     if not assigned I`PrimesAbove then
+        require IsIntegral(I): "the ideal must be integral";
         S:=Order(I);
         if assigned I`Factorization then
             primes:=[P[1] : P in I`Factorization];
@@ -207,9 +207,9 @@ end function;
 /// Given an integral fractional $S$-ideal $I$ coprime with the conductor of $S$ (hence invertible in $S$), returns its factorization into a product of primes of $S$.
 intrinsic Factorization(I::AlgEtQIdl) -> Tup
 {Given an integral fractional S-ideal I coprime with the conductor of S (hence invertible in S), returns its factorization into a product of primes of S.}
-    S:=Order(I);
-    require IsIntegral(I) and I ne OneIdeal(S): "the argument must be a proper integral ideal";
     if not assigned I`Factorization then
+        S:=Order(I);
+        require IsIntegral(I) and I ne OneIdeal(S): "the argument must be a proper integral ideal";
         if IsMaximal(S) then
             I`Factorization:=factorizationMaximalOrder(I);
         else

@@ -12,6 +12,7 @@
 freeze;
 
 import "OverOrders.m" : store_overorders;
+import "Ord.m" : zb_from_seq;
 
 RemoveBlanks:=function(str)
 // given a string str removes the blank spaces
@@ -124,7 +125,7 @@ intrinsic LoadWKICM(str::MonStgElt) -> AlgEtQOrd
             // the first ideal of each overorder is the order itself (the invertible class)
             require iI ne 1 or Index(IS) eq Index(S) : "the first ideal of each overorder must be the order";
             IS`MultiplicatorRing:=S;
-            IS`ZBasis:=zbI;
+            IS`ZBasis:=zb_from_seq(A,zbI);
             IS`IsInvertible:=iI eq 1; //only the first is invertible
             Append(~wkS,IS);
             IR:=R!!IS;

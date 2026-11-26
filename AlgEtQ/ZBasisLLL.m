@@ -13,18 +13,15 @@ freeze;
 
 declare verbose ZBasisLLL, 2;
 
-// Both attributes are set by ZBasisLLL, together with the ZBasis, and copied with it by 'eq' of
-// ideals. IsZBasisLLLFromHNF: the stored LLL-reduced ZBasis is the LLL reduction of the HNF of the
-// lattice, so it depends only on the lattice (see FromHNF in ZBasisLLL).
-declare attributes AlgEtQIdl : IsZBasisLLLReduced, IsZBasisLLLFromHNF;
-declare attributes AlgEtQOrd : IsZBasisLLLReduced, IsZBasisLLLFromHNF;
-
-import "Ord.m" : MatrixAtoQ , MatrixQtoA, crQZ, crZQ, hash_from_hnf, hnf_from_hash;
+import "Ord.m" : MatrixAtoQ , MatrixQtoA, crQZ, crZQ, hash_from_hnf, hnf_from_hash, lattice_hnf,
+                 zb_from_seq, zb_from_dM, zb_seq, zb_dM, zb_inv, replace_zbasis_if_smaller;
 
 ///# LLL-reduction of $\mathbb{Z}$-bases
 /// Whenever we call the intrinsic `ZBasis` for an order or a fractional ideal, we are computing a $\mathbb{Z}$-basis. This is produced directly from the known generators. This elements might have large coefficients making certain operation considerable slower. One can then reduce the given basis using the LLL algorithm to get better coefficients. While this procedure might cost some time, it is often convenient to perform this reduction if the ideal or the order are supposed to be used further.
-/// We provide the intrinsic `ZBasisLLL` which is a procedure changing the stored $\mathbb{Z}$-basis to an LLL-reduced one, if this has not been done before. The attribute `inclusion_matrix` is also deleted, since it depends on the stored $\mathbb{Z}$-basis.
+/// We provide the intrinsic `ZBasisLLL` which is a procedure changing the stored $\mathbb{Z}$-basis to an LLL-reduced one, if this has not been done before.
 /// The running time of the LLL algorithm grows with the size of the coefficients of the input basis. If the Hermite normal form of the basis has smaller coefficients, which happens for example when the stored basis has very large coefficients but the lattice has small index, then the LLL algorithm is applied to the Hermite normal form instead.
+/// The output of `ZBasisLLL` depends on the stored $\mathbb{Z}$-basis. The intrinsic `ZBasisLLLFromHNF` returns instead the LLL reduction of the Hermite normal form, which depends only on the lattice.
+/// The stored $\mathbb{Z}$-basis is also replaced when a smaller $\mathbb{Z}$-basis of the same lattice becomes known, for example the Hermite normal form computed for the hash: see `ReplaceZBasis`.
 
 //------------
 // LLL - Reduce ZBasis. This should be called whenever we are storing some orders or ideals.
@@ -36,116 +33,132 @@ max_abs:=function(X)
     return Max(Max(E),-Min(E));
 end function;
 
-lll_zbasis:=function(A,zb,hash : FromHNF:=false)
-// Given a Z-basis zb of a lattice in A (or [] when the hash is known), and its hash (see
-// hash_from_hnf in Ord.m) or [] if it is not known, returns an LLL-reduced Z-basis of the same
-// lattice, the hash, and whether the reduced matrix was the HNF, that is, whether the output
-// depends only on the lattice.
-// With FromHNF:=true the HNF is always the matrix that is reduced, so the output depends only on
-// the lattice, and not on zb; this can be slower when zb is already almost reduced.
-// Let M be the matrix of the coordinates of zb and d its denominator.
-// The entries of the HNF of d*M are bounded by its pivots, while the entries of d*M are not:
-// if the HNF has smaller entries, we LLL-reduce it instead, which is much faster.
-// Otherwise, for example if zb is already (almost) reduced, we LLL-reduce d*M itself,
-// since starting from the HNF would undo the reduction already present in zb.
-// Working with the integer matrix d*M is also faster than calling LLL on M.
-// The HNF of d*M is d times the HNF of the lattice, which can be read from the hash, if known:
-// otherwise we compute it, and the hash comes for free.
-    // With zb empty (an order created from its HNF, see create_order in Ord.m), the basis is the
-    // HNF basis: with d = hash[1], its denominator, d*M is the HNF read from the hash, so it is not
-    // converted to elements and back. The result is the same as for the HNF basis given as zb.
-    if #zb eq 0 then
-        assert #hash gt 0;
-        d:=hash[1];
-        H:=hnf_from_hash(hash,d);
-        L:=LLL(H);
-        return MatrixQtoA(A,(1/d)*crZQ(L)),hash,true;
-    end if;
-    M:=MatrixAtoQ(zb);
-    // the denominator of the matrix of a Z-basis depends only on the lattice: it is hash[1]
-    d:=#hash gt 0 select hash[1] else Integers()!Denominator(M);
-    MZ:=crQZ(d*M);
-    if #hash gt 0 then
-        H:=hnf_from_hash(hash,d);
-        assert2 H eq HermiteForm(MZ);
+lll_zbasis:=function(X)
+// Given a lattice X (an order, a fractional ideal or a module) with a working Z-basis (see
+// zbasis_fmt in Ord.m), returns the record of an LLL reduction of it. The hash of X is stored if it
+// was not known: the HNF is computed anyway.
+// Let d and M be as in zbasis_fmt (M = d times the matrix of the coordinates of the basis).
+// The entries of the HNF H of M are bounded by its pivots, while the entries of M are not:
+// if H has smaller entries, we LLL-reduce it instead, which is much faster.
+// Otherwise, for example if the basis is already (almost) reduced, we LLL-reduce M itself,
+// since starting from the HNF would undo the reduction already present in the basis.
+// Working with the integer matrix M is also faster than calling LLL on a rational matrix.
+// H can be read from the hash, if known: otherwise we compute it, and the hash comes for free.
+    Z:=X`ZBasis;
+    d,M:=zb_dM(X);
+    if assigned X`Hash then
+        H:=hnf_from_hash(X`Hash,d);
+        assert2 H eq HermiteForm(M);
+    elif Z`hnf then
+        H:=M;
+        X`Hash:=hash_from_hnf(H,d);
     else
-        H:=HermiteForm(MZ); // MZ is square of full rank, so H has no zero rows
+        H:=HermiteForm(M); // M is square of full rank, so H has no zero rows
         assert2 Rank(H) eq Nrows(H);
-        hash:=hash_from_hnf(H,d);
+        X`Hash:=hash_from_hnf(H,d);
     end if;
-    use_hnf:=FromHNF or max_abs(H) lt max_abs(MZ);
+    use_hnf:=max_abs(H) lt max_abs(M);
     vprintf ZBasisLLL, 2 : "lll_zbasis: max entry of the basis has %o bits, of the HNF %o bits. Using the %o.\n",
-                            Ilog2(max_abs(MZ)+1), Ilog2(max_abs(H)+1), use_hnf select "HNF" else "basis";
-    // if zb is the HNF basis (often the case), then MZ is H: reducing MZ is reducing the HNF
-    from_hnf:=use_hnf or MZ eq H;
-    if use_hnf then
-        MZ:=H;
-    end if;
-    L:=LLL(MZ);
+                            Ilog2(max_abs(M)+1), Ilog2(max_abs(H)+1), use_hnf select "HNF" else "basis";
+    L:=LLL(use_hnf select H else M);
     assert2 HermiteForm(L) eq H; // same lattice
-    return MatrixQtoA(A,(1/d)*crZQ(L)),hash,from_hnf;
+    return zb_from_dM(Z`A,d,L : lll:=true);
 end function;
 
-zbasis_lll_needed:=function(S,FromHNF)
-// Whether ZBasisLLL(S : FromHNF:=FromHNF) has to compute: the stored ZBasis is not LLL-reduced yet
-// or, if FromHNF, it was not obtained from the HNF.
-    reduced:=assigned S`IsZBasisLLLReduced and S`IsZBasisLLLReduced;
-    from_hnf:=assigned S`IsZBasisLLLFromHNF and S`IsZBasisLLLFromHNF;
-    return not reduced or (FromHNF and not from_hnf);
+canonical_zbasis:=function(X)
+// Given a lattice X (an order, a fractional ideal or a module), returns the record (see zbasis_fmt
+// in Ord.m) of the LLL reduction of its HNF, read from the hash: it depends only on the lattice.
+    h:=myHash(X); // also makes sure that X has a working Z-basis
+    d:=h[1];
+    return zb_from_dM(X`ZBasis`A,d,LLL(hnf_from_hash(h,d)) : lll:=true);
 end function;
 
-/// A procedure that replaces the stored $\mathbb{Z}$-basis with an LLL-reduced one, if this has not been done before. With the vararg `FromHNF:=true`, the LLL reduction starts from the Hermite normal form of the lattice, so that the new $\mathbb{Z}$-basis depends only on the lattice, and not on the stored one; this can be slower when the stored $\mathbb{Z}$-basis is already almost reduced. The attribute `inclusion_matrix`, which depends on the stored $\mathbb{Z}$-basis, is deleted.
-intrinsic ZBasisLLL(S::AlgEtQOrd : FromHNF:=false)
-{A procedure that replaces the stored ZBasis with an LLL-reduced one, if this has not been done before. With the vararg FromHNF:=true, the LLL reduction starts from the Hermite normal form of the lattice, so that the new ZBasis depends only on the lattice, and not on the stored one; this can be slower when the stored ZBasis is already almost reduced. The attribute inclusion_matrix, which depends on the stored ZBasis, is deleted.}
-  if zbasis_lll_needed(S,FromHNF) then
-    // the hash depends only on the lattice: it is used if known, and stored if computed; an order
-    // created by create_order from its HNF has no ZBasis yet, and the hash is then known
-    zb,hash,from_hnf:=lll_zbasis(Algebra(S),assigned S`ZBasis select S`ZBasis else [],
-                                    assigned S`Hash select S`Hash else [] : FromHNF:=FromHNF);
-    S`ZBasis:=zb;
-    S`Hash:=hash;
-    S`IsZBasisLLLReduced:=true;
-    S`IsZBasisLLLFromHNF:=from_hnf;
-    delete S`inclusion_matrix; // this is computed with respect to the old ZBasis!
+/// A procedure that replaces the stored $\mathbb{Z}$-basis with an LLL-reduced one, if this has not been done before.
+intrinsic ZBasisLLL(S::AlgEtQOrd)
+{A procedure that replaces the stored ZBasis with an LLL-reduced one, if this has not been done before.}
+  if not S`ZBasis`lll then
+    _:=replace_zbasis_if_smaller(S,lll_zbasis(S) : Force:=true);
   end if;
 end intrinsic;
 
 ///ditto
-intrinsic ZBasisLLL(S::AlgEtQIdl : FromHNF:=false)
+intrinsic ZBasisLLL(S::AlgEtQIdl)
 { " } // "
-  if zbasis_lll_needed(S,FromHNF) then
-    // the hash depends only on the lattice: it is used if known, and stored if computed
-    zb,hash,from_hnf:=lll_zbasis(Algebra(S),ZBasis(S),assigned S`Hash select S`Hash else [] :
-                                    FromHNF:=FromHNF);
-    S`ZBasis:=zb;
-    S`Hash:=hash;
-    S`IsZBasisLLLReduced:=true;
-    S`IsZBasisLLLFromHNF:=from_hnf;
-    delete S`inclusion_matrix; // this is computed with respect to the old ZBasis!
-    // If the ideal has at least dim generators, for example the old ZBasis when it was created from
-    // more than dim generators, we replace them with the LLL-reduced ZBasis: it generates the
-    // ideal, it is not longer, and its elements are smaller, which makes the operations using
-    // Generators faster, e.g. products of ideals. Fewer generators are kept, since products of
-    // ideals with few generators avoid computing a ZBasis.
-    if #Generators(S) ge AbsoluteDimension(Algebra(S)) then
-      S`Generators:=S`ZBasis;
-    end if;
+  if not assigned S`ZBasis then
+    _:=ZBasis(S);
   end if;
+  if not S`ZBasis`lll then
+    // If the ideal has at least dim generators, for example the old ZBasis when it was created from
+    // more than dim generators, they are replaced with the LLL-reduced ZBasis (see
+    // replace_zbasis_if_smaller): it generates the ideal, it is not longer, and its elements are
+    // smaller, which makes the operations using Generators faster, e.g. products of ideals. Fewer
+    // generators are kept, since products of ideals with few generators avoid computing a ZBasis.
+    _:=replace_zbasis_if_smaller(S,lll_zbasis(S) : Force:=true);
+  end if;
+end intrinsic;
+
+/// Returns the LLL reduction of the Hermite normal form of the order (or of the fractional ideal): a $\mathbb{Z}$-basis which depends only on the lattice, and not on the stored $\mathbb{Z}$-basis. It is computed once and stored. If it is smaller than the stored $\mathbb{Z}$-basis, it replaces it, see `ReplaceZBasis`.
+intrinsic ZBasisLLLFromHNF(S::AlgEtQOrd) -> SeqEnum[AlgEtQElt]
+{Returns the LLL reduction of the Hermite normal form of the order (or of the fractional ideal): a Z-basis which depends only on the lattice, and not on the stored Z-basis. It is computed once and stored. If it is smaller than the stored Z-basis, it replaces it, see ReplaceZBasis.}
+    if not assigned S`CanonicalZBasis then
+        S`CanonicalZBasis:=canonical_zbasis(S);
+    end if;
+    zb:=zb_seq(S : att:="CanonicalZBasis"); // before the record is copied below
+    _:=replace_zbasis_if_smaller(S,S`CanonicalZBasis);
+    return zb;
+end intrinsic;
+
+///ditto
+intrinsic ZBasisLLLFromHNF(S::AlgEtQIdl) -> SeqEnum[AlgEtQElt]
+{ " } // "
+    if not assigned S`CanonicalZBasis then
+        S`CanonicalZBasis:=canonical_zbasis(S);
+    end if;
+    zb:=zb_seq(S : att:="CanonicalZBasis"); // before the record is copied below
+    _:=replace_zbasis_if_smaller(S,S`CanonicalZBasis);
+    return zb;
+end intrinsic;
+
+/// Replaces the stored $\mathbb{Z}$-basis of $S$ with the given $\mathbb{Z}$-basis `zb` of the same lattice, if it is smaller: if the integer matrix of its coordinates (multiplied by their common denominator) has at most $3/4$ of the bits of the one of the stored $\mathbb{Z}$-basis. With `Force:=true` it is always replaced. The stored $\mathbb{Z}$-basis of orders, ideals and modules is replaced only in this way (also by the package itself, e.g. when the Hermite normal form is computed for the hash, and by `ZBasisLLL`): with `SetVerbose("ZBasis",1)` every replacement which is not forced is printed.
+intrinsic ReplaceZBasis(S::AlgEtQOrd, zb::SeqEnum[AlgEtQElt] : Force:=false)
+{Replaces the stored Z-basis of S with the given Z-basis zb of the same lattice, if it is smaller: if the integer matrix of its coordinates (multiplied by their common denominator) has at most 3/4 of the bits of the one of the stored Z-basis. With Force:=true it is always replaced. The stored Z-basis of orders, ideals and modules is replaced only in this way (also by the package itself, e.g. when the Hermite normal form is computed for the hash, and by ZBasisLLL): with SetVerbose("ZBasis",1) every replacement which is not forced is printed.}
+    A:=Algebra(S);
+    require #zb eq AbsoluteDimension(A) and Universe(zb) cmpeq A : "zb must be a Z-basis in the algebra of S";
+    H,d:=lattice_hnf(zb);
+    require Nrows(H) eq #zb and hash_from_hnf(H,d) eq myHash(S) : "zb must be a Z-basis of S";
+    _:=replace_zbasis_if_smaller(S,zb_from_seq(A,zb) : Force:=Force);
+end intrinsic;
+
+///ditto
+intrinsic ReplaceZBasis(S::AlgEtQIdl, zb::SeqEnum[AlgEtQElt] : Force:=false)
+{ " } // "
+    A:=Algebra(S);
+    require #zb eq AbsoluteDimension(A) and Universe(zb) cmpeq A : "zb must be a Z-basis in the algebra of S";
+    H,d:=lattice_hnf(zb);
+    require Nrows(H) eq #zb and hash_from_hnf(H,d) eq myHash(S) : "zb must be a Z-basis of S";
+    _:=replace_zbasis_if_smaller(S,zb_from_seq(A,zb) : Force:=Force);
 end intrinsic;
 
 //------------
 // Short elements modulo a fractional ideal
 //------------
 
-/// Given an element $x$ and a fractional ideal $J$ in the same algebra, returns an element of $x+J$ with small coordinates. It is obtained by subtracting from $x$ the element of $J$ whose coordinates with respect to the stored $\mathbb{Z}$-basis of $J$ are the coordinates of $x$ rounded to the nearest integers. The stored $\mathbb{Z}$-basis of $J$ is first replaced by an LLL-reduced one, see `ZBasisLLL`. The output depends only on the class of $x$ modulo $J$, and it is $0$ if and only if $x$ is in $J$.
-intrinsic ShortElementModulo(x::AlgEtQElt, J::AlgEtQIdl) -> AlgEtQElt
-{Given an element x and a fractional ideal J in the same algebra, returns an element of x+J with small coordinates. It is obtained by subtracting from x the element of J whose coordinates with respect to the stored Z-basis of J are the coordinates of x rounded to the nearest integers. The stored Z-basis of J is first replaced by an LLL-reduced one, see ZBasisLLL. The output depends only on the class of x modulo J, and it is 0 if and only if x is in J.}
+/// Given an element $x$ and a fractional ideal $J$ in the same algebra, returns an element of $x+J$ with small coordinates. It is obtained by subtracting from $x$ the element of $J$ whose coordinates with respect to the stored $\mathbb{Z}$-basis of $J$ are the coordinates of $x$ rounded to the nearest integers. The stored $\mathbb{Z}$-basis of $J$ is first replaced by an LLL-reduced one, see `ZBasisLLL`. With the vararg `Canonical:=true` (default `false`) the $\mathbb{Z}$-basis `ZBasisLLLFromHNF(J)` is used instead, which depends only on $J$: then the output depends only on $x+J$, and not on the stored $\mathbb{Z}$-basis of $J$. In both cases the output depends only on the class of $x$ modulo $J$ (given the $\mathbb{Z}$-basis), and it is $0$ if and only if $x$ is in $J$.
+intrinsic ShortElementModulo(x::AlgEtQElt, J::AlgEtQIdl : Canonical:=false) -> AlgEtQElt
+{Given an element x and a fractional ideal J in the same algebra, returns an element of x+J with small coordinates. It is obtained by subtracting from x the element of J whose coordinates with respect to the stored Z-basis of J are the coordinates of x rounded to the nearest integers. The stored Z-basis of J is first replaced by an LLL-reduced one, see ZBasisLLL. With the vararg Canonical:=true (default false) the Z-basis ZBasisLLLFromHNF(J) is used instead, which depends only on J: then the output depends only on x+J, and not on the stored Z-basis of J. In both cases the output depends only on the class of x modulo J (given the Z-basis), and it is 0 if and only if x is in J.}
     require Algebra(x) cmpeq Algebra(J) : "the element and the ideal must be in the same algebra";
-    ZBasisLLL(J);
-    c := AbsoluteCoordinates([x],J)[1];
+    if Canonical then
+        zb:=ZBasisLLLFromHNF(J);
+        Minv:=zb_inv(J : att:="CanonicalZBasis");
+    else
+        ZBasisLLL(J);
+        zb:=ZBasis(J);
+        Minv:=zb_inv(J);
+    end if;
+    c:=Eltseq(MatrixAtoQ([x])*Minv); // the coordinates of x with respect to zb
     // We round with Floor(e+1/2), since it commutes with adding integers: hence the output depends
     // only on x+J.
-    return x - DotProduct([ Floor(e+1/2) : e in c ], ZBasis(J));
+    return x - DotProduct([ Floor(e+1/2) : e in c ], zb);
 end intrinsic;
 
 /* TESTS
@@ -208,7 +221,7 @@ end intrinsic;
       assert MS eq (1/d)*ChangeRing(LLL(use_hnf select H else MZ),Rationals());
       assert HermiteForm(ChangeRing(d*MS,Integers())) eq H; // same lattice
       assert zbl_is_lll_reduced(MS);
-      assert S`IsZBasisLLLReduced;
+      assert S`ZBasis`lll;
       zb1:=ZBasis(S);
       ZBasisLLL(S);
       assert ZBasis(S) eq zb1; // nothing changes the second time
@@ -219,7 +232,7 @@ end intrinsic;
           assert One(A) in S;
       end if;
   end procedure;
-  zbl_fresh:=function(R,zb) J:=Ideal(R,zb); J`ZBasis:=zb; return J; end function;
+  zbl_fresh:=function(R,zb) J:=Ideal(R,zb); ReplaceZBasis(J,zb : Force:=true); return J; end function;
 
   SetSeed(1);
   pols:=[ x^8+16, (x-1)*(x-20)*(x^2-5)*(x^3-2), x^10-x^9+4*x^8-6*x^7+8*x^6-16*x^5+16*x^4-24*x^3+32*x^2-16*x+32 ];
@@ -256,50 +269,52 @@ end intrinsic;
       // orders: the maximal order with a skewed basis
       O:=MaximalOrder(A);
       zb:=zbl_QtoA(A,zbl_skew(zbl_AtoQ(ZBasis(O)),40));
-      O`ZBasis:=zb;
-      O`IsZBasisLLLReduced:=false;
-      delete O`inclusion_matrix;
+      ReplaceZBasis(O,zb : Force:=true); // a record which is not flagged as LLL-reduced
       zbl_check(O,zb,"HNF");
       assert R subset O;
       printf ".";
   end for;
 
-  // FromHNF: the LLL reduction starts from the HNF, so the new ZBasis depends only on the lattice.
-  // The default reduction of the HNF basis is from the HNF too; the one of an already reduced basis
-  // of an ideal with huge index is not (the basis has smaller entries than the HNF), and FromHNF
-  // then reduces again, from the HNF.
+  // ZBasisLLLFromHNF: the LLL reduction of the HNF, which depends only on the lattice and not on
+  // the stored Z-basis; it replaces the stored Z-basis only if it is smaller (see ReplaceZBasis).
   A:=EtaleAlgebra(x^8+16);
   R:=EquationOrder(A);
   I:=Ideal(R,[ A!Random(R,3) : i in [1..3] ])^20;
   zbI:=ZBasis(I); // the HNF basis
   I1:=zbl_fresh(R,zbI);
+  c1:=ZBasisLLLFromHNF(I1);
   ZBasisLLL(I1);
-  assert I1`IsZBasisLLLFromHNF;
+  assert ZBasis(I1) eq c1; // the LLL reduction of the HNF basis is the canonical one
   zb:=zbl_QtoA(A,LLL(zbl_skew(zbl_AtoQ(zbI),5))); // reduced, from another basis
   I2:=zbl_fresh(R,zb);
   ZBasisLLL(I2);
-  assert I2`IsZBasisLLLReduced and not I2`IsZBasisLLLFromHNF;
   zb2:=ZBasis(I2);
   ZBasisLLL(I2);
   assert ZBasis(I2) eq zb2; // already reduced: nothing to do
-  ZBasisLLL(I2 : FromHNF:=true);
-  assert I2`IsZBasisLLLFromHNF and ZBasis(I2) eq ZBasis(I1);
+  assert ZBasisLLLFromHNF(I2) eq c1; // the same lattice
   I3:=zbl_fresh(R,zbl_QtoA(A,zbl_skew(zbl_AtoQ(zbI),40))); // huge entries
-  ZBasisLLL(I3 : FromHNF:=true);
-  assert ZBasis(I3) eq ZBasis(I1);
+  assert ZBasisLLLFromHNF(I3) eq c1;
+  assert ZBasis(I3) eq c1; // much smaller than the stored Z-basis: it replaced it
   assert forall{ z : z in zbI | z in I2 and z in I3 }; // the inclusion matrices are the new ones
-  // orders: an order with a reduced basis not from the HNF, flagged by hand
+  // orders: the canonical Z-basis of the maximal order, and orders with other Z-bases
   O:=MaximalOrder(A);
-  ZBasisLLL(O : FromHNF:=true);
-  zbO:=ZBasis(O);
-  O2:=Order(zbl_QtoA(A,zbl_skew(zbl_AtoQ(zbO),5))); // Order reduces its HNF basis
-  assert O2`IsZBasisLLLFromHNF and ZBasis(O2) eq zbO;
-  O2`ZBasis:=zbl_QtoA(A,LLL(zbl_skew(zbl_AtoQ(zbO),5)));
-  O2`IsZBasisLLLReduced:=true;
-  O2`IsZBasisLLLFromHNF:=false;
-  delete O2`inclusion_matrix;
-  ZBasisLLL(O2 : FromHNF:=true);
-  assert O2`IsZBasisLLLFromHNF and ZBasis(O2) eq zbO and One(A) in O2;
+  cO:=ZBasisLLLFromHNF(O);
+  // Order reduces the HNF
+  O2:=Order(zbl_QtoA(A,zbl_skew(zbl_AtoQ(cO),5)) : CheckIsKnownOrder:=false);
+  assert ZBasis(O2) eq cO and ZBasisLLLFromHNF(O2) eq cO and One(A) in O2;
+  ReplaceZBasis(O2,zbl_QtoA(A,zbl_skew(zbl_AtoQ(cO),40)) : Force:=true);
+  // smaller: it replaced it
+  assert ZBasisLLLFromHNF(O2) eq cO and ZBasis(O2) eq cO and One(A) in O2;
+  // without Force, a Z-basis which is not smaller is not taken
+  zbO2:=ZBasis(O2);
+  ReplaceZBasis(O2,zbl_QtoA(A,zbl_skew(zbl_AtoQ(cO),40)));
+  assert ZBasis(O2) eq zbO2;
+  // the HNF computed for the hash replaces a Z-basis with many more bits
+  J:=zbl_fresh(R,zbl_QtoA(A,zbl_skew(zbl_AtoQ(zbI),40)));
+  delete J`Hash; if assigned J`HashValue then delete J`HashValue; end if; // as if not known
+  bJ:=ZBasis(J);
+  _:=myHash(J);
+  assert ZBasis(J) eq zbI and J eq Ideal(R,bJ); // zbI is the HNF basis
   printf ".";
 
   // ShortElementModulo(y,J) is in y+J, it depends only on y+J, it is 0 on J, and its coordinates

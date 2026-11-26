@@ -16,7 +16,7 @@ declare verbose CRT, 2;
 declare attributes AlgEtQOrd : CRT_data;
 declare attributes AlgEtQIdl : CRT_data;
 
-import "Ord.m" : crQZ , crZQ , MatrixAtoQ , all_but_one , all_in;
+import "Ord.m" : crQZ , crZQ , MatrixAtoQ , all_but_one , all_in , zb_dM;
 
 ///## Chinese remainder theorem
 /// Let $I$ and $J$ be integral fractional ideals over the same order $S$ in an étale algebra.
@@ -46,9 +46,8 @@ import "Ord.m" : crQZ , crZQ , MatrixAtoQ , all_but_one , all_in;
 CRT_data_order:=function(S)
     if not assigned S`CRT_data then
         zS:=ZBasis(S);
-        M:=MatrixAtoQ(zS);
-        d:=Denominator(M);
-        M:=VerticalJoin(crQZ(d*M),ZeroMatrix(Integers(),#zS));
+        d,MS:=zb_dM(S); // MS = d*MatrixAtoQ(zS), with d its denominator (see zbasis_fmt in Ord.m)
+        M:=VerticalJoin(MS,ZeroMatrix(Integers(),#zS));
         H,V:=HermiteForm(M); // V*M eq H
         cc:=AbsoluteCoordinates([One(Algebra(S))],S)[1];
         vprintf CRT,2 : "ZBasis(S)=%o\nM=\n%o\ncc=%o\nH=\n%o\nV=\n%o\n",zS,M,cc,H,V;
@@ -65,7 +64,9 @@ CRT_data_ideal:=function(I)
      if not assigned I`CRT_data then
          _,d:=CRT_data_order(Order(I));
          zI:=ZBasis(I);
-         I`CRT_data:=<crQZ(d*MatrixAtoQ(zI)),zI>;
+         dI,MI:=zb_dM(I); // MI = dI*MatrixAtoQ(zI), and d*MatrixAtoQ(zI) is integral: dI divides d
+         assert d mod dI eq 0;
+         I`CRT_data:=<(d div dI)*MI,zI>;
          // 20240426 : we now store also the ZBasis, since the attribute might change (eg. when
          // using LLL)
      end if;

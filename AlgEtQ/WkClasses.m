@@ -19,7 +19,7 @@ declare attributes AlgEtQOrd:   WKICM,
                                 WKICM_bar;
 import "LowCohenMacaulayType.m" : wkicm_bar_CM_type2;
 import "OverOrders.m" : store_overorders;
-import "Ord.m" : all_but_one;
+import "Ord.m" : all_but_one, order_from_sum;
 
 
 ///# Weak equivalence class monoid
@@ -170,18 +170,19 @@ wkicm_bar_with_P_P:=function(I,P,gensU)
     // subspaces.
     U_gens:=[ g : g in Seqset([ mat(g) : g in gensU ]) | not IsScalar(g) ];
 
-    // Magma's sets of subspaces of a KModule (type ModFld, as Q) are slow: a membership compares the
-    // subspaces one by one (about 1.5 ms each for subspaces of GF(11)^4). We keep sets of keys
+    // Magma's sets of subspaces of a KModule (type ModFld, as Q) are slow: a membership compares
+    // the subspaces one by one (about 1.5 ms each for subspaces of GF(11)^4). We keep sets of keys
     // instead: the entries of the reduced echelon form of a basis matrix of the subspace, which
-    // determines it (the reduced echelon form is unique). The coordinates are taken in Q: Basis(W) is
-    // in the coordinates of W.
+    // determines it (the reduced echelon form is unique). The coordinates are taken in Q: Basis(W)
+    // is in the coordinates of W.
     ech:=func< W | EchelonForm(Matrix(k,[ Eltseq(Q!b) : b in Basis(W) ])) >;
     key:=func< W | Eltseq(ech(W)) >;
 
     orbit:=function(W)
     // the keys of the orbit of the subspace W under A^*. The group is finite, so the closure under
     // the generators suffices. The subspaces of the orbit are kept as echelon matrices only: the
-    // image of the row space of X under g is the row space of X*g, and no KModule subspace is built.
+    // image of the row space of X under g is the row space of X*g, and no KModule subspace is
+    // built.
         X0:=ech(W);
         orb:={ Eltseq(X0) };
         frontier:=[ X0 ];
@@ -264,7 +265,7 @@ local_orders:=function(S, pp)
         Append(~ps,p);
         k:=Valuation(Index(O,S),p);
         // S+P^kO is closed under multiplication
-        Append(~SPs,Order(ZBasis(S) cat ZBasis(O!!P^k) : Check:=0));
+        Append(~SPs,order_from_sum([* S,O!!P^k *]));
     end for;
     return SPs,ps;
 end function;

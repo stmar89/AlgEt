@@ -12,7 +12,7 @@ freeze;
 
 declare verbose OverOrders, 1;
 
-import "Ord.m" : op_over_product;
+import "Ord.m" : op_over_product, order_from_sum;
 
 // Attributes of an order R, with the only functions that write them.
 declare attributes AlgEtQOrd : MinimalOverOrders, // An AssociativeArray keyed by the singular
@@ -91,13 +91,13 @@ local_overorders:=function(R)
 end function;
 
 is_P_overorder:=function(R, S, pp, ps)
-// Given an order R, its singular primes pp, the rational primes ps below them (ps[k] in pp[k]), and an
-// overorder S ne R, returns k if S is a pp[k]-overorder of R, that is, if the R-module S/R is supported
-// only at pp[k], and 0 otherwise (S/R supported at several primes).
-// If S/R is supported only at pp[k] then [S:R] = #(S/R) is a power of ps[k]; conversely, if [S:R] is a power
-// of p, then S/R is supported at primes above p. So the index decides, without a colon ideal, unless
-// several singular primes lie above p: then the support is read from the annihilator (R:S) of S/R, as the
-// primes containing it.
+// Given an order R, its singular primes pp, the rational primes ps below them (ps[k] in pp[k]), and
+// an overorder S ne R, returns k if S is a pp[k]-overorder of R, that is, if the R-module S/R is
+// supported only at pp[k], and 0 otherwise (S/R supported at several primes).
+// If S/R is supported only at pp[k] then [S:R] = #(S/R) is a power of ps[k]; conversely, if [S:R]
+// is a power of p, then S/R is supported at primes above p. So the index decides, without a colon
+// ideal, unless several singular primes lie above p: then the support is read from the annihilator
+// (R:S) of S/R, as the primes containing it.
     is_pp,p:=IsPrimePower(Integers()!Index(S,R));
     if not is_pp then
         return 0; // S/R is supported above several rational primes
@@ -173,7 +173,7 @@ sum_of_two_overorders:=function(R,S,T)
     elif S eq R then
         return T;
     end if;
-    return Order(ZBasis(S) cat ZBasis(T) : Check:=0);
+    return order_from_sum([S,T]); // as Order(ZBasis(S) cat ZBasis(T) : Check:=0)
 end function;
 
 all_sums_of_local_overorders:=function(R,oo_at_Ps)
@@ -318,11 +318,11 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl : CheckIsKnownOrde
             // This map V->V sends x:->x^q. It is well-def.
             qpow:=hom<V->V | [mVTtoV(pow(v@@mVTtoV,q)) : v in Basis(V)]>;
             F:=BaseField(V);
-            // All the minimal overorders S come from qpow-invariant subspaces W of V: B=S/P is closed
-            // under x:->x^q, so W=B/F is invariant under qpow. We enumerate them once, as the
-            // submodules of V with qpow acting (an F[X]-module), by increasing dimension. This is much
-            // faster than enumerating all the subspaces of V (B4 case 1, Z+3O in Q(3^(1/8)): 14250
-            // invariant subspaces of F_3^7 against 2051562).
+            // All the minimal overorders S come from qpow-invariant subspaces W of V: B=S/P is
+            // closed under x:->x^q, so W=B/F is invariant under qpow. We enumerate them once, as
+            // the submodules of V with qpow acting (an F[X]-module), by increasing dimension. This
+            // is much faster than enumerating all the subspaces of V (B4 case 1, Z+3O in
+            // Q(3^(1/8)): 14250 invariant subspaces of F_3^7 against 2051562).
             Vq:=RModule([ MatrixAlgebra(F,dV)!Matrix(qpow) ]);
             subs:=[ sub<V|[ V!Eltseq(Vq!b) : b in Basis(W) ]> : W in Submodules(Vq) ];
             // Type 1: the minimal overorders S with dim_F(S/R)=1, i.e. the invariant lines Fw (the
@@ -331,8 +331,8 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl : CheckIsKnownOrde
             for W in [ W : W in subs | Dimension(W) eq 1 ] do
                 w:=Basis(W)[1];
                 if q eq 2 then
-                    // for q eq 2 being an invariant line, hence in the eigenspace of 1, guarantees that
-                    // it is mult closed
+                    // for q eq 2 being an invariant line, hence in the eigenspace of 1, guarantees
+                    // that it is mult closed
                     S:=Order([w@@mTV] cat zbR : CheckIsKnownOrder:=CheckIsKnownOrder);
                     Include(~output,S);// necessarily minimal, because it has dim 1
                     Append(~type1_ws,w);

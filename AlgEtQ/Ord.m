@@ -13,6 +13,10 @@ freeze;
 
 declare verbose AlgEtQOrd, 3;
 
+// the replacements of the working Z-basis of orders, ideals and modules, see
+// replace_zbasis_if_smaller
+declare verbose ZBasis, 2;
+
 declare type AlgEtQOrd;
 
 import "Elt.m" : CreateAlgEtQElt;
@@ -32,7 +36,9 @@ declare attributes AlgEtQOrd : IsMaximal,
                               IsProductOfOrders,
                               IsProductOfOrdersInFactorAlgebras,
                               Index,
-                              ZBasis,
+                              ZBasis, // the working Z-basis, a record of format zbasis_fmt
+                              CanonicalZBasis, // the LLL reduction of the HNF, a record of format
+                                               // zbasis_fmt: see ZBasisLLLFromHNF
                               Generators,
                               OneIdeal,
                               Algebra,
@@ -41,8 +47,7 @@ declare attributes AlgEtQOrd : IsMaximal,
                               IsGorenstein,
                               IsBass,
                               Hash, // the sequence returned by myHash
-                              HashValue, // the integer returned by Hash
-                              inclusion_matrix;
+                              HashValue; // the integer returned by Hash
 
 ///hide-all
 intrinsic Print(A::AlgEtQOrd)
@@ -167,6 +172,145 @@ hnf_from_hash:=function(hash,d)
     return (d div e)*Matrix(Integers(),Nrows(T),Ncols(T),Eltseq(T));
 end function;
 
+// Z-bases of lattices: orders, fractional ideals and modules.
+// A Z-basis of a lattice X is stored in a record of format zbasis_fmt: the working Z-basis in
+// X`ZBasis (what ZBasis returns and ZBasisLLL reduces, as in v1.0.2), and the canonical one, the
+// LLL reduction of the HNF of the lattice, in X`CanonicalZBasis (see ZBasisLLLFromHNF). The fields
+// hold the same basis in different forms, and each one is computed only when it is needed:
+// - A: the algebra where the elements live (the universe algebra for a module);
+// - seq: the elements;
+// - d, M: the integer matrix M = d*MatrixAtoQ(seq), where d is the denominator of MatrixAtoQ(seq).
+//   It depends only on the lattice (it is the smallest d with d*X in ZZ^n): it is the same for all
+//   the Z-bases of X, and it is X`Hash[1] when the hash is known;
+// - Minv: the inclusion matrix MatrixAtoQ(seq)^-1 = d*M^-1, see inclusion_matrix;
+// - lll: whether the basis is LLL-reduced;
+// - hnf: whether M is the HNF of d*X.
+// The records are written only by the functions below and by ZBasisLLL and ZBasisLLLFromHNF:
+// the forms of a basis cannot get out of step (as the inclusion matrix of an old ZBasis could, when
+// it was a separate attribute).
+zbasis_fmt:=recformat< A, seq : SeqEnum, d : RngIntElt, M : Mtrx, Minv : Mtrx, lll : BoolElt,
+                       hnf : BoolElt >;
+
+zb_from_seq:=function(A,seq : lll:=false, hnf:=false)
+// the record of the Z-basis seq of a lattice in A
+    return rec< zbasis_fmt | A:=A, seq:=seq, lll:=lll, hnf:=hnf >;
+end function;
+
+zb_from_dM:=function(A,d,M : lll:=false, hnf:=false)
+// the record of the Z-basis given by the rows of (1/d)*M, for an integer d>0 and an integer matrix
+// M. Any such d is allowed: d and M are divided by their gcd, so that d is the denominator of
+// (1/d)*M, as in zbasis_fmt.
+    g:=GCD(d,GCD(Eltseq(M)));
+    if g ne 1 then
+        d:=d div g;
+        M:=Matrix(Integers(),Nrows(M),Ncols(M),[ c div g : c in Eltseq(M) ]);
+    end if;
+    return rec< zbasis_fmt | A:=A, d:=d, M:=M, lll:=lll, hnf:=hnf >;
+end function;
+
+zb_seq:=function(X : att:="ZBasis")
+// the elements of the Z-basis of X in the attribute att (which must be assigned), computed from d
+// and M if needed
+    Z:=X``att;
+    if not assigned Z`seq then
+        Z`seq:=MatrixQtoA(Z`A,(1/Z`d)*crZQ(Z`M));
+        X``att:=Z;
+    end if;
+    return Z`seq;
+end function;
+
+zb_dM:=function(X : att:="ZBasis")
+// d and M of the Z-basis of X in the attribute att (which must be assigned), see zbasis_fmt,
+// computed from the elements if needed; d is read from the hash when it is known
+    Z:=X``att;
+    if not assigned Z`d then
+        Q:=MatrixAtoQ(Z`seq);
+        Z`d:=assigned X`Hash select X`Hash[1] else Integers()!Denominator(Q);
+        Z`M:=crQZ(Z`d*Q);
+        X``att:=Z;
+    end if;
+    return Z`d,Z`M;
+end function;
+
+zb_inv:=function(X : att:="ZBasis")
+// the inclusion matrix of the Z-basis of X in the attribute att (which must be assigned)
+    Z:=X``att;
+    if not assigned Z`Minv then
+        d,M:=zb_dM(X : att:=att);
+        Z:=X``att; // zb_dM may have filled d and M
+        Z`Minv:=d*crZQ(M)^-1;
+        X``att:=Z;
+    end if;
+    return Z`Minv;
+end function;
+
+total_bits:=function(M)
+// the number of bits of the entries of the integer matrix M: the measure used to compare two
+// Z-bases of the same lattice (see replace_zbasis_if_smaller). A zero entry counts as one bit: the
+// zeros of an HNF are cheap in the integer arithmetic.
+    return &+[ Ilog2(Abs(c)+1)+1 : c in Eltseq(M) ];
+end function;
+
+replace_zbasis_if_smaller:=function(X,Z : Force:=false)
+// Given a lattice X (an order, a fractional ideal or a module) and a record Z of format zbasis_fmt
+// with another Z-basis of the same lattice, makes Z the working Z-basis of X if X has none, if
+// Force is true, or if Z is smaller: its matrix has at most 3/4 of the bits of the matrix of the
+// working Z-basis (see total_bits). The margin avoids replacing a basis, and with it the
+// coordinates returned by AbsoluteCoordinates, for no measurable gain: in our measurements
+// (2026-11-26) the operations on lattices take the same time with Z-bases whose sizes differ by
+// less, and are slower only with much larger ones (e.g. a*Z-basis, or a skewed basis). Returns
+// whether the working Z-basis was replaced. Every replacement of the working Z-basis goes through
+// this function.
+// The Generators of an ideal or a module with at least dim generators (e.g. the old Z-basis) are
+// replaced with the new Z-basis, as ZBasisLLL does.
+    if assigned X`ZBasis and not Force then
+        d,M:=zb_dM(X);
+        if not assigned Z`d then
+            Z`d:=d;
+            Z`M:=crQZ(d*MatrixAtoQ(Z`seq));
+        end if;
+        assert Z`d eq d; // the denominator depends only on the lattice
+        bX:=total_bits(M);
+        bZ:=total_bits(Z`M);
+        if 4*bZ gt 3*bX then
+            return false;
+        end if;
+        vprintf ZBasis, 1 : "replace_zbasis_if_smaller: the working Z-basis (%o bits) is replaced by a basis with %o bits\n", bX, bZ;
+    end if;
+    X`ZBasis:=Z;
+    if Type(X) ne AlgEtQOrd and assigned X`Generators and #X`Generators ge AbsoluteDimension(Z`A) then
+        X`Generators:=zb_seq(X);
+    end if;
+    return true;
+end function;
+
+sum_of_lattices_hnf:=function(Xs : extra:=[])
+// Given orders or fractional ideals in the same algebra, returns H and d as in lattice_hnf for the
+// lattice spanned by all of them (and by the elements in extra), from the integer matrices of their
+// working Z-bases (see zb_dM): when they are known, the Z-bases are not converted to matrices
+// again, and their elements are not needed.
+    ds:=[]; Ms:=[* *]; // a list: the matrices of the records are square, the one of extra not
+    if #extra gt 0 then
+        Q:=MatrixAtoQ(extra);
+        Append(~ds,Integers()!Denominator(Q));
+        Append(~Ms,crQZ(ds[1]*Q));
+    end if;
+    for X in Xs do
+        if not assigned X`ZBasis then
+            _:=ZBasis(X);
+        end if;
+        dX,MX:=zb_dM(X);
+        Append(~ds,dX);
+        Append(~Ms,MX);
+    end for;
+    d:=LCM(ds);
+    M:=(d div ds[1])*Ms[1];
+    for k in [2..#Ms] do
+        M:=VerticalJoin(M,(d div ds[k])*Ms[k]);
+    end for;
+    return hnf(M),d;
+end function;
+
 all_but_one:=function(seq, op, one)
 // Given a sequence seq of n elements, an associative and commutative operation op (a function of
 // two arguments, e.g. func< I,J | I meet J >) and its neutral element one, returns rests and suf,
@@ -238,46 +382,58 @@ end function;
 /// The `ZBasis` is put in a canonical form (we use the Hermite normal form of the numerators and divide by the denominators), unless the parameter `Check` is set to $0$ and the given elements are as many as the dimension of the algebra: then they are taken as the `ZBasis`. The entries of the corresponding upper triangular matrix uniquely determine the order and are used for hashing it.
 
 create_order:=function(A,gens,zb,hash,CheckIsKnownOrder)
-// Creates the order of A with Z-basis zb, generated by gens (zb is used as generators when gens has
-// more than dim elements), with the given hash if hash is not empty (see hash_from_hnf). If
-// CheckIsKnownOrder is true and the order is already known, returns the known one. The stored
-// Z-basis is LLL-reduced.
+// Creates the order of A with Z-basis zb, generated by gens (when gens has more than dim elements,
+// the generators are the Z-basis, see Generators), with the given hash if hash is not empty (see
+// hash_from_hnf). If CheckIsKnownOrder is true and the order is already known, returns the known
+// one. The stored Z-basis is LLL-reduced.
 // If zb is empty, the hash must be given: the Z-basis is then the LLL reduction of the HNF read
-// from the hash (see lll_zbasis in ZBasisLLL.m), computed only if the order is not already known.
-// This avoids converting the HNF basis to elements and back (MatrixQtoA, MatrixAtoQ and the
-// denominator of the matrix cost about 6 times the LLL itself in OverOrders_3.12).
+// from the hash, computed only if the order is not already known, and its elements only when they
+// are asked for (see zbasis_fmt). This avoids converting the HNF basis to elements and back
+// (MatrixQtoA, MatrixAtoQ and the denominator of the matrix cost about 6 times the LLL itself in
+// OverOrders_3.12).
     dim:=AbsoluteDimension(A);
-    if #zb eq 0 then
-        assert #hash gt 0;
-        R:=New(AlgEtQOrd);
-        R`Algebra:=A;
-        R`Hash:=hash;
-        if CheckIsKnownOrder then
-            IsKnownOrder(~R);
-            if assigned R`ZBasis then // R is the stored copy of a known order
-                return R;
-            end if;
-        end if;
-        ZBasisLLL(R); // R has no ZBasis yet: it is computed from the hash
-        R`Generators:=#gens le dim select gens else R`ZBasis;
-        assert2 One(A) in R;
-        return R;
-    end if;
-    assert #zb eq dim;
     R:=New(AlgEtQOrd);
     R`Algebra:=A;
-    R`Generators:=#gens le dim select gens else zb;
-    R`ZBasis:=zb;
     if #hash gt 0 then
         R`Hash:=hash;
     end if;
-    assert2 One(A) in R;
-    if CheckIsKnownOrder then
-        IsKnownOrder(~R);
+    if #zb eq 0 then
+        assert #hash gt 0;
+        R`ZBasis:=zb_from_dM(A,hash[1],hnf_from_hash(hash,hash[1]) : hnf:=true);
+    else
+        assert #zb eq dim;
+        R`ZBasis:=zb_from_seq(A,zb);
     end if;
-    ZBasisLLL(R); // for better coefficients: it uses the HNF stored in the hash, computed by
-                  // IsKnownOrder
+    if CheckIsKnownOrder then
+        R0:=R;
+        IsKnownOrder(~R);
+        if not IsIdentical(R,R0) then // R is the stored copy of a known order
+            return R;
+        end if;
+    end if;
+    if #gens gt 0 and #gens le dim then // otherwise Generators returns the Z-basis
+        R`Generators:=gens;
+    end if;
+    assert2 One(A) in R;
+    ZBasisLLL(R); // for better coefficients: it uses the HNF stored in the hash, if known
     return R;
+end function;
+
+order_from_sum:=function(Xs)
+// The order spanned as a Z-module by the orders and fractional ideals in Xs, whose sum is assumed
+// to be closed under multiplication, as Order(&cat[ ZBasis(X) : X in Xs ] : Check:=0) (the same
+// output), but from the integer matrices of the Z-bases (see sum_of_lattices_hnf). Examples: S+T
+// for overorders S and T of R which differ from R at distinct primes, S+P^kO.
+    A:=Algebra(Xs[1]);
+    H,d:=sum_of_lattices_hnf(Xs);
+    assert Nrows(H) eq AbsoluteDimension(A);
+    hash:=hash_from_hnf(H,d);
+    if GetAssertions() ge 2 then // the lattice is closed under multiplication
+        zbH:=MatrixQtoA(A,(1/d)*crZQ(H));
+        H2,d2:=lattice_hnf(zbH cat [ z1*z2 : z1,z2 in zbH ]);
+        assert hash_from_hnf(H2,d2) eq hash;
+    end if;
+    return create_order(A,[],[],hash,true);
 end function;
 
 /// Returns the order generated as an algebra over $\mathbb{Z}$ by a given sequence of elements. The parameter `Check` (default $100$) determines how many times the program tries to obtain a multiplicatively closed lattice by adding the product of the given generators. If `Check` is $0$ then this step is skipped: the $\mathbb{Z}$-span of the given elements is assumed to be closed under multiplication, which is not verified, and it is returned as an order. The parameter `CheckIsKnownOrder` determines whether the program checks if the order is already known, i.e. in the attribute `KnownOrders` of the algebra. The default value is true. The stored $\mathbb{Z}$-basis is LLL reduced.
@@ -463,17 +619,21 @@ intrinsic Algebra(S::AlgEtQOrd) -> AlgEtQ
   return S`Algebra;
 end intrinsic;
 
-/// Returns the stored $\mathbb{Z}$-basis of the order.
+/// Returns the stored $\mathbb{Z}$-basis of the order, the working one: it is replaced by `ZBasisLLL`, and also when a smaller $\mathbb{Z}$-basis of the same lattice becomes known (for example its Hermite normal form, computed by `myHash`), see `ReplaceZBasis`. So the coordinates returned by `AbsoluteCoordinates` refer to the $\mathbb{Z}$-basis stored at the time of the call.
 intrinsic ZBasis(S::AlgEtQOrd)->SeqEnum[AlgEtQElt]
-{Return a Z-basis of the order.}
-    // assigned at creation
-    return S`ZBasis;
+{Return a Z-basis of the order, the stored working one: it is replaced by ZBasisLLL, and also when a smaller Z-basis of the same lattice becomes known (for example its Hermite normal form, computed by myHash), see ReplaceZBasis. So the coordinates returned by AbsoluteCoordinates refer to the Z-basis stored at the time of the call.}
+    // the record is assigned at creation, its elements possibly only now (see zbasis_fmt)
+    return zb_seq(S);
 end intrinsic;
 
 /// Return a set of generators as a $\mathbb{Z}$-algebra of the order.
 intrinsic Generators(S::AlgEtQOrd)->SeqEnum[AlgEtQElt]
 {Return a set of generators (as a Z-algebra) of the order.}
-    // assigned at creation
+    // assigned at creation, unless the order was created from more than dim elements: then the
+    // generators are the Z-basis
+    if not assigned S`Generators then
+        S`Generators:=ZBasis(S);
+    end if;
     return S`Generators;
 end intrinsic;
 
@@ -490,9 +650,12 @@ intrinsic myHash(S::AlgEtQOrd)->SeqEnum[RngIntElt]
 {Hash function for AlgEtQOrd.}
 // two orders have the hash iff they are equal
     if not assigned S`Hash then
-        H,d:=lattice_hnf(ZBasis(S));
+        d,M:=zb_dM(S);
+        H:=hnf(M);
         assert2 IsUpperTriangular(H);
         S`Hash:=hash_from_hnf(H,d);
+        // the HNF is a Z-basis of S: it becomes the working one if it is smaller
+        _:=replace_zbasis_if_smaller(S,zb_from_dM(Algebra(S),d,H : hnf:=true));
     end if;
     return S`Hash;
 end intrinsic;
@@ -530,18 +693,15 @@ end intrinsic;
 /// The same matrix can be used to obtain the coordinates of a sequence of elements with respect to the $\mathbb{Z}$-basis.
 
 inclusion_matrix:=function(O)
-// the inclusion matrix is simply the inverse of the matrix MatrixAtoQ(ZBasis(O)).
+// The inclusion matrix of the working Z-basis of O (an order, a fractional ideal or a module): the
+// inverse of the matrix MatrixAtoQ(ZBasis(O)), stored in the record of the Z-basis (see
+// zbasis_fmt), so that it always belongs to the current Z-basis.
 // This allows to check if an element is in O by simply making one matrix multiplication, rather
 // then solving a system (as in AbsoluteCoordinates). It is much faster.
-// O can also be an ideal.
-    if not assigned O`inclusion_matrix then
-        zO:=ZBasis(O);
-        O`inclusion_matrix:=<MatrixAtoQ(zO)^-1,zO>;
+    if not assigned O`ZBasis then
+        _:=ZBasis(O); // an ideal or a module whose Z-basis is not computed yet
     end if;
-    assert2 ZBasis(O) eq O`inclusion_matrix[2]; // if the ZBasis(O) is changed and inclusion_matrix
-                                                // is not deleted
-                                                // the assert will fail.
-    return Explode(O`inclusion_matrix);
+    return zb_inv(O);
 end function;
 
 all_in:=function(seq,X)
@@ -553,7 +713,8 @@ all_in:=function(seq,X)
         return true;
     end if;
     Minv:=inclusion_matrix(X);
-    return CanChangeRing(MatrixAtoQ(seq)*Minv,Integers());
+    is_in:=CanChangeRing(MatrixAtoQ(seq)*Minv,Integers()); // only the first of its two values
+    return is_in;
 end function;
 
 intrinsic 'in'(x::AlgEtQElt,O::AlgEtQOrd) -> BoolElt
@@ -646,8 +807,9 @@ end intrinsic;
 intrinsic Index(T::AlgEtQOrd) -> FldRatElt
 {Given an order T returns the determinant of the change of basis from a Z-basis of T to the basis of the parent algebra.}
   if not assigned T`Index then
-    matT:=MatrixAtoQ(ZBasis(T));
-    T`Index := Abs(Rationals() ! Determinant(matT));
+    // the determinant of (1/d)*M, see zbasis_fmt
+    d,M:=zb_dM(T);
+    T`Index := Abs(Determinant(M))/d^Nrows(M);
   end if;
   return T`Index;
 end intrinsic;
@@ -690,12 +852,12 @@ intrinsic '*'(O1::AlgEtQOrd,O2::AlgEtQOrd)->AlgEtQOrd
 end intrinsic;
 
 meet_zbasis:=function(X1,X2)
-// Given two orders or fractional ideals (or one of each) in the same algebra, returns the HNF
-// Z-basis of the intersection of their lattices and its hash.
+// Given two orders or fractional ideals (or one of each) in the same algebra, returns the record
+// (see zbasis_fmt) of the HNF Z-basis of the intersection of their lattices, without its elements,
+// and its hash.
 // The intersection depends only on the lattices: when the hash of X is known, d times the HNF of
-// its lattice is read from the hash (hnf_from_hash, for any multiple d of hash[1]), with no matrix
-// of the stored Z-basis and no denominator to compute (hash[1] is the denominator of the matrix of
-// any Z-basis of X).
+// its lattice is read from the hash (hnf_from_hash, for any multiple d of hash[1]); otherwise the
+// integer matrix of its working Z-basis is used (see zb_dM).
     A:=Algebra(X1);
     N:=AbsoluteDimension(A);
     Ms:=[* *]; ds:=[];
@@ -704,15 +866,18 @@ meet_zbasis:=function(X1,X2)
             Append(~Ms,X`Hash);
             Append(~ds,X`Hash[1]);
         else
-            M:=MatrixAtoQ(ZBasis(X));
-            Append(~Ms,M);
-            Append(~ds,Integers()!Denominator(M));
+            if not assigned X`ZBasis then
+                _:=ZBasis(X);
+            end if;
+            dX,MX:=zb_dM(X);
+            Append(~Ms,MX);
+            Append(~ds,dX);
         end if;
     end for;
     d:=LCM(ds);
-    scaled:=func< M | Type(M) eq SeqEnum select hnf_from_hash(M,d) else crQZ(d*M) >;
-    MI:=scaled(Ms[1]);
-    MJ:=scaled(Ms[2]);
+    scaled:=func< M,dX | Type(M) eq SeqEnum select hnf_from_hash(M,d) else (d div dX)*M >;
+    MI:=scaled(Ms[1],ds[1]);
+    MJ:=scaled(Ms[2],ds[2]);
     MZ:=ZeroMatrix(Integers(),N,N);
     M:=Matrix(HorizontalJoin(VerticalJoin(MI,MJ),VerticalJoin(MI,MZ)));
     M:=hnf(M);
@@ -720,8 +885,7 @@ meet_zbasis:=function(X1,X2)
     P:=Matrix(N,N,[M[i,j] : i,j in [N+1..2*N]]);
     // A block of a matrix in HNF is in HNF: P is the HNF of d times the matrix of a Z-basis of the
     // intersection, so its hash is free (see lattice_hnf).
-    zb:=MatrixQtoA(A,(1/d)*crZQ(P));
-    return zb,hash_from_hnf(P,d);
+    return zb_from_dM(A,d,P : hnf:=true),hash_from_hnf(P,d);
 end function;
 
 intrinsic 'meet'(O1::AlgEtQOrd,O2::AlgEtQOrd)->AlgEtQOrd
@@ -744,11 +908,11 @@ intrinsic 'meet'(O1::AlgEtQOrd,O2::AlgEtQOrd)->AlgEtQOrd
     if O2 subset O1 then
         return O2;
     end if;
-    zb,hash:=meet_zbasis(O1,O2);
-    // The intersection of two orders is multiplicatively closed. Its hash is known: we store it
-    // before the known orders are looked up, which would compute it again.
-    O:=create_order(Algebra(O1),zb,zb,hash,true);
-    assert2 O eq Order(zb);
+    _,hash:=meet_zbasis(O1,O2);
+    // The intersection of two orders is multiplicatively closed. Its hash is known: the order is
+    // created from it (see create_order), and it is looked up among the known orders.
+    O:=create_order(Algebra(O1),[],[],hash,true);
+    assert2 O eq Order(ZBasis(O));
     return O;
 end intrinsic;
 
@@ -1019,7 +1183,9 @@ end intrinsic;
     end for;
     for I in ids do
         J:=fresh_ideal(I);
-        J`ZBasis:=ZBasis(I); // a Z-basis but no hash: ZBasisLLL computes the hash and stores it
+        // a Z-basis but no hash: ZBasisLLL computes the hash and stores it (a copy of the record of
+        // the Z-basis of I, not LLL-reduced)
+        Z:=I`ZBasis; Z`lll:=false; J`ZBasis:=Z;
         assert not assigned J`Hash;
         ZBasisLLL(J);
         assert assigned J`Hash and myHash(J) eq myHash(fresh_ideal(J)) and J eq I;

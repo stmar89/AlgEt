@@ -38,17 +38,16 @@ declare attributes AlgEtQMod : Index, //stores the index
                               UniverseAlgebra, // A pair <V,m> where V is the algebra where M lives
                                                // in, and m is the action Algebra(R)->V
                               Generators,
-                              ZBasis,
+                              ZBasis, // the working Z-basis, a record of format zbasis_fmt (Ord.m)
+                              CanonicalZBasis, // the LLL reduction of the HNF, a record of format
+                                               // zbasis_fmt: see ZBasisLLLFromHNF
                               IsDirectSumOfIdeals,
                               Hash, // the sequence returned by myHash
-                              HashValue, // the integer returned by Hash
-                              inclusion_matrix,
-                              IsZBasisLLLReduced, // these two are set by ZBasisLLL, see ZBasisLLL
-                                                  // for ideals
-                              IsZBasisLLLFromHNF;
+                              HashValue; // the integer returned by Hash
 
-import "../AlgEtQ/Ord.m" : crZQ , MatrixAtoQ , MatrixQtoA , inclusion_matrix , lattice_hnf , hash_from_hnf , all_in;
-import "../AlgEtQ/ZBasisLLL.m" : lll_zbasis;
+import "../AlgEtQ/Ord.m" : crZQ , MatrixAtoQ , MatrixQtoA , inclusion_matrix , lattice_hnf , hash_from_hnf , all_in ,
+                           hnf , zb_from_seq , zb_from_dM , zb_seq , zb_dM , replace_zbasis_if_smaller;
+import "../AlgEtQ/ZBasisLLL.m" : lll_zbasis , canonical_zbasis;
 import "PowerBass.m" : is_pure_power_internal;
 import "../AlgEtQ/Quotients.m" : quotient_from_zbases;
 
@@ -76,11 +75,10 @@ CreateAlgEtQMod:=function(S,m,gens : ZSpan:=false)
             gens:=[g*m(s) : g in gens, s in ZBasis(S) ];
         end if;
         H,d:=lattice_hnf(gens);
-        zb:=MatrixQtoA(V,(1/d)*crZQ(H));
-        assert #zb eq AbsoluteDimension(V);
+        assert Nrows(H) eq AbsoluteDimension(V);
         I`Hash:=hash_from_hnf(H,d);
-        I`ZBasis:=zb;
-        gens:=zb;
+        I`ZBasis:=zb_from_dM(V,d,H : hnf:=true);
+        gens:=zb_seq(I);
     end if;
     I`Generators:=gens;
     return I;
@@ -177,8 +175,9 @@ intrinsic Generators(I::AlgEtQMod) -> SeqEnum[AlgEtQElt]
     return I`Generators;
 end intrinsic;
 
+/// Returns a $\mathbb{Z}$-basis of the module, the stored working one: it is replaced by `ZBasisLLL`, and also when a smaller $\mathbb{Z}$-basis of the same lattice becomes known, see `ReplaceZBasis`.
 intrinsic ZBasis(I::AlgEtQMod)->SeqEnum[AlgEtQElt]
-{Returns a Z-basis of the module.}    
+{Returns a Z-basis of the module, the stored working one: it is replaced by ZBasisLLL, and also when a smaller Z-basis of the same lattice becomes known, see ReplaceZBasis.}
     if not assigned I`ZBasis then
         assert assigned I`Generators;
         assert not assigned I`Hash; //if Hash is assigned then a ZBasis has been computed
@@ -186,44 +185,63 @@ intrinsic ZBasis(I::AlgEtQMod)->SeqEnum[AlgEtQElt]
         S:=Order(I);
         gens:=[g*m(s) : g in Generators(I) , s in ZBasis(S) ];
         H,d:=lattice_hnf(gens);
-        zb:=MatrixQtoA(V,(1/d)*crZQ(H));
-        assert #zb eq AbsoluteDimension(V);
+        assert Nrows(H) eq AbsoluteDimension(V);
         I`Hash:=hash_from_hnf(H,d);
-        I`ZBasis:=zb;
+        I`ZBasis:=zb_from_dM(V,d,H : hnf:=true);
     end if;
-    return I`ZBasis;
+    return zb_seq(I);
 end intrinsic;
 
 intrinsic myHash(I::AlgEtQMod)->SeqEnum[RngIntElt]
 {Hash function.}
     if not assigned I`Hash then
-        H,d:=lattice_hnf(ZBasis(I));
+        if not assigned I`ZBasis then
+            _:=ZBasis(I); // it computes the HNF and the hash
+        end if;
+    end if;
+    if not assigned I`Hash then
+        d,M:=zb_dM(I);
+        H:=hnf(M);
         assert2 IsUpperTriangular(H);
         I`Hash:=hash_from_hnf(H,d);
+        // the HNF is a Z-basis of I: it becomes the working one if it is smaller
+        _:=replace_zbasis_if_smaller(I,zb_from_dM(UniverseAlgebra(I),d,H : hnf:=true));
     end if;
     return I`Hash;
 end intrinsic;
 
-/// A procedure that replaces the stored $\mathbb{Z}$-basis of the module with an LLL-reduced one, if this has not been done before. With the vararg `FromHNF:=true`, the LLL reduction starts from the Hermite normal form, so that the new $\mathbb{Z}$-basis depends only on the module, and not on the stored one. The attribute `inclusion_matrix`, which depends on the stored $\mathbb{Z}$-basis, is deleted. See `ZBasisLLL` for ideals.
-intrinsic ZBasisLLL(M::AlgEtQMod : FromHNF:=false)
-{A procedure that replaces the stored ZBasis of the module with an LLL-reduced one, if this has not been done before. With the vararg FromHNF:=true, the LLL reduction starts from the Hermite normal form, so that the new ZBasis depends only on the module, and not on the stored one. The attribute inclusion_matrix, which depends on the stored ZBasis, is deleted. See ZBasisLLL for ideals.}
-    reduced:=assigned M`IsZBasisLLLReduced and M`IsZBasisLLLReduced;
-    from_hnf:=assigned M`IsZBasisLLLFromHNF and M`IsZBasisLLLFromHNF;
-    if not reduced or (FromHNF and not from_hnf) then
-        V:=UniverseAlgebra(M);
-        // the hash depends only on the lattice: it is used if known, and stored if computed
-        zb,hash,from_hnf:=lll_zbasis(V,ZBasis(M),assigned M`Hash select M`Hash else [] : FromHNF:=FromHNF);
-        M`ZBasis:=zb;
-        M`Hash:=hash;
-        M`IsZBasisLLLReduced:=true;
-        M`IsZBasisLLLFromHNF:=from_hnf;
-        delete M`inclusion_matrix; // this is computed with respect to the old ZBasis!
-        // as for ideals: at least dim generators, for example the old ZBasis, are replaced with the
-        // new ZBasis, which is not longer and has smaller elements
-        if #Generators(M) ge AbsoluteDimension(V) then
-            M`Generators:=zb;
-        end if;
+/// A procedure that replaces the stored $\mathbb{Z}$-basis of the module with an LLL-reduced one, if this has not been done before. See `ZBasisLLL` for ideals.
+intrinsic ZBasisLLL(M::AlgEtQMod)
+{A procedure that replaces the stored ZBasis of the module with an LLL-reduced one, if this has not been done before. See ZBasisLLL for ideals.}
+    if not assigned M`ZBasis then
+        _:=ZBasis(M);
     end if;
+    if not M`ZBasis`lll then
+        // as for ideals: at least dim generators, for example the old ZBasis, are replaced with the
+        // new ZBasis, which is not longer and has smaller elements (see replace_zbasis_if_smaller)
+        _:=replace_zbasis_if_smaller(M,lll_zbasis(M) : Force:=true);
+    end if;
+end intrinsic;
+
+/// Returns the LLL reduction of the Hermite normal form of the module: a $\mathbb{Z}$-basis which depends only on the module, and not on the stored $\mathbb{Z}$-basis. It is computed once and stored. If it is smaller than the stored $\mathbb{Z}$-basis, it replaces it, see `ReplaceZBasis`.
+intrinsic ZBasisLLLFromHNF(M::AlgEtQMod) -> SeqEnum[AlgEtQElt]
+{Returns the LLL reduction of the Hermite normal form of the module: a Z-basis which depends only on the module, and not on the stored Z-basis. It is computed once and stored. If it is smaller than the stored Z-basis, it replaces it, see ReplaceZBasis.}
+    if not assigned M`CanonicalZBasis then
+        M`CanonicalZBasis:=canonical_zbasis(M);
+    end if;
+    zb:=zb_seq(M : att:="CanonicalZBasis"); // before the record is copied below
+    _:=replace_zbasis_if_smaller(M,M`CanonicalZBasis);
+    return zb;
+end intrinsic;
+
+/// Replaces the stored $\mathbb{Z}$-basis of the module $M$ with the given $\mathbb{Z}$-basis `zb` of the same module, if it is smaller, or always with `Force:=true`. See `ReplaceZBasis` for ideals.
+intrinsic ReplaceZBasis(M::AlgEtQMod, zb::SeqEnum[AlgEtQElt] : Force:=false)
+{Replaces the stored Z-basis of the module M with the given Z-basis zb of the same module, if it is smaller, or always with Force:=true. See ReplaceZBasis for ideals.}
+    V:=UniverseAlgebra(M);
+    require #zb eq AbsoluteDimension(V) and Universe(zb) cmpeq V : "zb must be a Z-basis in the universe algebra of M";
+    H,d:=lattice_hnf(zb);
+    require Nrows(H) eq #zb and hash_from_hnf(H,d) eq myHash(M) : "zb must be a Z-basis of M";
+    _:=replace_zbasis_if_smaller(M,zb_from_seq(V,zb) : Force:=Force);
 end intrinsic;
 
 //----------
@@ -300,8 +318,12 @@ end intrinsic;
 intrinsic Index(T::AlgEtQMod) -> FldRatElt
 {Given an ideal T computes its index with respect to the basis of the algebra of T as a free Z-module.}
   if not assigned T`Index then
-    matT := MatrixAtoQ(ZBasis(T));
-    T`Index := Abs(Rationals() ! Determinant(matT));
+    // the determinant of (1/d)*M, see zbasis_fmt in Ord.m
+    if not assigned T`ZBasis then
+      _:=ZBasis(T);
+    end if;
+    d,M:=zb_dM(T);
+    T`Index := Abs(Determinant(M))/d^Nrows(M);
   end if;
   return T`Index;
 end intrinsic;
@@ -329,7 +351,10 @@ intrinsic '!!'(T::AlgEtQOrd,I::AlgEtQMod) -> AlgEtQMod
         //in this case, Generators of I might not be a generating set over T
         _,m:=UniverseAlgebra(I);
         id:=Module(T,m,ZBasis(I));
-        id`ZBasis:=ZBasis(I); //the ZBasis stays the same..
+        id`ZBasis:=I`ZBasis; //the ZBasis stays the same (its record, with the inclusion matrix)
+        if assigned I`CanonicalZBasis then
+            id`CanonicalZBasis:=I`CanonicalZBasis;
+        end if;
         return id;
     else
         _,m:=UniverseAlgebra(I);
@@ -350,7 +375,8 @@ intrinsic Quotient(I::AlgEtQMod, J::AlgEtQMod) -> GrpAb, Map
     require UniverseAlgebra(I) cmpeq UniverseAlgebra(J) : "the modules must be in the same universe algebra";
     // The maps use the Z-basis zbI of I at creation and its inclusion matrix Minv, so that they
     // stay correct if ZBasis(I) is replaced later (see quotient_from_zbases in Quotients.m).
-    Minv,zbI := inclusion_matrix(I);
+    Minv:=inclusion_matrix(I);
+    zbI:=ZBasis(I); // the Z-basis of the same record as Minv
     return quotient_from_zbases(UniverseAlgebra(I),Minv,zbI,ZBasis(J));
 end intrinsic;
 
@@ -414,21 +440,20 @@ end intrinsic;
     end try;
     assert "not in the same algebra" in msg;
     printf ".";
-    // ZBasisLLL: the same module and hash, with an LLL-reduced Z-basis; with FromHNF the Z-basis
-    // depends only on the module; a quotient map created before the reduction stays correct.
+    // ZBasisLLL: the same module and hash, with an LLL-reduced Z-basis; ZBasisLLLFromHNF depends
+    // only on the module; a quotient map created before the reduction stays correct.
     for M in mods[1..10] do
         zb:=ZBasis(M);
         N1:=Module(E,m,zb); // the HNF basis
         N2:=Module(E,m,zb);
         // another Z-basis of the same module
-        N2`ZBasis:=[ zb[1] ] cat [ zb[i]+(i+7)*zb[1] : i in [2..#zb] ];
+        ReplaceZBasis(N2,[ zb[1] ] cat [ zb[i]+(i+7)*zb[1] : i in [2..#zb] ] : Force:=true);
         J:=Module(E,m,[ 3*z : z in zb ]); // 3M, contained in M
         Q,q:=Quotient(N2,J);
-        ZBasisLLL(N1 : FromHNF:=true);
+        c1:=ZBasisLLLFromHNF(N1);
         ZBasisLLL(N2);
-        assert N2`IsZBasisLLLReduced and myHash(N2) eq myHash(M) and N2 eq M;
-        ZBasisLLL(N2 : FromHNF:=true);
-        assert N2`IsZBasisLLLFromHNF and ZBasis(N2) eq ZBasis(N1);
+        assert N2`ZBasis`lll and myHash(N2) eq myHash(M) and N2 eq M;
+        assert ZBasisLLLFromHNF(N2) eq c1;
         assert forall{ z : z in zb | z in N2 }; // the inclusion matrix is the one of the new ZBasis
         assert forall{ z : z in ZBasis(N2) | q(z)@@q - z in J } and forall{ z : z in ZBasis(J) | q(z) eq Zero(Q) };
     end for;

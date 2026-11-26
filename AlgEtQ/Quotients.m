@@ -55,7 +55,8 @@ intrinsic Quotient(I::AlgEtQIdl, zbJ::SeqEnum[AlgEtQElt]) -> GrpAb, Map
 {Given a fractional ideal I and the ZBasis of an ideal or order J such that  J subset I, returns the abelian group Q=I/J together with the quotient map q:I->Q.}
     A:=Algebra(I);
     require forall{ z : z in zbJ | Algebra(z) cmpeq A } : "the algebra is not the same";
-    Minv,zbI:=inclusion_matrix(I);
+    Minv:=inclusion_matrix(I);
+    zbI:=ZBasis(I); // the Z-basis of the same record as Minv
     return quotient_from_zbases(A,Minv,zbI,zbJ);
 end intrinsic;
 
@@ -70,7 +71,8 @@ intrinsic Quotient(S::AlgEtQOrd, zbJ::SeqEnum[AlgEtQElt]) -> GrpAb, Map
 {Given an order S and the ZBasis of an ideal or order J such that J subset S, returns the abelian group Q=S/J together with the quotient map q:S->Q.}
     A:=Algebra(S);
     require forall{ z : z in zbJ | Algebra(z) cmpeq A } : "the algebra is not the same";
-    Minv,zbS:=inclusion_matrix(S);
+    Minv:=inclusion_matrix(S);
+    zbS:=ZBasis(S); // the Z-basis of the same record as Minv
     return quotient_from_zbases(A,Minv,zbS,zbJ);
 end intrinsic;
 
@@ -170,7 +172,8 @@ intrinsic QuotientVS(I::AlgEtQOrd, J::AlgEtQOrd, P::AlgEtQIdl) -> ModRng, Map
  - J subset I and I/J is a vector space V over K, say of dimension d.
  The function returns the KModule K^d=V and the natural surjection I->V (with preimages).}
     S := Order(P);
-    IS:=S!!OneIdeal(I); JS:=S!!OneIdeal(J); // S*I and S*J: equal to I and J if and only if they are S-modules
+    IS:=S!!OneIdeal(I); JS:=S!!OneIdeal(J); // S*I and S*J: equal to I and J if and only if they are
+                                            // S-modules
     require Index(IS) eq Index(I) : "the first argument must be an S-module, where S is the order of P";
     require Index(JS) eq Index(J) : "the second argument must be an S-module, where S is the order of P";
     return QuotientVS(IS,JS,P);
@@ -219,7 +222,8 @@ intrinsic QuotientVS(I::AlgEtQIdl, J::AlgEtQIdl, P::AlgEtQIdl) -> ModRng, Map
     require (#K)^d eq Integers()!(Index(J)/Index(I)) : "I/J is not a vector space over the residue field of P";
     V := KModule(K,d);
     //need to find a basis of I/J over R/P.
-    Minv,zbI := inclusion_matrix(I); // see coords_wrt
+    Minv:=inclusion_matrix(I); // see coords_wrt
+    zbI:=ZBasis(I); // the Z-basis of the same record as Minv
     N := #zbI;
     F := FreeAbelianGroup(N);
     relJ := [F ! cc : cc in coords_wrt(ZBasis(J),Minv)];
@@ -344,13 +348,14 @@ end intrinsic;
     Q,q:=Quotient(I,J);
     V,v:=QuotientVS(I,J,P);
     zb:=ZBasis(I);
-    I`ZBasis:=[ zb[1] ] cat [ zb[i]+(i+1)*zb[1] : i in [2..#zb] ]; // another Z-basis of I
-    delete I`inclusion_matrix; // as ZBasisLLL does
+    // another one
+    ReplaceZBasis(I,[ zb[1] ] cat [ zb[i]+(i+1)*zb[1] : i in [2..#zb] ] : Force:=true);
     assert forall{ y : y in Q | q(y@@q) eq y } and forall{ z : z in ZBasis(J) | q(z) eq Zero(Q) };
     assert forall{ y : y in V | v(y@@v) eq y } and forall{ z : z in ZBasis(J) | v(z) eq Zero(V) };
     printf ".";
 
-    // the arguments must be modules over the order of P, and I/J a vector space over its residue field
+    // the arguments must be modules over the order of P, and I/J a vector space over its residue
+    // field
     _<x>:=PolynomialRing(Integers());
     A:=EtaleAlgebra(x^2+1); O:=MaximalOrder(A); i:=PrimitiveElement(A); R:=Order([3*i]);
     failed:=false; try _:=QuotientVS(O,R,PrimesAbove(3*OneIdeal(O))[1]); catch e failed:=true; end try; assert failed;

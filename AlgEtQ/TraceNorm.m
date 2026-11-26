@@ -13,6 +13,8 @@ freeze;
 
 declare verbose AlgEtQTraceNorm, 3;
 
+import "Ord.m" : zb_from_seq;
+
 ///# Trace and norm
 /// Let $A$ be an étale algebra over $\mathbb{Q}$, with components $K_1\times\cdots\times K_n$.
 /// We define the `(absolute) trace` on $A$ as the additive map $\mathrm{Tr_{A/\mathbb{Q}}}\colon A\to \mathbb{Q}$ that sends an element $a\in A$ to $\sum_{i=1}^n \mathrm{Tr}_{K_i/\mathbb{Q}}(a)$.
@@ -79,7 +81,7 @@ intrinsic TraceDualIdeal(I::AlgEtQIdl) -> AlgEtQIdl
         BB:=[ A ! < BB[k][i] : k in [1..Nnf] > : i in [1..n] ];
         assert2 forall{ i : i,j in [1..n] | AbsoluteTrace( B[i]*BB[j] ) eq KroneckerDelta(i,j) };
         It:=Ideal(S,BB);
-        It`ZBasis:=BB; //we know that BB is a ZBasis
+        It`ZBasis:=zb_from_seq(A,BB); //we know that BB is a ZBasis
         if assigned I`MultiplicatorRing then
         // the multiplicator ring of I is the same of its trace dual.
             It`MultiplicatorRing:=I`MultiplicatorRing;

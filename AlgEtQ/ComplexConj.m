@@ -17,7 +17,7 @@ declare attributes AlgEtQ : HasComplexConjugate;
 declare attributes AlgEtQOrd : IsConjugateStable;
 declare attributes AlgEtQIdl : IsConjugateStable;
 
-import "Ord.m" : lattice_hnf, hash_from_hnf, MatrixQtoA, crZQ;
+import "Ord.m" : lattice_hnf, hash_from_hnf, MatrixQtoA, crZQ, zb_from_dM;
 
 ///# Complex Conjugation and CM-étale algebras
 /// Let $A$ be an étale algebra over $\mathbb{Q}$ with components $K_1\times\cdots\times K_n$.
@@ -77,7 +77,7 @@ intrinsic IsConjugateStable(I::AlgEtQIdl) -> BoolElt,AlgEtQIdl
         // conj is a Z-basis of Ib: its HNF gives the ZBasis and the hash that ZBasis(Ib) would
         // compute from the dim^2 products of conj with ZBasis(Ob).
         H,d:=lattice_hnf(conj);
-        Ib`ZBasis:=MatrixQtoA(Algebra(I),(1/d)*crZQ(H));
+        Ib`ZBasis:=zb_from_dM(Algebra(I),d,H : hnf:=true);
         Ib`Hash:=hash_from_hnf(H,d);
         if not is_stableO then
             is_stable:=false; //can't compare I and Ib since they are defined over different orders

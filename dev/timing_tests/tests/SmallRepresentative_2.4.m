@@ -13,6 +13,16 @@
     1693 digits, about 1 s with 9362a5e).
 */
 AttachSpec(spec);
+// Stores zb as the Z-basis of J without any computation: before 2026-11-26 the attribute ZBasis is the
+// sequence, since then a record (zbasis_fmt in Ord.m), whose format is read from an existing record.
+set_zbasis:=procedure(J,zb)
+    if "CanonicalZBasis" in GetAttributes(AlgEtQIdl) then
+        S:=Order(J); _:=ZBasis(OneIdeal(S));
+        J`ZBasis:=rec< Format(OneIdeal(S)`ZBasis) | A:=Algebra(J), seq:=zb, lll:=false, hnf:=false >;
+    else
+        J`ZBasis:=zb;
+    end if;
+end procedure;
 SetSeed(1);
 SetClassGroupBounds("GRH");
 _<x>:=PolynomialRing(Integers());
@@ -45,7 +55,7 @@ for d in data do
     zb:=ZBasis(Ideal(O,ZBasis(P^n))); // the HNF basis, the same in every version
     Append(~chks,checksum(zb));
     J:=Ideal(O,zb); // a fresh copy
-    J`ZBasis:=zb;
+    set_zbasis(J,zb);
     t0:=Cputime();
         aJ,a:=SmallRepresentative(J);
     t+:=Cputime(t0);

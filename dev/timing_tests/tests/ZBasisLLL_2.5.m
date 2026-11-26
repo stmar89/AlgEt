@@ -13,6 +13,16 @@
     algebra, with entries of about 100 digits, 250 rounds, about 6 s with 9362a5e).
 */
 AttachSpec(spec);
+// Stores zb as the Z-basis of J without any computation: before 2026-11-26 the attribute ZBasis is the
+// sequence, since then a record (zbasis_fmt in Ord.m), whose format is read from an existing record.
+set_zbasis:=procedure(J,zb)
+    if "CanonicalZBasis" in GetAttributes(AlgEtQIdl) then
+        S:=Order(J); _:=ZBasis(OneIdeal(S));
+        J`ZBasis:=rec< Format(OneIdeal(S)`ZBasis) | A:=Algebra(J), seq:=zb, lll:=false, hnf:=false >;
+    else
+        J`ZBasis:=zb;
+    end if;
+end procedure;
 SetSeed(1);
 _<x>:=PolynomialRing(Integers());
 // Fixed inputs (see README): a checksum of the coordinates of a sequence of elements, printed and asserted below.
@@ -73,7 +83,7 @@ for r in [1..100] do
     for inp in inputs do
         R,zb,L:=Explode(inp);
         J:=Ideal(R,zb); // a fresh copy, since ZBasisLLL does nothing on a reduced basis
-        J`ZBasis:=zb;
+        set_zbasis(J,zb);
         t0:=Cputime();
             ZBasisLLL(J);
         t+:=Cputime(t0);

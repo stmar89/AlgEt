@@ -15,6 +15,7 @@ freeze;
 // TwoGeneratingSet
 //------------
 import "ShortEltSmallRep.m" : short_non_zero_divisors;
+import "Ord.m" : zb_from_seq;
 
 ///## Two-generating set
 
@@ -31,7 +32,7 @@ intrinsic TwoGeneratingSet(I::AlgEtQIdl)
             I`Generators:=[a]; //the ideal is principal
         else
             aS:=Ideal(S,zbaS);
-            aS`ZBasis:=zbaS;
+            aS`ZBasis:=zb_from_seq(Algebra(S),zbaS);
             // a and b generate I if and only if the images of b*ZBasis(S) generate Q
             generates:=func< b | Q eq sub<Q|[q(b*z):z in ZBasis(S)]> >;
             // We try elements of I in a fixed order: the LLL-reduced ZBasis of I (computed by
@@ -99,7 +100,7 @@ end intrinsic;
             a,b:=Explode(Generators(I));
             zbaE:=[ a*z : z in ZBasis(E) ];
             aE:=Ideal(E,zbaE);
-            aE`ZBasis:=zbaE;
+            ReplaceZBasis(aE,zbaE : Force:=true);
             assert ShortElementModulo(b,aE) eq b;
             assert I eq Ideal(E,[a,b]);
         end if;

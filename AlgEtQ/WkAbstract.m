@@ -11,6 +11,8 @@
 
 freeze;
 
+import "Ord.m" : order_from_sum;
+
 declare verbose WkAbstract, 3;
 
 declare attributes AlgEtQOrd: WKICMAbstractRep;
@@ -353,7 +355,7 @@ intrinsic Localization(W::AlgEtQWECM,P::AlgEtQIdl)->AlgEtQWECM
     O:=MaximalOrder(Algebra(R));
     _,p:=IsPrimePower(Index(R,P));
     k:=Valuation(Index(O,R),p);
-    RP:=Order(ZBasis(R) cat ZBasis(O!!P^k) : Check:=0); // R+P^kO is closed under multiplication
+    RP:=order_from_sum([* R,O!!P^k *]); // R+P^kO is closed under multiplication
     return WeakEquivalenceClassMonoidAbstract(RP);
 end intrinsic;
 

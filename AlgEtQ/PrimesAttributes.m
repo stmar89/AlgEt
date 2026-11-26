@@ -88,7 +88,6 @@ intrinsic Uniformizers(PPs::SeqEnum[AlgEtQIdl]) -> SeqEnum
     // element of its class modulo L, the product of the P_i^2 (their intersection, since they are
     // coprime): the LLL reduction of the HNF of L, so that the output depends only on the primes.
     L:=&meet PPs2;
-    ZBasisLLL(L : FromHNF:=true);
     mL:=MinimalInteger(L);
     for iP->P in PPs do
         vprintf Uniformizers,2 : "nice_uniformizers: %o-th prime...",iP;
@@ -96,13 +95,12 @@ intrinsic Uniformizers(PPs::SeqEnum[AlgEtQIdl]) -> SeqEnum
         // An element of P not in P^2 has valuation 1 at P. We take the first one in the LLL-reduced
         // Z-basis of P obtained from its HNF, which depends only on P: some element of a Z-basis of
         // P is not in P^2, since P ne P^2.
-        ZBasisLLL(P : FromHNF:=true);
-        tP:=[ z : z in ZBasis(P) | not z in P2 ][1];
+        tP:=[ z : z in ZBasisLLLFromHNF(P) | not z in P2 ][1];
         vprintf Uniformizers,2 : "got an element of valuation 1...";
         assert2 tP in P and not tP in P2;
         elts:=[ i eq iP select tP else one : i in [1..#PPs] ];
         tP:=CRT(PPs2,elts);
-        tP:=ShortElementModulo(tP,L);
+        tP:=ShortElementModulo(tP,L : Canonical:=true);
         // Adding a multiple of the smallest positive integer mL in L does not change the classes
         // modulo the P_i^2, and tP+k*mL is a zero-divisor for at most one k per component.
         k:=0;
@@ -157,9 +155,8 @@ end intrinsic;
             // short: the reduction modulo L, the product of the P^2, plus k times the smallest
             // integer of L, with k at most the number of components
             L:=&meet[ P^2 : P in pp ];
-            ZBasisLLL(L : FromHNF:=true); // the basis used by Uniformizers
             assert forall{ t : t in ts | exists{ k : k in [0..#Components(A)] |
-                                            t-ShortElementModulo(t,L) eq k*MinimalInteger(L) } };
+                                            t-ShortElementModulo(t,L : Canonical:=true) eq k*MinimalInteger(L) } };
             assert forall{ 0 : i,j in [1..#pp] | Valuation(ts[i],pp[j]) eq (i eq j select 1 else 0) };
             // not random: the same uniformizers with another seed, for equal primes created again
             SetSeed(2);

@@ -37,9 +37,10 @@ max_abs:=function(X)
 end function;
 
 lll_zbasis:=function(A,zb,hash : FromHNF:=false)
-// Given a Z-basis zb of a lattice in A, and its hash (see hash_from_hnf in Ord.m) or [] if it is
-// not known, returns an LLL-reduced Z-basis of the same lattice, the hash, and whether the reduced
-// matrix was the HNF, that is, whether the output depends only on the lattice.
+// Given a Z-basis zb of a lattice in A (or [] when the hash is known), and its hash (see
+// hash_from_hnf in Ord.m) or [] if it is not known, returns an LLL-reduced Z-basis of the same
+// lattice, the hash, and whether the reduced matrix was the HNF, that is, whether the output
+// depends only on the lattice.
 // With FromHNF:=true the HNF is always the matrix that is reduced, so the output depends only on
 // the lattice, and not on zb; this can be slower when zb is already almost reduced.
 // Let M be the matrix of the coordinates of zb and d its denominator.
@@ -50,6 +51,16 @@ lll_zbasis:=function(A,zb,hash : FromHNF:=false)
 // Working with the integer matrix d*M is also faster than calling LLL on M.
 // The HNF of d*M is d times the HNF of the lattice, which can be read from the hash, if known:
 // otherwise we compute it, and the hash comes for free.
+    // With zb empty (an order created from its HNF, see create_order in Ord.m), the basis is the
+    // HNF basis: with d = hash[1], its denominator, d*M is the HNF read from the hash, so it is not
+    // converted to elements and back. The result is the same as for the HNF basis given as zb.
+    if #zb eq 0 then
+        assert #hash gt 0;
+        d:=hash[1];
+        H:=hnf_from_hash(hash,d);
+        L:=LLL(H);
+        return MatrixQtoA(A,(1/d)*crZQ(L)),hash,true;
+    end if;
     M:=MatrixAtoQ(zb);
     d:=Integers()!Denominator(M);
     MZ:=crQZ(d*M);
@@ -86,9 +97,10 @@ end function;
 intrinsic ZBasisLLL(S::AlgEtQOrd : FromHNF:=false)
 {A procedure that replaces the stored ZBasis with an LLL-reduced one, if this has not been done before. With the vararg FromHNF:=true, the LLL reduction starts from the Hermite normal form of the lattice, so that the new ZBasis depends only on the lattice, and not on the stored one; this can be slower when the stored ZBasis is already almost reduced. The attribute inclusion_matrix, which depends on the stored ZBasis, is deleted.}
   if zbasis_lll_needed(S,FromHNF) then
-    // the hash depends only on the lattice: it is used if known, and stored if computed
-    zb,hash,from_hnf:=lll_zbasis(Algebra(S),ZBasis(S),assigned S`Hash select S`Hash else [] :
-                                    FromHNF:=FromHNF);
+    // the hash depends only on the lattice: it is used if known, and stored if computed; an order
+    // created by create_order from its HNF has no ZBasis yet, and the hash is then known
+    zb,hash,from_hnf:=lll_zbasis(Algebra(S),assigned S`ZBasis select S`ZBasis else [],
+                                    assigned S`Hash select S`Hash else [] : FromHNF:=FromHNF);
     S`ZBasis:=zb;
     S`Hash:=hash;
     S`IsZBasisLLLReduced:=true;

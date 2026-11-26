@@ -242,7 +242,27 @@ create_order:=function(A,gens,zb,hash,CheckIsKnownOrder)
 // more than dim elements), with the given hash if hash is not empty (see hash_from_hnf). If
 // CheckIsKnownOrder is true and the order is already known, returns the known one. The stored
 // Z-basis is LLL-reduced.
+// If zb is empty, the hash must be given: the Z-basis is then the LLL reduction of the HNF read
+// from the hash (see lll_zbasis in ZBasisLLL.m), computed only if the order is not already known.
+// This avoids converting the HNF basis to elements and back (MatrixQtoA, MatrixAtoQ and the
+// denominator of the matrix cost about 6 times the LLL itself in OverOrders_3.12).
     dim:=AbsoluteDimension(A);
+    if #zb eq 0 then
+        assert #hash gt 0;
+        R:=New(AlgEtQOrd);
+        R`Algebra:=A;
+        R`Hash:=hash;
+        if CheckIsKnownOrder then
+            IsKnownOrder(~R);
+            if assigned R`ZBasis then // R is the stored copy of a known order
+                return R;
+            end if;
+        end if;
+        ZBasisLLL(R); // R has no ZBasis yet: it is computed from the hash
+        R`Generators:=#gens le dim select gens else R`ZBasis;
+        assert2 One(A) in R;
+        return R;
+    end if;
     assert #zb eq dim;
     R:=New(AlgEtQOrd);
     R`Algebra:=A;
@@ -314,7 +334,7 @@ intrinsic Order( gens::SeqEnum[AlgEtQElt] : Check:=100 , CheckIsKnownOrder:=true
         end if;
         e:=Integers()!Denominator(P);
         hash:=hash_from_hnf(crQZ(e*P),e);
-        zb:=MatrixQtoA(A,P);
+        zb:=[]; // the LLL-reduced Z-basis is computed from the hash in create_order
     elif #gens gt dim then
     // We assume that gens generates over Z a multiplicatively closed lattice: we only need its
     // Z-basis (one HNF). Examples:
@@ -324,11 +344,12 @@ intrinsic Order( gens::SeqEnum[AlgEtQElt] : Check:=100 , CheckIsKnownOrder:=true
     // - S+I, for an order S and an integral ideal I of an overorder of S.
         H,d:=lattice_hnf(gens);
         hash:=hash_from_hnf(H,d);
-        zb:=MatrixQtoA(A,(1/d)*crZQ(H));
+        zb:=[]; // the LLL-reduced Z-basis is computed from the hash in create_order
         // the lattice is closed under multiplication: it has the same hash as the lattice spanned
         // with the products
         if GetAssertions() ge 2 then
-            H2,d2:=lattice_hnf(zb cat [ z1*z2 : z1,z2 in zb ]);
+            zbH:=MatrixQtoA(A,(1/d)*crZQ(H));
+            H2,d2:=lattice_hnf(zbH cat [ z1*z2 : z1,z2 in zbH ]);
             assert hash_from_hnf(H2,d2) eq hash;
         end if;
     else
@@ -988,7 +1009,8 @@ end intrinsic;
     end for;
     printf ".";
 
-    // Check:=1 suffices when one enlargement is needed; EquationOrder needs an integral primitive element
+    // Check:=1 suffices when one enlargement is needed; EquationOrder needs an integral primitive
+    // element
     _<x>:=PolynomialRing(Integers());
     A:=EtaleAlgebra(x^3-2);
     assert Order([PrimitiveElement(A)] : Check:=1) eq EquationOrder(A);

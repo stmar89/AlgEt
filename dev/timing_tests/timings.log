@@ -1332,3 +1332,14 @@
 2026-11-20 20:59	laplace OvGU	2.30-1	d65a92f	round3	WKICM_4.9	211.380	ok
 2026-11-20 20:59	laplace OvGU	2.30-1	d65a92f	round3	WkAbstract_5.4	91.240	ok
 2026-11-20 20:59	laplace OvGU	2.30-1	d65a92f	round3	ZBasisLLL_2.5	174.510	ok
+2026-11-26 10:05	laptop aerox	2.30-1	445e170	B37-base	GraphOverOrders_3.14	120.480	ok
+2026-11-26 10:05	laptop aerox	2.30-1	445e170	B37-base	GraphOverOrders_3.15	119.910	ok
+2026-11-26 10:05	laptop aerox	2.30-1	445e170	B37-base	GraphOverOrders_3.16	159.630	ok
+2026-11-26 10:05	laptop aerox	2.30-1	445e170	B37-base	GraphOverOrders_3.17	132.510	ok
+2026-11-26 10:05	laptop aerox	2.30-1	445e170	B37-base	OverOrders_3.10	116.360	ok
+2026-11-26 10:05	laptop aerox	2.30-1	445e170	B37-base	OverOrders_3.11	124.380	ok
+2026-11-26 10:05	laptop aerox	2.30-1	445e170	B37-base	OverOrders_3.12	120.660	ok
+2026-11-26 10:05	laptop aerox	2.30-1	445e170	B37-base	OverOrders_3.13	15.490	ok
+2026-11-26 10:05	laptop aerox	2.30-1	445e170	B37-base	OverOrders_3.7	18.420	ok
+2026-11-26 10:15	laptop aerox	2.30-1	445e170	B37-base-pair	OverOrders_3.10	126.060	ok
+2026-11-26 10:17	laptop aerox	2.30-1	445e170	B37-base-pair	OverOrders_3.11	129.780	ok

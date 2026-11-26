@@ -48,6 +48,16 @@ SELECTED := $(ALLTESTS)
 else
 SELECTED := $(sort $(foreach t,$(TESTS),$(wildcard $(TESTDIR)/$(t).m)))
 endif
+# By default, run and all skip the selected tests that already have a line in timings.log for this machine and
+# commit, so that isolated runs logged earlier are not repeated; FORCE=1 runs them anyway (e.g. for more rounds).
+ifeq ($(strip $(FORCE)),)
+ifneq ($(filter run all,$(MAKECMDGOALS)),)
+DONETESTS := $(shell [ -f $(LOGFILE) ] && awk -F'\t' -v m="$(MACHINE)" -v c="$(COMMIT)" '!/^\#/ && $$2==m && $$4==c {print $$6}' $(LOGFILE) | sort -u)
+SKIPPED := $(filter $(addprefix $(TESTDIR)/,$(addsuffix .m,$(DONETESTS))),$(SELECTED))
+SELECTED := $(filter-out $(SKIPPED),$(SELECTED))
+endif
+endif
+SELNAMES := $(patsubst $(TESTDIR)/%.m,%,$(SELECTED))
 LOGS := $(patsubst $(TESTDIR)/%.m,$(LOGDIR)/%.log,$(SELECTED))
 
 # The tests that took longest on this machine (from timings.log) are started first, so that the wall time of a run
@@ -63,16 +73,20 @@ all: clean
 	@$(MAKE) --no-print-directory run
 
 run:
-	@[ -n "$(SELECTED)" ] || { echo "No test selected (TESTS='$(TESTS)')."; exit 1; }
+	@[ -z "$(SKIPPED)" ] || echo "Skipped, already in $(LOGFILE) for '$(MACHINE)' and $(COMMIT) (FORCE=1 runs them): $(patsubst $(TESTDIR)/%.m,%,$(SKIPPED))"
+ifeq ($(strip $(SELECTED)),)
+	@echo "Nothing to run (TESTS='$(TESTS)')."
+else
 	@mkdir -p $(LOGDIR)
 	@echo "Timing tests: $(words $(SELECTED)) tests, $(JOBS) at a time, timeout $(TIMEOUT)s."
 	@echo "  spec $(SPEC) (commit $(COMMIT)), machine '$(MACHINE)', Magma $(MAGMAVER), label '$(LABEL)'"
 	@# Attach the spec once, so that the package is compiled before the parallel runs start.
 	@echo 'AttachSpec("$(SPEC)"); quit;' | magma -b > /dev/null
-	@start=$$(date +%s); $(MAKE) --no-print-directory -j$(JOBS) logs; \
+	@start=$$(date +%s); $(MAKE) --no-print-directory -j$(JOBS) logs TESTS="$(SELNAMES)"; \
 	 echo "Wall time of the run: $$(( $$(date +%s) - start )) s"
-	@$(MAKE) --no-print-directory summary
-	@$(MAKE) --no-print-directory log
+	@$(MAKE) --no-print-directory summary TESTS="$(SELNAMES)"
+	@$(MAKE) --no-print-directory log TESTS="$(SELNAMES)"
+endif
 
 logs: $(LOGS_ORDERED)
 

@@ -30,8 +30,9 @@ exact tag or the short hash of the tree `SPEC` points to (plus `-dirty` if it ha
 folder), or the content of its `COMMIT` file.
 
 A test that does not finish within `TIMEOUT` is recorded with status `TIMEOUT(<limit>s)`, e.g. `TIMEOUT(2400s)`, and
-`make compare` shows it as `>2400`. `make all` always runs every test, also the ones that timed out before (e.g.
-WKICM_4.7 with v1.0.2). A timeout with a commit other than the baseline (`BASELINE`),
+`make compare` shows it as `>2400`. `make all` and `make run` skip the tests that already have a line in
+`timings.log` for the same machine and commit (also the ones that timed out), so that a run after isolated runs only
+adds the missing tests; `FORCE=1` runs them anyway, e.g. for more rounds of the same commit. A timeout with a commit other than the baseline (`BASELINE`),
 of a test that completed before on the same machine (with any commit), is also a regression: the run prints a
 `REGRESSION:` warning and the case is recorded in `regressions.txt`, to be investigated.
 

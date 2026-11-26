@@ -22,14 +22,15 @@ declare attributes AlgEtQOrd : SingularPrimes,
                                             // order because ideals over different orders cannot be
                                             // compared.
 
-// The primes of the maximal order O, built once: an AssociativeArray keyed by the rational primes q,
-// whose value is the list of the triples <i, P_L, P>, one for each prime P of O above q: P is
-// P_L, a prime of the maximal order of the i-th component, at the i-th component, and the unit ideal
-// at the other components. The list has the components in order, and for each of them the
+// The primes of the maximal order O, built once: an AssociativeArray keyed by the rational primes
+// q, whose value is the list of the triples <i, P_L, P>, one for each prime P of O above q: P is
+// P_L, a prime of the maximal order of the i-th component, at the i-th component, and the unit
+// ideal at the other components. The list has the components in order, and for each of them the
 // primes in the order of Factorization(q*O_i). Each P is marked prime, with its ramification index
 // and its inertia degree. Written only by primes_above_rational_prime; read by
-// factorizationMaximalOrder and PlacesAboveRationalPrime. A prime of O is always the same object, so
-// what is stored on it (ZBasis, Hash, residue field, PrimeBelow, minimal overorders) is computed once.
+// factorizationMaximalOrder and PlacesAboveRationalPrime. A prime of O is always the same object,
+// so what is stored on it (ZBasis, Hash, residue field, PrimeBelow, minimal overorders) is computed
+// once.
 declare attributes AlgEtQOrd : PrimesAboveRationalPrime;
 
 ///# Primes, factorization and completions
@@ -43,12 +44,20 @@ intrinsic IsPrime(I::AlgEtQIdl) -> BoolElt
 {Returns whether the given integral fractional ideal is a prime of its order of definition.}
     if not assigned I`IsPrime then
         require IsIntegral(I): "the ideal must be integral";
-        prim:=PrimesAbove(I);
-        if #prim eq 1 and I eq prim[1] then
+        // Cheap tests first, from N = [S:I]: S/I is a field only if N = p^f and p is in I (the
+        // characteristic of S/I is p); if N = p, then S/I has p elements, so it is a field. Only
+        // the remaining cases need the primes above I.
+        S:=Order(I);
+        is_pp,p,f:=IsPrimePower(Integers()!Index(OneIdeal(S),I));
+        if not is_pp or not (Algebra(S)!p in I) then
+            bool:=false;
+        elif f eq 1 then
             bool:=true;
         else
-            bool:=false;
+            prim:=PrimesAbove(I);
+            bool:=#prim eq 1 and I eq prim[1];
         end if;
+        assert2 bool eq (#PrimesAbove(I) eq 1 and I eq PrimesAbove(I)[1]);
         I`IsPrime:=bool;
     end if;
     return I`IsPrime;
@@ -149,8 +158,8 @@ intrinsic PrimesAbove(I::AlgEtQIdl) -> SeqEnum[AlgEtQIdl]
         else
             // The primes of S containing I contain N:=MinimalInteger(I), so they are above the
             // rational primes q dividing N. Each of them is PrimeBelow(S,PO) for a prime PO of the
-            // maximal order O above q, and I c PO meet S if and only if I c PO. The primes of O above
-            // q are built once (primes_above_rational_prime) and I c PO is tested with a few
+            // maximal order O above q, and I c PO meet S if and only if I c PO. The primes of O
+            // above q are built once (primes_above_rational_prime) and I c PO is tested with a few
             // memberships: neither I*O nor its factorization are needed. The output is in a fixed
             // order: by q, then by component; repetitions (several primes of O above the same prime
             // of S) are removed.
@@ -264,7 +273,8 @@ intrinsic Factorization(I::AlgEtQIdl) -> Tup
                 Append(~facS, <P,pO[2]>);
             end for;
             assert2 #{ p[1] : p in facS } eq #facS; // the primes of S are distinct
-            assert2 I eq &*[ &*[ p[1] : i in [1..p[2]] ] : p in facS ]; // no '^': see factorizationMaximalOrder
+            // no '^': see factorizationMaximalOrder
+            assert2 I eq &*[ &*[ p[1] : i in [1..p[2]] ] : p in facS ];
             I`Factorization:=facS;
         end if;
      end if;
@@ -387,9 +397,10 @@ end intrinsic;
     end try;
     assert ok;
     printf ".";
-    // at assertion level 2, the check of a factorization formed the prime powers with '^', which for
-    // this ideal led to an infinite recursion (TwoGeneratingSet, CoprimeRepresentative, PrimesAbove,
-    // Factorization) and a crash of Magma; found by the timing test PicardGroup_1.8 at level 2
+    // at assertion level 2, the check of a factorization formed the prime powers with '^', which
+    // for this ideal led to an infinite recursion (TwoGeneratingSet, CoprimeRepresentative,
+    // PrimesAbove, Factorization) and a crash of Magma; found by the timing test PicardGroup_1.8 at
+    // level 2
     SetAssertions(2);
     _<x>:=PolynomialRing(Integers());
     A:=EtaleAlgebra(x^6-3*x^5-3*x^4+65*x^3-48*x^2-768*x+4096);
@@ -402,6 +413,16 @@ end intrinsic;
     I:=Ideal(S,[ A!t : t in gI ]);
     TwoGeneratingSet(I);
     assert #Generators(I) le 2 and I eq Ideal(S,Generators(I));
+    printf ".";
+    // IsPrime decides from the index first: fresh copies, so that no flag is set
+    A:=EtaleAlgebra((x^2+5)*(x^2-2));
+    E:=EquationOrder(A);
+    for P in PrimesAbove(6*OneIdeal(E)) do
+        assert IsPrime(Ideal(E,ZBasis(P))); // index p or p^f
+    end for;
+    assert not IsPrime(Ideal(E,ZBasis(6*OneIdeal(E)))); // the index is not a prime power
+    assert not IsPrime(Ideal(E,ZBasis(PrimesAbove(3*OneIdeal(E))[1]^2))); // index p^2, not prime
+    assert not IsPrime(Ideal(E,ZBasis(9*OneIdeal(E)))); // 3 is not in 9E
     printf ".";
     SetAssertions(1);
     printf " all good!";

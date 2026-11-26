@@ -47,7 +47,7 @@ declare attributes AlgEtQMod : Index, //stores the index
                                                   // for ideals
                               IsZBasisLLLFromHNF;
 
-import "../AlgEtQ/Ord.m" : crZQ , MatrixAtoQ , MatrixQtoA , inclusion_matrix , lattice_hnf , hash_from_hnf;
+import "../AlgEtQ/Ord.m" : crZQ , MatrixAtoQ , MatrixQtoA , inclusion_matrix , lattice_hnf , hash_from_hnf , all_in;
 import "../AlgEtQ/ZBasisLLL.m" : lll_zbasis;
 import "PowerBass.m" : is_pure_power_internal;
 import "../AlgEtQ/Quotients.m" : quotient_from_zbases;
@@ -63,8 +63,8 @@ CreateAlgEtQMod:=function(S,m,gens : ZSpan:=false)
 // Given S::AlgEtQOrd and some generators creates the new object 
 // m:Algebra(S)->Parent(gens[1]) determine the action
 // Here we just assign the generators. we do not compute the Zbasis unless necessary!
-// If ZSpan is true, then gens are assumed to generate the module also over Z: the ZBasis is computed
-// from them, without multiplying them by ZBasis(S) (as for ideals, see CreateAlgEtQIdl).
+// If ZSpan is true, then gens are assumed to generate the module also over Z: the ZBasis is
+// computed from them, without multiplying them by ZBasis(S) (as for ideals, see CreateAlgEtQIdl).
     I:=New(AlgEtQMod);
     V:=Codomain(m);
     I`UniverseAlgebra:=<V,m>;
@@ -269,10 +269,7 @@ end intrinsic;
 intrinsic 'in'(x::AlgEtQElt , I::AlgEtQMod ) -> BoolElt
 {Returns if x is in I.}
     require Algebra(x) eq UniverseAlgebra(I) : "the elements must lie in the same algebra of definition";
-    ZZ:=Integers();
-    coord:=AbsoluteCoordinates([x],I)[1];
-    is_in:=forall{m : m in coord | IsCoercible(ZZ,m)};
-    return is_in;
+    return all_in([x],I);
 end intrinsic;
 
 intrinsic 'in'(x::RngIntElt , I::AlgEtQMod ) -> BoolElt
@@ -293,7 +290,7 @@ intrinsic 'subset'(I1 :: AlgEtQMod, I2 :: AlgEtQMod) -> BoolElt
   end if;
   // the generators of I1 generate it over Order(I1): if the orders differ, a Z-basis is needed
   gens:=Order(I1) eq Order(I2) select Generators(I1) else ZBasis(I1);
-  return forall{ x : x in gens | x in I2};
+  return all_in(gens,I2);
 end intrinsic;
 
 //----------
@@ -443,7 +440,8 @@ end intrinsic;
     M:=Module(S,m,[One(A)]);
     assert T!!M eq Module(T,m,ZBasis(O));
     printf ".";
-    // ModuleFromDirectSum refuses a sum which is not direct; subset of modules over different orders
+    // ModuleFromDirectSum refuses a sum which is not direct; subset of modules over different
+    // orders
     _<x>:=PolynomialRing(Integers());
     K:=EtaleAlgebra(x^2+20); R:=EquationOrder(K); O:=MaximalOrder(K); m:=NaturalAction(K,K);
     failed:=false; try _:=ModuleFromDirectSum(R,m,[<OneIdeal(R),m>,<Ideal(R,ZBasis(O)),m>]); catch e failed:=true; end try; assert failed;
@@ -462,7 +460,8 @@ end intrinsic;
     V:=EtaleAlgebra([NumberField(x^2+20),NumberField(x^2+20)]); m:=NaturalAction(K,V);
     e:=OrthogonalIdempotents(V);
     failed:=false; try _:=ModuleFromDirectSum(R,m,[<Ideal(R,ZBasis(O)),e[1]>,<OneIdeal(R),e[2]>]); catch e failed:=true; end try; assert failed;
-    _:=ModuleFromDirectSum(R,m,[<OneIdeal(R),e[1]>,<Ideal(R,ZBasis(O)),e[2]>]); // (R:R) c (O:O): a chain
+    // (R:R) c (O:O): a chain
+    _:=ModuleFromDirectSum(R,m,[<OneIdeal(R),e[1]>,<Ideal(R,ZBasis(O)),e[2]>]);
     printf ".";
     SetAssertions(1);
     printf " all good!";

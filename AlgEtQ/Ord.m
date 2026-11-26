@@ -544,6 +544,18 @@ inclusion_matrix:=function(O)
     return Explode(O`inclusion_matrix);
 end function;
 
+all_in:=function(seq,X)
+// Given a sequence of elements of the algebra of X, an order, a fractional ideal or a module
+// (anything with a ZBasis), returns whether all of them are in X: one matrix for all the elements,
+// one product with the inclusion matrix, and one test that the product is integral (CanChangeRing
+// is about 8 times faster than testing the entries one by one with IsCoercible).
+    if #seq eq 0 then
+        return true;
+    end if;
+    Minv:=inclusion_matrix(X);
+    return CanChangeRing(MatrixAtoQ(seq)*Minv,Integers());
+end function;
+
 intrinsic 'in'(x::AlgEtQElt,O::AlgEtQOrd) -> BoolElt
 {Inclusion of an element in the order.}
     require Algebra(x) cmpeq Algebra(O) : "the algebra is not the same";
@@ -553,10 +565,7 @@ intrinsic 'in'(x::AlgEtQElt,O::AlgEtQOrd) -> BoolElt
         return true;
     end if;
     */
-    ZZ:=Integers();
-    coord:=AbsoluteCoordinates([x],O)[1];
-    is_in:=forall{m : m in coord | IsCoercible(ZZ,m)};
-    return is_in;
+    return all_in([x],O);
 end intrinsic;
 
 intrinsic 'in'(x::RngIntElt,O::AlgEtQOrd) -> BoolElt
@@ -575,7 +584,7 @@ intrinsic 'subset'(O1 :: AlgEtQOrd, O2 :: AlgEtQOrd) -> BoolElt
   if not Index(O2, O1) in Integers() then
     return false;
   end if;
-  return forall{z : z in Generators(O1) | z in O2 };
+  return all_in(Generators(O1),O2); // ring generators suffice: O2 is closed under products
 end intrinsic;
 
 /// Given an element $x$ and an order $S$, returns the coordinates of the element with respect to the stored $\mathbb{Z}$-basis of $S$.
@@ -743,7 +752,7 @@ intrinsic IsProductOfOrders(O::AlgEtQOrd)->BoolElt, Tup
     if not assigned O`IsProductOfOrders then
         A:=Algebra(O);
         idem:=OrthogonalIdempotents(A);
-        test:=forall{x : x in idem | x in O};
+        test:=all_in(idem,O);
         if test then
             nf,_,projs:=Components(A);
             if #nf eq 1 then

@@ -16,7 +16,7 @@ declare verbose CRT, 2;
 declare attributes AlgEtQOrd : CRT_data;
 declare attributes AlgEtQIdl : CRT_data;
 
-import "Ord.m" : crQZ , crZQ , MatrixAtoQ , all_but_one;
+import "Ord.m" : crQZ , crZQ , MatrixAtoQ , all_but_one , all_in;
 
 ///## Chinese remainder theorem
 /// Let $I$ and $J$ be integral fractional ideals over the same order $S$ in an étale algebra.
@@ -123,7 +123,7 @@ intrinsic ChineseRemainderTheorem(Is::SeqEnum[AlgEtQIdl],as::SeqEnum[AlgEtQElt])
     N:=#as;
     S:=Order(Is[1]);
     require #Is eq N: "The number of ideals is not the same as the number of elements";
-    require forall{i : i in [1..N] | as[i] in S}:"the elements must lie in order of definition of the ideals";
+    require all_in(as,S):"the elements must lie in order of definition of the ideals";
     require forall{i : i in [2..N] | Order(Is[i]) eq S}:"the ideals must be of the same order";
     // From the last ideal to the first: e = as[i] modulo Is[i], and e is the element of the
     // previous step modulo suf[i+1], the intersection of Is[i+1..N]. The intersections of the

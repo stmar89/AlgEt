@@ -42,7 +42,7 @@ declare attributes AlgEtQIdl : Index, //stores the index
                               inclusion_matrix;
 
 import "Ord.m" : crQZ , crZQ , hnf , MatrixAtoQ , MatrixQtoA , meet_zbasis , inclusion_matrix ,
-                 lattice_hnf , hash_from_hnf , hnf_from_hash;
+                 lattice_hnf , hash_from_hnf , hnf_from_hash , all_in;
 import "ShortEltSmallRep.m" : short_non_zero_divisors;
 
 ///# Ideals of orders in étale algebras over $\mathbb{Q}$
@@ -226,9 +226,9 @@ intrinsic '!!'(T::AlgEtQOrd,I::AlgEtQIdl) -> AlgEtQIdl
             return I`ExtensionToMultiplicatorRing;
         end if;
         if not (to_max or to_mr or Order(I) subset T) then
-            // Order(I) and T are not contained in each other: the generators of I over Order(I) do not
-            // generate I*T over T, while a Z-basis of I does. I*T is an Order(I)*T-module, so it is
-            // not invertible over T: no attributes are set.
+            // Order(I) and T are not contained in each other: the generators of I over Order(I) do
+            // not generate I*T over T, while a Z-basis of I does. I*T is an Order(I)*T-module, so
+            // it is not invertible over T: no attributes are set.
             return Ideal(T,ZBasis(I));
         end if;
         out:=Ideal(T,Generators(I));
@@ -401,11 +401,9 @@ end intrinsic;
 intrinsic 'in'(x::AlgEtQElt , I::AlgEtQIdl ) -> BoolElt
 {Returns whether the element is in the given fractional ideal.}
     require Algebra(x) eq Algebra(I) : "the elements must lie in the same algebra of definition";
-    ZZ:=Integers();
-    coord:=AbsoluteCoordinates([x],I)[1];
-    is_in:=forall{m : m in coord | IsCoercible(ZZ,m)};
-    return is_in;
+    return all_in([x],I);
 end intrinsic;
+
 
 ///ditto
 intrinsic 'in'(x::RngIntElt , I::AlgEtQIdl ) -> BoolElt
@@ -421,25 +419,33 @@ end intrinsic;
 
 intrinsic 'subset'(S::AlgEtQOrd,I::AlgEtQIdl) -> BoolElt
 {Inclusion testing.}
-    require Order(I) eq S: "the second argument must be an ideal of the first argument";
+    require Algebra(I) eq Algebra(S): "the order and the ideal must be in the same algebra";
     return OneIdeal(S) subset I;
 end intrinsic;
 
 ///ditto
 intrinsic 'subset'(I::AlgEtQIdl,S::AlgEtQOrd) -> BoolElt
 { " } // "
-    require Order(I) eq S: "the first argument must be an ideal of the second argument";
+    require Algebra(I) eq Algebra(S): "the order and the ideal must be in the same algebra";
     return I subset OneIdeal(S);
 end intrinsic;
 
 ///ditto
 intrinsic 'subset'(I1 :: AlgEtQIdl, I2 :: AlgEtQIdl) -> BoolElt
 { " } // "
-  require Order(I1) eq Order(I2) : "The ideals must be in the same order.";
+  // The inclusion of lattices does not depend on the orders: only the algebra must be the same.
+  require Algebra(I1) eq Algebra(I2) : "The ideals must be in the same algebra.";
   if not Index(I2, I1) in Integers() then
     return false;
   end if;
-  return forall{ x : x in Generators(I1) | x in I2};
+  // The generators of I1 generate it over S1 = Order(I1): they suffice if S1 is contained in the
+  // multiplicator ring of I2, e.g. if the orders are equal or Order(I2) is maximal. Otherwise a
+  // Z-basis of I1 is needed.
+  S1:=Order(I1); S2:=Order(I2);
+  if S1 eq S2 or (assigned S2`IsMaximal and S2`IsMaximal) then
+    return all_in(Generators(I1),I2);
+  end if;
+  return all_in(ZBasis(I1),I2);
 end intrinsic;
 
 ///## Index
@@ -454,10 +460,11 @@ intrinsic Index(I::AlgEtQIdl) -> FldRatElt
   return I`Index;
 end intrinsic;
 
-/// Given fractional ideals $J$ and $I$ defined over the same order returns $[J:I] = [J:J \cap I]/[I : J \cap I]$.
+/// Given fractional ideals $J$ and $I$ in the same algebra (possibly over different orders) returns $[J:I] = [J:J \cap I]/[I : J \cap I]$.
 intrinsic Index(J::AlgEtQIdl, I::AlgEtQIdl) -> FldRatElt
-{Given fractional ideals J and I defined over the same order returns [J:I] = [J:J meet I]/[I : J meet I].}
-  require Order(I) eq Order(J): "the ideals must be of the same order";
+{Given fractional ideals J and I in the same algebra (possibly over different orders) returns [J:I] = [J:J meet I]/[I : J meet I].}
+  // the index of lattices does not depend on the orders
+  require Algebra(I) eq Algebra(J): "the ideals must be in the same algebra";
   out:=Index(I)/Index(J);
   if IsCoercible(Integers(),out) then
     out:=Integers()!out;
@@ -465,10 +472,10 @@ intrinsic Index(J::AlgEtQIdl, I::AlgEtQIdl) -> FldRatElt
   return out;
 end intrinsic;
 
-/// Given an order $S$ and a fractional $S$-ideal $I$ returns $[S:I] = [S:S \cap I]/[I : S \cap I]$.
+/// Given an order $S$ and a fractional ideal $I$ in the same algebra (over any order) returns $[S:I] = [S:S \cap I]/[I : S \cap I]$.
 intrinsic Index(S::AlgEtQOrd, I::AlgEtQIdl) -> FldRatElt
-{Given an ideal I of an order S returns [S:I] = [S:S cap I]/[I : S cap I].}
-    require Order(I) eq S: "the ideal must be of the appropriate order";
+{Given an order S and a fractional ideal I in the same algebra (over any order) returns [S:I] = [S:S cap I]/[I : S cap I].}
+    require Algebra(I) eq Algebra(S): "the order and the ideal must be in the same algebra";
     return Index(OneIdeal(S), I);
 end intrinsic;
 
@@ -1529,6 +1536,28 @@ end intrinsic;
     // generators which do not span a lattice of full rank
     A:=EtaleAlgebra((x^2+5)*(x^2+7)); E:=EquationOrder(A); e1:=OrthogonalIdempotents(A)[1];
     failed:=false; try _:=Ideal(E,[e1,2*e1]); catch e failed:=true; end try; assert failed;
+    printf ".";
+    // subset and Index across orders: only the algebra must be the same
+    _<x>:=PolynomialRing(Integers());
+    A:=EtaleAlgebra(x^2+1); O:=MaximalOrder(A); i:=PrimitiveElement(A); E:=Order([2*i]);
+    // OneIdeal(O) is generated by 1, which is in E, but O is not contained in E: the generators of
+    // an ideal over another order do not suffice
+    assert not OneIdeal(O) subset OneIdeal(E);
+    assert OneIdeal(E) subset OneIdeal(O);
+    assert Index(OneIdeal(O),OneIdeal(E)) eq 2 and Index(O,OneIdeal(E)) eq 2;
+    assert OneIdeal(E) subset O and not OneIdeal(O) subset E and not O subset OneIdeal(E);
+    I:=Ideal(E,[A!3]); J:=Ideal(O,[A!3]); // 3E = 3Z+6iZ and 3O = 3Z+3iZ
+    assert I subset J and not J subset I and Index(J,I) eq 2;
+    // the memberships of all the elements at once agree with the elements one by one
+    A:=EtaleAlgebra((x^2+5)*(x^3-2)); E:=EquationOrder(A); O:=MaximalOrder(A);
+    s:=48271;
+    for k in [1..30] do
+        s:=48271*s mod (2^31-1);
+        y:=&+[ ((s div 7^j) mod 7 - 3)*b/((s mod 3)+1) : j->b in AbsoluteBasis(A) ];
+        P:=PrimesAbove(((s mod 5)+2)*OneIdeal(E))[1];
+        assert (y in P) eq forall{ c : c in AbsoluteCoordinates(y,P) | IsCoercible(Integers(),c) };
+        assert (y in E) eq forall{ c : c in AbsoluteCoordinates([y],E)[1] | IsCoercible(Integers(),c) };
+    end for;
     printf ".";
     SetAssertions(1);
     printf " all good!";

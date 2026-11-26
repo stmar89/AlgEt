@@ -13,6 +13,8 @@ freeze;
 
 declare verbose FactPrimes, 3;
 
+import "Ord.m" : all_in;
+
 declare attributes AlgEtQOrd : SingularPrimes,
                                PrimesBelow; // The cache of PrimeBelow: an AssociativeArray keyed by
                                             // the orders T
@@ -170,7 +172,8 @@ intrinsic PrimesAbove(I::AlgEtQIdl) -> SeqEnum[AlgEtQIdl]
             for q in PrimeDivisors(MinimalInteger(I)) do
                 for t in primes_above_rational_prime(O,q) do
                     PO:=t[3];
-                    if forall{ g : g in gI | g in PO } then
+                    // the generators of I over S suffice: S is in O, the order of PO
+                    if all_in(gI,PO) then
                         Include(~primes, maxS select PO else PrimeBelow(S,PO));
                     end if;
                 end for;

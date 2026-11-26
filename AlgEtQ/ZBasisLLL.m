@@ -62,7 +62,8 @@ lll_zbasis:=function(A,zb,hash : FromHNF:=false)
         return MatrixQtoA(A,(1/d)*crZQ(L)),hash,true;
     end if;
     M:=MatrixAtoQ(zb);
-    d:=Integers()!Denominator(M);
+    // the denominator of the matrix of a Z-basis depends only on the lattice: it is hash[1]
+    d:=#hash gt 0 select hash[1] else Integers()!Denominator(M);
     MZ:=crQZ(d*M);
     if #hash gt 0 then
         H:=hnf_from_hash(hash,d);

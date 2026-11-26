@@ -689,17 +689,30 @@ intrinsic '*'(O1::AlgEtQOrd,O2::AlgEtQOrd)->AlgEtQOrd
     return Order(gens);
 end intrinsic;
 
-meet_zbasis:=function(zb1,zb2)
-//Returns the ZBasis of the intersection of the lattices gerated by the gven two Z-bases.
-    A:=Algebra(zb1[1]);
-    N:=#zb1;
-    MI:=crZQ(MatrixAtoQ(zb1));
-    MJ:=crZQ(MatrixAtoQ(zb2));
-    dI:=Integers() ! Denominator(MI);
-    dJ:=Integers() ! Denominator(MJ);
-    d:=LCM(dI,dJ);
-    MI:=crQZ(d*MI);
-    MJ:=crQZ(d*MJ);
+meet_zbasis:=function(X1,X2)
+// Given two orders or fractional ideals (or one of each) in the same algebra, returns the HNF
+// Z-basis of the intersection of their lattices and its hash.
+// The intersection depends only on the lattices: when the hash of X is known, d times the HNF of
+// its lattice is read from the hash (hnf_from_hash, for any multiple d of hash[1]), with no matrix
+// of the stored Z-basis and no denominator to compute (hash[1] is the denominator of the matrix of
+// any Z-basis of X).
+    A:=Algebra(X1);
+    N:=AbsoluteDimension(A);
+    Ms:=[* *]; ds:=[];
+    for X in [* X1, X2 *] do
+        if assigned X`Hash then
+            Append(~Ms,X`Hash);
+            Append(~ds,X`Hash[1]);
+        else
+            M:=MatrixAtoQ(ZBasis(X));
+            Append(~Ms,M);
+            Append(~ds,Integers()!Denominator(M));
+        end if;
+    end for;
+    d:=LCM(ds);
+    scaled:=func< M | Type(M) eq SeqEnum select hnf_from_hash(M,d) else crQZ(d*M) >;
+    MI:=scaled(Ms[1]);
+    MJ:=scaled(Ms[2]);
     MZ:=ZeroMatrix(Integers(),N,N);
     M:=Matrix(HorizontalJoin(VerticalJoin(MI,MJ),VerticalJoin(MI,MZ)));
     M:=hnf(M);
@@ -731,7 +744,7 @@ intrinsic 'meet'(O1::AlgEtQOrd,O2::AlgEtQOrd)->AlgEtQOrd
     if O2 subset O1 then
         return O2;
     end if;
-    zb,hash:=meet_zbasis(ZBasis(O1),ZBasis(O2));
+    zb,hash:=meet_zbasis(O1,O2);
     // The intersection of two orders is multiplicatively closed. Its hash is known: we store it
     // before the known orders are looked up, which would compute it again.
     O:=create_order(Algebra(O1),zb,zb,hash,true);

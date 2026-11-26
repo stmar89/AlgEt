@@ -1369,3 +1369,11 @@
 2026-11-26 15:13	laptop aerox	2.30-1	cf9d135	F1-base	CohenMacaulay_9.4	145.670	ok
 2026-11-26 15:18	laptop aerox	2.30-1	cf9d135	F1-base	PicardGroup_1.8	294.770	ok
 2026-11-26 15:21	laptop aerox	2.30-1	cf9d135	F1-base	GraphOverOrders_3.14	56.710	ok
+2026-11-26 15:13	laptop aerox	2.30-1	7dffb48	F1	CohenMacaulay_9.4	124.410	ok
+2026-11-26 15:18	laptop aerox	2.30-1	7dffb48	F1	PicardGroup_1.8	256.060	ok
+2026-11-26 15:21	laptop aerox	2.30-1	7dffb48	F1	GraphOverOrders_3.14	55.050	ok
+2026-11-26 15:30	laptop aerox	2.30-1	7dffb48	F2-base	CohenMacaulay_9.4	119.220	ok
+2026-11-26 15:35	laptop aerox	2.30-1	7dffb48	F2-base	PicardGroup_1.8	247.590	ok
+2026-11-26 15:37	laptop aerox	2.30-1	7dffb48	F2-base	GraphOverOrders_3.14	55.190	ok
+2026-11-26 15:42	laptop aerox	2.30-1	7dffb48	F2-base	PicardGroup_1.8	266.590	ok
+2026-11-26 15:44	laptop aerox	2.30-1	7dffb48	F2-base	CohenMacaulay_9.4	126.350	ok

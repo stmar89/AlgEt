@@ -759,7 +759,7 @@ intrinsic 'meet'(I::AlgEtQIdl, J::AlgEtQIdl) -> AlgEtQIdl
     if J subset I then
         return J;
     end if;
-    zb,hash:=meet_zbasis(ZBasis(I),ZBasis(J));
+    zb,hash:=meet_zbasis(I,J);
     id:=Ideal(Order(I),zb);
     id`ZBasis:=zb;
     id`Hash:=hash; // free: see meet_zbasis
@@ -1557,6 +1557,23 @@ end intrinsic;
         P:=PrimesAbove(((s mod 5)+2)*OneIdeal(E))[1];
         assert (y in P) eq forall{ c : c in AbsoluteCoordinates(y,P) | IsCoercible(Integers(),c) };
         assert (y in E) eq forall{ c : c in AbsoluteCoordinates([y],E)[1] | IsCoercible(Integers(),c) };
+    end for;
+    printf ".";
+    // meet reads the HNF from the hash when it is known: the same intersection as from fresh copies
+    // without a hash (Ideal and Order with dim elements and Check:=0 compute none)
+    A:=EtaleAlgebra((x^2+5)*(x^3-2)); E:=EquationOrder(A); O:=MaximalOrder(A);
+    ids:=[ PrimesAbove(p*OneIdeal(E))[1] : p in [2,3,5] ] cat [ Conductor(E), 6*OneIdeal(E) ];
+    for I,J in ids do
+        IJ:=I meet J;
+        I0:=Ideal(E,ZBasis(I)); J0:=Ideal(E,ZBasis(J));
+        assert not assigned I0`Hash and not assigned J0`Hash;
+        IJ0:=I0 meet J0;
+        assert ZBasis(IJ) eq ZBasis(IJ0) or (IJ eq I or IJ eq J);
+        assert IJ eq IJ0;
+    end for;
+    oo:=[ E, O, Order(ZBasis(E) cat [ 2*z : z in ZBasis(O) ]), Order(ZBasis(E) cat [ 3*z : z in ZBasis(O) ]) ];
+    for S,T in oo do
+        assert (S meet T) eq (Order(ZBasis(S) : Check:=0) meet Order(ZBasis(T) : Check:=0));
     end for;
     printf ".";
     SetAssertions(1);

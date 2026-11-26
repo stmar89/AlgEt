@@ -27,7 +27,35 @@ intrinsic IdealsOfIndex(O::RngOrd, N::RngIntElt) -> SeqEnum[RngOrdIdl]
   if N eq 1 then
         return [1*O];
   end if;
-  return [ J : J in IdealsUpTo(N, O) | Norm(J) eq N ];
+  if not IsMaximal(O) then
+      return [ J : J in IdealsUpTo(N, O) | Norm(J) eq N ];
+  end if;
+  // O is a Dedekind domain: an ideal of norm N is the product over the p^e exactly dividing N of an
+  // ideal of norm p^e, which is a product of powers P^a of the primes above p, with the sum of the
+  // a*f(P) equal to e. No enumeration of all the ideals of norm up to N.
+  result:=[ 1*O ];
+  for pe in Factorization(N) do
+      p,e:=Explode(pe);
+      sols:=[ <1*O,0> ]; // <a product of powers of the primes above p seen so far, its exponent of
+                         // p>
+      for Pr in Decomposition(O,p) do
+          P:=Pr[1];
+          f:=InertiaDegree(P);
+          new:=[];
+          for s in sols do
+              J,n:=Explode(s);
+              while n le e do
+                  Append(~new,<J,n>);
+                  J:=J*P;
+                  n+:=f;
+              end while;
+          end for;
+          sols:=new;
+      end for;
+      result:=[ I*s[1] : s in sols, I in result | s[2] eq e ];
+  end for;
+  assert2 forall{ J : J in result | Norm(J) eq N };
+  return result;
 end intrinsic;
 
 /// Given a fractional $O$-ideal $I$ in a number field and a positive integer $N$, with $N$ coprime with the conductor, returns all the fractional $O$-ideals $J$ contained in $I$ with index $[I:J]=N$.
@@ -101,8 +129,8 @@ intrinsic IdealsOfIndex(I::AlgEtQIdl, N::RngIntElt : Method := "Default") -> Seq
     if Method eq "Slow" then
         test := false;
     else
-        // The ideals are computed over T:=MultiplicatorRing(I): they are all the S-ideals of index N in I
-        // only if N is coprime to [T:S] too, besides the conductor of T.
+        // The ideals are computed over T:=MultiplicatorRing(I): they are all the S-ideals of index N
+        // in I only if N is coprime to [T:S] too, besides the conductor of T.
         T:=MultiplicatorRing(I);
         test, dec := IsProductOfIdeals(T!!I);
         if GCD(Integers()!Index(T,Order(I)), N) ne 1 then
@@ -176,6 +204,15 @@ end intrinsic;
     A:=EtaleAlgebra(x^2+1); O:=MaximalOrder(A); i:=PrimitiveElement(A); E:=Order([2*i]);
     I:=E!!OneIdeal(O);
     assert #IdealsOfIndex(I,2) eq 3 and #IdealsOfIndex(I,2 : Method:="Slow") eq 3;
+    printf ".";
+    // the ideals of a maximal order of RngOrd type are built from the primes above the prime
+    // divisors of N: the same as the enumeration of all the ideals of norm up to N
+    for f in [x^2+5, x^3-2, x^4-x^3+2*x+7] do
+        O:=MaximalOrder(NumberField(f));
+        for N in [1..60] cat [360] do
+            assert Set(IdealsOfIndex(O,N)) eq { J : J in IdealsUpTo(N,O) | Norm(J) eq N };
+        end for;
+    end for;
     printf ".";
     SetAssertions(1);
     printf " all good!";

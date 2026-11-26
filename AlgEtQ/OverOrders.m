@@ -90,23 +90,43 @@ local_overorders:=function(R)
     return R`LocalOverOrders;
 end function;
 
+is_P_overorder:=function(R, S, pp, ps)
+// Given an order R, its singular primes pp, the rational primes ps below them (ps[k] in pp[k]), and an
+// overorder S ne R, returns k if S is a pp[k]-overorder of R, that is, if the R-module S/R is supported
+// only at pp[k], and 0 otherwise (S/R supported at several primes).
+// If S/R is supported only at pp[k] then [S:R] = #(S/R) is a power of ps[k]; conversely, if [S:R] is a power
+// of p, then S/R is supported at primes above p. So the index decides, without a colon ideal, unless
+// several singular primes lie above p: then the support is read from the annihilator (R:S) of S/R, as the
+// primes containing it.
+    is_pp,p:=IsPrimePower(Integers()!Index(S,R));
+    if not is_pp then
+        return 0; // S/R is supported above several rational primes
+    end if;
+    ks:=[ k : k in [1..#pp] | ps[k] eq p ];
+    assert #ks ge 1; // the support of S/R is not empty, and consists of singular primes
+    if #ks eq 1 then
+        return ks[1];
+    end if;
+    cS:=ColonIdeal(R,R!!OneIdeal(S));
+    supp:=[ k : k in ks | cS subset pp[k] ];
+    assert #supp ge 1;
+    return #supp eq 1 select supp[1] else 0;
+end function;
+
 p_overorders_from_known:=function(R)
 // Given a non-maximal order R whose overorders are known (R`OverOrders is assigned), returns the
-// sequence of the L_k's, see local_overorders_fmt, selected from R`OverOrders.
-// An overorder S of R is a P-overorder if and only if the R-module S/R is supported only at P. The
-// support of S/R consists of the primes containing its annihilator, which is the colon ideal (R:S).
-// These primes are singular, since S/R is zero locally at the other primes. So each overorder is
-// tested once, for all the singular primes.
+// sequence of the L_k's, see local_overorders_fmt, selected from R`OverOrders: each overorder is
+// tested once, for all the singular primes, with is_P_overorder.
     pp:=SingularPrimes(R);
+    ps:=[ MinimalInteger(P) : P in pp ]; // the rational prime below P
     oo_at_Ps:=[ [ R ] : P in pp ];
     for S in R`OverOrders do
         if S ne R then
-            cS:=ColonIdeal(R,R!!OneIdeal(S));
-            supp:=[ k : k in [1..#pp] | cS subset pp[k] ];
-            assert #supp ge 1; // since S ne R
-            if #supp eq 1 then
-                Append(~oo_at_Ps[supp[1]],S);
+            k:=is_P_overorder(R,S,pp,ps);
+            if k gt 0 then
+                Append(~oo_at_Ps[k],S);
             end if;
+            assert2 k eq 0 or forall{ j : j in [1..#pp] | (j eq k) eq (ColonIdeal(R,R!!OneIdeal(S)) subset pp[j]) };
         end if;
     end for;
     for k in [1..#pp] do

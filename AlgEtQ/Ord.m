@@ -24,6 +24,8 @@ import "Elt.m" : CreateAlgEtQElt;
 declare attributes AlgEtQ : MaximalOrder,
                            ProductOfEquationOrders,
                            EquationOrder,
+                           AbsoluteBasisDiscriminant, // the discriminant of the absolute basis of
+                                                      // the algebra, see Discriminant for orders
                            KnownOrders; // An indexed set containing all the orders in the algebra
                                         // constructed so far.
                                         // We store them, because to avoid creating multiple copies
@@ -47,7 +49,8 @@ declare attributes AlgEtQOrd : IsMaximal,
                               IsGorenstein,
                               IsBass,
                               Hash, // the sequence returned by myHash
-                              HashValue; // the integer returned by Hash
+                              HashValue, // the integer returned by Hash
+                              Discriminant; // see Discriminant
 
 ///hide-all
 intrinsic Print(A::AlgEtQOrd)
@@ -577,15 +580,6 @@ intrinsic MaximalOrder(A::AlgEtQ)->AlgEtQOrd
     return A`MaximalOrder;
 end intrinsic;
 
-intrinsic IsMaximal(S::AlgEtQOrd) -> BoolElt
-{Returns whether the given order is the maximal order of the étale algebra.}
-    if not assigned S`IsMaximal then
-        O:=MaximalOrder(Algebra(S));
-        S`IsMaximal:=S eq O;
-    end if;
-    return S`IsMaximal;
-end intrinsic;
-
 ///## The attribute `KnownOrders`
 /// An étale algebra $A$ has an attribute `KnownOrders`, in which all previously constructed orders are stored.
 /// Whenever the creation intrinsic for orders is called, the program checks if the orders has already been constructed. This is done to prevent the creation of the same order multiple times. This check can be turned off with the appropriate parameter.
@@ -825,6 +819,44 @@ intrinsic Index(S::AlgEtQOrd, T::AlgEtQOrd) -> FldRatElt
   return elt;
 end intrinsic;
 
+///## Discriminant
+
+/// Returns the discriminant of the order $S$, that is, the determinant of the trace form $\mathrm{Tr}_{A/\mathbb{Q}}(z_iz_j)$ on a $\mathbb{Z}$-basis $z_1,\ldots,z_n$ of $S$. It does not depend on the $\mathbb{Z}$-basis. If $T$ is an overorder of $S$ then the discriminant of $S$ is $[T:S]^2$ times the discriminant of $T$.
+intrinsic Discriminant(S::AlgEtQOrd) -> RngIntElt
+{Returns the discriminant of the order S, that is, the determinant of the trace form Tr(z_i*z_j) on a Z-basis z_1,...,z_n of S. It does not depend on the Z-basis. If T is an overorder of S then the discriminant of S is [T:S]^2 times the discriminant of T.}
+    // With B the matrix of the absolute coordinates of ZBasis(S), the trace form of ZBasis(S) is
+    // B times the trace form of the absolute basis times B^T, and |det(B)| is Index(S): the
+    // discriminant is Index(S)^2 times the discriminant of the absolute basis of the algebra. The
+    // latter is the product of the discriminants of the bases of the components (the absolute basis
+    // is their concatenation, and the trace form is block diagonal), computed once. For a component
+    // K = Q[x]/(f) with its power basis, it is the discriminant of the monic polynomial f/lc(f),
+    // which needs no arithmetic in K (Discriminant(K) is not it when f is not monic and integral);
+    // otherwise the determinant of the trace form of Basis(K).
+    if assigned S`Discriminant then
+        return S`Discriminant;
+    end if;
+    A:=Algebra(S);
+    if not assigned A`AbsoluteBasisDiscriminant then
+        discs:=[];
+        for K in Components(A) do
+            if BaseField(K) cmpeq Rationals() and Basis(K) eq [ K.1^i : i in [0..Degree(K)-1] ] then
+                f:=ChangeRing(DefiningPolynomial(K),Rationals());
+                Append(~discs,Discriminant(f/LeadingCoefficient(f)));
+            else
+                Append(~discs,Determinant(Matrix(Rationals(),[ [ Trace(b*c) : c in Basis(K) ] : b in Basis(K) ])));
+            end if;
+        end for;
+        A`AbsoluteBasisDiscriminant:=&*discs;
+        assert2 A`AbsoluteBasisDiscriminant eq &*[ Determinant(Matrix(Rationals(),[ [ Trace(b*c) : c in Basis(K) ] : b in Basis(K) ])) : K in Components(A) ];
+    end if;
+    d:=Index(S)^2*A`AbsoluteBasisDiscriminant;
+    assert IsIntegral(d); // S is an order: the traces of its elements are integers
+    // stored: e.g. SingularPrimes and IsMaximal factor it (Magma remembers the factorizations of
+    // integers, so the second Factorization is free)
+    S`Discriminant:=Integers()!d;
+    return S`Discriminant;
+end intrinsic;
+
 ///## Product and intersection of orders
 
 intrinsic '*'(O1::AlgEtQOrd,O2::AlgEtQOrd)->AlgEtQOrd
@@ -939,6 +971,15 @@ intrinsic IsProductOfOrders(O::AlgEtQOrd)->BoolElt, Tup
                 require PrimeField(A) eq BaseField(A) : "We require the algebra to be defined over the Rationals(). The reason is that we don't have a functioning method to create orders in relative number fields which are not over the maximal order of the base field. One can still check if the order O is a product by checking if OrthogonalIdempotents(A) are in O.";
                 orders:=< Order( [ projs[i](z) : z in zb ] ) : i in [1..#idem] >;
                 assert2 O eq Order(A,orders);
+            end if;
+            if assigned O`IsMaximal and O`IsMaximal then
+                // the orders of the components of the maximal order are maximal: Magma is told so,
+                // as for its own MaximalOrder (e.g. ClassGroup refuses an order not known to be
+                // maximal). This happens when O was found maximal by IsMaximal, without computing
+                // the maximal orders of the components.
+                for OL in orders do
+                    SetOrderMaximal(OL,true);
+                end for;
             end if;
             O`IsProductOfOrders:=<true,orders>;
         else
@@ -1208,6 +1249,27 @@ end intrinsic;
     // with Check:=0, fewer elements than the dimension are refused
     A:=EtaleAlgebra(x^3-2);
     failed:=false; try _:=Order([One(A)] : Check:=0); catch e failed:=true; end try; assert failed;
+    printf ".";
+    // Discriminant: the determinant of the trace form on a Z-basis, which does not depend on the
+    // Z-basis; disc(S) = [T:S]^2*disc(T) for an overorder T; the maximal order has the product of
+    // the discriminants of the maximal orders of the components (also for a component of degree 1
+    // and a non-monic defining polynomial).
+    _<y>:=PolynomialRing(Rationals());
+    for A in [ EtaleAlgebra((x^2+5)*(x^3-2)*(x-1)), EtaleAlgebra(x^6+3*x^5+99*x^2+2997),
+               EtaleAlgebra([NumberField(2*y^2+1), NumberField(y^3-y/2+1/3)]) ] do
+        O:=MaximalOrder(A);
+        S:=Order([ 6*z : z in ZBasis(O) ]);
+        for R in [ S, O ] do
+            zb:=ZBasis(R);
+            assert Discriminant(R) eq Determinant(Matrix([ [ AbsoluteTrace(a*b) : b in zb ] : a in zb ]));
+        end for;
+        assert Discriminant(S) eq Index(O,S)^2*Discriminant(O);
+        assert Discriminant(O) eq &*[ Discriminant(MaximalOrder(K)) : K in Components(A) ];
+        zb:=ZBasis(S);
+        ReplaceZBasis(S,[ zb[1] ] cat [ zb[i]+(i+1)*zb[1] : i in [2..#zb] ] : Force:=true);
+        zb:=ZBasis(S);
+        assert Discriminant(S) eq Determinant(Matrix([ [ AbsoluteTrace(a*b) : b in zb ] : a in zb ]));
+    end for;
     printf ".";
     SetAssertions(1);
     printf "all good!";

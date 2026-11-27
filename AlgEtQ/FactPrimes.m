@@ -37,10 +37,66 @@ declare attributes AlgEtQOrd :
                                       // primes of S above p, each one a single object. Written only
                                       // by primes_of_order_above; read by PrimesAbove and
                                       // PrimeBelow.
+            MultiplicationMatrices, // The matrices of the multiplications by the elements of
+                                    // ZBasis(S) in the coordinates of ZBasis(S) (integer matrices,
+                                    // for the working Z-basis they were computed with: a tuple
+                                    // <matrices, ZBasis(S)>). Written and read only by
+                                    // fp_multiplication.
             PrimesBelow; // The cache of PrimeBelow: an AssociativeArray keyed by the orders T
                          // containing S, whose value at T is an AssociativeArray keyed by the
                          // primes P of T, with value PrimeBelow(S,P). The primes are grouped by
                          // their order because ideals over different orders cannot be compared.
+
+fp_multiplication:=function(S,p)
+// The F_p-algebra S/pS in the coordinates of zb = ZBasis(S): returns F = GF(p), V = F^n, the
+// matrices mult_by[i] of the multiplications by zb[i] (row j: the coordinates of zb[j]*zb[i]), and
+// the identity one, as a vector of V. Let BQ be the matrix of the absolute coordinates of zb and
+// R_i the matrix of the multiplication by zb[i] in the absolute basis (RepresentationMatrix): then
+// BQ*R_i*BQ^-1 is the matrix of the multiplication by zb[i] in the coordinates of zb, an integer
+// matrix since S is a ring, which we reduce modulo p. BQ^-1 is the inclusion matrix of S.
+// The integer matrices do not depend on p: they are computed once and stored in
+// S`MultiplicationMatrices, together with the Z-basis they refer to (if the working Z-basis is
+// replaced, they are computed again).
+    A:=Algebra(S);
+    zb:=ZBasis(S);
+    n:=#zb;
+    F:=GF(p);
+    V:=VectorSpace(F,n);
+    BQinv:=zb_inv(S);
+    if not assigned S`MultiplicationMatrices or not IsIdentical(S`MultiplicationMatrices[2],zb) then
+        dS,MS:=zb_dM(S); // MS = dS*BQ, an integer matrix
+        BQ:=(1/dS)*crZQ(MS);
+        S`MultiplicationMatrices:=<[ ChangeRing(BQ*RepresentationMatrix(z)*BQinv,Integers()) : z in zb ],zb>;
+    end if;
+    mult_by:=[ ChangeRing(M,F) : M in S`MultiplicationMatrices[1] ];
+    one:=V![ F!c : c in Eltseq(MatrixAtoQ([One(A)])*BQinv) ];
+    return F,V,mult_by,one;
+end function;
+
+is_field_fp:=function(I,p)
+// Given an integral ideal I of an order S with p in I (so that B = S/I is an F_p-algebra), returns
+// whether B is a field. A finite commutative F_p-algebra is reduced if and only if the Frobenius x
+// -> x^p (an F_p-linear map) is injective, since x^p = 0 for x ne 0 exactly when B has nilpotents;
+// a reduced B is a product of finite fields, and the fixed points of the Frobenius are F_p in each
+// factor: B is a field if and only if they form a space of dimension 1. B = V/U with V = S/pS (see
+// fp_multiplication) and U = I/pS, spanned by the coordinates (integers) of ZBasis(I) modulo p. The
+// Frobenius of B comes from the lifts x of the basis of B: x^p = one*L_x^p, with L_x the matrix of
+// the multiplication by x, a sum of the mult_by[i].
+    S:=Order(I);
+    F,V,mult_by,one:=fp_multiplication(S,p);
+    n:=Dimension(V);
+    U:=sub<V| [ V![ F!(Integers()!c) : c in r ] : r in AbsoluteCoordinates(ZBasis(I),S) ]>;
+    B,q:=quo<V|U>;
+    f:=Dimension(B);
+    images:=[];
+    for i in [1..f] do
+        x:=B.i@@q;
+        Lx:=&+[ x[k]*mult_by[k] : k in [1..n] | x[k] ne 0 ];
+        Append(~images,q(one*Lx^p));
+    end for;
+    FrobB:=Matrix(F,f,f,&cat[ Eltseq(y) : y in images ]);
+    return Dimension(Kernel(FrobB)) eq 0 and Dimension(Kernel(FrobB-IdentityMatrix(F,f))) eq 1;
+end function;
 
 ///# Primes, factorization and completions
 
@@ -55,19 +111,33 @@ intrinsic IsPrime(I::AlgEtQIdl) -> BoolElt
         require IsIntegral(I): "the ideal must be integral";
         // Cheap tests first, from N = [S:I]: S/I is a field only if N = p^f and p is in I (the
         // characteristic of S/I is p); if N = p, then S/I has p elements, so it is a field. Only
-        // the remaining cases need the primes above I.
+        // the remaining cases need a computation in the F_p-algebra S/I.
         S:=Order(I);
         is_pp,p,f:=IsPrimePower(Integers()!Index(OneIdeal(S),I));
-        if not is_pp or not (Algebra(S)!p in I) then
+        if assigned I`Factorization then
+            // a known factorization decides (see also Factorization)
+            bool:=#I`Factorization eq 1 and I`Factorization[1][2] eq 1;
+        elif not is_pp or not (Algebra(S)!p in I) then
             bool:=false;
         elif f eq 1 then
             bool:=true;
         else
-            prim:=PrimesAbove(I);
-            bool:=#prim eq 1 and I eq prim[1];
+            // S/I is an F_p-algebra of dimension f >= 2: a direct test, without computing the
+            // primes (see is_field_fp)
+            bool:=is_field_fp(I,p);
         end if;
         assert2 bool eq (#PrimesAbove(I) eq 1 and I eq PrimesAbove(I)[1]);
         I`IsPrime:=bool;
+        // A prime which is invertible (e.g. a prime of the maximal order) is coprime to the
+        // conductor: its factorization is itself, and so are the primes above it.
+        if bool and ((assigned S`IsMaximal and S`IsMaximal) or (assigned I`IsInvertible and I`IsInvertible)) then
+            if not assigned I`Factorization then
+                I`Factorization:=< <I,1> >;
+            end if;
+            if not assigned I`PrimesAbove then
+                I`PrimesAbove:=[ I ];
+            end if;
+        end if;
     end if;
     return I`IsPrime;
 end intrinsic;
@@ -94,24 +164,13 @@ primes_above_p_fp:=function(S,p)
     A:=Algebra(S);
     zb:=ZBasis(S);
     n:=#zb;
-    F:=GF(p);
-    V:=VectorSpace(F,n); // B = S/pS, in the coordinates of zb
-
-    // 1. The multiplication of B. Let BQ be the matrix of the absolute coordinates of zb (row i is
-    //    zb[i]) and R_i the matrix of the multiplication by zb[i] in the absolute basis (row j is
-    //    the absolute coordinates of zb[i] times the j-th basis element: RepresentationMatrix).
-    //    Then BQ*R_i*BQ^-1 is the matrix of the multiplication by zb[i] in the coordinates of zb:
-    //    its row j contains the coordinates of zb[j]*zb[i]. It is an integer matrix, since S is a
-    //    ring: we reduce it modulo p. BQ^-1 is the inclusion matrix of S (stored).
-    dS,MS:=zb_dM(S); // MS = dS*BQ, an integer matrix
-    BQ:=(1/dS)*crZQ(MS);
-    BQinv:=zb_inv(S);
-    mult_by:=[ ChangeRing(ChangeRing(BQ*RepresentationMatrix(z)*BQinv,Integers()),F) : z in zb ];
+    // 1. The multiplication of B: the matrices mult_by[i] of the multiplications by zb[i] in the
+    //    coordinates of zb, and the identity one (see fp_multiplication).
+    F,V,mult_by,one:=fp_multiplication(S,p); // B = S/pS, in the coordinates of zb
+    dS,MS:=zb_dM(S); // MS = dS times the matrix of the absolute coordinates of zb
     // the product in B of x and y (vectors in V): x = sum x[i]*zb[i], so x*y = sum
     // x[i]*(y*mult_by[i])
     mult:=func< x,y | V!Eltseq(&+[ x[i]*(y*mult_by[i]) : i in [1..n] | x[i] ne 0 ]) >;
-    // the identity of B, in the coordinates of zb
-    one:=V![ F!c : c in Eltseq(MatrixAtoQ([One(A)])*BQinv) ];
 
     // 2. The Frobenius Fr: x -> x^p as an n x n matrix over F_p (rows: images of the basis
     //    vectors). zb[i]^p = 1*zb[i]*...*zb[i] (p times), i.e. one*mult_by[i]^p: a power of a
@@ -124,11 +183,11 @@ primes_above_p_fp:=function(S,p)
     while p^t lt n do
         t+:=1;
     end while;
-    rad:=Kernel(Frob^t);
+    Frobt:=Frob^t;
+    rad:=Kernel(Frobt);
     Q,q:=quo<V|rad>;
     r:=Dimension(Q);
     lift:=func< y | y@@q >;
-    multQ:=func< x,y | q(mult(lift(x),lift(y))) >;
     oneQ:=q(one);
 
     // 4. The fixed points K of the Frobenius on Q (it induces a map on Q, since Fr(rad) c rad):
@@ -137,47 +196,47 @@ primes_above_p_fp:=function(S,p)
     K:=Kernel(FrobQ-IdentityMatrix(F,r));
     m:=Dimension(K);
 
-    // 5. The primitive idempotents of Q: we split the identity with the elements k of a basis of K
-    //    (see above). For each current idempotent e we compute the minimal polynomial of k*e in the
-    //    algebra eQ, from the first linear dependence among e, k*e, (k*e)^2, ..., and split e
-    //    according to its roots (all in F_p, and distinct).
-    PX<X>:=PolynomialRing(F);
-    idems:=[ oneQ ];
+    // 5. The decomposition of Q into its m field factors k_j = e_j*Q, with matrices: for an element
+    //    k of K, the multiplication by k on Q is diagonalizable with eigenvalues in F_p (k is in
+    //    F_p^m), and its eigenspaces are the sums of the factors on which k takes the same value.
+    //    Intersecting the eigenspaces of the elements of a basis of K separates all the factors,
+    //    since K = F_p^m is spanned by its basis. Then e_j is the component of 1 in the j-th
+    //    factor, and the j-th maximal ideal (1-e_j)*Q is the sum of the other factors.
+    // the matrix of the multiplication by x in Q (rows: the products of the basis vectors with x)
+    mult_by_in_Q:=function(x)
+        y:=lift(x);
+        M:=&+[ y[i]*mult_by[i] : i in [1..n] | y[i] ne 0 ]; // v -> v*y on V
+        return Matrix(F,r,r,&cat[ Eltseq(q(lift(Q.i)*M)) : i in [1..r] ]);
+    end function;
+    Qr:=VectorSpace(F,r); // Q in its coordinates
+    blocks:=[ Qr ];
     for k in Basis(K) do
-        if #idems eq m then
+        if #blocks eq m then
             break; // all the factors are separated
         end if;
-        new:=[];
-        for e in idems do
-            ke:=multQ(Q!Eltseq(k),e);
-            // the powers e, ke, ke^2, ... until they become linearly dependent
-            pows:=[ e ];
-            repeat
-                Append(~pows,multQ(pows[#pows],ke));
-            until Rank(Matrix(F,#pows,r,&cat[ Eltseq(v) : v in pows ])) lt #pows;
-            // ke^s = c[1]*e + c[2]*ke + ... + c[s]*ke^(s-1): the minimal polynomial of ke in eQ
-            c:=Eltseq(Solution(Matrix(F,#pows-1,r,&cat[ Eltseq(v) : v in pows[1..#pows-1] ]),Vector(F,Eltseq(pows[#pows]))));
-            minpol:=X^(#c) - &+[ c[i]*X^(i-1) : i in [1..#c] ];
-            roots:=[ rt[1] : rt in Roots(minpol) ];
-            assert #roots eq Degree(minpol); // distinct roots in F_p, since ke is in F_p^(m_e)
-            if #roots eq 1 then
-                Append(~new,e); // k is constant on the factors of e: e is not split by k
-                continue;
-            end if;
-            for a in roots do
-                // the idempotent prod_{b ne a} (ke - b*e)/(a - b): e on the factors where ke = a
-                ea:=e;
-                for b in roots do
-                    if b ne a then
-                        ea:=multQ(ea,ke-b*e)/(a-b);
-                    end if;
-                end for;
-                Append(~new,ea);
-            end for;
-        end for;
-        idems:=new;
+        Lk:=mult_by_in_Q(Q!Eltseq(k));
+        roots:=[ rt[1] : rt in Roots(MinimalPolynomial(Lk)) ];
+        if #roots gt 1 then
+            eig:=[ Kernel(Lk - a*IdentityMatrix(F,r)) : a in roots ];
+            blocks:=[ W meet E : W in blocks, E in eig | Dimension(W meet E) gt 0 ];
+        end if;
     end for;
-    assert #idems eq m;
+    assert #blocks eq m;
+    // the components of 1 in the factors, and the maximal ideals
+    big:=Matrix(F,r,r,&cat[ &cat[ Eltseq(b) : b in Basis(W) ] : W in blocks ]); // the bases, joined
+    c:=Eltseq(Solution(big,Vector(F,Eltseq(oneQ))));
+    starts:=[ 1 + &+[ Integers() | Dimension(blocks[i]) : i in [1..j-1] ] : j in [1..m] ];
+    idems:=[ Q!Eltseq(&+[ c[starts[j]+i-1]*big[starts[j]+i-1] : i in [1..Dimension(blocks[j])] ]) : j in [1..m] ];
+    maxQs:=[* *]; // a list: subspaces of different dimensions
+    for j in [1..m] do
+        gensM:=[ Q | ];
+        for i in [1..m] do
+            if i ne j then
+                gensM cat:=[ Q!Eltseq(b) : b in Basis(blocks[i]) ];
+            end if;
+        end for;
+        Append(~maxQs,sub<Q|gensM>);
+    end for;
 
     // 6. The primes. For each primitive idempotent e, the maximal ideal (1-e)*Q of Q, its
     //    preimage U in V (spanned by lifts of a basis of (1-e)*Q and by rad), and the prime of S:
@@ -186,15 +245,63 @@ primes_above_p_fp:=function(S,p)
     //    dS times the absolute coordinates of a Z-basis of the prime: one more HNF, and the ideal
     //    is created from it with its hash (ideal_from_hnf in Idl.m), without any product of
     //    elements.
+    // 7. Few generators for each prime, instead of the n elements of its Z-basis: the operations
+    //    on an ideal, e.g. the colon (P:P) (one multiplication matrix per generator) or P*P, cost
+    //    in proportion to the number of its generators. B is the product of the local algebras
+    //    e_j*B, for the idempotents e_j of B lifting the primitive idempotents of Q: a lift x of
+    //    e_j(mod rad) gives e_j = x^(p^t) = x*Fr^t, since (e+r)^p = e+r^p in characteristic p and
+    //    r^(p^t) = 0 for r in rad. The maximal ideal of B corresponding to e_j is
+    //    (1-e_j)*B + m_j, with m_j = e_j*rad the maximal ideal of e_j*B. If v_1,...,v_g generate
+    //    m_j as a B-module, then (1-e_j)+v_1, v_2, ..., v_g generate (1-e_j)*B + m_j (since
+    //    B*((1-e_j)+v) = (1-e_j)*B + B*v, the two idempotents being orthogonal), and 1-e_j alone
+    //    if m_j = 0. The prime is generated over S by p and lifts of these elements. The v_i are
+    //    chosen greedily, each one outside the B-module spanned by the previous ones (B*v is the
+    //    row space of the matrix of the multiplication by v); g is small: it is the number of
+    //    generators of the maximal ideal of S_P/pS_P, 1 or 0 if P is invertible.
+    // rows: zb[i]*v
+    mult_matrix:=func< v | Matrix(F,n,n,&cat[ Eltseq(v*mult_by[i]) : i in [1..n] ]) >;
+    rad_mat:=Matrix(F,Dimension(rad),n,&cat[ Eltseq(b) : b in Basis(rad) ]);
+    to_S:=func< vs | [ A | &+[ (Integers()!c[i])*zb[i] : i in [1..n] | c[i] ne 0 ] : c in vs ] >;
     primes:=[];
-    for e in idems do
-        maxQ:=sub<Q|[ multQ(Q.i,oneQ-e) : i in [1..r] ]>;
+    for j in [1..m] do
+        e:=idems[j];
+        maxQ:=maxQs[j];
         U:=[ lift(u) : u in Basis(maxQ) ] cat Basis(rad);
         L:=VerticalJoin(p*IdentityMatrix(Integers(),n),
                         Matrix(Integers(),#U,n,&cat[ [ Integers()!c : c in Eltseq(u) ] : u in U ]));
         Hc:=hnf(L); // the prime in the coordinates of zb
         P:=ideal_from_hnf(S,hnf(Hc*MS),dS);
         P`IsPrime:=true;
+        // the generators, see 7.
+        eB:=lift(e)*Frobt; // the idempotent of B lifting e
+        assert mult(eB,eB) eq eB;
+        mj:=sub<V| Dimension(rad) gt 0 select Rows(rad_mat*mult_matrix(eB)) else [] >; // e*rad
+        if Dimension(mj) eq 0 then
+            // The local factor e*B of B is a field: P*S_P = p*S_P is principal, so P is invertible,
+            // with multiplicator ring S. This is free here, while the test (P:P) eq S costs a colon
+            // ideal and the creation of an order: e.g. above the primes dividing the resultants of
+            // the components (which divide the discriminant with exponent >= 2) most primes are of
+            // this kind, and SingularPrimes tests them all. (m_j ne 0 does not decide: Z[sqrt(-3)]
+            // is singular at the prime above 2, Z[i] is not.)
+            P`IsInvertible:=true;
+            P`MultiplicatorRing:=S;
+            assert2 MultiplicatorRing(Ideal(S,ZBasis(P))) eq S;
+        end if;
+        vs:=[];
+        W:=sub<V|>;
+        for v in Basis(mj) do
+            if not v in W then
+                Append(~vs,v);
+                W:=W+sub<V|Rows(mult_matrix(v))>; // B*v, contained in mj
+            end if;
+            if W eq mj then
+                break;
+            end if;
+        end for;
+        gensB:=#vs eq 0 select [ one-eB ] else [ one-eB+vs[1] ] cat vs[2..#vs];
+        gens:=[ A!p ] cat to_S(gensB);
+        assert2 Ideal(S,gens) eq P;
+        P`Generators:=gens;
         Append(~primes,P);
     end for;
     return primes;
@@ -217,6 +324,14 @@ places_above_rational_prime:=function(O, q)
                 tup_p:=tup_one_ideals;
                 tup_p[i]:=pe[1]; // we replace the i-th ideal with the prime
                 P:=Ideal(O,tup_p);
+                // if this prime of O was found from O/qO (see primes_of_order_above, e.g. when O
+                // was found maximal by IsMaximal), we use that object: each prime is one ideal
+                if assigned O`PrimesAboveRationalPrime and IsDefined(O`PrimesAboveRationalPrime,q) then
+                    old:=[ Q : Q in O`PrimesAboveRationalPrime[q] | Q eq P ];
+                    if #old gt 0 then
+                        P:=old[1];
+                    end if;
+                end if;
                 ZBasisLLL(P);
                 P`IsPrime:=true;
                 P`RamificationIndex:=pe[2]; // the exponent of the prime in q*O_i
@@ -232,12 +347,13 @@ end function;
 
 primes_of_order_above:=function(S,p)
 // The primes of the order S above the rational prime p from the F_p-algebra S/pS
-// (primes_above_p_fp), without the maximal order: used by PrimesAbove when the maximal order of the
-// algebra is not known (otherwise the stored primes of the maximal order are contracted, which is
-// faster when they are shared by many orders). Computed once and stored in
-// S`PrimesAboveRationalPrime. A prime already found by PrimeBelow (an intersection) is returned as
-// that object, so that every prime of S is one ideal, whose attributes (ZBasis, hash, residue
-// field, minimal overorders) are computed once.
+// (primes_above_p_fp), without the maximal order: used by SingularPrimes, and by PrimesAbove when
+// the maximal order of the algebra is not known (otherwise the stored primes of the maximal order
+// are contracted, which is faster when they are shared by many orders). Computed once and stored in
+// S`PrimesAboveRationalPrime. A prime already found by PrimeBelow (an intersection), or by
+// places_above_rational_prime for a maximal order, is returned as that object, so that every prime
+// of S is one ideal, whose attributes (ZBasis, hash, residue field, minimal overorders) are
+// computed once.
     if not assigned S`PrimesAboveRationalPrime then
         S`PrimesAboveRationalPrime:=AssociativeArray();
     end if;
@@ -246,19 +362,52 @@ primes_of_order_above:=function(S,p)
         if assigned S`PrimesBelow then
             known:=&cat[ [ S`PrimesBelow[T][P] : P in Keys(S`PrimesBelow[T]) ] : T in Keys(S`PrimesBelow) ];
         end if;
+        // the primes of a maximal order S built from the factorization of p in the components (see
+        // places_above_rational_prime)
+        if assigned S`PlacesAboveRationalPrime and IsDefined(S`PlacesAboveRationalPrime,p) then
+            known cat:=[ t[3] : t in S`PlacesAboveRationalPrime[p] ];
+        end if;
         primes:=primes_above_p_fp(S,p);
+        // Their Z-bases are LLL-reduced only when they are returned (by PrimesAbove and
+        // SingularPrimes): many of them are only tested here.
         for k in [1..#primes] do
             old:=[ Q : Q in known | Q eq primes[k] ];
             if #old gt 0 then
                 primes[k]:=old[1];
-            else
-                ZBasisLLL(primes[k]);
             end if;
         end for;
         S`PrimesAboveRationalPrime[p]:=primes;
     end if;
     return S`PrimesAboveRationalPrime[p];
 end function;
+
+/// Given an order $S$ and a rational prime $p$, returns the primes of $S$ above $p$, that is, the maximal ideals of $S$ containing $p$. If $S$ is known to be maximal, they come from the factorization of $p$ in the components of the algebra, with their ramification indices and inertia degrees; otherwise from the $\mathbb{F}_p$-algebra $S/pS$, without computing the maximal order. They are computed once and stored in $S$.
+intrinsic PrimesAboveRationalPrime(S::AlgEtQOrd, p::RngIntElt) -> SeqEnum[AlgEtQIdl]
+{Given an order S and a rational prime p, returns the primes of S above p, that is, the maximal ideals of S containing p. If S is known to be maximal, they come from the factorization of p in the components of the algebra, with their ramification indices and inertia degrees; otherwise from the F_p-algebra S/pS, without computing the maximal order. They are computed once and stored in S.}
+    require IsPrime(p) : "p must be a prime number";
+    if assigned S`IsMaximal and S`IsMaximal then
+        return [ t[3] : t in places_above_rational_prime(S,p) ];
+    end if;
+    return primes_of_order_above(S,p);
+end intrinsic;
+
+store_as_maximal:=procedure(S)
+// S is found to be maximal (it has no singular primes): it is stored as such and, unless the
+// maximal order is already known, as the maximal order of the algebra, so that MaximalOrder returns
+// it without computing the maximal orders of the components. The orders of the components, if
+// already built (see IsProductOfOrders), are declared maximal to Magma.
+    S`IsMaximal:=true;
+    S`SingularPrimes:=[];
+    A:=Algebra(S);
+    if not assigned A`MaximalOrder then
+        A`MaximalOrder:=S;
+    end if;
+    if assigned S`IsProductOfOrders and S`IsProductOfOrders[1] then
+        for OL in S`IsProductOfOrders[2] do
+            SetOrderMaximal(OL,true);
+        end for;
+    end if;
+end procedure;
 
 /// Given an order $S$ and a prime $P$ of an order $T$ containing $S$, returns the prime $S \cap P$ of $S$ below $P$. The output is stored in $S$: asking again for the same prime returns the same ideal, with all its attributes.
 intrinsic PrimeBelow(S::AlgEtQOrd, P::AlgEtQIdl) -> AlgEtQIdl
@@ -378,12 +527,72 @@ end intrinsic;
 intrinsic SingularPrimes(R::AlgEtQOrd) -> SeqEnum[AlgEtQIdl]
 {Returns the non-invertible primes of the order.}
     if not assigned R`SingularPrimes then
-        // The conductor is computed with the maximal order, before PrimesAbove: so PrimesAbove
-        // contracts the stored primes of the maximal order, which is faster than the F_p-algebras
-        // when the singular primes of many orders are needed (see PrimesAbove).
-        R`SingularPrimes:=PrimesAbove(Conductor(R));
+        // Without the maximal order O (and the conductor (R:O)): a prime P of R above p is singular
+        // if and only if (P:P) ne R (if P is not invertible then P*P^-1 = P, so P^-1, which is
+        // strictly bigger than R, is contained in (P:P)). If P is singular then R is not maximal at
+        // P, so p divides [O:R], and p^2 divides disc(R) = [O:R]^2*disc(O). So the candidates are
+        // the primes of R above the p with p^2 | disc(R) (from the F_p-algebras R/pR, see
+        // primes_of_order_above), and the multiplicator rings (P:P) computed here are needed later
+        // anyway (e.g. MinimalOverOrdersAtPrime). The primes whose local factor of R/pR is a field
+        // are marked invertible by primes_above_p_fp, so that for them the test costs nothing. The
+        // output is in a fixed order: by p, then in the order of primes_of_order_above.
+        sing:=[];
+        if not (assigned R`IsMaximal and R`IsMaximal) then
+            for pe in Factorization(Discriminant(R)) do
+                p,e:=Explode(pe);
+                if e ge 2 then
+                    // the primes of R/pR are marked prime: IsInvertible tests (P:P) eq R, and
+                    // the order (P:P) is created only for a singular P
+                    sing cat:=[ P : P in primes_of_order_above(R,p) | not IsInvertible(P) ];
+                end if;
+            end for;
+        end if;
+        assert2 { myHash(P) : P in sing } eq { myHash(P) : P in PrimesAbove(Conductor(R)) };
+        for P in sing do
+            ZBasisLLL(P); // as PrimesAbove does for its output
+        end for;
+        R`SingularPrimes:=sing;
+        // the same answer as IsMaximal, whichever is called first
+        if #sing eq 0 then
+            store_as_maximal(R);
+        else
+            R`IsMaximal:=false;
+        end if;
     end if;
     return R`SingularPrimes;
+end intrinsic;
+
+/// Returns whether the given order is the maximal order of the étale algebra. If the maximal order is not known, it is not computed: an order is maximal if and only if it has no singular primes, which are tested from the F_p-algebras $S/pS$ (see `SingularPrimes`). If the order is maximal, it is stored as the maximal order of the algebra.
+intrinsic IsMaximal(S::AlgEtQOrd) -> BoolElt
+{Returns whether the given order is the maximal order of the étale algebra. If the maximal order is not known, it is not computed: an order is maximal if and only if it has no singular primes, which are tested from the F_p-algebras S/pS (see SingularPrimes). If the order is maximal, it is stored as the maximal order of the algebra.}
+    if not assigned S`IsMaximal then
+        A:=Algebra(S);
+        if assigned A`MaximalOrder then
+            S`IsMaximal:=S eq A`MaximalOrder;
+        elif assigned S`SingularPrimes then
+            S`IsMaximal:=#S`SingularPrimes eq 0;
+        else
+            // As in SingularPrimes, but stopping at the first singular prime: the candidates are
+            // the primes above the p with p^2 | disc(S), and a prime P is singular if and only if
+            // it is not invertible, i.e. (P:P) ne S (see IsInvertible). The callers which need the
+            // maximal order anyway compute it first (e.g. PicardGroup), and then this is only a
+            // comparison.
+            maximal:=true;
+            for pe in Factorization(Discriminant(S)) do
+                if pe[2] ge 2 and exists{ P : P in primes_of_order_above(S,pe[1]) | not IsInvertible(P) } then
+                    maximal:=false;
+                    break;
+                end if;
+            end for;
+            S`IsMaximal:=maximal;
+            if maximal then
+                // stored as the maximal order of the algebra (IsProductOfOrders builds the orders
+                // of the components from ZBasis(S) when they are needed)
+                store_as_maximal(S);
+            end if;
+        end if;
+    end if;
+    return S`IsMaximal;
 end intrinsic;
 
 ///ditto
@@ -436,6 +645,9 @@ intrinsic Factorization(I::AlgEtQIdl) -> Tup
     if not assigned I`Factorization then
         S:=Order(I);
         require IsIntegral(I) and I ne OneIdeal(S): "the argument must be a proper integral ideal";
+        // The maximal order is needed in both cases below (its components, or O itself): computed
+        // first, so that IsMaximal(S) is only a comparison (see IsMaximal).
+        _:=MaximalOrder(Algebra(S));
         if IsMaximal(S) then
             I`Factorization:=factorizationMaximalOrder(I);
         else
@@ -459,6 +671,10 @@ intrinsic Factorization(I::AlgEtQIdl) -> Tup
             // no '^': see factorizationMaximalOrder
             assert2 I eq &*[ &*[ p[1] : i in [1..p[2]] ] : p in facS ];
             I`Factorization:=facS;
+        end if;
+        // the factorization decides whether I is prime (see also IsPrime)
+        if not assigned I`IsPrime then
+            I`IsPrime:=#I`Factorization eq 1 and I`Factorization[1][2] eq 1;
         end if;
      end if;
      return I`Factorization;
@@ -606,6 +822,20 @@ end intrinsic;
     assert not IsPrime(Ideal(E,ZBasis(6*OneIdeal(E)))); // the index is not a prime power
     assert not IsPrime(Ideal(E,ZBasis(PrimesAbove(3*OneIdeal(E))[1]^2))); // index p^2, not prime
     assert not IsPrime(Ideal(E,ZBasis(9*OneIdeal(E)))); // 3 is not in 9E
+    // the direct test on S/I (index p^f, p in I): a product of two primes above p is reduced but
+    // not a field (two fixed points of the Frobenius); a square containing p is not reduced
+    for p in [2,3] do
+        pp:=PrimesAbove(p*OneIdeal(E));
+        if #pp ge 2 then
+            assert not IsPrime(Ideal(E,ZBasis(pp[1]*pp[2])));
+        end if;
+        for P in pp do
+            P2:=P*P;
+            if Algebra(E)!p in P2 then
+                assert not IsPrime(Ideal(E,ZBasis(P2)));
+            end if;
+        end for;
+    end for;
     printf ".";
     // Without the maximal order: PrimesAbove from the F_p-algebras S/pS. The same primes (as
     // lattices) as through the maximal order, and the same objects afterwards, also from
@@ -621,6 +851,88 @@ end intrinsic;
         assert forall{ P : P in pp2 | exists{ Q : Q in pp | IsIdentical(P,Q) } };
         assert forall{ PO : PO in PrimesAbove(30*O) | exists{ Q : Q in pp | IsIdentical(PrimeBelow(E,PO),Q) } };
     end for;
+    printf ".";
+    // IsMaximal without the maximal order: an order is maximal if and only if it has no singular
+    // primes (computed from the F_p-algebras S/pS); the maximal order is not computed (at assertion
+    // level 1: at level 2 SingularPrimes compares with the conductor)
+    lvl:=GetAssertions();
+    SetAssertions(1);
+    for f in [ x^2+1, (x^2+1)*(x^2-3), x^4+16, (x^2+5)*(x^2+20), x^6+3*x^5+99*x^2+2997 ] do
+        A:=EtaleAlgebra(f); E:=EquationOrder(A);
+        b:=IsMaximal(E);
+        // not computed if E is not maximal; E itself, stored as the maximal order, if it is
+        assert (not b and not assigned A`MaximalOrder) or (b and IsIdentical(A`MaximalOrder,E));
+        assert b eq (E eq MaximalOrder(A));
+    end for;
+    SetAssertions(lvl);
+    printf ".";
+    // a maximal order stored by IsMaximal works as the one built by MaximalOrder (its components
+    // are declared maximal to Magma, see IsProductOfOrders): the same Picard and unit groups,
+    // primes and factorizations
+    for f in [ x^2+1, x^3-2 ] do
+        A1:=EtaleAlgebra(f); E1:=EquationOrder(A1);
+        assert IsMaximal(E1);
+        A2:=EtaleAlgebra(f); O2:=MaximalOrder(A2);
+        for O in [ E1, O2 ] do
+            assert #PicardGroup(O) eq 1 and IsFinite(TorsionSubgroup(UnitGroup(O)));
+        end for;
+        assert { myHash(P) : P in PrimesAbove(6*OneIdeal(E1)) } eq { myHash(P) : P in PrimesAbove(6*OneIdeal(O2)) };
+        assert { <myHash(e[1]),e[2]> : e in Factorization(30*OneIdeal(E1)) } eq { <myHash(e[1]),e[2]> : e in Factorization(30*OneIdeal(O2)) };
+    end for;
+    printf ".";
+    // PrimesAboveRationalPrime: the same objects as PrimesAbove; for a maximal order, the primes
+    // from the factorization in the components, with ramification index and inertia degree
+    A:=EtaleAlgebra((x^2+5)*(x^3-2)); E:=EquationOrder(A); O:=MaximalOrder(A);
+    for S in [ E, O ] do
+        for p in [2,3,5] do
+            pp:=PrimesAboveRationalPrime(S,p);
+            assert forall{ P : P in PrimesAbove(p*OneIdeal(S)) | exists{ Q : Q in pp | IsIdentical(P,Q) } };
+        end for;
+    end for;
+    assert forall{ P : P in PrimesAboveRationalPrime(O,2) | assigned P`RamificationIndex };
+    // an order found maximal by IsMaximal: the primes of the maximal order built later from the
+    // components are the objects found from S/pS; SingularPrimes also stores the maximal order
+    lvl:=GetAssertions();
+    SetAssertions(1);
+    A:=EtaleAlgebra(x^3-2); E:=EquationOrder(A);
+    assert IsMaximal(E) and IsIdentical(MaximalOrder(A),E);
+    fp:=E`PrimesAboveRationalPrime[2];
+    pl:=PlacesAboveRationalPrime(A,2); // built from the components: the objects found from E/2E
+    assert forall{ P : P in pl | exists{ Q : Q in fp | IsIdentical(P,Q) } };
+    A:=EtaleAlgebra(x^3-2); E:=EquationOrder(A);
+    assert #SingularPrimes(E) eq 0 and assigned E`IsMaximal and E`IsMaximal and IsIdentical(A`MaximalOrder,E);
+    SetAssertions(lvl);
+    // IsBass stops at the first singular prime which is not Bass: the same answer as the definition
+    A:=EtaleAlgebra((x^2+5)*(x^2+20)); E:=EquationOrder(A);
+    for S in OverOrders(E) do
+        T:=Order(ZBasis(S) : CheckIsKnownOrder:=false); // a copy, without stored singular primes
+        assert IsBass(T) eq forall{ P : P in SingularPrimes(S) | IsBassAtPrime(S,P) };
+    end for;
+    // the factorizations and the primes above, passed by *, meet and + (see pass_primes in Idl.m),
+    // are those of fresh copies
+    A:=EtaleAlgebra(x^4+16); E:=EquationOrder(A);
+    reg:=[ P : P in PrimesAbove(15*OneIdeal(E)) | IsInvertible(P) ]; // regular primes
+    _:=[ Factorization(P) : P in reg ];
+    X:=reg[1]*reg[2]; Y:=reg[2]*reg[3];
+    fresh:=func< I | Ideal(E,ZBasis(I)) >;
+    for Z in [ X*Y, X meet Y, X+Y ] do
+        if Z ne OneIdeal(E) then
+            assert assigned Z`Factorization;
+            assert { <myHash(t[1]),t[2]> : t in Z`Factorization } eq { <myHash(t[1]),t[2]> : t in Factorization(fresh(Z)) };
+        end if;
+        assert { myHash(P) : P in PrimesAbove(Z) } eq { myHash(P) : P in PrimesAbove(fresh(Z)) };
+    end for;
+    sing:=SingularPrimes(E);
+    for Z in [ sing[1]*reg[1], sing[1] meet reg[1], sing[1]+X ] do
+        _:=PrimesAbove(sing[1]); _:=PrimesAbove(reg[1]); _:=PrimesAbove(X);
+        assert { myHash(P) : P in PrimesAbove(Z) } eq { myHash(P) : P in PrimesAbove(fresh(Z)) };
+    end for;
+    // IsPrime and Factorization fill each other: a regular prime gets its factorization, and the
+    // factorization decides IsPrime
+    P:=fresh(reg[1]); P`IsInvertible:=true;
+    assert IsPrime(P) and assigned P`Factorization and #P`Factorization eq 1;
+    I:=fresh(X); _:=Factorization(I);
+    assert assigned I`IsPrime and not I`IsPrime;
     printf ".";
     SetAssertions(1);
     printf " all good!";

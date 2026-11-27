@@ -60,10 +60,14 @@ declare attributes AlgEtQIdl: residue_class_ring_unit_subgroup_generators,
 /// Given an order $S$ and a proper integral $S$-ideal $I$ whose multiplicator ring is the maximal order, returns the group $(S/I)^\times$ and a map $(S/I)^\times \to  S$ giving representatives.
 intrinsic ResidueRingUnits(S::AlgEtQOrd,I::AlgEtQIdl) -> GrpAb,Map
 {Given an order S and a proper integral S-ideal I whose multiplicator ring is the maximal order, returns the group (S/I)^* and a map (S/I)^* -> S giving representatives.}
-    // the attribute is stored in I, hence for Order(I) only: the order is checked also on cached calls
+    // the attribute is stored in I, hence for Order(I) only: the order is checked also on cached
+    // calls
     require Order(I) eq S : "I is not an S-ideal.";
     if not assigned I`ResidueRingUnits then
         require I subset OneIdeal(S) : "I is not a proper S-ideal.";
+        // The maximal order is needed below in both cases (its components, or O itself): computed
+        // first, so that IsMaximal is only a comparison (see IsMaximal).
+        _:=MaximalOrder(Algebra(S));
         require IsMaximal(MultiplicatorRing(I)) : "the ideal needs to have maximal multiplicator ring.";
         maximal_order_case:=function(S,I)
         // if S is maximal
@@ -140,9 +144,11 @@ intrinsic ResidueRingUnitsSubgroupGenerators(F::AlgEtQIdl) -> SeqEnum[AlgEtQElt]
 {Given an integral S-ideal F which is also an ideal of the maximal order of the algebra (for example, the conductor of S), returns generators of (S/F)^*.}
     if not assigned F`residue_class_ring_unit_subgroup_generators then
         S:=Order(F);
-        require F subset OneIdeal(S) and IsMaximal(MultiplicatorRing(F)) : "F must be an integral ideal of S which is also an ideal of the maximal order.";
         A:=Algebra(S);
+        // the maximal order is needed below: computed first, so that IsMaximal is only a comparison
+        // (see IsMaximal)
         O:=MaximalOrder(A);
+        require F subset OneIdeal(S) and IsMaximal(MultiplicatorRing(F)) : "F must be an integral ideal of S which is also an ideal of the maximal order.";
         Fm:=O!!F;
         l:=Factorization(Fm);
         // the primes of S below the primes of O in the factorization: PrimeBelow returns the stored
@@ -935,6 +941,9 @@ intrinsic IsPrincipal(I1::AlgEtQIdl : GRH:=false )->BoolElt, AlgEtQElt
     end if;
     test,gen:=principal_by_short_element(I1);
     if not test then
+        // The maximal order is needed in both cases (its components, or O itself): computed first,
+        // so that IsMaximal is only a comparison (see IsMaximal).
+        _:=MaximalOrder(Algebra(I1));
         if IsMaximal(Order(I1)) then
             test,gen:=is_principal_maximal_components(I1,GRH);
         else
@@ -953,6 +962,9 @@ end intrinsic;
 intrinsic PicardGroup( S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
 {Returns the Picard group of the order S, which is not required to be maximal, and a map from the group to a set of representatives of the ideal classes. The parameter GRH (default false) can be set to true to assume GRH. The output is stored in S: a result computed without GRH is returned also when GRH is assumed, while a result computed under GRH is computed again when it is asked without GRH.}
     if not assigned S`PicardGroup or not valid_for(S`PicardGroup[3],GRH) then
+        // The maximal order is needed in both cases (the class groups of its components, or the
+        // conductor): computed first, so that IsMaximal(S) is only a comparison (see IsMaximal).
+        _:=MaximalOrder(Algebra(S));
         if IsMaximal(S) then
             P,p:=picard_group_maximal(S,GRH);
         else
@@ -980,6 +992,9 @@ end intrinsic;
 intrinsic UnitGroup(S::AlgEtQOrd : GRH:=false ) -> GrpAb, Map
 {Returns the unit group of the given order. The parameter GRH (default false) can be set to true to assume GRH. The output is stored in S: a result computed without GRH is returned also when GRH is assumed, while a result computed under GRH is computed again when it is asked without GRH.}
     if not assigned S`UnitGroup or not valid_for(S`UnitGroup[3],GRH) then
+        // The maximal order is needed in both cases (the unit groups of its components, or the
+        // conductor): computed first, so that IsMaximal(S) is only a comparison (see IsMaximal).
+        _:=MaximalOrder(Algebra(S));
         if IsMaximal(S) then
             U,u:=unit_group_maximal(S,GRH);
         else

@@ -239,9 +239,10 @@ intrinsic IsMaximalAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> BoolElt
         return not (R`Conductor subset P);
     end if;
     // P is invertible if and only if (P:P)=R: if P is not invertible then P*P^-1=P, so P^-1, which
-    // is strictly bigger than R, is contained in (P:P). (P:P) is needed anyway in
-    // MinimalOverOrdersAtPrime.
-    return MultiplicatorRing(P) eq R;
+    // is strictly bigger than R, is contained in (P:P). IsInvertible of a prime tests exactly this,
+    // and creates the order (P:P) only when it is not R (it is needed then in
+    // MinimalOverOrdersAtPrime).
+    return IsInvertible(P);
 end intrinsic;
 
 /// Given an order $R$ and prime $P$ of $R$, returns the minimal overorders $S$ of R whose conductor $(R:S)$ is a $P$-primary ideal of $R$. The minimality assumption forces the conductor $(R:S)$ to be exactly $P$. The vararg `CheckIsKnownOrder` (default `true`) determines whether the output is checked against the global database of known orders. If it is set to `false`, the output is not stored in the attribute `MinimalOverOrders` of $R$. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.

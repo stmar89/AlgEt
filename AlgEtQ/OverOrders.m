@@ -226,16 +226,22 @@ end function;
 
 /// Returns whether the order $R$ is maximal at the prime $P$, that is, if $(R:O)$ is not contained in $P$, where $O$ is the maximal order.
 intrinsic IsMaximalAtPrime(R::AlgEtQOrd, P::AlgEtQIdl) -> BoolElt
-{Returns whether the order R is maximal at the prime P, that is, if (R:O) is not contained in P, where O is the maximal order.}
+{Returns whether the order R is maximal at the prime P, that is, if (R:O) is not contained in P, where O is the maximal order; equivalently, if (P:P)=R.}
     require Order(P) eq R : "P must be an ideal of R";
-    if IsMaximal(R) then
+    require IsPrime(P) : "P must be a prime of R"; // free for the primes computed by the package
+    if assigned R`IsMaximal and IsMaximal(R) then
         return true;
     end if;
-    require IsPrime(P) : "P must be a prime of R"; // free for the primes computed by the package
     if assigned R`SingularPrimes then
         return not P in SingularPrimes(R);
     end if;
-    return not (Conductor(R) subset P);
+    if assigned R`Conductor and not assigned P`MultiplicatorRing then
+        return not (R`Conductor subset P);
+    end if;
+    // P is invertible if and only if (P:P)=R: if P is not invertible then P*P^-1=P, so P^-1, which
+    // is strictly bigger than R, is contained in (P:P). (P:P) is needed anyway in
+    // MinimalOverOrdersAtPrime.
+    return MultiplicatorRing(P) eq R;
 end intrinsic;
 
 /// Given an order $R$ and prime $P$ of $R$, returns the minimal overorders $S$ of R whose conductor $(R:S)$ is a $P$-primary ideal of $R$. The minimality assumption forces the conductor $(R:S)$ to be exactly $P$. The vararg `CheckIsKnownOrder` (default `true`) determines whether the output is checked against the global database of known orders. If it is set to `false`, the output is not stored in the attribute `MinimalOverOrders` of $R$. Based on "On the computations of overorders" by Tommy Hofmann and Carlo Sircana.
@@ -325,6 +331,13 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl : CheckIsKnownOrde
             // Q(3^(1/8)): 14250 invariant subspaces of F_3^7 against 2051562).
             Vq:=RModule([ MatrixAlgebra(F,dV)!Matrix(qpow) ]);
             subs:=[ sub<V|[ V!Eltseq(Vq!b) : b in Basis(W) ]> : W in Submodules(Vq) ];
+            // Each minimal overorder S below is the preimage in T of a subalgebra F+W of T/P: since
+            // F=R/P lifts to R and P is in R, S = R + sum R*w_i for lifts w_i of a basis of W. As a
+            // Z-module it is spanned by ZBasis(R) and the products w_i*z, z in ZBasis(R) (w_i
+            // itself is among their Z-combinations): one HNF with Check:=0, without the integrality
+            // tests and the closure loop of Order (the closure is verified there at assertion level
+            // 2).
+            // Any lifts can be taken, since two lifts differ by an element of R.
             // Type 1: the minimal overorders S with dim_F(S/R)=1, i.e. the invariant lines Fw (the
             // eigenvectors of qpow) such that F+Fw is closed under multiplication.
             type1_ws:=[V|]; // the generators w of the lines of type 1
@@ -333,14 +346,14 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl : CheckIsKnownOrde
                 if q eq 2 then
                     // for q eq 2 being an invariant line, hence in the eigenspace of 1, guarantees
                     // that it is mult closed
-                    S:=Order([w@@mTV] cat zbR : CheckIsKnownOrder:=CheckIsKnownOrder);
+                    S:=Order(zbR cat [ (w@@mTV)*z : z in zbR ] : Check:=0, CheckIsKnownOrder:=CheckIsKnownOrder);
                     Include(~output,S);// necessarily minimal, because it has dim 1
                     Append(~type1_ws,w);
                 else
                     wVT:=w@@mVTtoV;
                     w_square:=pow(wVT,2)@mVTtoV;
                     if Rank(Matrix([w,w_square])) eq 1 then
-                        S:=Order(Append(zbR,wVT@@mTtoVT) : CheckIsKnownOrder:=CheckIsKnownOrder);
+                        S:=Order(zbR cat [ (wVT@@mTtoVT)*z : z in zbR ] : Check:=0, CheckIsKnownOrder:=CheckIsKnownOrder);
                         Include(~output,S); // necessarily minimal, because it has dim 1
                         Append(~type1_ws,w);
                     end if;
@@ -363,20 +376,20 @@ intrinsic MinimalOverOrdersAtPrime(R::AlgEtQOrd, P::AlgEtQIdl : CheckIsKnownOrde
                         not exists{ w : w in type1_ws | w in W } and
                         is_ord_inV(W) then
                     assert Dimension(W) ge 2;
-                    S:=Order([v@@mTV:v in Basis(W)] cat zbR : CheckIsKnownOrder:=CheckIsKnownOrder);
+                    S:=Order(zbR cat [ (v@@mTV)*z : v in Basis(W), z in zbR ] : Check:=0, CheckIsKnownOrder:=CheckIsKnownOrder);
                     Include(~output,S);
                 end if;
             end for;
         end if;
         assert2 forall{S : S in output | ColonIdeal(R,R!!OneIdeal(S)) eq P};
-        // We store the output only if its orders have been checked against the database of known
-        // orders. Otherwise, the attribute would contain copies of orders which do not share their
-        // attributes with the known ones.
-        if CheckIsKnownOrder then
-            mins:=assigned R`MinimalOverOrders select R`MinimalOverOrders else AssociativeArray();
-            mins[P]:=output;
-            R`MinimalOverOrders:=mins;
-        end if;
+    end if;
+    // We store the output (also when it is empty, R being maximal at P) only if its orders have
+    // been checked against the database of known orders. Otherwise, the attribute would contain
+    // copies of orders which do not share their attributes with the known ones.
+    if CheckIsKnownOrder then
+        mins:=assigned R`MinimalOverOrders select R`MinimalOverOrders else AssociativeArray();
+        mins[P]:=output;
+        R`MinimalOverOrders:=mins;
     end if;
     return output;
 end intrinsic;

@@ -48,7 +48,8 @@ Detailed instructions are provided in the example file in the GitHub repository.
 Method should be of the form "julia -J /tmp/Hecke.so ~/path/to/AlgEt/" (the ".so" might be different according to your SO, according to the output of the julia command "Hecke.build()").}
 //TODO return also the isomorphism. Below there are some comments about it. Add it above as well.
 
-    require Method eq "Magma" or Method[1..5] eq "julia" : "Method should be Magma or julia or a string of julia command";
+    // #Method first: Method[1..5] fails on a shorter string, before the message of the require
+    require Method eq "Magma" or (#Method ge 5 and Method[1..5] eq "julia") : "Method should be Magma or julia or a string of julia command";
     V,m:=UniverseAlgebra(I);
     VJ,mJ:=UniverseAlgebra(J);
     S:=Order(I);
@@ -148,7 +149,8 @@ The vararg Method allows to choose if the isomorphism testing is done with "Magm
 To use the latter option, install julia, add the package Hecke and build the package.
 Detailed instructions are provided in the example file in the GitHub repository.
 Method should be of the form "julia -J /tmp/Hecke.so ~/path/to/AlgEt/" (the ".so" might be different according to your SO, according to the output of the julia command "Hecke.build()").}
-    require Method eq "Magma" or Method[1..5] eq "julia" : "Method should be Magma or julia or a string of julia command";
+    // #Method first: Method[1..5] fails on a shorter string, before the message of the require
+    require Method eq "Magma" or (#Method ge 5 and Method[1..5] eq "julia") : "Method should be Magma or julia or a string of julia command";
     // the code below assumes that m is the natural action of K on V (it matches the components of K
     // and V by their defining polynomials)
     require Domain(m) cmpeq Algebra(R) : "the domain of the map must be the algebra of the order";

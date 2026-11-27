@@ -53,7 +53,7 @@ intrinsic Hom(A::AlgEtQ , B::AlgEtQ , img::SeqEnum[AlgEtQElt] : CheckMultiplicat
     has_inverse:=false;
     if ComputeInverse then
         mm:=MatrixAtoQ(img);
-        has_inverse:=Rank(mm) eq AbsoluteDimension(A) and AbsoluteDimension(A) eq AbsoluteDimension(B);
+        has_inverse:=AbsoluteDimension(A) eq AbsoluteDimension(B) and Rank(mm) eq AbsoluteDimension(A);
     end if;
 
     if has_inverse then

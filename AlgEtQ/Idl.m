@@ -885,6 +885,8 @@ intrinsic Inverse(I::AlgEtQIdl) ->AlgEtQIdl
 {Computes the inverse of a given invertible ideal.}
     if not assigned I`Inverse then
         require IsInvertible(I) : "The ideal is not invertible in the order of definition";
+    end if;
+    if not assigned I`Inverse then // IsInvertible stores the inverse when it computes it
         O:=Order(I);
         COI:=ColonIdeal(O,I);
         COI`IsInvertible:=true;
@@ -1001,6 +1003,18 @@ intrinsic IsProductOfIdeals(I::AlgEtQIdl) -> BoolElt, Tup
 end intrinsic;
 
 /// Given two integral ideals $I$ and $J$ over the same order $S$, returns whether $I+J=S$.
+coprime_integral:=function(I,J)
+// Given integral ideals I and J over the same order S (not checked), returns whether I+J=S: the
+// minimal integers are coprime, or 1 is in the lattice spanned by I and J, which is tested on the
+// HNF of the sum (see sum_of_lattices_hnf), without creating the ideal I+J.
+    if GCD(MinimalInteger(I),MinimalInteger(J)) eq 1 then
+        return true;
+    end if;
+    H,d:=sum_of_lattices_hnf([I,J]);
+    is_in:=CanChangeRing(MatrixAtoQ([One(Algebra(I))])*(d*crZQ(H)^-1),Integers()); // first value
+    return is_in;
+end function;
+
 intrinsic IsCoprime(I::AlgEtQIdl,J::AlgEtQIdl) -> BoolElt
 {Given two integral ideals I and J over the same order S, returns whether I+J=S.}
     require Algebra(I) cmpeq Algebra(J) : "the ideals must lie in the same algebra";
@@ -1149,7 +1163,13 @@ intrinsic CoprimeRepresentative(I::AlgEtQIdl,J::AlgEtQIdl : MakeSmall:=false) ->
         gI:=Generators(I);
         is_good:=func< x | forall{ Q : Q in pp | exists{ g : g in gI | not x*g in Q } } >;
     else
-        is_good:=func< x | IsCoprime(x eq One(A) select I else x*I,J) >;
+        // x*I is integral by construction (x is 1 for an integral I, or in I^-1): no IsCoprime,
+        // whose requires and the shortcut I eq J would cost an HNF and an inclusion per candidate
+        is_good:=function(x)
+            xI:=x eq One(A) select I else x*I;
+            xI`IsIntegral:=true; // so that MinimalInteger does not test it again
+            return coprime_integral(xI,J);
+        end function;
     end if;
     if not MakeSmall and IsIntegral(I) and is_good(One(A)) then
         x:=One(A);

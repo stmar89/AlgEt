@@ -129,8 +129,8 @@ intrinsic IdealsOfIndex(I::AlgEtQIdl, N::RngIntElt : Method := "Default") -> Seq
     if Method eq "Slow" then
         test := false;
     else
-        // The ideals are computed over T:=MultiplicatorRing(I): they are all the S-ideals of index N
-        // in I only if N is coprime to [T:S] too, besides the conductor of T.
+        // The ideals are computed over T:=MultiplicatorRing(I): they are all the S-ideals of index
+        // N in I only if N is coprime to [T:S] too, besides the conductor of T.
         T:=MultiplicatorRing(I);
         test, dec := IsProductOfIdeals(T!!I);
         if GCD(Integers()!Index(T,Order(I)), N) ne 1 then
@@ -158,7 +158,7 @@ intrinsic IdealsOfIndex(I::AlgEtQIdl, N::RngIntElt : Method := "Default") -> Seq
             assert #J eq #dec;
             assert #J eq #Components(A);
             JA:= Order(I)!!Ideal(MultiplicatorRing(I) , J);
-            assert Index(I,JA) eq N;
+            assert2 Index(I,JA) eq N;
             Append(~result,JA);
         end for;
         return result;

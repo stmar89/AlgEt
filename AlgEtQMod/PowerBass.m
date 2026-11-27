@@ -264,7 +264,7 @@ bass_factor:=function(gens_input,Rg,mAgs,embs,projs)
                     p_u:=Hom(Ags,Ag,[(&+[ projs[j](g)*p_u[j]:j in [1..s]])/n_u:g in abs_Ags]);
                     J:=Ideal(Rg,[ p_u(g) : g in gens ]); // J=p_u(M)
                     S:=MultiplicatorRing(J);
-                    assert T subset S;
+                    assert2 T subset S;
                     if S eq T then
                         SwapElements(~gens,1,ui); // we put u in first position
                         tt:=true;
@@ -423,8 +423,8 @@ intrinsic DirectSumRepresentation(M::AlgEtQMod)->SeqEnum[Tup]
             assert forall{bc:bc in BC|Type(bc[1]) eq AlgEtQIdl};
             M`DirectSumRep:=BC;
         elif n eq Dimension(UA) then //squarefree case
-            // UA can be a copy of Ag (for example the one made by IsomorphismClassesOverBassOrder): the
-            // Z-basis of M is pulled back to Ag through the isomorphism Ag -> UA
+            // UA can be a copy of Ag (for example the one made by IsomorphismClassesOverBassOrder):
+            // the Z-basis of M is pulled back to Ag through the isomorphism Ag -> UA
             if UA cmpeq Ag then
                 zbM:=ZBasis(M);
             else
@@ -708,7 +708,8 @@ end intrinsic;
     M:=Module(EquationOrder(K),m,AbsoluteBasis(V));
     failed:=false; try _:=DirectSumRepresentation(M); catch e failed:=Position(e`Object,"not of the form") gt 0; end try; assert failed;
     printf ".";
-    // DirectSumRepresentation of a module rebuilt in a universe algebra which is a copy of Algebra(R)
+    // DirectSumRepresentation of a module rebuilt in a universe algebra which is a copy of
+    // Algebra(R)
     _<x>:=PolynomialRing(Integers());
     K:=EtaleAlgebra(x^2+20); R:=EquationOrder(K);
     cl:=IsomorphismClassesOverBassOrder(R,1);

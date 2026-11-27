@@ -13,27 +13,34 @@ freeze;
 
 declare verbose FactPrimes, 3;
 
-import "Ord.m" : all_in;
+import "Ord.m" : all_in, zb_dM, zb_inv, hnf, crZQ, MatrixAtoQ;
+import "Idl.m" : ideal_from_hnf;
 
-declare attributes AlgEtQOrd : SingularPrimes,
-                               PrimesBelow; // The cache of PrimeBelow: an AssociativeArray keyed by
-                                            // the orders T
-                                            // containing S, whose value at T is an AssociativeArray
-                                            // keyed by the primes P of T, with value
-                                            // PrimeBelow(S,P). The primes are grouped by their
-                                            // order because ideals over different orders cannot be
-                                            // compared.
-
-// The primes of the maximal order O, built once: an AssociativeArray keyed by the rational primes
-// q, whose value is the list of the triples <i, P_L, P>, one for each prime P of O above q: P is
-// P_L, a prime of the maximal order of the i-th component, at the i-th component, and the unit
-// ideal at the other components. The list has the components in order, and for each of them the
-// primes in the order of Factorization(q*O_i). Each P is marked prime, with its ramification index
-// and its inertia degree. Written only by primes_above_rational_prime; read by
-// factorizationMaximalOrder and PlacesAboveRationalPrime. A prime of O is always the same object,
-// so what is stored on it (ZBasis, Hash, residue field, PrimeBelow, minimal overorders) is computed
-// once.
-declare attributes AlgEtQOrd : PrimesAboveRationalPrime;
+declare attributes AlgEtQOrd :
+            SingularPrimes,
+            PlacesAboveRationalPrime, // The primes of the maximal order O, built once: an
+                                      // AssociativeArray keyed by the rational primes q, whose
+                                      // value is the list of the triples <i, P_L, P>, one for each
+                                      // prime P of O above q: P is P_L, a prime of the maximal
+                                      // order of the i-th component, at the i-th component, and the
+                                      // unit ideal at the other components. The list has the
+                                      // components in order, and for each of them the primes in the
+                                      // order of Factorization(q*O_i). Each P is marked prime, with
+                                      // its ramification index and its inertia degree. Written only
+                                      // by places_above_rational_prime; read by
+                                      // factorizationMaximalOrder, PrimesAbove and
+                                      // PlacesAboveRationalPrime. A prime of O is always the same
+                                      // object, so what is stored on it (ZBasis, Hash, residue
+                                      // field, PrimeBelow, minimal overorders) is computed once.
+            PrimesAboveRationalPrime, // The primes of S above the rational primes p: an
+                                      // AssociativeArray keyed by p, with value the sequence of the
+                                      // primes of S above p, each one a single object. Written only
+                                      // by primes_of_order_above; read by PrimesAbove and
+                                      // PrimeBelow.
+            PrimesBelow; // The cache of PrimeBelow: an AssociativeArray keyed by the orders T
+                         // containing S, whose value at T is an AssociativeArray keyed by the
+                         // primes P of T, with value PrimeBelow(S,P). The primes are grouped by
+                         // their order because ideals over different orders cannot be compared.
 
 ///# Primes, factorization and completions
 
@@ -77,54 +84,130 @@ intrinsic IsMaximalIdeal(I::AlgEtQIdl) -> BoolElt
     return IsPrime(I);
 end intrinsic;
 
-/// Given an order $S$ and a prime $P$ of an order $T$ containing $S$, returns the prime $S \cap P$ of $S$ below $P$. The output is stored in $S$: asking again for the same prime returns the same ideal, with all its attributes.
-intrinsic PrimeBelow(S::AlgEtQOrd, P::AlgEtQIdl) -> AlgEtQIdl
-{Given an order S and a prime P of an order T containing S, returns the prime S meet P of S below P. The output is stored in S: asking again for the same prime returns the same ideal, with all its attributes.}
-    T:=Order(P);
-    if T eq S then
-        return P;
-    end if;
-    if assigned S`PrimesBelow and IsDefined(S`PrimesBelow,T) and IsDefined(S`PrimesBelow[T],P) then
-        return S`PrimesBelow[T][P];
-    end if;
-    require IsPrime(P) : "the ideal must be prime";
-    // The inclusion test is skipped when T is the maximal order, which contains every order: this
-    // is the main use, and with many orders S the test would cost more than the intersection
-    // itself.
-    require (assigned T`IsMaximal and T`IsMaximal) or S subset T : "the order must be contained in the order of the prime";
-    // S/(S meet P) embeds in the finite field T/P, so it is a finite domain, hence a field: S meet
-    // P is a prime of S.
-    Q:=OneIdeal(S) meet S!!P;
-    Q`IsPrime:=true;
-    if not assigned S`PrimesBelow then
-        S`PrimesBelow:=AssociativeArray();
-    end if;
-    // Distinct primes, also of different orders, can be above the same prime of S: if it is already
-    // stored, we return it, so that each prime of S is one ideal, whose attributes (residue field,
-    // ...) are computed once.
-    for T2 in Keys(S`PrimesBelow) do
-        for P2 in Keys(S`PrimesBelow[T2]) do
-            if S`PrimesBelow[T2][P2] eq Q then
-                Q:=S`PrimesBelow[T2][P2];
-                break T2;
-            end if;
-        end for;
-    end for;
-    if not IsDefined(S`PrimesBelow,T) then
-        S`PrimesBelow[T]:=AssociativeArray();
-    end if;
-    S`PrimesBelow[T][P]:=Q;
-    return Q;
-end intrinsic;
+primes_above_p_fp:=function(S,p)
+// The primes of an order S above a rational prime p, from the F_p-algebra B = S/pS, without the
+// maximal order. The primes of S above p (the maximal ideals containing p) are in bijection with
+// the maximal ideals of  B = S/pS, of dimension n: P <-> P/pS. Let rad be the nilradical of B.
+// Then B/rad is a product of finite fields k_1 x ... x k_m, and the maximal ideals of  B are the
+// preimages of the maximal ideals of B/rad, which are the kernels of the m projections.
+// We find them with the Frobenius Fr: x -> x^p, which is F_p-linear on B (char p).
+    A:=Algebra(S);
+    zb:=ZBasis(S);
+    n:=#zb;
+    F:=GF(p);
+    V:=VectorSpace(F,n); // B = S/pS, in the coordinates of zb
 
-primes_above_rational_prime:=function(O, q)
+    // 1. The multiplication of B. Let BQ be the matrix of the absolute coordinates of zb (row i is
+    //    zb[i]) and R_i the matrix of the multiplication by zb[i] in the absolute basis (row j is
+    //    the absolute coordinates of zb[i] times the j-th basis element: RepresentationMatrix).
+    //    Then BQ*R_i*BQ^-1 is the matrix of the multiplication by zb[i] in the coordinates of zb:
+    //    its row j contains the coordinates of zb[j]*zb[i]. It is an integer matrix, since S is a
+    //    ring: we reduce it modulo p. BQ^-1 is the inclusion matrix of S (stored).
+    dS,MS:=zb_dM(S); // MS = dS*BQ, an integer matrix
+    BQ:=(1/dS)*crZQ(MS);
+    BQinv:=zb_inv(S);
+    mult_by:=[ ChangeRing(ChangeRing(BQ*RepresentationMatrix(z)*BQinv,Integers()),F) : z in zb ];
+    // the product in B of x and y (vectors in V): x = sum x[i]*zb[i], so x*y = sum
+    // x[i]*(y*mult_by[i])
+    mult:=func< x,y | V!Eltseq(&+[ x[i]*(y*mult_by[i]) : i in [1..n] | x[i] ne 0 ]) >;
+    // the identity of B, in the coordinates of zb
+    one:=V![ F!c : c in Eltseq(MatrixAtoQ([One(A)])*BQinv) ];
+
+    // 2. The Frobenius Fr: x -> x^p as an n x n matrix over F_p (rows: images of the basis
+    //    vectors). zb[i]^p = 1*zb[i]*...*zb[i] (p times), i.e. one*mult_by[i]^p: a power of a
+    //    matrix, computed by Magma with repeated squaring.
+    Frob:=Matrix(F,n,n,&cat[ Eltseq(one*mult_by[i]^p) : i in [1..n] ]);
+
+    // 3. The nilradical rad = ker(Fr^t) with p^t >= n, and the reduced algebra Q = B/rad, with the
+    //    quotient map q: V -> Q. Elements of Q are multiplied through lifts to V.
+    t:=1;
+    while p^t lt n do
+        t+:=1;
+    end while;
+    rad:=Kernel(Frob^t);
+    Q,q:=quo<V|rad>;
+    r:=Dimension(Q);
+    lift:=func< y | y@@q >;
+    multQ:=func< x,y | q(mult(lift(x),lift(y))) >;
+    oneQ:=q(one);
+
+    // 4. The fixed points K of the Frobenius on Q (it induces a map on Q, since Fr(rad) c rad):
+    //    K = F_p^m, with m the number of primes of S above p.
+    FrobQ:=Matrix(F,r,r,&cat[ Eltseq(q(lift(Q.i)*Frob)) : i in [1..r] ]);
+    K:=Kernel(FrobQ-IdentityMatrix(F,r));
+    m:=Dimension(K);
+
+    // 5. The primitive idempotents of Q: we split the identity with the elements k of a basis of K
+    //    (see above). For each current idempotent e we compute the minimal polynomial of k*e in the
+    //    algebra eQ, from the first linear dependence among e, k*e, (k*e)^2, ..., and split e
+    //    according to its roots (all in F_p, and distinct).
+    PX<X>:=PolynomialRing(F);
+    idems:=[ oneQ ];
+    for k in Basis(K) do
+        if #idems eq m then
+            break; // all the factors are separated
+        end if;
+        new:=[];
+        for e in idems do
+            ke:=multQ(Q!Eltseq(k),e);
+            // the powers e, ke, ke^2, ... until they become linearly dependent
+            pows:=[ e ];
+            repeat
+                Append(~pows,multQ(pows[#pows],ke));
+            until Rank(Matrix(F,#pows,r,&cat[ Eltseq(v) : v in pows ])) lt #pows;
+            // ke^s = c[1]*e + c[2]*ke + ... + c[s]*ke^(s-1): the minimal polynomial of ke in eQ
+            c:=Eltseq(Solution(Matrix(F,#pows-1,r,&cat[ Eltseq(v) : v in pows[1..#pows-1] ]),Vector(F,Eltseq(pows[#pows]))));
+            minpol:=X^(#c) - &+[ c[i]*X^(i-1) : i in [1..#c] ];
+            roots:=[ rt[1] : rt in Roots(minpol) ];
+            assert #roots eq Degree(minpol); // distinct roots in F_p, since ke is in F_p^(m_e)
+            if #roots eq 1 then
+                Append(~new,e); // k is constant on the factors of e: e is not split by k
+                continue;
+            end if;
+            for a in roots do
+                // the idempotent prod_{b ne a} (ke - b*e)/(a - b): e on the factors where ke = a
+                ea:=e;
+                for b in roots do
+                    if b ne a then
+                        ea:=multQ(ea,ke-b*e)/(a-b);
+                    end if;
+                end for;
+                Append(~new,ea);
+            end for;
+        end for;
+        idems:=new;
+    end for;
+    assert #idems eq m;
+
+    // 6. The primes. For each primitive idempotent e, the maximal ideal (1-e)*Q of Q, its
+    //    preimage U in V (spanned by lifts of a basis of (1-e)*Q and by rad), and the prime of S:
+    //    the lattice spanned by p*zb and the lifts of U, i.e. the rows of p*Id and of U in the
+    //    coordinates of zb. Its HNF Hc, times MS (= dS times the absolute coordinates of zb), gives
+    //    dS times the absolute coordinates of a Z-basis of the prime: one more HNF, and the ideal
+    //    is created from it with its hash (ideal_from_hnf in Idl.m), without any product of
+    //    elements.
+    primes:=[];
+    for e in idems do
+        maxQ:=sub<Q|[ multQ(Q.i,oneQ-e) : i in [1..r] ]>;
+        U:=[ lift(u) : u in Basis(maxQ) ] cat Basis(rad);
+        L:=VerticalJoin(p*IdentityMatrix(Integers(),n),
+                        Matrix(Integers(),#U,n,&cat[ [ Integers()!c : c in Eltseq(u) ] : u in U ]));
+        Hc:=hnf(L); // the prime in the coordinates of zb
+        P:=ideal_from_hnf(S,hnf(Hc*MS),dS);
+        P`IsPrime:=true;
+        Append(~primes,P);
+    end for;
+    return primes;
+end function;
+
+places_above_rational_prime:=function(O, q)
 // Given the maximal order O and a rational prime q, returns the list of the triples <i,P_L,P> of
-// the primes of O above q (see the attribute PrimesAboveRationalPrime), computing and storing it
+// the primes of O above q (see the attribute PlacesAboveRationalPrime), computing and storing it
 // the first time.
-    if not assigned O`PrimesAboveRationalPrime then
-        O`PrimesAboveRationalPrime:=AssociativeArray();
+    if not assigned O`PlacesAboveRationalPrime then
+        O`PlacesAboveRationalPrime:=AssociativeArray();
     end if;
-    if not IsDefined(O`PrimesAboveRationalPrime,q) then
+    if not IsDefined(O`PlacesAboveRationalPrime,q) then
         test,OasProd:=IsProductOfOrders(O);
         assert test; // since O is maximal
         tup_one_ideals:=< 1*OL : OL in OasProd >;
@@ -142,10 +225,91 @@ primes_above_rational_prime:=function(O, q)
                 Append(~out,<i,pe[1],P>);
             end for;
         end for;
-        O`PrimesAboveRationalPrime[q]:=out;
+        O`PlacesAboveRationalPrime[q]:=out;
     end if;
-    return O`PrimesAboveRationalPrime[q];
+    return O`PlacesAboveRationalPrime[q];
 end function;
+
+primes_of_order_above:=function(S,p)
+// The primes of the order S above the rational prime p from the F_p-algebra S/pS
+// (primes_above_p_fp), without the maximal order: used by PrimesAbove when the maximal order of the
+// algebra is not known (otherwise the stored primes of the maximal order are contracted, which is
+// faster when they are shared by many orders). Computed once and stored in
+// S`PrimesAboveRationalPrime. A prime already found by PrimeBelow (an intersection) is returned as
+// that object, so that every prime of S is one ideal, whose attributes (ZBasis, hash, residue
+// field, minimal overorders) are computed once.
+    if not assigned S`PrimesAboveRationalPrime then
+        S`PrimesAboveRationalPrime:=AssociativeArray();
+    end if;
+    if not IsDefined(S`PrimesAboveRationalPrime,p) then
+        known:=[];
+        if assigned S`PrimesBelow then
+            known:=&cat[ [ S`PrimesBelow[T][P] : P in Keys(S`PrimesBelow[T]) ] : T in Keys(S`PrimesBelow) ];
+        end if;
+        primes:=primes_above_p_fp(S,p);
+        for k in [1..#primes] do
+            old:=[ Q : Q in known | Q eq primes[k] ];
+            if #old gt 0 then
+                primes[k]:=old[1];
+            else
+                ZBasisLLL(primes[k]);
+            end if;
+        end for;
+        S`PrimesAboveRationalPrime[p]:=primes;
+    end if;
+    return S`PrimesAboveRationalPrime[p];
+end function;
+
+/// Given an order $S$ and a prime $P$ of an order $T$ containing $S$, returns the prime $S \cap P$ of $S$ below $P$. The output is stored in $S$: asking again for the same prime returns the same ideal, with all its attributes.
+intrinsic PrimeBelow(S::AlgEtQOrd, P::AlgEtQIdl) -> AlgEtQIdl
+{Given an order S and a prime P of an order T containing S, returns the prime S meet P of S below P. The output is stored in S: asking again for the same prime returns the same ideal, with all its attributes.}
+    T:=Order(P);
+    if T eq S then
+        return P;
+    end if;
+    if assigned S`PrimesBelow and IsDefined(S`PrimesBelow,T) and IsDefined(S`PrimesBelow[T],P) then
+        return S`PrimesBelow[T][P];
+    end if;
+    require IsPrime(P) : "the ideal must be prime";
+    // The inclusion test is skipped when T is the maximal order, which contains every order: this
+    // is the main use, and with many orders S the test would cost more than the intersection
+    // itself.
+    require (assigned T`IsMaximal and T`IsMaximal) or S subset T : "the order must be contained in the order of the prime";
+    // S/(S meet P) embeds in the finite field T/P, so it is a finite domain, hence a field: S meet
+    // P is a prime of S, above the rational prime p below P.
+    if not assigned S`PrimesBelow then
+        S`PrimesBelow:=AssociativeArray();
+    end if;
+    _,p:=IsPrimePower(Integers()!Index(T,P));
+    if assigned S`PrimesAboveRationalPrime and IsDefined(S`PrimesAboveRationalPrime,p) then
+        // The primes of S above p are known (primes_of_order_above): S meet P is the one contained
+        // in P, since a prime Q of S contained in P is contained in S meet P, hence equal to it (Q
+        // is maximal). Q c P is tested on the generators of Q (P is a T-ideal and S c T).
+        cands:=[ Q : Q in S`PrimesAboveRationalPrime[p] | all_in(Generators(Q),P) ];
+        assert #cands eq 1;
+        Q:=cands[1];
+        assert2 Q eq OneIdeal(S) meet S!!P;
+    else
+        Q:=OneIdeal(S) meet S!!P;
+        Q`IsPrime:=true;
+        // Distinct primes, also of different orders, can be above the same prime of S: if it is
+        // already stored, we return it, so that each prime of S is one ideal, whose attributes
+        // (residue field, ...) are computed once.
+        for T2 in Keys(S`PrimesBelow) do
+            for P2 in Keys(S`PrimesBelow[T2]) do
+                if S`PrimesBelow[T2][P2] eq Q then
+                    Q:=S`PrimesBelow[T2][P2];
+                    break T2;
+                end if;
+            end for;
+        end for;
+    end if;
+    if not IsDefined(S`PrimesBelow,T) then
+        S`PrimesBelow[T]:=AssociativeArray();
+    end if;
+    S`PrimesBelow[T][P]:=Q;
+    return Q;
+end intrinsic;
 
 /// Given an integral fractional $S$-ideal $I$, returns the sequence of primes of $S$ containing $I$.
 intrinsic PrimesAbove(I::AlgEtQIdl) -> SeqEnum[AlgEtQIdl]
@@ -159,24 +323,37 @@ intrinsic PrimesAbove(I::AlgEtQIdl) -> SeqEnum[AlgEtQIdl]
             primes:=[];
         else
             // The primes of S containing I contain N:=MinimalInteger(I), so they are above the
-            // rational primes q dividing N. Each of them is PrimeBelow(S,PO) for a prime PO of the
-            // maximal order O above q, and I c PO meet S if and only if I c PO. The primes of O
-            // above q are built once (primes_above_rational_prime) and I c PO is tested with a few
-            // memberships: neither I*O nor its factorization are needed. The output is in a fixed
-            // order: by q, then by component; repetitions (several primes of O above the same prime
-            // of S) are removed.
-            maxS:=IsMaximal(S);
-            O:=maxS select S else MaximalOrder(Algebra(I));
+            // rational primes q dividing N; I c P is tested with a few memberships. For each q:
+            // - if the primes of S above q are stored (see primes_of_order_above), we use them;
+            // - if the maximal order O of the algebra is known, each prime of S above q is
+            //   PrimeBelow(S,PO) for a prime PO of O above q, and I c PO meet S if and only if
+            //   I c PO. The primes of O above q are built once (places_above_rational_prime) and
+            //   shared by all the orders of the algebra: with many orders (e.g. all the overorders)
+            //   this is faster than the F_p-algebras below;
+            // - otherwise they come from the F_p-algebra S/qS (primes_of_order_above), and the
+            //   maximal order is not computed.
+            // The output is in a fixed order: by q, then by component of O (or in the order of
+            // primes_of_order_above); repetitions (several primes of O above the same prime of S)
+            // are removed.
             gI:=Generators(I);
+            A:=Algebra(S);
             primes:={@ @};
             for q in PrimeDivisors(MinimalInteger(I)) do
-                for t in primes_above_rational_prime(O,q) do
-                    PO:=t[3];
-                    // the generators of I over S suffice: S is in O, the order of PO
-                    if all_in(gI,PO) then
-                        Include(~primes, maxS select PO else PrimeBelow(S,PO));
-                    end if;
-                end for;
+                if assigned S`PrimesAboveRationalPrime and IsDefined(S`PrimesAboveRationalPrime,q) then
+                    primes join:={@ P : P in S`PrimesAboveRationalPrime[q] | all_in(gI,P) @};
+                elif assigned A`MaximalOrder then
+                    O:=MaximalOrder(A);
+                    maxS:=IsIdentical(S,O) or (assigned S`IsMaximal and S`IsMaximal);
+                    for t in places_above_rational_prime(O,q) do
+                        PO:=t[3];
+                        // the generators of I over S suffice: S is in O, the order of PO
+                        if all_in(gI,PO) then
+                            Include(~primes, maxS select PO else PrimeBelow(S,PO));
+                        end if;
+                    end for;
+                else
+                    primes join:={@ P : P in primes_of_order_above(S,q) | all_in(gI,P) @};
+                end if;
             end for;
             primes:=IndexedSetToSequence(primes);
             assert2 forall{P : P in primes | IsIntegral(P)};
@@ -194,13 +371,16 @@ end intrinsic;
 intrinsic PlacesAboveRationalPrime(E::AlgEtQ,p::RngIntElt)->SeqEnum[AlgEtQIdl]
 {Given an étale algebra and a rational prime, returns the primes of maximal order of the algebra containing the rational prime.}
     require IsPrime(p) : "The integer p needs to be a prime number";
-    // stored in the maximal order, see the attribute PrimesAboveRationalPrime
-    return [ t[3] : t in primes_above_rational_prime(MaximalOrder(E),p) ];
+    // stored in the maximal order, see the attribute PlacesAboveRationalPrime
+    return [ t[3] : t in places_above_rational_prime(MaximalOrder(E),p) ];
 end intrinsic;
 
 intrinsic SingularPrimes(R::AlgEtQOrd) -> SeqEnum[AlgEtQIdl]
 {Returns the non-invertible primes of the order.}
     if not assigned R`SingularPrimes then
+        // The conductor is computed with the maximal order, before PrimesAbove: so PrimesAbove
+        // contracts the stored primes of the maximal order, which is faster than the F_p-algebras
+        // when the singular primes of many orders are needed (see PrimesAbove).
         R`SingularPrimes:=PrimesAbove(Conductor(R));
     end if;
     return R`SingularPrimes;
@@ -236,8 +416,8 @@ function factorizationMaximalOrder(I)
             assert #facL gt 0;
             for p in facL do
                 // the prime of O which is p[1] at the i-th component, built once (see
-                // primes_above_rational_prime)
-                Ps:=[ t[3] : t in primes_above_rational_prime(O,Minimum(p[1])) | t[1] eq i and t[2] eq p[1] ];
+                // places_above_rational_prime)
+                Ps:=[ t[3] : t in places_above_rational_prime(O,Minimum(p[1])) | t[1] eq i and t[2] eq p[1] ];
                 assert #Ps eq 1;
                 Append(~fac,<Ps[1],p[2]>);
             end for;
@@ -350,7 +530,7 @@ end intrinsic;
     assert Seqset(P3) eq Seqset(PrimesAbove(3*O));
     assert Seqset(P2) ne Seqset(P3);
     assert PlacesAboveRationalPrime(A,2) eq P2; // the stored value
-    assert Keys(O`PrimesAboveRationalPrime) eq {2,3};
+    assert Keys(O`PlacesAboveRationalPrime) eq {2,3};
     // the primes of O are built once: the same objects in PlacesAboveRationalPrime, PrimesAbove and
     // Factorization, marked prime, with their ramification indices and inertia degrees
     assert forall{ P : P in PrimesAbove(2*O) cat [ f[1] : f in Factorization(6*O) ] |
@@ -426,6 +606,21 @@ end intrinsic;
     assert not IsPrime(Ideal(E,ZBasis(6*OneIdeal(E)))); // the index is not a prime power
     assert not IsPrime(Ideal(E,ZBasis(PrimesAbove(3*OneIdeal(E))[1]^2))); // index p^2, not prime
     assert not IsPrime(Ideal(E,ZBasis(9*OneIdeal(E)))); // 3 is not in 9E
+    printf ".";
+    // Without the maximal order: PrimesAbove from the F_p-algebras S/pS. The same primes (as
+    // lattices) as through the maximal order, and the same objects afterwards, also from
+    // PrimeBelow.
+    for f in [ (x^2+5)*(x^2+7)*(x^2+11), x^6+3*x^5+99*x^2+2997, x^4+16 ] do
+        A:=EtaleAlgebra(f); E:=EquationOrder(A);
+        pp:=PrimesAbove(30*OneIdeal(E));
+        assert not assigned A`MaximalOrder;
+        B:=EtaleAlgebra(f); EB:=EquationOrder(B); _:=MaximalOrder(B);
+        assert { myHash(P) : P in pp } eq { myHash(P) : P in PrimesAbove(30*OneIdeal(EB)) };
+        O:=MaximalOrder(A);
+        pp2:=PrimesAbove(6*OneIdeal(E)); // now the maximal order is known
+        assert forall{ P : P in pp2 | exists{ Q : Q in pp | IsIdentical(P,Q) } };
+        assert forall{ PO : PO in PrimesAbove(30*O) | exists{ Q : Q in pp | IsIdentical(PrimeBelow(E,PO),Q) } };
+    end for;
     printf ".";
     SetAssertions(1);
     printf " all good!";

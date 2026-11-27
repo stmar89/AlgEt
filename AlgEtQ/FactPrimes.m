@@ -648,38 +648,57 @@ function factorizationMaximalOrder(I)
     return fac;
 end function;
 
-/// Given an integral fractional $S$-ideal $I$ coprime with the conductor of $S$ (hence invertible in $S$), returns its factorization into a product of primes of $S$.
+/// Given an integral fractional $S$-ideal $I$ coprime with the conductor of $S$ (hence invertible in $S$), returns its factorization into a product of primes of $S$. If $S$ is not known to be maximal, the maximal order is not computed: the primes come from the $\mathbb{F}_p$-algebras $S/pS$ and the exponents from indices.
 intrinsic Factorization(I::AlgEtQIdl) -> Tup
-{Given an integral fractional S-ideal I coprime with the conductor of S (hence invertible in S), returns its factorization into a product of primes of S.}
+{Given an integral fractional S-ideal I coprime with the conductor of S (hence invertible in S), returns its factorization into a product of primes of S. If S is not known to be maximal, the maximal order is not computed: the primes come from the F_p-algebras S/pS and the exponents from indices.}
     if not assigned I`Factorization then
         S:=Order(I);
+        A:=Algebra(S);
         require IsIntegral(I) and I ne OneIdeal(S): "the argument must be a proper integral ideal";
-        // The maximal order is needed in both cases below (its components, or O itself): computed
-        // first, so that IsMaximal(S) is only a comparison (see IsMaximal).
-        _:=MaximalOrder(Algebra(S));
-        if IsMaximal(S) then
+        if (assigned S`IsMaximal and S`IsMaximal) or (assigned A`MaximalOrder and IsMaximal(S)) then
+            // the factorizations in the components of the algebra
             I`Factorization:=factorizationMaximalOrder(I);
         else
-            fS:=Conductor(S);
-            require IsCoprime(fS,I): "the ideal must be coprime with the conductor of the order of definition";
-            O:=MaximalOrder(Algebra(I));
-            IO:=O !! I;
-            facO:=factorizationMaximalOrder(IO);
-            // I is coprime with the conductor of S. So every prime P of S containing I is below
-            // exactly one prime PO of O containing IO, and the valuations of I at P and of IO at PO
-            // are equal, since S and O are equal locally at P. Hence we only need to intersect each
-            // PO with S.
-            facS:=<>;
-            for pO in facO do
-                P:=PrimeBelow(S,pO[1]);
-                ZBasisLLL(P);
-                P`IsPrime:=true;
-                Append(~facS, <P,pO[2]>);
+            // The primes of S containing I: they are above the rational primes q dividing the
+            // minimal integer of I, and come from the F_p-algebras S/qS (primes_of_order_above),
+            // also when the maximal order is known (faster than contracting the primes of the
+            // maximal order, see PrimesAbove, when the factorizations of a single order are
+            // computed). I is coprime with the conductor if and only if all of them are regular,
+            // i.e. invertible: the primes containing the conductor are the singular ones.
+            if assigned I`PrimesAbove then
+                pp:=I`PrimesAbove;
+            else
+                gI:=Generators(I);
+                pp:=[];
+                for q in PrimeDivisors(MinimalInteger(I)) do
+                    pp cat:=[ P : P in primes_of_order_above(S,q) | all_in(gI,P) ];
+                end for;
+                for P in pp do
+                    ZBasisLLL(P); // as PrimesAbove does for its output
+                end for;
+                I`PrimesAbove:=pp;
+            end if;
+            require forall{ P : P in pp | IsInvertible(P) } : "the ideal must be coprime with the conductor of the order of definition";
+            // The exponents. At a regular prime P above q, the localization S_P is a discrete
+            // valuation ring and I_P = P^v_P, so [S:I] is the product of the [S:P]^v_P, with
+            // [S:P] = q^f_P. If P is the only prime above q containing I, then
+            // v_P = v_q([S:I])/f_P. Otherwise v_P comes from the index of I+P^k, with k >= v_P
+            // (see Valuation).
+            N:=Integers()!Index(S,I);
+            fac:=<>;
+            for q in Sort(Setseq({ MinimalInteger(P) : P in pp })) do
+                ppq:=[ P : P in pp | MinimalInteger(P) eq q ];
+                vq:=Valuation(N,q);
+                fs:=[ Ilog(q,Integers()!Index(S,P)) : P in ppq ];
+                vs:=#ppq eq 1 select [ vq div fs[1] ] else [ Valuation(I,P) : P in ppq ];
+                assert &+[ fs[i]*vs[i] : i in [1..#ppq] ] eq vq; // [S:I] at q
+                for i in [1..#ppq] do
+                    Append(~fac,<ppq[i],vs[i]>);
+                end for;
             end for;
-            assert2 #{ p[1] : p in facS } eq #facS; // the primes of S are distinct
             // no '^': see factorizationMaximalOrder
-            assert2 I eq &*[ &*[ p[1] : i in [1..p[2]] ] : p in facS ];
-            I`Factorization:=facS;
+            assert2 I eq &*[ &*[ p[1] : i in [1..p[2]] ] : p in fac ];
+            I`Factorization:=fac;
         end if;
         // the factorization decides whether I is prime (see also IsPrime)
         if not assigned I`IsPrime then
@@ -965,6 +984,32 @@ end intrinsic;
         Q:=fresh(P); Q`IsPrime:=true; // marked prime: read from the index
         assert MinimalInteger(Q) eq MinimalInteger(fresh(P));
         Q:=fresh(P); assert IsPrime(Q) and assigned Q`MinimalInteger and Q`MinimalInteger eq P`MinimalInteger;
+    end for;
+    printf ".";
+    // Factorization of the ideals of a non-maximal order without the maximal order: the same primes
+    // and exponents as from the factorization in the maximal order (contracted with PrimeBelow),
+    // also with several primes above the same rational prime; an ideal not coprime with the
+    // conductor is refused
+    for f in [ (x^2+5)*(x^2+7), x^6+3*x^5+99*x^2+2997, (x^4+16)*(x^2+3) ] do
+        A:=EtaleAlgebra(f); E:=EquationOrder(A);
+        reg:=[ P : P in &cat[ PrimesAbove(q*OneIdeal(E)) : q in [2,3,5,7] ] | IsInvertible(P) ];
+        ids:=[ reg[i]^(1+(i mod 3))*reg[j]^(1+(j mod 2)) : i,j in [1..#reg] | i lt j ];
+        facs:=[ Factorization(I) : I in ids ];
+        assert not assigned A`MaximalOrder;
+        O:=MaximalOrder(A);
+        for k in [1..#ids] do
+            facO:=Factorization(O!!ids[k]);
+            assert { <myHash(t[1]),t[2]> : t in facs[k] } eq { <myHash(PrimeBelow(E,t[1])),t[2]> : t in facO };
+            // with the maximal order known: the same, on a fresh copy
+            J:=Ideal(E,ZBasis(ids[k]));
+            assert { <myHash(t[1]),t[2]> : t in Factorization(J) } eq { <myHash(t[1]),t[2]> : t in facs[k] };
+        end for;
+        sing:=SingularPrimes(E);
+        if #sing gt 0 then
+            P:=Ideal(E,ZBasis(sing[1]));
+            try _:=Factorization(P); ok:=false; catch e ok:=true; end try;
+            assert ok;
+        end if;
     end for;
     printf ".";
     SetAssertions(1);

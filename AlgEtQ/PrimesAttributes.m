@@ -18,31 +18,64 @@ declare verbose Uniformizers, 3;
 
 // we continue the doc of FactPrimes.m
 
-///## Primes of the maximal order
+///## Valuations, and primes of the maximal order
 
-/// Given an element $x$ and a prime $P$ of the maximal order, returns the valuation of $x$ at $P$.
+valuation_at_invertible_prime:=function(J,P)
+// Given an integral ideal J and an invertible prime P of the same order S, returns the valuation of
+// J at P. The localization S_P is a discrete valuation ring, so J_P = P^v S_P. For k >= v, J+P^k is
+// P^v at P and S at every other prime Q (P^k is not contained in Q), so [S : J+P^k] = p^(f*v),
+// where [S:P] = p^f. An upper bound for v: [S:J] >= [S_P:J_P] = p^(f*v).
+    if not J subset P then
+        return 0;
+    end if;
+    S:=Order(P);
+    p:=MinimalInteger(P); // P meet Z = pZ
+    f:=Ilog(p,Integers()!Index(S,P));
+    k:=Valuation(Integers()!Index(S,J),p) div f;
+    v:=Valuation(Integers()!Index(S,J+P^k),p) div f;
+    assert2 (J+P^(k+1)) eq (J+P^k); // v < k+1: the bound holds
+    return v;
+end function;
+
+/// Given an element $x$ and a prime $P$ of an order $S$, returns the valuation of $x$ at $P$. Either $S$ is the maximal order, or $P$ is invertible and $x$ is not a zero-divisor; in the second case the maximal order is not computed.
 intrinsic Valuation(x::AlgEtQElt,P::AlgEtQIdl) -> RngIntElt
-{Given an element x and a prime P of the maximal order, returns the valuation of x at P.}
+{Given an element x and a prime P of an order S, returns the valuation of x at P. Either S is the maximal order, or P is invertible and x is not a zero-divisor; in the second case the maximal order is not computed.}
     OO:=Order(P);
-    require IsMaximal(OO) and IsPrime(P): "The input needs to be a prime of the maximal order.";
-    _,comp:=IsProductOfIdeals(P);
-    ind:=[ i : i in [1..#comp] | not One(NumberField(Order(comp[i]))) in comp[i] ];
-    assert #ind eq 1;
-    ind:=ind[1];
-    return Valuation(Components(x)[ind],comp[ind]);
+    require IsPrime(P): "P must be a prime";
+    if (assigned OO`IsMaximal and OO`IsMaximal) or (assigned Algebra(OO)`MaximalOrder and IsMaximal(OO)) then
+        _,comp:=IsProductOfIdeals(P);
+        ind:=[ i : i in [1..#comp] | not One(NumberField(Order(comp[i]))) in comp[i] ];
+        assert #ind eq 1;
+        ind:=ind[1];
+        return Valuation(Components(x)[ind],comp[ind]);
+    end if;
+    require IsInvertible(P): "P must be a prime of the maximal order, or an invertible prime";
+    require not IsZeroDivisor(x): "x must not be a zero-divisor, unless P is a prime of the maximal order";
+    return Valuation(x*OneIdeal(OO),P);
 end intrinsic;
 
-/// Given a fractional ideal $I$ and a prime $P$, both of the maximal order, returns the valuation of $I$ at $P$.
+/// Given a fractional ideal $I$ and a prime $P$ of the same order $S$, returns the valuation of $I$ at $P$. Either $S$ is the maximal order, or $P$ is invertible, so that the localization of $S$ at $P$ is a discrete valuation ring; in the second case the maximal order is not computed.
 intrinsic Valuation(I::AlgEtQIdl,P::AlgEtQIdl) -> RngIntElt
-{Given a fractional ideal I and a prime P, both of the maximal order, returns the valuation of I at P.}
+{Given a fractional ideal I and a prime P of the same order S, returns the valuation of I at P. Either S is the maximal order, or P is invertible, so that the localization of S at P is a discrete valuation ring; in the second case the maximal order is not computed.}
     OO:=Order(P);
-    require IsMaximal(OO) and IsPrime(P): "The input needs to be a prime of the maximal order.";
-    _,compI:=IsProductOfIdeals(I);
-    _,compP:=IsProductOfIdeals(P);
-    ind:=[ i : i in [1..#compP] | not One(NumberField(Order(compP[i]))) in compP[i] ];
-    assert #ind eq 1;
-    ind:=ind[1];
-    return Valuation(compI[ind],compP[ind]);
+    require Order(I) eq OO and IsPrime(P): "P must be a prime of the order of I";
+    if (assigned OO`IsMaximal and OO`IsMaximal) or (assigned Algebra(OO)`MaximalOrder and IsMaximal(OO)) then
+        _,compI:=IsProductOfIdeals(I);
+        _,compP:=IsProductOfIdeals(P);
+        ind:=[ i : i in [1..#compP] | not One(NumberField(Order(compP[i]))) in compP[i] ];
+        assert #ind eq 1;
+        ind:=ind[1];
+        return Valuation(compI[ind],compP[ind]);
+    end if;
+    require IsInvertible(P): "P must be a prime of the maximal order, or an invertible prime";
+    // d*I is integral: v_P(I) = v_P(d*I) - v_P(d), with v_P(d) = v_p(d)*v_P(p)
+    J,d:=MakeIntegral(I);
+    v:=valuation_at_invertible_prime(J,P);
+    p:=MinimalInteger(P);
+    if d mod p eq 0 then
+        v -:= Valuation(d,p)*valuation_at_invertible_prime(p*OneIdeal(OO),P);
+    end if;
+    return v;
 end intrinsic;
 
 /// Given a prime $P$ of the maximal order $\mathcal{O}$ above the rational prime $p$, it returns the inertia degree of $P$, that is, the index of the finite field extension $\mathbb{F}_p \to \mathcal{O}/P$.
@@ -175,6 +208,31 @@ end intrinsic;
     O1:=MaximalOrder(EtaleAlgebra(x^2+1)); O2:=MaximalOrder(EtaleAlgebra(x^2+1));
     failed:=false; try _:=Uniformizers([PrimesAbove(2*OneIdeal(O1))[1],PrimesAbove(5*OneIdeal(O2))[1]]); catch e failed:=true; end try; assert failed;
     failed:=false; try _:=Uniformizers([Universe([PrimesAbove(2*OneIdeal(O1))[1]])|]); catch e failed:=true; end try; assert failed;
+    printf ".";
+    // Valuation at an invertible prime P of a non-maximal order, without the maximal order: the
+    // same as the valuation at the prime P*O of the maximal order, for fractional ideals (also not
+    // coprime with the conductor) and elements; a singular prime is refused
+    _<x>:=PolynomialRing(Integers());
+    for f in [ (x^2+5)*(x^2+7), x^6+3*x^5+99*x^2+2997 ] do
+        A:=EtaleAlgebra(f); E:=EquationOrder(A); a:=PrimitiveElement(A);
+        pp:=&cat[ PrimesAbove(q*OneIdeal(E)) : q in [2,3,5,7] ];
+        reg:=[ P : P in pp | IsInvertible(P) ];
+        sing:=[ P : P in pp | not IsInvertible(P) ];
+        ids:=[ (1/6)*reg[1]^2*reg[#reg], reg[2]^3*(2*a+1)*OneIdeal(E), (1/35)*OneIdeal(E) ] cat [ P*Q : P in sing, Q in reg[1..2] ];
+        elts:=[ a, 2*a+1, (a^2-3)/10, A!12 ];
+        vals:=[ [ Valuation(I,P) : P in reg ] : I in ids ];
+        evals:=[ [ Valuation(y,P) : P in reg ] : y in elts ];
+        assert not assigned A`MaximalOrder;
+        O:=MaximalOrder(A);
+        regO:=[ O!!P : P in reg ]; // the primes of O above the regular primes
+        assert forall{ P : P in regO | IsPrime(P) };
+        assert vals eq [ [ Valuation(O!!I,P) : P in regO ] : I in ids ];
+        assert evals eq [ [ Valuation(y,P) : P in regO ] : y in elts ];
+        if #sing gt 0 then
+            try _:=Valuation(ids[1],sing[1]); ok:=false; catch e ok:=true; end try;
+            assert ok;
+        end if;
+    end for;
     printf ".";
     SetAssertions(1);
     printf " all good!";

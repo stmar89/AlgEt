@@ -51,9 +51,10 @@ intrinsic InertiaDegree(P::AlgEtQIdl) -> RngIntElt
     if not assigned P`InertiaDegree then
         OO:=Order(P);
         require IsMaximal(OO) and IsPrime(P): "The input needs to be a prime of the maximal order.";
-        q:=Index(OO,P);
-        t,p,f:=IsPrimePower(q);
-        assert t;
+        q:=Integers()!Index(OO,P);
+        p:=MinimalInteger(P); // P meet Z = pZ
+        f:=Ilog(p,q);
+        assert p^f eq q;
         P`InertiaDegree:= f;
     end if;
     return P`InertiaDegree;
@@ -65,9 +66,7 @@ intrinsic RamificationIndex(P::AlgEtQIdl) -> RngIntElt
     if not assigned P`RamificationIndex then
         OO:=Order(P);
         require IsMaximal(OO) and IsPrime(P): "The input needs to be a prime of the maximal order.";
-        q:=Index(OO,P);
-        t,p:=IsPrimePower(q);
-        assert t;
+        p:=MinimalInteger(P); // P meet Z = pZ
         P`RamificationIndex:=Valuation(Algebra(P)!p,P);
     end if;
     return P`RamificationIndex;

@@ -261,7 +261,7 @@ local_orders:=function(S, pp)
     SPs:=[];
     ps:=[];
     for P in pp do
-        _,p:=IsPrimePower(Index(S,P));
+        p:=MinimalInteger(P); // P meet Z = pZ
         Append(~ps,p);
         k:=Valuation(Index(O,S),p);
         // S+P^kO is closed under multiplication

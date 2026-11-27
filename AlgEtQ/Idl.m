@@ -1114,9 +1114,14 @@ end intrinsic;
 intrinsic MinimalInteger(I::AlgEtQIdl) -> RngIntElt
 {Returns the smallest integer contained in the given fractional ideal, which must be integral.}
     if not assigned I`MinimalInteger then
-        require IsIntegral(I): "the ideal must be integral";
-        coord:=AbsoluteCoordinates([One(Algebra(I))],I)[1];
-        min:=LCM([ Denominator(c) : c in Eltseq(coord)]);
+        if assigned I`IsPrime and I`IsPrime then
+            // I meet Z = pZ, where [S:I] = p^f: no coordinates
+            _,min:=IsPrimePower(Integers()!Index(Order(I),I));
+        else
+            require IsIntegral(I): "the ideal must be integral";
+            coord:=AbsoluteCoordinates([One(Algebra(I))],I)[1];
+            min:=LCM([ Denominator(c) : c in Eltseq(coord)]);
+        end if;
         assert2 min in I;
         I`MinimalInteger:=min;
     end if;

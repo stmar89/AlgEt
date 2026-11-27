@@ -245,7 +245,8 @@ wkicm_bar_CM_type2:=function(S,pp)
         I:=MakeIntegral(St);
         pows:=[];
         for P in pp do
-            _,p,e:=IsPrimePower(Integers()!Index(S,P)); // e=Valuation(p,Index(S,P));
+            p:=MinimalInteger(P); // P meet Z = pZ
+            e:=Ilog(p,Integers()!Index(S,P)); // [S:P] = p^e
             // By Proposition 4.2 of Klueners and Pauli "Computing residue class rings ...", with
             // this m we have P^m \subseteq I locally at P. The exponent uses the valuation at p of
             // the global index [S:I], which is at least the local one at P: m may be larger than

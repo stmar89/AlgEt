@@ -353,7 +353,7 @@ intrinsic Localization(W::AlgEtQWECM,P::AlgEtQIdl)->AlgEtQWECM
     R:=Order(W);
     require Order(P) eq R and IsPrime(P) : "P needs to be a maximal ideal of the underlying order of W";
     O:=MaximalOrder(Algebra(R));
-    _,p:=IsPrimePower(Index(R,P));
+    p:=MinimalInteger(P); // P meet Z = pZ
     k:=Valuation(Index(O,R),p);
     RP:=order_from_sum([* R,O!!P^k *]); // R+P^kO is closed under multiplication
     return WeakEquivalenceClassMonoidAbstract(RP);

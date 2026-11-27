@@ -91,7 +91,8 @@ intrinsic ResidueField(P::AlgEtQIdl) -> FldFin, Map
         S := Order(P);
         A := Algebra(S);
         Q,q := ResidueRing(S,P); // q:A->Q, where Q=S/P is an abelian group isomorphic to GF(p)^d
-        _,p,d := IsPrimePower(#Q);
+        p := MinimalInteger(P); // P meet Z = pZ
+        d := Ilog(p,#Q); // #Q = [S:P] = p^d
         Fp := GF(p);
         // We look for a in S whose image generates S/P over GF(p), that is, such that the images of
         // 1,a,...,a^(d-1) are linearly independent over GF(p). Most elements of S/P have this

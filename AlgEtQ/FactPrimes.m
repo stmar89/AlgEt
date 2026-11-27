@@ -128,6 +128,9 @@ intrinsic IsPrime(I::AlgEtQIdl) -> BoolElt
         end if;
         assert2 bool eq (#PrimesAbove(I) eq 1 and I eq PrimesAbove(I)[1]);
         I`IsPrime:=bool;
+        if bool and not assigned I`MinimalInteger then
+            I`MinimalInteger:=p; // I meet Z = pZ
+        end if;
         // A prime which is invertible (e.g. a prime of the maximal order) is coprime to the
         // conductor: its factorization is itself, and so are the primes above it.
         if bool and ((assigned S`IsMaximal and S`IsMaximal) or (assigned I`IsInvertible and I`IsInvertible)) then
@@ -272,6 +275,7 @@ primes_above_p_fp:=function(S,p)
         Hc:=hnf(L); // the prime in the coordinates of zb
         P:=ideal_from_hnf(S,hnf(Hc*MS),dS);
         P`IsPrime:=true;
+        P`MinimalInteger:=p; // P meet Z = pZ
         // the generators, see 7.
         eB:=lift(e)*Frobt; // the idempotent of B lifting e
         assert mult(eB,eB) eq eB;
@@ -337,6 +341,7 @@ places_above_rational_prime:=function(O, q)
                 end if;
                 ZBasisLLL(P);
                 P`IsPrime:=true;
+                P`MinimalInteger:=q; // P meet Z = qZ
                 P`RamificationIndex:=pe[2]; // the exponent of the prime in q*O_i
                 P`InertiaDegree:=Ilog(q,Integers()!Index(O,P)); // [O:P] = q^f
                 assert2 q^P`InertiaDegree eq Index(O,P);
@@ -432,7 +437,7 @@ intrinsic PrimeBelow(S::AlgEtQOrd, P::AlgEtQIdl) -> AlgEtQIdl
     if not assigned S`PrimesBelow then
         S`PrimesBelow:=AssociativeArray();
     end if;
-    _,p:=IsPrimePower(Integers()!Index(T,P));
+    p:=MinimalInteger(P); // P meet Z = pZ (stored for the primes built by the package)
     if assigned S`PrimesAboveRationalPrime and IsDefined(S`PrimesAboveRationalPrime,p) then
         // The primes of S above p are known (primes_of_order_above): S meet P is the one contained
         // in P, since a prime Q of S contained in P is contained in S meet P, hence equal to it (Q
@@ -444,6 +449,7 @@ intrinsic PrimeBelow(S::AlgEtQOrd, P::AlgEtQIdl) -> AlgEtQIdl
     else
         Q:=OneIdeal(S) meet S!!P;
         Q`IsPrime:=true;
+        Q`MinimalInteger:=p; // Q meet Z = P meet Z = pZ
         // Distinct primes, also of different orders, can be above the same prime of S: if it is
         // already stored, we return it, so that each prime of S is one ideal, whose attributes
         // (residue field, ...) are computed once.
@@ -943,6 +949,22 @@ end intrinsic;
         pp:=PrimesAbove(c[2]*OneIdeal(E));
         assert #pp eq 1 and pp[1] eq c[2]*OneIdeal(E) and IsPrime(pp[1]) and IsInvertible(pp[1]);
         assert not assigned A`MaximalOrder;
+    end for;
+    printf ".";
+    // MinimalInteger of the primes: stored when they are built (from S/pS, from the components of
+    // the maximal order, by PrimeBelow, by IsPrime), and read from the index for an ideal known to
+    // be prime; the same as from the coordinates of 1
+    A:=EtaleAlgebra((x^2+5)*(x^3-2)); E:=EquationOrder(A);
+    fresh:=func< P | Ideal(Order(P),ZBasis(P)) >;
+    pp:=&cat[ PrimesAbove(p*OneIdeal(E)) : p in [2,3,5] ]; // from E/pE
+    O:=MaximalOrder(A);
+    ppO:=&cat[ PrimesAbove(p*O) : p in [2,3,5] ]; // from the components
+    ppB:=[ PrimeBelow(E,P) : P in ppO ];
+    for P in pp cat ppO cat ppB do
+        assert assigned P`MinimalInteger and P`MinimalInteger eq MinimalInteger(fresh(P));
+        Q:=fresh(P); Q`IsPrime:=true; // marked prime: read from the index
+        assert MinimalInteger(Q) eq MinimalInteger(fresh(P));
+        Q:=fresh(P); assert IsPrime(Q) and assigned Q`MinimalInteger and Q`MinimalInteger eq P`MinimalInteger;
     end for;
     printf ".";
     SetAssertions(1);
